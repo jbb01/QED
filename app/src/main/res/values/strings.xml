@@ -164,6 +164,14 @@
         <item>@string/log_dateinterval</item>
     </string-array>
 
+    <!-- Gallery Fragment + Activity -->
+    <string name="title_fragment_gallery">Galerie</string>
+    <string name="gallery_server_list">https://qedgallery.qed-verein.de/album_list.php</string>
+    <string name="gallery_server_album">https://qedgallery.qed-verein.de/album_view.php?page=0&amp;albumid=</string>
+    <string name="gallery_server_login">https://qedgallery.qed-verein.de/account.php</string>
+    <string name="gallery_login_failed">Galerie Login fehlgeschlagen</string>
+    <string name="gallery_server_thumbnail">https://qedgallery.qed-verein.de/image.php?type=thumbnail&amp;imageid=</string>
+
     <!-- Sonstiges -->
 
 </resources>

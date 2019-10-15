@@ -114,9 +114,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 startActivity(intent);
                 finish();
                 return true; }
-            case R.id.nav_gallery:
-                Toast.makeText(this, R.string.coming_soon, Toast.LENGTH_SHORT).show();
-                return false;
         }
 
         navView.setCheckedItem(menuItem);
@@ -167,6 +164,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     transaction.replace(R.id.fragment, fragment);
                 }
                 toolbar.setTitle(getString(R.string.title_fragment_events_database));
+                break;
+            case R.id.nav_gallery:
+                if (!onlyTitle) {
+                    fragment = new GalleryFragment();
+                    transaction.replace(R.id.fragment, fragment);
+                }
+                toolbar.setTitle(getString(R.string.title_fragment_gallery));
                 break;
         }
         if (!onlyTitle) transaction.commit();

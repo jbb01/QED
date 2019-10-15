@@ -87,7 +87,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src/test/shaders" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/build" />
     </content>
-    <orderEntry type="jdk" jdkName="Android API 28 Platform" jdkType="Android SDK" />
+    <orderEntry type="jdk" jdkName="Android API 29 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" scope="TEST" name="Gradle: junit:junit:4.12@jar" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: net.sf.kxml:kxml2:2.3.0@jar" level="project" />
@@ -101,8 +101,7 @@
     <orderEntry type="library" scope="TEST" name="Gradle: com.android.support.test:runner:1.0.2@aar" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.android.support.test:monitor:1.0.2@aar" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.android.support.test.espresso:espresso-idling-resource:3.0.2@aar" level="project" />
-    <orderEntry type="library" name="Gradle: __local_aars__:C.\Users\Jonah\Desktop\QED\QED\app\libs\json-simple-1.1.jar:unspecified@jar" level="project" />
-    <orderEntry type="library" name="Gradle: com.googlecode.json-simple:json-simple:1.1@jar" level="project" />
+    <orderEntry type="library" name="Gradle: __local_aars__:C.\Users\Jonah\Documents\GitHub\QED\app\libs\json-simple-1.1.jar:unspecified@jar" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.commons:commons-text:1.4@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.squareup.okhttp3:okhttp:3.11.0@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.x5dev:chunk-templates:3.0.1@jar" level="project" />
@@ -150,5 +149,6 @@
     <orderEntry type="library" name="Gradle: android.arch.lifecycle:livedata:1.1.1@aar" level="project" />
     <orderEntry type="library" name="Gradle: android.arch.lifecycle:livedata-core:1.1.1@aar" level="project" />
     <orderEntry type="library" name="Gradle: android.arch.core:runtime:1.1.1@aar" level="project" />
+    <orderEntry type="library" name="Gradle: android-android-29" level="project" />
   </component>
 </module>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/gallery_background"
+    tools:context=".activities.GalleryFragment">
+
+    <ProgressBar
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:paddingTop="15dp"
+        android:gravity="center_horizontal"
+        android:id="@+id/search_progress"
+        style="?android:attr/progressBarStyleLarge"
+        android:visibility="visible" />
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:id="@+id/gallery_list_container"
+        android:background="@color/gallery_background"
+        android:divider="@drawable/person_divider"
+        android:dividerHeight="@dimen/person_divider"
+        android:scrollbarStyle="outsideInset"
+        android:fastScrollAlwaysVisible="true"
+        android:fastScrollEnabled="true"
+        android:visibility="gone"
+        tools:listitem="@layout/list_item_gallery"
+        tools:ignore="RtlSymmetry" />
+</RelativeLayout>
