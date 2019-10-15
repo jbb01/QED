@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/image"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="@dimen/event_padding_horizontal"
+    android:paddingEnd="@dimen/event_padding_horizontal"
+    android:paddingTop="@dimen/event_padding_vertical"
+    android:paddingBottom="@dimen/event_padding_vertical"
+    android:clipToPadding="false"
+    android:layout_gravity="center"
+    android:descendantFocusability="blocksDescendants">
+
+    <ImageView
+        android:id="@+id/thumbnail"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintDimensionRatio="w,1:1"
+        android:padding="2dp"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        tools:src="@drawable/ic_gallery_icon"
+        tools:tint="@android:color/holo_green_dark"/>
+
+    <ProgressBar
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintDimensionRatio="w,1:1"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_gravity="center_horizontal"
+        android:paddingTop="15dp"
+        android:gravity="center_horizontal"
+        android:id="@+id/loading"
+        style="?android:attr/progressBarStyleLarge"
+        android:visibility="visible" />
+
+</android.support.constraint.ConstraintLayout>

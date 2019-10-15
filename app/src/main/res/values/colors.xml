@@ -95,4 +95,9 @@
     <color name="event_big_name">@android:color/black</color>
     <color name="event_icons">#868686</color>
 
+    <!-- Gallery -->
+    <color name="gallery_list_text">@android:color/black</color>
+    <color name="gallery_background">@android:color/white</color>
+    <color name="gallery_list_divider">#f0f0f0</color>
+
 </resources>
