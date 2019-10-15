@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:ordering="sequentially">
+    <objectAnimator
+        android:duration="@integer/checkbox_change_1"
+        android:propertyName="pathData"
+        android:valueFrom="M -7.5 -7.5 h 15 v 15 h -15 v -15 L -7.5 -7.5 v 15 h 15 v -15 h -15"
+        android:valueTo="M -7.5 -7.5 h 15 v 15 h -15 v -15 L 0 0 v 0 h 0 v 0 h 0"
+        android:valueType="pathType"
+        android:interpolator="@android:interpolator/linear"/>
+    <objectAnimator
+        android:duration="@integer/checkbox_change_2"
+        android:propertyName="pathData"
+        android:valueFrom="M -7.5 -7.5 h 15 v 15 h -15 v -15 L 0 0 v 0 h 0 v 0 h 0"
+        android:valueTo="M -7.5 -7.5 h 15 v 15 h -15 v -15 L -7.5 -7.5 v 15 h 15 v -15 h -15"
+        android:valueType="pathType"
+        android:interpolator="@android:interpolator/linear"/>
+</set>

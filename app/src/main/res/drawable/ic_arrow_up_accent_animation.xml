@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-vector
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/ic_arrow_down_accent">
+    <target
+        android:name="arrow"
+        android:animation="@anim/ic_arrow_rotate_from0_to180"/>
+</animated-vector>

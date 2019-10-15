@@ -1,0 +1,60 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_chat_title"
+            android:title="@string/drawer_chat_heading">
+            <menu>
+                <group android:checkableBehavior="single">
+                    <item
+                        android:id="@+id/nav_chat"
+                        android:icon="@drawable/ic_drawer_chat"
+                        android:title="@string/drawer_chat" />
+                    <item
+                        android:id="@+id/nav_chat_log"
+                        android:icon="@drawable/ic_drawer_chat_log"
+                        android:title="@string/drawer_chat_log" />
+                    <item
+                        android:id="@+id/nav_chat_db"
+                        android:icon="@drawable/ic_drawer_chat_db"
+                        android:title="@string/drawer_chat_db" />
+                </group>
+            </menu>
+        </item>
+        <item
+            android:id="@+id/nav_database_title"
+            android:title="@string/drawer_database_heading">
+            <menu>
+                <group android:checkableBehavior="single">
+                    <item
+                        android:id="@+id/nav_database_persons"
+                        android:icon="@drawable/ic_drawer_persons"
+                        android:title="@string/drawer_persons" />
+                    <item
+                        android:id="@+id/nav_database_events"
+                        android:icon="@drawable/ic_drawer_events"
+                        android:title="@string/drawer_events" />
+                </group>
+            </menu>
+        </item>
+        <item
+            android:id="@+id/nav_gallery_title"
+            android:title="@string/drawer_gallery_heading">
+            <menu>
+                <item
+                    android:id="@+id/nav_gallery"
+                    android:icon="@drawable/ic_drawer_gallery"
+                    android:title="@string/drawer_gallery"/>
+            </menu>
+        </item>
+        <item
+            android:id="@+id/nav_settings"
+            android:icon="@drawable/ic_drawer_settings"
+            android:checkable="false"
+            android:title="@string/drawer_settings"/>
+        <item
+            android:id="@+id/nav_logout"
+            android:icon="@drawable/ic_drawer_logout"
+            android:checkable="false"
+            android:title="@string/drawer_logout"/>
+    </group>
+</menu>

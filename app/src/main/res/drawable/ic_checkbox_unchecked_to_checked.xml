@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2015 The Android Open Source Project
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+          http://www.apache.org/licenses/LICENSE-2.0
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+android:name="ic_checkbox_checked"
+android:width="32dp"
+android:viewportWidth="48"
+android:height="32dp"
+android:viewportHeight="48">
+<group
+    android:name="icon"
+    android:translateX="24"
+    android:translateY="24"
+    android:scaleX="0.2"
+    android:scaleY="0.2">
+    <group
+        android:name="icon_old_group"
+        android:scaleX="7.5"
+        android:scaleY="7.5">
+        <path
+            android:name="icon_old"
+            android:fillColor="@color/colorAccent"
+            android:pathData="M -7.5 -7.5 h15 v15 h -15 l 2.5 -2.5 l 0.75 0.75 l 4.25 -4.25 l 4.25 4.25 l 1.5 -1.5 l -4.25 -4.25 l 4.25 -4.25 l -1.5 -1.5 l -4.25 4.25 l -4.25 -4.25 l -1.5 1.5 l 4.25 4.25 l -4.25 4.25 l 0.75 0.75 l -2 2"/>
+    </group>
+    <group
+        android:name="icon_new_group"
+        android:scaleX="7.5"
+        android:scaleY="7.5">
+        <path
+            android:name="icon_new"
+            android:pathData="M 7.0,-9.0 c 0.0,0.0 -14.0,0.0 -14.0,0.0 c -1.1044921875,0.0 -2.0,0.8955078125 -2.0,2.0 c 0.0,0.0 0.0,14.0 0.0,14.0 c 0.0,1.1044921875 0.8955078125,2.0 2.0,2.0 c 0.0,0.0 14.0,0.0 14.0,0.0 c 1.1044921875,0.0 2.0,-0.8955078125 2.0,-2.0 c 0.0,0.0 0.0,-14.0 0.0,-14.0 c 0.0,-1.1044921875 -0.8955078125,-2.0 -2.0,-2.0 c 0.0,0.0 0.0,0.0 0.0,0.0 Z M -2.0,5.00001525879 c 0.0,0.0 -5.0,-5.00001525879 -5.0,-5.00001525879 c 0.0,0.0 1.41409301758,-1.41409301758 1.41409301758,-1.41409301758 c 0.0,0.0 3.58590698242,3.58601379395 3.58590698242,3.58601379395 c 0.0,0.0 7.58590698242,-7.58601379395 7.58590698242,-7.58601379395 c 0.0,0.0 1.41409301758,1.41409301758 1.41409301758,1.41409301758 c 0.0,0.0 -9.0,9.00001525879 -9.0,9.00001525879 Z"
+            android:fillColor="@color/colorAccent" />
+    </group>
+    <group
+        android:name="icon_fill_group"
+        android:scaleX="7.5"
+        android:scaleY="7.5">
+        <path
+            android:name="icon_fill"
+            android:pathData="M -7.5 -7.5 h 15 v 15 h -15 v -15 L -7.5 -7.5 v 15 h 15 v -15 h -15"
+            android:fillColor="@color/colorAccent" />
+    </group>
+    <group
+        android:name="box"
+        android:scaleX="7.5"
+        android:scaleY="7.5">
+        <path
+            android:pathData="M -7.0,-7.0 l 14.0,0.0 c 0.0,0.0 0.0,0.0 0.0,0.0 l 0.0,14.0 c 0.0,0.0 0.0,0.0 0.0,0.0 l -14.0,0.0 c 0.0,0.0 0.0,0.0 0.0,0.0 l 0.0,-14.0 c 0.0,0.0 0.0,0.0 0.0,0.0 Z M 7.0,-9.0 c 0.0,0.0 -14.0,0.0 -14.0,0.0 c -1.1044921875,0.0 -2.0,0.8955078125 -2.0,2.0 c 0.0,0.0 0.0,14.0 0.0,14.0 c 0.0,1.1044921875 0.8955078125,2.0 2.0,2.0 c 0.0,0.0 14.0,0.0 14.0,0.0 c 1.1044921875,0.0 2.0,-0.8955078125 2.0,-2.0 c 0.0,0.0 0.0,-14.0 0.0,-14.0 c 0.0,-1.1044921875 -0.8955078125,-2.0 -2.0,-2.0 c 0.0,0.0 0.0,0.0 0.0,0.0 Z"
+            android:fillColor="@color/colorAccent" />
+    </group>
+</group>
+</vector>

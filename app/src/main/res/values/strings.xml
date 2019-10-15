@@ -1,0 +1,169 @@
+<resources>
+    <!-- Chat -->
+    <string name="chat_server_ping">chat.qed-verein.de</string>
+    <string name="chat_server_login">https://chat.qed-verein.de/rubychat/account</string>
+    <string name="chat_server_history">https://chat.qed-verein.de/rubychat/history</string>
+    <string name="chat_websocket">wss://chat.qed-verein.de/websocket</string>
+    <string name="chat_version">20171030131648</string>
+    <string name="database_server_login">https://www.qeddb.qed-verein.de/index.php</string>
+    <string name="database_server_person">https://www.qeddb.qed-verein.de/person.php?session_id2=%s&amp;person=%s&amp;tab=%s</string>
+    <string name="database_server_persons">https://www.qeddb.qed-verein.de/personen.php?session_id2=%s&amp;tables_weitere_daten=1</string>
+    <string name="database_server_events">https://www.qeddb.qed-verein.de/veranstaltungen.php?session_id2=%s</string>
+    <string name="database_server_event">https://www.qeddb.qed-verein.de/veranstaltung.php?session_id2=%s&amp;veranstaltung=%s&amp;tab=%s</string>
+
+
+    <!-- General -->
+    <string name="app_name">QED</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="double_back_to_exit_toast">Erneut drücken zum Verlassen</string>
+    <string name="cant_connect">Keine Verbindung zum Internet möglich</string>
+    <string name="database_login_failed">Datenbank Login fehlgeschlagen</string>
+    <string name="chat_login_failed">Chat Login fehlgeschlagen</string>
+    <string name="notQED">Diese App steht in keiner offiziellen Verbindung zum Quod Erat Demonstrandum e.V.</string>
+    <string name="content_description_icon">Icon</string>
+    <string name="content_description_divider">Trennlinie</string>
+    <string name="background">background</string>
+    <string name="coming_soon">Coming soon</string>
+
+    <!-- Chat Fragment -->
+    <string name="title_fragment_chat">Chat</string>
+    <string name="chat_refresh">Aktualisieren</string>
+    <string name="chat_button_send">Senden</string>
+    <string name="chat_message_hint">Nachricht schreiben</string>
+    <string name="chat_scroll_down_button_content_description">Nach unten scrollen</string>
+
+    <!-- Login Activity -->
+    <string name="title_activity_login">Anmelden</string>
+    <string name="login_prompt_username">Benutzername</string>
+    <string name="login_prompt_password">Passwort</string>
+    <string name="login_action_sign_in">Anmelden</string>
+    <string name="login_action_sign_in_short">Anmelden</string>
+    <string name="login_error_incorrect_data">Logindaten sind ungültig</string>
+
+    <!-- Database -->
+    <string name="database_hits">Treffer</string>
+    <string name="database_search_button">Suchen</string>
+    <string name="database_save_done">Gespeichert</string>
+    <!-- Chat Database Fragment -->
+    <string name="title_fragment_chat_database">Datenbank</string>
+    <string name="chat_database_channel_checkbox">Channel</string>
+    <string name="chat_database_channel_hint">Channel</string>
+    <string name="chat_database_message_checkbox">Nachricht</string>
+    <string name="chat_database_message_hint">Nachricht</string>
+    <string name="chat_database_name_checkbox">Name</string>
+    <string name="chat_database_name_hint">Name</string>
+    <string name="chat_database_dateFrom_checkbox">von</string>
+    <string name="chat_database_dateFrom_hint">yyyy-mm-dd hh:mm:ss</string>
+    <string name="chat_database_dateTo_checkbox">bis</string>
+    <string name="chat_database_dateTo_hint">yyyy-mm-dd hh:mm:ss</string>
+    <string name="chat_database_id_checkbox">ID</string>
+    <string name="chat_database_id_hint">vonID-bisID</string>
+    <!-- Persons Database Fragment -->
+    <string name="title_fragment_persons_database">Personen</string>
+    <string name="persons_database_firstName_checkbox">Vorname</string>
+    <string name="persons_database_firstName_hint">Vorname</string>
+    <string name="persons_database_lastName_checkbox">Nachname</string>
+    <string name="persons_database_lastName_hint">Nachname</string>
+    <string name="persons_database_active_checkbox">Aktiv</string>
+    <string name="persons_database_member_checkbox">Mitglied</string>
+    <string name="persons_database_sort">Sortieren nach</string>
+    <string name="persons_database_sort_first_name">Vornamen</string>
+    <string name="persons_database_sort_last_name">Nachnamen</string>
+    <!-- Events Database Fragment -->
+    <string name="title_fragment_events_database">Veranstaltungen</string>
+
+    <!-- Person Bottom Sheet -->
+    <string name="person_tab_personal_data">Persönliche Daten</string>
+    <string name="person_tab_qed">QED</string>
+    <string name="person_subtitle_birthday">Geburtstag</string>
+    <string name="person_subtitle_station">Heimatbahnhof</string>
+    <string name="person_subtitle_email">Emailadresse</string>
+    <string name="person_subtitle_memberSince">Mitglied seit</string>
+    <string name="person_no_events">Hier gibt es nichts zu sehen!</string>
+    <string name="person_active">Aktiv</string>
+    <string name="person_inactive">Inaktiv</string>
+
+    <!-- Event Bottom Sheet -->
+    <string name="event_tab_overview">Übersicht</string>
+    <string name="event_tab_members">Teilnehmer</string>
+    <string name="event_subtitle_time">Zeitraum</string>
+    <string name="event_subtitle_deadline">Anmeldeschluss</string>
+    <string name="event_subtitle_cost">Kosten</string>
+    <string name="event_subtitle_max_members">Maximale Teilnehmerzahl</string>
+    <string name="event_subtitle_hotel">Übernachtungen</string>
+
+    <!-- Data Key -->
+    <string name="data_pwhash_key">pwhash</string>
+    <string name="data_userid_key">userid</string>
+    <string name="data_username_key">username</string>
+    <string name="data_password_key">password</string>
+
+    <!-- Preference Keys -->
+    <string name="preferences_shared_preferences">com.jonahbauer.qed_preferences</string>
+    <string name="preferences_name_key">name</string>
+    <string name="preferences_channel_key">channel</string>
+    <string name="preferences_showSense_key">showSense</string>
+    <string name="preferences_publicId_key">publicId</string>
+    <string name="preferences_showLinks_key">showLinks</string>
+    <string name="preferences_katex_key">katex</string>
+
+    <string name="preferences_loggedIn_key">loggedIn</string>
+    <string name="preferences_drawerSelection_key">drawerSelection</string>
+
+    <!-- Preference Activity -->
+    <string name="title_activity_settings">Einstellungen</string>
+    <string name="preferences_header_chat">Chat</string>
+    <string name="preferences_chat_name_title">Name</string>
+    <string name="preferences_chat_channel_title">Channel</string>
+    <string name="preferences_chat_showSense_title">Sinn anzeigen</string>
+    <string name="preferences_chat_publicId_title">Öffentliche ID</string>
+    <string name="preferences_chat_showLinks_title">Links anzeigen</string>
+    <string name="preferences_chat_katex_title">KaTex Rendering</string>
+
+    <!-- Navigation Drawer -->
+    <string name="drawer_chat_heading">Chat</string>
+    <string name="drawer_chat">Chat</string>
+    <string name="drawer_chat_log">Log</string>
+    <string name="drawer_chat_db">Datenbank</string>
+
+    <string name="drawer_database_heading">Datenbank</string>
+    <string name="drawer_persons">Personen</string>
+    <string name="drawer_events">Veranstaltungen</string>
+
+    <string name="drawer_gallery_heading">Galerie</string>
+    <string name="drawer_gallery">Galerie</string>
+
+    <string name="drawer_settings">Einstellungen</string>
+    <string name="drawer_logout">Abmelden</string>
+
+    <!-- Log Fragment -->
+    <string name="title_fragment_log">Log</string>
+    <string name="log_subtitle_date_interval">Posts vom {0,date,dd.MM.yyyy} bis zum {1,date,dd.MM.yyyy}</string>
+    <string name="log_subtitle_date_recent">Posts der letzten {0,choice,1#|2#{0} }Stunde{0,choice,1#|2#n}</string>
+    <string name="log_subtitle_post_recent">Letzte{0,choice,1#r|2# {0}} Post{0,choice,1#|2#s}</string>
+    <string name="log_action_save">In Datenbank speichern</string>
+    <string name="log_wait_for_save">Bitte warte bis das Speichern abgeschlossen ist.</string>
+    <string name="log_error">Fehler!</string>
+
+    <!-- Log Dialog Activity -->
+    <string name="title_activity_log_dialog">Logs</string>
+    <string name="log_dialog_mode_label">Modus</string>
+    <string name="log_dialog_postrecent_before">Letzte</string>
+    <string name="log_dialog_postrecent_after">Posts</string>
+    <string name="log_dialog_daterecent_before">Letzte</string>
+    <string name="log_dialog_daterecent_after">Stunden</string>
+    <string name="log_dialog_dateinterval_from">Von</string>
+    <string name="log_dialog_dateinterval_to">Bis</string>
+    <string name="log_postrecent">postrecent</string>
+    <string name="log_daterecent">daterecent</string>
+    <string name="log_dateinterval">dateinterval</string>
+    <string-array name="modes">
+        <item>@string/log_postrecent</item>
+        <item>@string/log_daterecent</item>
+        <item>@string/log_dateinterval</item>
+    </string-array>
+
+    <!-- Sonstiges -->
+
+</resources>

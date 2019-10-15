@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activities.ChatFragment"
+    android:background="@color/chat_background"
+    android:id="@+id/fragment"
+    android:clipToPadding="false"
+    android:clipChildren="false">
+
+    <ImageView
+        android:id="@+id/background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:contentDescription="@string/background"
+        android:scaleType="centerCrop"
+        android:src="@drawable/background_part" />
+
+    <TextView
+        android:id="@+id/date_banner"
+        android:elevation="1dp"
+        android:gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerInParent="true"
+        android:background="@drawable/background_message_extended"
+        android:backgroundTint="@color/chat_date"
+        android:textSize="@dimen/message_date_size"
+        android:textColor="@color/chat_date_text"
+        android:layout_marginTop="3dp"
+        android:visibility="gone"/>
+
+    <ListView
+        android:id="@+id/messageBox"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:background="#00ffffff"
+        android:divider="#00ffffff"
+        android:dividerHeight="@dimen/message_divider"
+        android:clipToPadding="false"
+        android:layout_above="@id/strip"
+        android:layout_alignParentStart="true"
+        android:choiceMode="none"
+        android:transcriptMode="normal"
+        android:scrollbarStyle="outsideOverlay"
+        android:paddingEnd="?android:attr/scrollbarSize"
+        tools:listitem="@layout/list_item_message"
+        tools:ignore="RtlSymmetry" />
+
+    <View
+        android:id="@+id/strip"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/message_padding_vertical"
+        android:background="@android:color/transparent"
+        android:layout_above="@id/editText_message"/>
+
+    <EditText
+        android:id="@+id/editText_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
+        android:layout_alignBottom="@+id/button_send"
+        android:layout_toStartOf="@+id/button_send"
+        android:layout_marginStart="6dp"
+        android:gravity="center_vertical"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingTop="3dp"
+        android:paddingBottom="3dp"
+        android:background="@drawable/background_send"
+        android:hint="@string/chat_message_hint"
+        android:selectAllOnFocus="false"
+        android:clickable="true"
+        android:focusable="true"
+        android:inputType="textMultiLine"
+        android:singleLine="false"
+        android:scrollbars="vertical"
+        android:elevation="6dp"
+        android:maxLines="5"/>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/button_send"
+        android:layout_width="@dimen/send_button_size"
+        android:layout_height="@dimen/send_button_size"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="6dp"
+        android:layout_marginEnd="6dp"
+        android:layout_marginBottom="6dp"
+        app:backgroundTint="@android:color/white"
+        app:fabCustomSize="48dp"
+        android:src="@drawable/ic_send"
+        android:theme="@style/AppTheme"
+        android:contentDescription="@string/chat_button_send"/>
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@id/button_send"
+        android:layout_alignStart="@id/button_send"
+        android:layout_above="@id/quick_settings_layout"
+        android:orientation="vertical"
+        android:clipToPadding="false"
+        android:clipChildren="false"
+        android:gravity="center">
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/scroll_down_Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fabSize="mini"
+            app:backgroundTint="@color/floating_action_button_background"
+            app:rippleColor="@color/floating_action_button_ripple"
+            android:src="@drawable/ic_double_arrow_down"
+            android:contentDescription="@string/chat_scroll_down_button_content_description"
+            android:visibility="visible"
+            android:clipToPadding="false"
+            android:clipChildren="false"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/quick_settings_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@id/button_send"
+        android:layout_above="@id/button_send"
+        android:orientation="horizontal"
+        android:paddingBottom="1dp"
+        android:layout_marginEnd="4dp"
+        android:clipToPadding="false"
+        android:clipChildren="false"
+        android:gravity="center">
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/quick_settings_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="3dp"
+            android:src="@drawable/ic_quick_settings_name"
+            app:fabSize="mini"
+            app:backgroundTint="@color/floating_action_button_background"
+            app:rippleColor="@color/floating_action_button_ripple"/>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/quick_settings_channel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="3dp"
+            android:src="@drawable/ic_quick_settings_channel"
+            app:fabSize="mini"
+            app:backgroundTint="@color/floating_action_button_background"
+            app:rippleColor="@color/floating_action_button_ripple"/>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/quick_settings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="3dp"
+            android:src="@drawable/ic_drawer_settings"
+            android:tint="@color/colorAccent"
+            app:fabSize="mini"
+            app:backgroundTint="@color/floating_action_button_background"
+            app:rippleColor="@color/floating_action_button_ripple"/>
+
+    </LinearLayout>
+
+</RelativeLayout>

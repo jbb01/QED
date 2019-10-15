@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:startOffset="@integer/checkbox_change_1">
+    <objectAnimator
+        android:duration="@integer/checkbox_change_2"
+        android:propertyName="scaleX"
+        android:valueFrom="0"
+        android:valueTo="7.5"/>
+    <objectAnimator
+        android:duration="@integer/checkbox_change_2"
+        android:propertyName="scaleY"
+        android:valueFrom="0"
+        android:valueTo="7.5"/>
+</set>

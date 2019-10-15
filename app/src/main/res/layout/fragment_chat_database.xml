@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/chat_database_background"
+    android:id="@+id/fragment"
+    tools:context=".activities.ChatDatabaseFragment">
+
+    <ImageView
+        android:id="@+id/background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"
+        android:translationZ="-1dp"
+        android:contentDescription="@string/background"/>
+
+    <LinearLayout
+        android:id="@+id/database_search_filters"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="false"
+        android:paddingBottom="7dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/chat_database_search_background"
+            android:elevation="5dp"
+            tools:ignore="UselessParent">
+            <TableLayout
+                android:id="@+id/expand"
+                android:visibility="gone"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentTop="true"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="1dp"
+                    android:paddingEnd="1dp">
+                    <CheckBox
+                        android:id="@+id/database_channel_checkbox"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginEnd="10dp"
+                        android:textColor="@color/chat_database_search_headers"
+                        android:text="@string/chat_database_channel_checkbox" />
+                    <EditText
+                        android:id="@+id/database_channel_editText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="6dp"
+                        android:textSize="16sp"
+                        android:hint="@string/chat_database_channel_hint"
+                        android:inputType="text" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="1dp"
+                    android:paddingEnd="1dp">
+                    <CheckBox
+                        android:id="@+id/database_message_checkbox"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginEnd="10dp"
+                        android:textColor="@color/chat_database_search_headers"
+                        android:text="@string/chat_database_message_checkbox" />
+                    <EditText
+                        android:id="@+id/database_message_editText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="6dp"
+                        android:textSize="16sp"
+                        android:hint="@string/chat_database_message_hint"
+                        android:inputType="text" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="1dp"
+                    android:paddingEnd="1dp">
+                    <CheckBox
+                        android:id="@+id/database_name_checkbox"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginEnd="10dp"
+                        android:textColor="@color/chat_database_search_headers"
+                        android:text="@string/chat_database_name_checkbox" />
+                    <EditText
+                        android:id="@+id/database_name_editText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="6dp"
+                        android:textSize="16sp"
+                        android:hint="@string/chat_database_name_hint"
+                        android:inputType="text" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="1dp"
+                    android:paddingEnd="1dp">
+                    <CheckBox
+                        android:id="@+id/database_dateFrom_checkbox"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginEnd="10dp"
+                        android:textColor="@color/chat_database_search_headers"
+                        android:text="@string/chat_database_dateFrom_checkbox" />
+                    <EditText
+                        android:id="@+id/database_dateFrom_editText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="6dp"
+                        android:textSize="16sp"
+                        android:hint="@string/chat_database_dateFrom_hint"
+                        android:inputType="datetime" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="1dp"
+                    android:paddingEnd="1dp">
+                    <CheckBox
+                        android:id="@+id/database_dateTo_checkbox"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginEnd="10dp"
+                        android:textColor="@color/chat_database_search_headers"
+                        android:text="@string/chat_database_dateTo_checkbox" />
+                    <EditText
+                        android:id="@+id/database_dateTo_editText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="6dp"
+                        android:textSize="16sp"
+                        android:hint="@string/chat_database_dateTo_hint"
+                        android:inputType="datetime" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="1dp"
+                    android:paddingEnd="1dp">
+                    <CheckBox
+                        android:id="@+id/database_id_checkbox"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginEnd="10dp"
+                        android:textColor="@color/chat_database_search_headers"
+                        android:text="@string/chat_database_id_checkbox" />
+                    <EditText
+                        android:id="@+id/database_id_editText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="6dp"
+                        android:textSize="16sp"
+                        android:hint="@string/chat_database_id_hint"
+                        android:inputType="text" />
+                </TableRow>
+            </TableLayout>
+
+            <Button
+                android:id="@+id/search_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_below="@id/expand"
+                android:background="@drawable/button"
+                android:paddingStart="@dimen/activity_horizontal_margin"
+                android:paddingEnd="@dimen/activity_horizontal_margin"
+                android:text="@string/database_search_button"
+                android:textColor="@color/colorAccent"/>
+
+            <TextView
+                android:id="@+id/database_hits"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="6dp"
+                android:paddingEnd="6dp"
+                android:layout_alignTop="@id/search_button"
+                android:layout_alignBottom="@id/search_button"
+                android:layout_toEndOf="@id/search_button"
+                android:layout_toStartOf="@id/expand_checkBox"
+                android:layout_below="@id/expand"
+                android:gravity="center_vertical" />
+
+            <CheckBox
+                android:id="@+id/expand_checkBox"
+                android:paddingEnd="10dp"
+                tools:ignore="RtlSymmetry"
+                android:layout_alignParentEnd="true"
+                android:layout_alignTop="@id/search_button"
+                android:layout_alignBottom="@id/search_button"
+                android:layout_below="@id/expand"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:button="@drawable/ic_arrow_down_accent_animation"/>
+
+        </RelativeLayout>
+    </LinearLayout>
+
+    <ProgressBar
+        android:layout_below="@id/database_search_filters"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:paddingTop="15dp"
+        android:gravity="center_horizontal"
+        android:id="@+id/search_progress"
+        style="?android:attr/progressBarStyleLarge"
+        android:visibility="gone" />
+
+    <ListView
+        android:id="@+id/message_list_view"
+        android:layout_below="@id/database_search_filters"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:translationY="-7dp"
+        android:translationZ="-1dp"
+        android:layout_marginBottom="-6dp"
+        android:background="@android:color/transparent"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="@dimen/message_divider"
+        android:scrollbarStyle="outsideInset"
+        android:fastScrollAlwaysVisible="true"
+        android:fastScrollEnabled="true"
+        android:visibility="gone"
+        tools:listitem="@layout/extended_message" />
+
+</RelativeLayout>
