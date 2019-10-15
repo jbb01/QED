@@ -2,6 +2,7 @@ package com.jonahbauer.qed.logs;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.R;
@@ -17,11 +18,12 @@ import java.util.stream.Collectors;
 
 import javax.net.ssl.HttpsURLConnection;
 
-public class LogGetter extends AsyncTask<Object, Void, Boolean> {
+public class LogGetter extends AsyncTask<Object, String, Boolean> {
     private final String KEY_USERID = Application.getContext().getString(R.string.data_userid_key);
     private final String KEY_PWHASH = Application.getContext().getString(R.string.data_pwhash_key);
     private String log;
     private LogReceiver receiver;
+    private boolean oom;
 
     @Override
     protected Boolean doInBackground(Object... args) {
@@ -38,9 +40,12 @@ public class LogGetter extends AsyncTask<Object, Void, Boolean> {
             if (args[2] instanceof Context) context = (Context) args[2];
             else return false;
         }
+        BufferedInputStream inLog = null;
+        HttpsURLConnection logConnection = null;
+        StringBuilder sbLog = null;
         try {
             URL url = new URL(context.getString(R.string.chat_server_history)+"?"+options);
-            HttpsURLConnection logConnection = (HttpsURLConnection) url.openConnection();
+            logConnection = (HttpsURLConnection) url.openConnection();
 
             logConnection.setDoInput(true);
             logConnection.setReadTimeout(0);
@@ -49,10 +54,9 @@ public class LogGetter extends AsyncTask<Object, Void, Boolean> {
             logConnection.setRequestProperty("Cookie", "pwhash=" + ((Application) Application.getContext()).loadData(KEY_PWHASH, true) + ";userid=" + ((Application) Application.getContext()).loadData(KEY_USERID, false));
             logConnection.connect();
 
-            BufferedInputStream inLog = new BufferedInputStream(logConnection.getInputStream());
-            StringBuffer sbLog;
+            inLog = new BufferedInputStream(logConnection.getInputStream());
 
-            sbLog = new StringBuffer();
+            sbLog = new StringBuilder();
 
             int x;
 
@@ -68,26 +72,51 @@ public class LogGetter extends AsyncTask<Object, Void, Boolean> {
 
             return true;
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e("com.jonahbauer.qed", e.getMessage(), e);
+        } catch (OutOfMemoryError e) {
+            Log.e("com.jonahbauer.qed", e.getMessage(), e);
+            oom = true;
+
+            if (sbLog != null)
+                log = sbLog.toString();
+
+            return false;
+        } finally {
+            if (inLog != null) {
+                try {
+                    inLog.close();
+                } catch (IOException ignored) {}
+            }
+
+            if (logConnection != null) {
+                logConnection.disconnect();
+            }
         }
         return false;
     }
 
     @Override
     protected void onPostExecute(final Boolean success) {
+        if (oom) {
+            receiver.onOutOfMemory();
+        }
+
         if (log == null) {
             return;
         }
 
-        List<Message> messages = Arrays.stream(log.split("\n"))
+        List<Message> messages = Arrays.stream(log.split("\n")).parallel()
                 .filter(str -> !str.contains("\"type\":\"ok\""))
                 .map(Message::interpretJSONMessage)
                 .filter(Objects::nonNull)
                 .sorted((message, other) -> message != null ? message.compareTo(other) : 0)
-                .sequential()
                 .collect(Collectors.toList());
 
         receiver.onReceiveLogs(messages);
+    }
+
+    @Override
+    protected void onProgressUpdate(String... values) {
     }
 
     @Override

@@ -55,11 +55,15 @@ public class PersonDatabaseFragment extends Fragment implements CompoundButton.O
     private char[] sessionId;
     private char[] cookie;
 
+    public static int showPerson;
+    public static boolean shownPerson;
+
     private boolean sortLastName = false;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         persons = new ArrayList<>();
         QEDDBLogin qeddbLogin = new QEDDBLogin();
         qeddbLogin.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, this);
@@ -247,6 +251,11 @@ public class PersonDatabaseFragment extends Fragment implements CompoundButton.O
         personAdapter.addAll(persons);
         searchProgress.setVisibility(View.GONE);
         personListView.setVisibility(View.VISIBLE);
+
+        if (showPerson != 0 && !shownPerson) {
+            showBottomSheetDialogFragment(String.valueOf(showPerson));
+            shownPerson = true;
+        }
     }
 
     public void showBottomSheetDialogFragment(String personId) {

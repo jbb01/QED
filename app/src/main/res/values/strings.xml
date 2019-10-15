@@ -18,6 +18,7 @@
     <string name="cancel">Abbrechen</string>
     <string name="double_back_to_exit_toast">Erneut drücken zum Verlassen</string>
     <string name="cant_connect">Keine Verbindung zum Internet möglich</string>
+    <string name="no_internet">Etwas ist schief gelaufen. Bitte überprüfe deine Internetverbindung.</string>
     <string name="database_login_failed">Datenbank Login fehlgeschlagen</string>
     <string name="chat_login_failed">Chat Login fehlgeschlagen</string>
     <string name="notQED">Diese App steht in keiner offiziellen Verbindung zum Quod Erat Demonstrandum e.V.</string>
@@ -158,6 +159,7 @@
     <string name="log_postrecent">postrecent</string>
     <string name="log_daterecent">daterecent</string>
     <string name="log_dateinterval">dateinterval</string>
+    <string name="log_oom">Out of Memory. Bitte weniger auf einmal.</string>
     <string-array name="modes">
         <item>@string/log_postrecent</item>
         <item>@string/log_daterecent</item>

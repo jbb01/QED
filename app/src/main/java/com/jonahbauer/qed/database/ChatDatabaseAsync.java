@@ -10,6 +10,7 @@ import com.jonahbauer.qed.chat.Message;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.jonahbauer.qed.database.ChatDatabaseContract.ChatEntry.COLUMN_NAME_BOTTAG;
 import static com.jonahbauer.qed.database.ChatDatabaseContract.ChatEntry.COLUMN_NAME_CHANNEL;
@@ -62,7 +63,7 @@ public class ChatDatabaseAsync extends AsyncTask<Object, Integer, Boolean> {
                     query(receiver, query, args);
                     return true;
                 }
-            case INSERTALL:
+            case INSERT_ALL:
                 if (objects.length < 3) return false;
                 else {
                     List messages;
@@ -111,9 +112,12 @@ public class ChatDatabaseAsync extends AsyncTask<Object, Integer, Boolean> {
         insertsRunning ++;
         SQLiteDatabase chatLogWritable = databaseHelper.getWritableDatabase();
 
-        List<Message> doneMessages = new ArrayList<>();
+        chatLogWritable.beginTransaction();
 
-        messages.stream().parallel().forEach(message -> {
+        AtomicInteger i = new AtomicInteger();
+        int j = messages.size();
+
+        messages.stream().sequential().forEach(message -> {
             ContentValues value = new ContentValues();
             value.put(COLUMN_NAME_ID, message.id);
             value.put(COLUMN_NAME_USERID, message.userId);
@@ -129,10 +133,11 @@ public class ChatDatabaseAsync extends AsyncTask<Object, Integer, Boolean> {
                 chatLogWritable.insertOrThrow(TABLE_NAME, null, value);
             } catch (SQLiteConstraintException ignored) {}
 
-            doneMessages.add(message);
-
-            publishProgress(doneMessages.size(), messages.size());
+            publishProgress(i.incrementAndGet(), j);
         });
+
+        chatLogWritable.setTransactionSuccessful();
+        chatLogWritable.endTransaction();
 
         insertsRunning --;
         if (insertsRunning == 0) chatLogWritable.close();
@@ -145,10 +150,10 @@ public class ChatDatabaseAsync extends AsyncTask<Object, Integer, Boolean> {
 
     @Override
     protected void onProgressUpdate(Integer... values) {
-        if (mode == Mode.INSERTALL && (receiver != null)) receiver.onInsertAllUpdate(values[0], values[1]);
+        if (mode == Mode.INSERT_ALL && (receiver != null)) receiver.onInsertAllUpdate(values[0], values[1]);
     }
 
     enum Mode {
-        QUERY, INSERTALL
+        QUERY, INSERT_ALL
     }
 }

@@ -75,7 +75,7 @@ public class ChatDatabase {
     public void insertAll(List<Message> messages) {
         ChatDatabaseAsync async = new ChatDatabaseAsync();
         asyncTasks.add(async);
-        async.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, ChatDatabaseAsync.Mode.INSERTALL, chatDatabaseHelper, messages, receiver);
+        async.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, ChatDatabaseAsync.Mode.INSERT_ALL, chatDatabaseHelper, messages, receiver);
     }
 
     public long getLastId() {

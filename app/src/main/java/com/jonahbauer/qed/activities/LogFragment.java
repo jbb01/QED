@@ -200,7 +200,7 @@ public class LogFragment extends Fragment implements LogReceiver, ChatDatabaseRe
         switch (item.getItemId()) {
             case R.id.log_save:
                 database.insertAll(messageAdapter.getData());
-                break;
+                return true;
         }
         return false;
     }
@@ -219,17 +219,26 @@ public class LogFragment extends Fragment implements LogReceiver, ChatDatabaseRe
 
     @Override
     public void onReceiveLogs(List<Message> messages) {
-        messageAdapter.addAll(messages);
-        messageAdapter.notifyDataSetChanged();
-
-        searchProgressBar.setVisibility(View.GONE);
-        messageListView.setVisibility(View.VISIBLE);
+        if (messages != null) {
+            messageAdapter.addAll(messages);
+            messageAdapter.notifyDataSetChanged();
+            searchProgressBar.setVisibility(View.GONE);
+            messageListView.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
     public void onLogError() {
         searchProgressBar.setVisibility(View.GONE);
         Toast.makeText(getContext(), R.string.log_error, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onOutOfMemory() {
+        Toast.makeText(getContext(), R.string.log_oom, Toast.LENGTH_LONG).show();
+
+        searchProgressBar.setVisibility(View.GONE);
+        messageListView.setVisibility(View.VISIBLE);
     }
 
     @Override

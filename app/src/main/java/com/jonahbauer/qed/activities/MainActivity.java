@@ -2,6 +2,7 @@ package com.jonahbauer.qed.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -19,6 +20,9 @@ import android.widget.Toast;
 import com.jonahbauer.qed.Internet;
 import com.jonahbauer.qed.R;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, Internet {
     DrawerLayout drawerLayout;
     NavigationView navView;
@@ -32,11 +36,51 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         sharedPreferences = getSharedPreferences(getString(R.string.preferences_shared_preferences), MODE_PRIVATE);
 
+        Intent intent = getIntent();
+        if (Intent.ACTION_VIEW.equals(intent.getAction())) {
+            Uri data = intent.getData();
+            if (data != null) {
+                String host = data.getHost();
+                String path = data.getPath();
+
+                String query = data.getQuery();
+                String[] queriesArray = query.split("&");
+                Map<String,String> queries = new HashMap<>();
+                for (String q : queriesArray) {
+                    String[] parts = q.split("=");
+                    if (parts.length > 1) queries.put(parts[0], parts[1]);
+                    else if (parts.length > 0) queries.put(parts[0], "");
+                }
+
+                if (host.equals("qeddb.qed-verein.de")) {
+                    if (path.startsWith("/personen.php")) {
+                        sharedPreferences.edit().putInt(getString(R.string.preferences_drawerSelection_key), R.id.nav_database_persons).apply();
+                        PersonDatabaseFragment.showPerson = Integer.valueOf(queries.getOrDefault("person", "0"));
+                        PersonDatabaseFragment.shownPerson = false;
+                    }
+                    else if (path.startsWith("/veranstaltungen.php")) {
+                        sharedPreferences.edit().putInt(getString(R.string.preferences_drawerSelection_key), R.id.nav_database_events).apply();
+                        EventDatabaseFragment.showEventId = Integer.valueOf(queries.getOrDefault("veranstaltung", "0"));
+                        EventDatabaseFragment.shownEvent = false;
+                    }
+                } else if (host.equals("chat.qed-verein.de")) {
+                    if (path.startsWith("/index.html")) {
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putInt(getString(R.string.preferences_drawerSelection_key), R.id.nav_chat);
+                        editor.putString(getString(R.string.preferences_channel_key), queries.getOrDefault("channel", ""));
+                        editor.apply();
+                    }
+                }
+            }
+        }
+
+
         if (!sharedPreferences.getBoolean(getString(R.string.preferences_loggedIn_key),false)) {
-            Intent intent = new Intent(this, LoginActivity.class);
-            startActivity(intent);
+            Intent intent2 = new Intent(this, LoginActivity.class);
+            startActivity(intent2);
             finish();
             return;
         }
@@ -131,7 +175,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     public void reloadFragment(boolean onlyTitle) {
-         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         switch (sharedPreferences.getInt(getString(R.string.preferences_drawerSelection_key),R.id.nav_chat)) {
             case R.id.nav_chat:
                 if (!onlyTitle) {
@@ -139,6 +183,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     transaction.replace(R.id.fragment, fragment);
                 }
                 toolbar.setTitle(getString(R.string.title_fragment_chat));
+                navView.setCheckedItem(R.id.nav_chat);
                 break;
             case R.id.nav_chat_db:
                 if (!onlyTitle) {
@@ -146,6 +191,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     transaction.replace(R.id.fragment, fragment);
                 }
                 toolbar.setTitle(getString(R.string.title_fragment_chat_database));
+                navView.setCheckedItem(R.id.nav_chat_db);
                 break;
             case R.id.nav_database_persons:
                 if (!onlyTitle) {
@@ -153,6 +199,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     transaction.replace(R.id.fragment, fragment);
                 }
                 toolbar.setTitle(getString(R.string.title_fragment_persons_database));
+                navView.setCheckedItem(R.id.nav_database_persons);
                 break;
             case R.id.nav_chat_log:
                 if (!onlyTitle) {
@@ -160,6 +207,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     transaction.replace(R.id.fragment, fragment);
                 }
                 toolbar.setTitle(getString(R.string.title_fragment_log));
+                navView.setCheckedItem(R.id.nav_chat_log);
                 break;
             case R.id.nav_database_events:
                 if (!onlyTitle) {
@@ -167,6 +215,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     transaction.replace(R.id.fragment, fragment);
                 }
                 toolbar.setTitle(getString(R.string.title_fragment_events_database));
+                navView.setCheckedItem(R.id.nav_database_events);
                 break;
         }
         if (!onlyTitle) transaction.commit();
@@ -180,5 +229,45 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onConnectionRegain() {
         if (fragment != null && fragment instanceof Internet) ((Internet) fragment).onConnectionRegain();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        if (Intent.ACTION_VIEW.equals(intent.getAction())) {
+            Uri data = intent.getData();
+            if (data != null) {
+                String host = data.getHost();
+                String path = data.getPath();
+
+                String query = data.getQuery();
+                String[] queriesArray = query.split("&");
+                Map<String, String> queries = new HashMap<>();
+                for (String q : queriesArray) {
+                    String[] parts = q.split("=");
+                    if (parts.length > 1) queries.put(parts[0], parts[1]);
+                    else if (parts.length > 0) queries.put(parts[0], "");
+                }
+
+                if (host.equals("qeddb.qed-verein.de")) {
+                    if (path.startsWith("/personen.php")) {
+                        sharedPreferences.edit().putInt(getString(R.string.preferences_drawerSelection_key), R.id.nav_database_persons).apply();
+                        PersonDatabaseFragment.showPerson = Integer.valueOf(queries.getOrDefault("person", "0"));
+                        PersonDatabaseFragment.shownPerson = false;
+                    } else if (path.startsWith("/veranstaltungen.php")) {
+                        sharedPreferences.edit().putInt(getString(R.string.preferences_drawerSelection_key), R.id.nav_database_events).apply();
+                        EventDatabaseFragment.showEventId = Integer.valueOf(queries.getOrDefault("veranstaltung", "0"));
+                        EventDatabaseFragment.shownEvent = false;
+                    }
+                } else if (host.equals("chat.qed-verein.de")) {
+                    if (path.startsWith("/index.html")) {
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putInt(getString(R.string.preferences_drawerSelection_key), R.id.nav_chat);
+                        editor.putString(getString(R.string.preferences_channel_key), queries.getOrDefault("channel", ""));
+                        editor.apply();
+                    }
+                }
+            }
+        }
+        reloadFragment(false);
     }
 }

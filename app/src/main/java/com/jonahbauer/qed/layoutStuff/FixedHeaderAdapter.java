@@ -21,9 +21,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "WeakerAccess"})
 public abstract class FixedHeaderAdapter<T, S> extends ArrayAdapter<T> implements SectionIndexer, AbsListView.OnScrollListener {
-    private List<T> itemList;
+    protected List<T> itemList;
     private Function<T,S> headerMap;
     private Comparator<? super T> comparator;
     private Object[] sections;

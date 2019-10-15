@@ -68,7 +68,6 @@ public class ChatFragment extends Fragment implements Internet, LogReceiver, Abs
     private EditText messageEditText;
     private ImageButton sendButton;
     private MenuItem refreshButton;
-    private FloatingActionButton quickSettings;
     private FloatingActionButton quickSettingsName;
     private FloatingActionButton quickSettingsChannel;
 
@@ -92,10 +91,11 @@ public class ChatFragment extends Fragment implements Internet, LogReceiver, Abs
         messageListView = view.findViewById(R.id.messageBox);
         messageEditText = view.findViewById(R.id.editText_message);
         sendButton = view.findViewById(R.id.button_send);
-        quickSettings = view.findViewById(R.id.quick_settings);
+        FloatingActionButton quickSettings = view.findViewById(R.id.quick_settings);
         quickSettingsName = view.findViewById(R.id.quick_settings_name);
         quickSettingsChannel = view.findViewById(R.id.quick_settings_channel);
 
+        assert getContext() != null;
         sharedPreferences = getContext().getSharedPreferences(getString(R.string.preferences_shared_preferences), MODE_PRIVATE);
         
         TileDrawable tileDrawable  = new TileDrawable(view.getContext().getDrawable(R.drawable.background_part), Shader.TileMode.REPEAT);
@@ -120,9 +120,7 @@ public class ChatFragment extends Fragment implements Internet, LogReceiver, Abs
 
             inputDialog.setView(editTextView);
 
-            inputDialog.setNegativeButton(getString(R.string.cancel), (dialog, which) -> {
-                dialog.cancel();
-            });
+            inputDialog.setNegativeButton(getString(R.string.cancel), (dialog, which) -> dialog.cancel());
 
             inputDialog.setPositiveButton(getString(R.string.ok), (dialog, which) -> {
                 sharedPreferences.edit().putString(getString(R.string.preferences_name_key), inputEditText.getText().toString()).apply();
@@ -144,9 +142,7 @@ public class ChatFragment extends Fragment implements Internet, LogReceiver, Abs
 
             inputDialog.setView(editTextView);
 
-            inputDialog.setNegativeButton(getString(R.string.cancel), (dialog, which) -> {
-                dialog.cancel();
-            });
+            inputDialog.setNegativeButton(getString(R.string.cancel), (dialog, which) -> dialog.cancel());
 
             inputDialog.setPositiveButton(getString(R.string.ok), (dialog, which) -> {
                 sharedPreferences.edit().putString(getString(R.string.preferences_channel_key), inputEditText.getText().toString()).apply();
@@ -383,6 +379,9 @@ public class ChatFragment extends Fragment implements Internet, LogReceiver, Abs
 
     @Override
     public void onLogError() {}
+
+    @Override
+    public void onOutOfMemory() {}
 
     @Override
     public void onScrollStateChanged(AbsListView view, int scrollState) {

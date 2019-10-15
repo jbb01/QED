@@ -1,6 +1,8 @@
 package com.jonahbauer.qed.activities;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -11,6 +13,7 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -19,6 +22,7 @@ import android.widget.ProgressBar;
 import android.widget.TabHost;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.layoutStuff.AnimatedTabHostListener;
@@ -116,6 +120,7 @@ public class PersonBottomSheet extends BottomSheetDialogFragment implements QEDD
 
         eventListAdapter = new EventListAdapter(view.getContext(), new ArrayList<>());
         eventListView.setAdapter(eventListAdapter);
+        eventListView.setOnItemClickListener(eventListAdapter);
 
         tabHost.setup();
 
@@ -139,14 +144,39 @@ public class PersonBottomSheet extends BottomSheetDialogFragment implements QEDD
 
     @Override
     public void onPersonReceived(Person person) {
-        for (Pair<String, String> phone : person.phoneNumbers) {
-            addListItem(phoneLinearLayout, phoneTableRow, phone.second, phone.first);
+        if (person == null) {
+            Toast.makeText(getContext(), R.string.no_internet, Toast.LENGTH_SHORT).show();
+            this.dismiss();
+            return;
         }
 
-        if (person.email != null && !person.email.trim().equals("")) addListItem(mailLinearLayout, mailTableRow, person.email, getString(R.string.person_subtitle_email));
+        for (Pair<String, String> phone : person.phoneNumbers) {
+            View view = addListItem(phoneLinearLayout, phoneTableRow, phone.second, phone.first);
+            view.setOnClickListener(a -> {
+                Intent intent = new Intent(Intent.ACTION_DIAL);
+                intent.setData(Uri.fromParts("tel", phone.second, null));
+                startActivity(intent);
+            });
+        }
+
+        if (person.email != null && !person.email.trim().equals("")) {
+            View view = addListItem(mailLinearLayout, mailTableRow, person.email, getString(R.string.person_subtitle_email));
+            view.setOnClickListener(a -> {
+                Intent intent = new Intent(Intent.ACTION_SENDTO);
+                intent.setData(Uri.parse("mailto:"));
+                intent.putExtra(Intent.EXTRA_EMAIL, new String[] {person.email});
+                intent.putExtra(Intent.EXTRA_SUBJECT, "");
+                startActivity(intent);
+            });
+        }
 
         for (String address : person.addresses) {
-            addListItem(addressLinearLayout, addressTableRow, address, null);
+            View view = addListItem(addressLinearLayout, addressTableRow, address, null);
+            view.setOnClickListener(a -> {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse("geo:0,0?q=" + address));
+                startActivity(intent);
+            });
         }
 
         if (person.homeStation != null && !person.homeStation.trim().equals("")) addListItem(stationLinearLayout, stationTableRow, person.homeStation, getString(R.string.person_subtitle_station));
@@ -177,22 +207,25 @@ public class PersonBottomSheet extends BottomSheetDialogFragment implements QEDD
         tabcontent.setVisibility(View.VISIBLE);
     }
 
-    public void addListItem(LinearLayout list, TableRow row, String title, String subtitle) {
+    public View addListItem(LinearLayout list, TableRow row, String title, String subtitle) {
         row.setVisibility(View.VISIBLE);
 
         assert getContext() != null;
+
+        LinearLayout linearLayout = new LinearLayout(getContext());
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
 
         TextView titleTextView = new TextView(getContext());
         titleTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
         titleTextView.setTextColor(getContext().getColor(android.R.color.black));
         titleTextView.setText(title);
-        list.addView(titleTextView);
+        linearLayout.addView(titleTextView);
 
         if (subtitle != null) {
             TextView subtitleTextView = new TextView(getContext());
             subtitleTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
             subtitleTextView.setText(subtitle);
-            list.addView(subtitleTextView);
+            linearLayout.addView(subtitleTextView);
         }
 
         ImageView dividerImageView = new ImageView(getContext());
@@ -207,10 +240,14 @@ public class PersonBottomSheet extends BottomSheetDialogFragment implements QEDD
                 0,
                 (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, getResources().getDisplayMetrics())
         );
-        list.addView(dividerImageView, dividerLayoutParams);
+        linearLayout.addView(dividerImageView, dividerLayoutParams);
+
+        list.addView(linearLayout);
+
+        return linearLayout;
     }
 
-    private class EventListAdapter extends ArrayAdapter<Pair<Event,String>> {
+    private class EventListAdapter extends ArrayAdapter<Pair<Event,String>> implements AdapterView.OnItemClickListener {
         private List<Pair<Event, String>> eventList;
         private Context context;
 
@@ -282,6 +319,20 @@ public class PersonBottomSheet extends BottomSheetDialogFragment implements QEDD
             event.name = title;
             event.startString = subtitle;
             add(new Pair<>(event, null));
+        }
+
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            Event event = eventList.get(position).first;
+
+            if (event != null && getActivity() != null) {
+                EventDatabaseFragment.showEventId = 0;
+                EventDatabaseFragment.showEvent = event.name;
+                EventDatabaseFragment.shownEvent = false;
+                getContext().getSharedPreferences(getString(R.string.preferences_shared_preferences), Context.MODE_PRIVATE).edit().putInt(getString(R.string.preferences_drawerSelection_key), R.id.nav_database_events).apply();
+                ((MainActivity)getActivity()).reloadFragment(false);
+                dismiss();
+            }
         }
     }
 }

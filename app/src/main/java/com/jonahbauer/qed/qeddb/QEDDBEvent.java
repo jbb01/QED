@@ -154,30 +154,35 @@ public class QEDDBEvent extends AsyncTask<Object, Void, String[]> {
             while (matcher.find()) {
                 String data = matcher.group();
                 if (data.contains("teilnehmer")) {
-                    String firstName = null, lastName = null, type = null, email = null;
+                    String type = null;
+
+                    Person person = new Person();
+
+                    Matcher matcher3 = Pattern.compile("person=(\\d*)").matcher(data);
+                    if (matcher3.find()) {
+                        String id = matcher3.group(1);
+                        person.id = Integer.valueOf(id);
+                    }
+
                     Matcher matcher2 = Pattern.compile("<div class=\"[^\"]*\" title=\"([^\"]*)\">([^&]*)&nbsp;</div>").matcher(data);
                     while (matcher2.find()) {
                         String title = matcher2.group(1);
                         String value = matcher2.group(2);
                         switch (title) {
                             case "Vorname":
-                                firstName = value;
+                                person.firstName = value;
                                 break;
                             case "Nachname":
-                                lastName = value;
+                                person.lastName = value;
                                 break;
                             case "Status":
                                 type = value;
                                 break;
                             case "E-Mail":
-                                email = value;
+                                person.email = value;
                                 break;
                         }
                     }
-                    Person person = new Person();
-                    person.firstName = firstName;
-                    person.lastName = lastName;
-                    person.email = email;
 
                     if (type != null) switch (type) {
                         case "offen":

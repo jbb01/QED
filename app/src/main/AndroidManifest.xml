@@ -21,11 +21,32 @@
             android:label="@string/title_fragment_chat"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateVisible|adjustResize">
+            android:windowSoftInputMode="stateVisible|adjustResize"
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <!-- Accepts URIs that begin with "example://gizmos” -->
+                <data android:scheme="https"
+                    android:host="qeddb.qed-verein.de"
+                    android:pathPrefix="/personen.php" />
+                <data android:scheme="https"
+                    android:host="qeddb.qed-verein.de"
+                    android:pathPrefix="/veranstaltungen.php" />
+                <data android:scheme="https"
+                    android:host="chat.qed-verein.de"
+                    android:pathPrefix="/index.html" />
+                <data android:scheme="http"
+                    android:host="chat.qed-verein.de"
+                    android:pathPrefix="/index.html" />
+            </intent-filter>
+
         </activity>
 
         <activity

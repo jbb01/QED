@@ -32,6 +32,10 @@ public class EventDatabaseFragment extends Fragment implements QEDDBLoginReceive
     private char[] sessionId;
     private char[] cookie;
 
+    public static String showEvent;
+    public static int showEventId;
+    public static boolean shownEvent = true;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,5 +101,18 @@ public class EventDatabaseFragment extends Fragment implements QEDDBLoginReceive
         eventAdapter.notifyDataSetChanged();
         searchProgress.setVisibility(View.GONE);
         eventListView.setVisibility(View.VISIBLE);
+
+        if ((showEvent != null || showEventId != 0) && !shownEvent) {
+            if (showEventId != 0) showBottomSheetDialogFragment(String.valueOf(showEventId));
+            else {
+                for (Event event : events) {
+                    if (event.name.equals(showEvent)) {
+                        showBottomSheetDialogFragment(event);
+                        break;
+                    }
+                }
+            }
+            shownEvent = true;
+        }
     }
 }

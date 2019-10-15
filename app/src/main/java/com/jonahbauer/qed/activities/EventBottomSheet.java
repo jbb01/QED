@@ -1,8 +1,10 @@
 package com.jonahbauer.qed.activities;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.CalendarContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialogFragment;
@@ -10,6 +12,7 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -18,6 +21,7 @@ import android.widget.SectionIndexer;
 import android.widget.TabHost;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.layoutStuff.AnimatedTabHostListener;
@@ -64,6 +68,7 @@ public class EventBottomSheet extends BottomSheetDialogFragment implements QEDDB
     private TextView hotelTextView;
     private TableRow hotelTableRow;
     private TableRow orgaTableRow;
+    private TableRow timeTableRow;
     private LinearLayout orgaLinearLayout;
 
     private PersonListAdapter personListAdapter;
@@ -117,6 +122,7 @@ public class EventBottomSheet extends BottomSheetDialogFragment implements QEDDB
 
         nameBigTextView = view.findViewById(R.id.event_name_big);
         timeTextView = view.findViewById(R.id.event_time_text);
+        timeTableRow = view.findViewById(R.id.event_time_row);
         deadlineTextView = view.findViewById(R.id.event_deadline_text);
         costTextView = view.findViewById(R.id.event_cost_text);
         maxMembersTextView = view.findViewById(R.id.event_max_member_text);
@@ -129,6 +135,7 @@ public class EventBottomSheet extends BottomSheetDialogFragment implements QEDDB
         ListView personListView = view.findViewById(R.id.event_member_list);
         personListView.setAdapter(personListAdapter);
         personListView.setOnScrollListener(personListAdapter);
+        personListView.setOnItemClickListener(personListAdapter);
 
         tabHost.setup();
 
@@ -152,10 +159,26 @@ public class EventBottomSheet extends BottomSheetDialogFragment implements QEDDB
 
     @Override
     public void onEventReceived(Event event) {
+        if (event == null) {
+            Toast.makeText(getContext(), R.string.no_internet, Toast.LENGTH_SHORT).show();
+            this.dismiss();
+            return;
+        }
+
         nameBigTextView.setText(event.name);
-        if (event.start != null && event.end != null)
+        if (event.start != null && event.end != null) {
             timeTextView.setText(MessageFormat.format("{0,date,dd.MM.yyyy} - {1,date,dd.MM.yyyy}", event.start, event.end));
-        else
+            timeTableRow.setOnClickListener(a -> {
+                Intent intent = new Intent(Intent.ACTION_INSERT)
+                        .setData(CalendarContract.Events.CONTENT_URI)
+                        .putExtra(CalendarContract.Events.TITLE, event.name)
+                        .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, event.start.getTime())
+                        .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, event.end.getTime())
+                        .putExtra(CalendarContract.EXTRA_EVENT_ALL_DAY, true);
+
+                startActivity(intent);
+            });
+        } else
             timeTextView.setText(MessageFormat.format("{0} - {1}", event.startString, event.endString));
         if (event.deadline != null)
             deadlineTextView.setText(MessageFormat.format("{0,date,dd.MM.yyyy HH:mm:ss}", event.deadline));
@@ -178,8 +201,11 @@ public class EventBottomSheet extends BottomSheetDialogFragment implements QEDDB
         tabcontent.setVisibility(View.VISIBLE);
     }
 
-    public void addListItem(LinearLayout list, TableRow row, String title, String subtitle) {
+    public View addListItem(LinearLayout list, TableRow row, String title, String subtitle) {
         row.setVisibility(View.VISIBLE);
+
+        LinearLayout linearLayout = new LinearLayout(getContext());
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
 
         assert getContext() != null;
 
@@ -187,13 +213,13 @@ public class EventBottomSheet extends BottomSheetDialogFragment implements QEDDB
         titleTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
         titleTextView.setTextColor(getContext().getColor(android.R.color.black));
         titleTextView.setText(title);
-        list.addView(titleTextView);
+        linearLayout.addView(titleTextView);
 
         if (subtitle != null) {
             TextView subtitleTextView = new TextView(getContext());
             subtitleTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
             subtitleTextView.setText(subtitle);
-            list.addView(subtitleTextView);
+            linearLayout.addView(subtitleTextView);
         }
 
         ImageView dividerImageView = new ImageView(getContext());
@@ -208,10 +234,14 @@ public class EventBottomSheet extends BottomSheetDialogFragment implements QEDDB
                 0,
                 (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, getResources().getDisplayMetrics())
         );
-        list.addView(dividerImageView, dividerLayoutParams);
+        linearLayout.addView(dividerImageView, dividerLayoutParams);
+
+        list.addView(linearLayout);
+
+        return linearLayout;
     }
 
-    private class PersonListAdapter extends FixedHeaderAdapter<Person, Person.MemberType> implements SectionIndexer {
+    private class PersonListAdapter extends FixedHeaderAdapter<Person, Person.MemberType> implements SectionIndexer, AdapterView.OnItemClickListener {
 
         PersonListAdapter(Context context, @NonNull List<Person> itemList, @NonNull Function<Person, Person.MemberType> headerMap, Comparator<? super Person> comparator, View fixedHeader) {
             super(context, itemList, headerMap, comparator, fixedHeader);
@@ -241,6 +271,19 @@ public class EventBottomSheet extends BottomSheetDialogFragment implements QEDDB
                 ((ImageView)view.findViewById(R.id.header)).setImageResource(R.drawable.ic_event_member_confirmed);
             else if (header == MEMBER_OPT_OUT)
                 ((ImageView)view.findViewById(R.id.header)).setImageResource(R.drawable.ic_event_member_opt_out);
+        }
+
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            Person person = itemList.get(position);
+
+            if (person != null && getActivity() != null) {
+                PersonDatabaseFragment.showPerson = person.id;
+                PersonDatabaseFragment.shownPerson = false;
+                getContext().getSharedPreferences(getString(R.string.preferences_shared_preferences), Context.MODE_PRIVATE).edit().putInt(getString(R.string.preferences_drawerSelection_key), R.id.nav_database_persons).apply();
+                ((MainActivity)getActivity()).reloadFragment(false);
+                dismiss();
+            }
         }
     }
 }
