@@ -7,4 +7,9 @@
         android:icon="@drawable/ic_settings_chat"
         android:title="@string/preferences_header_chat" />
 
+    <header
+        android:fragment="com.jonahbauer.qed.activities.SettingsActivity$GalleryPreferenceFragment"
+        android:icon="@drawable/ic_settings_gallery"
+        android:title="@string/preferences_header_gallery" />
+
 </preference-headers>

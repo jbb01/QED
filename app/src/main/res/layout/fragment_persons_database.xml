@@ -200,7 +200,8 @@
         android:gravity="center_horizontal"
         android:id="@+id/search_progress"
         style="?android:attr/progressBarStyleLarge"
-        android:visibility="visible" />
+        android:visibility="visible"
+        tools:visibility="gone"/>
 
     <ListView
         android:id="@+id/person_list_view"
@@ -218,7 +219,22 @@
         android:fastScrollAlwaysVisible="true"
         android:fastScrollEnabled="true"
         android:visibility="gone"
-        tools:listitem="@layout/list_item_person" />
+        tools:listitem="@layout/list_item_person"
+        tools:visibility="visible"/>
+
+    <TextView
+        android:id="@+id/label_offline"
+        android:layout_below="@id/database_search_filters"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:translationY="-7dp"
+        android:translationZ="-1dp"
+        android:textAlignment="center"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:text="@string/database_offline"
+        android:visibility="gone"/>
 
     <LinearLayout
         android:layout_width="match_parent"

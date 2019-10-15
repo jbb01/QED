@@ -1,5 +1,7 @@
 package com.jonahbauer.qed.qedgallery;
 
+@Deprecated
 public interface QEDGalleryLoginReceiver {
-    void onReceiveSessionId(char[] sessionId, char[] pwhash, char[] userid);
+    void onLoginFinish(boolean success);
+    void onLoginError();
 }

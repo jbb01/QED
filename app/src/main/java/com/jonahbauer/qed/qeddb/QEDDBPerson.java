@@ -1,7 +1,8 @@
 package com.jonahbauer.qed.qeddb;
 
 import android.os.AsyncTask;
-import android.support.v4.util.Pair;
+
+import androidx.core.util.Pair;
 
 import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.R;
@@ -20,6 +21,11 @@ import java.util.regex.Pattern;
 
 import javax.net.ssl.HttpsURLConnection;
 
+/**
+ * @deprecated
+ * use {@link com.jonahbauer.qed.networking.AsyncLoadQEDPage} instead
+ */
+@Deprecated
 public class QEDDBPerson extends AsyncTask<Object, Void, String[]> {
     private QEDDBPersonReceiver receiver;
 
@@ -29,34 +35,30 @@ public class QEDDBPerson extends AsyncTask<Object, Void, String[]> {
 
     @Override
     protected String[] doInBackground(Object...objects) {
-        char[] sessionId;
-        char[] cookie;
         String userId;
 
-        if (objects.length < 4) return null;
+        if (objects.length < 2) return null;
         if (objects[0] instanceof QEDDBPersonReceiver) receiver = (QEDDBPersonReceiver) objects[0];
         else return null;
 
-        if (objects[1] instanceof char[]) sessionId = (char[]) objects[1];
+        if (objects[1] instanceof String) userId = (String) objects[1];
         else return null;
 
-        if (objects[2] instanceof char[]) cookie = (char[]) objects[2];
-        else return null;
+        Application application = Application.getContext();
+        if (userId.equals(application.loadData(Application.KEY_USERID,false))) isSelf = true;
 
-        if (objects[3] instanceof String) userId = (String) objects[3];
-        else return null;
-
-        Application application = (Application) Application.getContext();
-        if (userId.equals(application.loadData(application.getResources().getString(R.string.data_userid_key),false))) isSelf = true;
+        String sessionId = application.loadData(Application.KEY_DATABASE_SESSIONID, true);
+        String sessionId2 = application.loadData(Application.KEY_DATABASE_SESSIONID2, true);
+        if (sessionId == null || sessionId2 == null) return null;
 
         String[] result = new String[3];
         for (int i = 1 ; i <= 3; i++) {
             try {
-                HttpsURLConnection httpsURLConnection = (HttpsURLConnection) new URL(String.format(Application.getContext().getString(R.string.database_server_person), String.valueOf(sessionId), userId, String.valueOf(i))).openConnection();
+                HttpsURLConnection httpsURLConnection = (HttpsURLConnection) new URL(String.format(Application.getContext().getString(R.string.database_server_person), sessionId2, userId, String.valueOf(i))).openConnection();
                 httpsURLConnection.setRequestMethod("POST");
                 httpsURLConnection.setDoOutput(true);
                 httpsURLConnection.setInstanceFollowRedirects(false);
-                httpsURLConnection.setRequestProperty("Cookie", String.valueOf(cookie));
+                httpsURLConnection.setRequestProperty("Cookie", sessionId);
                 httpsURLConnection.setUseCaches(false);
                 httpsURLConnection.connect();
 

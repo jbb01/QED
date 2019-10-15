@@ -1,14 +1,11 @@
 package com.jonahbauer.qed.activities;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.BottomSheetDialogFragment;
-import android.support.v4.util.Pair;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,10 +21,16 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.util.Pair;
+
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.layoutStuff.AnimatedTabHostListener;
-import com.jonahbauer.qed.qeddb.QEDDBPerson;
-import com.jonahbauer.qed.qeddb.QEDDBPersonReceiver;
+import com.jonahbauer.qed.networking.QEDDBPages;
+import com.jonahbauer.qed.networking.QEDPageReceiver;
 import com.jonahbauer.qed.qeddb.event.Event;
 import com.jonahbauer.qed.qeddb.person.Person;
 
@@ -35,12 +38,13 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PersonBottomSheet extends BottomSheetDialogFragment implements QEDDBPersonReceiver {
-    public static final String EXTRA_SESSION_ID = "sessionId";
-    public static final String EXTRA_PERSON_ID = "personId";
-    public static final String EXTRA_COOKIE = "cookie";
+public class PersonBottomSheet extends BottomSheetDialogFragment implements QEDPageReceiver<Person> {
+    private static final String EXTRA_PERSON_ID = "personId";
 
     private float dp;
+
+    private boolean receivedError;
+    private boolean dismissed;
 
     private TextView nameBigTextView;
     private TextView activeTextView;
@@ -63,10 +67,8 @@ public class PersonBottomSheet extends BottomSheetDialogFragment implements QEDD
     private ProgressBar progressBar;
     private ViewGroup tabcontent;
 
-    public static PersonBottomSheet newInstance(char[] sessionId, char[] cookie, String personId) {
+    static PersonBottomSheet newInstance(String personId) {
         Bundle args = new Bundle();
-        args.putCharArray(EXTRA_SESSION_ID, sessionId);
-        args.putCharArray(EXTRA_COOKIE, cookie);
         args.putString(EXTRA_PERSON_ID, personId);
         PersonBottomSheet fragment = new PersonBottomSheet();
         fragment.setArguments(args);
@@ -79,15 +81,9 @@ public class PersonBottomSheet extends BottomSheetDialogFragment implements QEDD
 
         Bundle args = getArguments();
         assert args != null;
-        char[] sessionId = args.getCharArray(EXTRA_SESSION_ID);
         String personId = args.getString(EXTRA_PERSON_ID);
-        char[] cookie = args.getCharArray(EXTRA_COOKIE);
 
-        args.putCharArray(EXTRA_SESSION_ID, new char[0]);
-        args.putCharArray(EXTRA_COOKIE, new char[0]);
-
-        QEDDBPerson qeddbPerson = new QEDDBPerson();
-        qeddbPerson.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, this, sessionId, cookie, personId);
+        QEDDBPages.getPerson(getClass().toString(), personId, this);
     }
 
     @Nullable
@@ -143,12 +139,14 @@ public class PersonBottomSheet extends BottomSheetDialogFragment implements QEDD
 
 
     @Override
-    public void onPersonReceived(Person person) {
+    public void onPageReceived(String tag, Person person) {
         if (person == null) {
             Toast.makeText(getContext(), R.string.no_internet, Toast.LENGTH_SHORT).show();
             this.dismiss();
             return;
         }
+
+        if (dismissed) return;
 
         for (Pair<String, String> phone : person.phoneNumbers) {
             View view = addListItem(phoneLinearLayout, phoneTableRow, phone.second, phone.first);
@@ -207,7 +205,21 @@ public class PersonBottomSheet extends BottomSheetDialogFragment implements QEDD
         tabcontent.setVisibility(View.VISIBLE);
     }
 
-    public View addListItem(LinearLayout list, TableRow row, String title, String subtitle) {
+    @Override
+    public void onNetworkError(String tag) {
+        Log.e(Application.LOG_TAG_ERROR, "networkError at: " + tag);
+        
+        if (dismissed) return;
+
+        if (!receivedError) {
+            receivedError = true;
+            progressBar.post(() -> Toast.makeText(getContext(), R.string.cant_connect, Toast.LENGTH_SHORT).show());
+            progressBar.postDelayed(() -> receivedError = false, 5000);
+            dismiss();
+        }
+    }
+
+    private View addListItem(LinearLayout list, TableRow row, String title, String subtitle) {
         row.setVisibility(View.VISIBLE);
 
         assert getContext() != null;
@@ -245,6 +257,12 @@ public class PersonBottomSheet extends BottomSheetDialogFragment implements QEDD
         list.addView(linearLayout);
 
         return linearLayout;
+    }
+
+    @Override
+    public void onDismiss(@NonNull DialogInterface dialog) {
+        dismissed = true;
+        super.onDismiss(dialog);
     }
 
     private class EventListAdapter extends ArrayAdapter<Pair<Event,String>> implements AdapterView.OnItemClickListener {

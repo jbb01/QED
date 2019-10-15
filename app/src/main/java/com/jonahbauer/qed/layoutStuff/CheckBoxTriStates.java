@@ -4,16 +4,17 @@ import android.content.Context;
 import android.graphics.drawable.Animatable;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.widget.CompoundButton;
+
+import androidx.annotation.Nullable;
 
 import com.jonahbauer.qed.R;
 
 /**
  * Base on https://stackoverflow.com/a/40939367/3950497 answer.
  */
-public class CheckBoxTriStates extends android.support.v7.widget.AppCompatCheckBox {
+public class CheckBoxTriStates extends androidx.appcompat.widget.AppCompatCheckBox {
 
     static public final int UNKNOW = -1;
 

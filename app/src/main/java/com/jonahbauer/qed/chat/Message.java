@@ -1,9 +1,15 @@
 package com.jonahbauer.qed.chat;
 
+import android.util.Log;
+
+import androidx.annotation.NonNull;
+
+import com.jonahbauer.qed.Application;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 public class Message {
     public final String name;
@@ -28,6 +34,7 @@ public class Message {
         this.channel = channel;
     }
 
+    @NonNull
     public String toString() {
         return "{"
                 + "\"id\":\"" + id + "\", "
@@ -49,7 +56,6 @@ public class Message {
         return interpretJSONMessage(jsonMessage, true);
     }
 
-    @SuppressWarnings("WeakerAccess")
     public static Message interpretJSONMessage(String jsonMessage, boolean format) {
         try {
             JSONObject json = new JSONObject(jsonMessage);
@@ -63,17 +69,19 @@ public class Message {
             int id = json.getInt("id");
             int bottag = json.getInt("bottag");
             if (format) {
-                name = new String(name.getBytes("ISO-8859-1"), "UTF-8");
-                message = new String(message.getBytes("ISO-8859-1"), "UTF-8");
-                username = new String(username.getBytes("ISO-8859-1"), "UTF-8");
-                color = new String(color.getBytes("ISO-8859-1"), "UTF-8");
-                date = new String(date.getBytes("ISO-8859-1"), "UTF-8");
-                channel = new String(channel.getBytes("ISO-8859-1"), "UTF-8");
+                name = new String(name.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+                message = new String(message.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+                username = new String(username.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+                color = new String(color.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+                date = new String(date.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+                channel = new String(channel.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
             }
             name = name.trim();
             if ("null".equals(username)) username = null;
             return new Message(name, message, date, userid, username, color, id, bottag, channel);
-        } catch (JSONException | UnsupportedEncodingException ignored) {}
+        } catch (JSONException e) {
+            Log.e(Application.LOG_TAG_ERROR, jsonMessage + ": " + e.getMessage(), e);
+        }
         return null;
     }
 

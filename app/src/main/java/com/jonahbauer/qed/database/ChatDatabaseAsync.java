@@ -117,7 +117,7 @@ public class ChatDatabaseAsync extends AsyncTask<Object, Integer, Boolean> {
         AtomicInteger i = new AtomicInteger();
         int j = messages.size();
 
-        messages.stream().sequential().forEach(message -> {
+        for (Message message : messages) {
             ContentValues value = new ContentValues();
             value.put(COLUMN_NAME_ID, message.id);
             value.put(COLUMN_NAME_USERID, message.userId);
@@ -134,7 +134,7 @@ public class ChatDatabaseAsync extends AsyncTask<Object, Integer, Boolean> {
             } catch (SQLiteConstraintException ignored) {}
 
             publishProgress(i.incrementAndGet(), j);
-        });
+        }
 
         chatLogWritable.setTransactionSuccessful();
         chatLogWritable.endTransaction();

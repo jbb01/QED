@@ -2,13 +2,14 @@ package com.jonahbauer.qed.qeddb.person;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.layoutStuff.FixedHeaderAdapter;
@@ -25,17 +26,15 @@ public class PersonAdapter extends FixedHeaderAdapter<Person, Character> {
     private String sort;
 
     private static Comparator<Person> comparatorFirstName = Comparator.comparing(
-            person -> (person.firstName + " " + person.lastName)
-                    .toUpperCase()
-                    .replaceAll("Ö", "O")
-                    .replaceAll("Ü", "U")
-                    .replaceAll("Ä","A"));
+            person -> {
+                if (person.comparableFirstName == null) person.comparableFirstName = (person.firstName + " " + person.lastName).replaceAll("Ö", "O").replaceAll("Ü", "U").replaceAll("Ä","A");
+                return person.comparableFirstName;
+            });
     private static Comparator<Person> comparatorLastName = Comparator.comparing(
-            person -> (person.lastName + ", " + person.firstName)
-                    .toUpperCase()
-                    .replaceAll("Ö", "O")
-                    .replaceAll("Ü", "U")
-                    .replaceAll("Ä","A"));
+            person -> {
+                if (person.comparableLastName == null) person.comparableLastName = (person.lastName + " " + person.firstName).replaceAll("Ö", "O").replaceAll("Ü", "U").replaceAll("Ä","A");
+                return person.comparableLastName;
+            });
     private static Function<Person, Character> headerMapFirstName = person -> person.firstName.toUpperCase().toUpperCase().replaceAll("Ö", "O").replaceAll("Ü", "U").replaceAll("Ä","A").charAt(0);
     private static Function<Person, Character> headerMapLastName = person -> person.lastName.toUpperCase().toUpperCase().replaceAll("Ö", "O").replaceAll("Ü", "U").replaceAll("Ä","A").charAt(0);
 

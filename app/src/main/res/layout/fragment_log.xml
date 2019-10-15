@@ -8,7 +8,7 @@
     android:background="@color/log_background"
     tools:context=".activities.LogFragment">
 
-    <RelativeLayout
+    <!--<RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <ImageView
@@ -19,16 +19,12 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentTop="true"
             android:layout_alignParentBottom="true"
-            android:contentDescription="@string/background"/>
+            android:contentDescription="@string/background"/>-->
 
-        <LinearLayout
+        <!--<LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentBottom="true">
+            android:orientation="vertical" >-->
             <ProgressBar
                 android:id="@+id/save_progress"
                 style="@android:style/Widget.ProgressBar.Horizontal"
@@ -55,10 +51,60 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="30dp"
-                android:layout_marginBottom="8dp"
+                android:layout_marginBottom="30dp"
                 android:visibility="visible"
+                tools:visibility="visible"
                 android:background="#00ffffff"
                 android:layout_gravity="center"/>
+
+            <TableLayout
+                android:id="@+id/progress_table"
+                android:visibility="visible"
+                tools:visibility="visible"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp">
+                <TableRow>
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_column="1"
+                        android:src="@drawable/ic_log_download"
+                        android:padding="4dp"
+                        tools:ignore="ContentDescription" />
+                    <TextView
+                        android:id="@+id/progress_download_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_column="2"
+                        android:text="@string/log_downloading"
+                        android:gravity="center_vertical"
+                        android:paddingStart="10dp"
+                        android:paddingEnd="10dp"
+                        android:textSize="16sp" />
+                </TableRow>
+                <TableRow>
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_column="1"
+                        android:padding="4dp"
+                        android:src="@drawable/ic_log_converting"
+                        tools:ignore="ContentDescription" />
+                    <TextView
+                        android:id="@+id/progress_parse_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_column="2"
+                        android:text="@string/log_parsing"
+                        android:gravity="center_vertical"
+                        android:paddingStart="10dp"
+                        android:paddingEnd="10dp"
+                        android:textSize="16sp" />
+                </TableRow>
+
+            </TableLayout>
 
             <ListView
                 android:layout_width="match_parent"
@@ -72,7 +118,8 @@
                 android:scrollbarStyle="outsideOverlay"
                 android:fastScrollAlwaysVisible="true"
                 android:fastScrollEnabled="true"
+                tools:visibility="gone"
                 tools:ignore="RtlSymmetry" />
-        </LinearLayout>
-    </RelativeLayout>
+    <!--</LinearLayout>
+</RelativeLayout>-->
 </LinearLayout>

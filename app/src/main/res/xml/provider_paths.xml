@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <external-files-path name="images" path="gallery/images" />
+    <external-files-path name="external" path="." />
+    <external-path name="secure_name" path="Pictures/QEDGallery" />
+</paths>

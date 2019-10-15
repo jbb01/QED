@@ -1,46 +1,52 @@
 package com.jonahbauer.qed.activities;
 
-import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
+import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.R;
-import com.jonahbauer.qed.qeddb.QEDDBEventsList;
-import com.jonahbauer.qed.qeddb.QEDDBEventsListReceiver;
-import com.jonahbauer.qed.qeddb.QEDDBLogin;
-import com.jonahbauer.qed.qeddb.QEDDBLoginReceiver;
+import com.jonahbauer.qed.networking.QEDDBPages;
+import com.jonahbauer.qed.networking.QEDPageReceiver;
 import com.jonahbauer.qed.qeddb.event.Event;
 import com.jonahbauer.qed.qeddb.event.EventAdapter;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-public class EventDatabaseFragment extends Fragment implements QEDDBLoginReceiver, QEDDBEventsListReceiver {
+public class EventDatabaseFragment extends Fragment implements QEDPageReceiver<List<Event>> {
     private EventAdapter eventAdapter;
 
     private ListView eventListView;
     private ProgressBar searchProgress;
-    private char[] sessionId;
-    private char[] cookie;
+    private TextView offlineLabel;
 
-    public static String showEvent;
-    public static int showEventId;
-    public static boolean shownEvent = true;
+    static String showEvent;
+    static int showEventId;
+    static boolean shownEvent = true;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        QEDDBLogin qeddbLogin = new QEDDBLogin();
-        qeddbLogin.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, this);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        searchProgress.setVisibility(View.VISIBLE);
+        offlineLabel.setVisibility(View.GONE);
+        eventListView.setVisibility(View.GONE);
+        QEDDBPages.getEventList(getClass().toString(), this);
     }
 
     @Override
@@ -50,6 +56,7 @@ public class EventDatabaseFragment extends Fragment implements QEDDBLoginReceive
 
         eventListView = view.findViewById(R.id.event_list_view);
         searchProgress = view.findViewById(R.id.search_progress);
+        offlineLabel = view.findViewById(R.id.label_offline);
 
         eventAdapter = new EventAdapter(getContext(), new ArrayList<>());
         eventListView.setAdapter(eventAdapter);
@@ -58,45 +65,24 @@ public class EventDatabaseFragment extends Fragment implements QEDDBLoginReceive
         return view;
     }
 
-    @Override
-    public void onDestroy() {
-        if (sessionId != null) for (int i = 0; i < sessionId.length; i++) sessionId[i] = 0;
-        if (cookie != null) for (int i = 0; i < cookie.length; i++) cookie[i] = 0;
-        super.onDestroy();
-    }
-
-    @Override
-    public void onReceiveSessionId(char[] sessionId, char[] cookie) {
-        if (sessionId == null) {
-            Intent intent = new Intent(getActivity(), LoginActivity.class);
-            intent.putExtra(LoginActivity.ERROR_MESSAGE, getString(R.string.database_login_failed));
-            startActivity(intent);
-            if (getActivity() != null) getActivity().finish();
-        } else {
-            this.sessionId = Arrays.copyOf(sessionId, sessionId.length);
-            this.cookie = Arrays.copyOf(cookie, cookie.length);
-            QEDDBEventsList qeddbEvents = new QEDDBEventsList();
-            qeddbEvents.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, this, sessionId, cookie);
-        }
-    }
-
     @SuppressWarnings("unused")
-    public void showBottomSheetDialogFragment(String eventId) {
+    private void showBottomSheetDialogFragment(String eventId) {
         assert getFragmentManager() != null;
 
-        EventBottomSheet eventBottomSheet = EventBottomSheet.newInstance(sessionId, cookie, eventId);
+        EventBottomSheet eventBottomSheet = EventBottomSheet.newInstance(eventId);
         eventBottomSheet.show(getFragmentManager(), eventBottomSheet.getTag());
     }
 
-    public void showBottomSheetDialogFragment(Event event) {
+    private void showBottomSheetDialogFragment(Event event) {
         assert getFragmentManager() != null;
 
-        EventBottomSheet eventBottomSheet = EventBottomSheet.newInstance(sessionId, cookie, event);
+        EventBottomSheet eventBottomSheet = EventBottomSheet.newInstance(event);
         eventBottomSheet.show(getFragmentManager(), eventBottomSheet.getTag());
     }
 
     @Override
-    public void onEventsListReceived(List<Event> events) {
+    public void onPageReceived(String tag, List<Event> events) {
+        eventAdapter.clear();
         eventAdapter.addAll(events);
         eventAdapter.notifyDataSetChanged();
         searchProgress.setVisibility(View.GONE);
@@ -114,5 +100,22 @@ public class EventDatabaseFragment extends Fragment implements QEDDBLoginReceive
             }
             shownEvent = true;
         }
+    }
+
+    @Override
+    public void onNetworkError(String tag) {
+        Log.e(Application.LOG_TAG_ERROR, "networkError at " + tag);
+
+        offlineLabel.post(() -> {
+            offlineLabel.setVisibility(View.VISIBLE);
+            searchProgress.setVisibility(View.GONE);
+            eventListView.setVisibility(View.GONE);
+        });
+
+//        Intent intent = new Intent(getActivity(), LoginActivity.class);
+//        intent.putExtra(LoginActivity.ERROR_MESSAGE, getString(R.string.database_login_failed));
+//        startActivity(intent);
+//        if (getActivity() != null) getActivity().finish();
+
     }
 }

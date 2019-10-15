@@ -1,11 +1,12 @@
 package com.jonahbauer.qed.logs;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.jonahbauer.qed.chat.Message;
 
 import java.util.List;
 
+@Deprecated
 public interface LogReceiver {
     void onReceiveLogs(@Nullable List<Message> message);
     void onLogError();

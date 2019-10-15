@@ -1,17 +1,11 @@
 package com.jonahbauer.qed.activities;
 
-import android.content.Intent;
 import android.graphics.drawable.Animatable;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.Transformation;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -19,26 +13,25 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
-import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
+import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.layoutStuff.CheckBoxTriStates;
-import com.jonahbauer.qed.qeddb.QEDDBLogin;
-import com.jonahbauer.qed.qeddb.QEDDBLoginReceiver;
-import com.jonahbauer.qed.qeddb.QEDDBPersonsList;
-import com.jonahbauer.qed.qeddb.QEDDBPersonsListReceiver;
+import com.jonahbauer.qed.networking.QEDDBPages;
+import com.jonahbauer.qed.networking.QEDPageReceiver;
 import com.jonahbauer.qed.qeddb.person.Person;
 import com.jonahbauer.qed.qeddb.person.PersonAdapter;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-public class PersonDatabaseFragment extends Fragment implements CompoundButton.OnCheckedChangeListener, QEDDBLoginReceiver, QEDDBPersonsListReceiver {
+public class PersonDatabaseFragment extends Fragment implements CompoundButton.OnCheckedChangeListener, QEDPageReceiver<List<Person>> {
     private PersonAdapter personAdapter;
 
     private ListView personListView;
@@ -52,11 +45,11 @@ public class PersonDatabaseFragment extends Fragment implements CompoundButton.O
     private EditText firstNameEditText;
     private EditText lastNameEditText;
     private TextView hitsView;
-    private char[] sessionId;
-    private char[] cookie;
+    private TextView offlineLabel;
+    private Button searchButton;
 
-    public static int showPerson;
-    public static boolean shownPerson;
+    static int showPerson;
+    static boolean shownPerson;
 
     private boolean sortLastName = false;
 
@@ -65,8 +58,17 @@ public class PersonDatabaseFragment extends Fragment implements CompoundButton.O
         super.onCreate(savedInstanceState);
 
         persons = new ArrayList<>();
-        QEDDBLogin qeddbLogin = new QEDDBLogin();
-        qeddbLogin.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, this);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        searchProgress.setVisibility(View.VISIBLE);
+        offlineLabel.setVisibility(View.GONE);
+        personListView.setVisibility(View.GONE);
+        searchButton.setEnabled(false);
+        QEDDBPages.getPersonList(getClass().toString(), this);
     }
 
     @Override
@@ -77,7 +79,7 @@ public class PersonDatabaseFragment extends Fragment implements CompoundButton.O
         CheckBox expandCheckBox = view.findViewById(R.id.expand_checkBox);
         personListView = view.findViewById(R.id.person_list_view);
         expand = view.findViewById(R.id.expand);
-        Button searchButton = view.findViewById(R.id.search_button);
+        searchButton = view.findViewById(R.id.search_button);
         searchProgress = view.findViewById(R.id.search_progress);
         firstNameCheckBox = view.findViewById(R.id.database_firstName_checkbox);
         lastNameCheckBox = view.findViewById(R.id.database_lastName_checkbox);
@@ -86,6 +88,7 @@ public class PersonDatabaseFragment extends Fragment implements CompoundButton.O
         firstNameEditText = view.findViewById(R.id.database_firstName_editText);
         lastNameEditText = view.findViewById(R.id.database_lastName_editText);
         hitsView = view.findViewById(R.id.database_hits);
+        offlineLabel = view.findViewById(R.id.label_offline);
         RadioButton sortByFirstNameRadioButton = view.findViewById(R.id.database_sort_first_name_radio_button);
         RadioButton sortByLastNameRadioButton = view.findViewById(R.id.database_sort_last_name_radio_button);
 
@@ -114,13 +117,6 @@ public class PersonDatabaseFragment extends Fragment implements CompoundButton.O
     }
 
     @Override
-    public void onDestroy() {
-        if (sessionId != null) for (int i = 0; i < sessionId.length; i++) sessionId[i] = 0;
-        if (cookie != null) for (int i = 0; i < cookie.length; i++) cookie[i] = 0;
-        super.onDestroy();
-    }
-
-    @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         switch (buttonView.getId()) {
             case R.id.expand_checkBox:
@@ -145,7 +141,7 @@ public class PersonDatabaseFragment extends Fragment implements CompoundButton.O
         }
     }
 
-    public void onRadioButtonClicked(View view) {
+    private void onRadioButtonClicked(View view) {
         boolean checked = ((RadioButton) view).isChecked();
 
         switch (view.getId()) {
@@ -159,66 +155,70 @@ public class PersonDatabaseFragment extends Fragment implements CompoundButton.O
     }
 
     private static void expand(final View v, int duration) {
-        v.getLayoutParams().height = 1;
         v.setVisibility(View.VISIBLE);
-
-        v.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-        final int targetHeight = v.getMeasuredHeight();
-
-        Animation a = new Animation() {
-            @Override
-            protected void applyTransformation(float interpolatedTime, Transformation t) {
-                v.getLayoutParams().height = interpolatedTime == 1
-                        ? LayoutParams.WRAP_CONTENT
-                        : (int) (targetHeight * interpolatedTime);
-                v.requestLayout();
-            }
-
-            @Override
-            public boolean willChangeBounds() {
-                return true;
-            }
-        };
-
-        a.setDuration(duration);
-        v.startAnimation(a);
+//        v.getLayoutParams().height = 1;
+//        v.setVisibility(View.VISIBLE);
+//
+//        v.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+//        final int targetHeight = v.getMeasuredHeight();
+//
+//        Animation a = new Animation() {
+//            @Override
+//            protected void applyTransformation(float interpolatedTime, Transformation t) {
+//                v.getLayoutParams().height = interpolatedTime == 1
+//                        ? LayoutParams.WRAP_CONTENT
+//                        : (int) (targetHeight * interpolatedTime);
+//                v.requestLayout();
+//            }
+//
+//            @Override
+//            public boolean willChangeBounds() {
+//                return true;
+//            }
+//        };
+//
+//        a.setDuration(duration);
+//        v.startAnimation(a);
     }
 
     private static void collapse(final View v, int duration) {
-        final int initialHeight = v.getMeasuredHeight();
-
-        Animation a = new Animation()
-        {
-            @Override
-            protected void applyTransformation(float interpolatedTime, Transformation t) {
-                if(interpolatedTime == 1){
-                    v.setVisibility(View.GONE);
-                }else{
-                    v.getLayoutParams().height = initialHeight - (int)(initialHeight * interpolatedTime);
-                    v.requestLayout();
-                }
-            }
-
-            @Override
-            public boolean willChangeBounds() {
-                return true;
-            }
-        };
-
-        a.setDuration(duration);
-        v.startAnimation(a);
+        v.setVisibility(View.GONE);
+//        final int initialHeight = v.getMeasuredHeight();
+//
+//        Animation a = new Animation()
+//        {
+//            @Override
+//            protected void applyTransformation(float interpolatedTime, Transformation t) {
+//                if(interpolatedTime == 1){
+//                    v.setVisibility(View.GONE);
+//                }else{
+//                    v.getLayoutParams().height = initialHeight - (int)(initialHeight * interpolatedTime);
+//                    v.requestLayout();
+//                }
+//            }
+//
+//            @Override
+//            public boolean willChangeBounds() {
+//                return true;
+//            }
+//        };
+//
+//        a.setDuration(duration);
+//        v.startAnimation(a);
     }
 
-    public void search() {
-        Stream<Person> stream = persons.stream();
-        if (firstNameCheckBox.isChecked()) stream = stream.filter(person -> person.firstName.contains(firstNameEditText.getText().toString().trim()));
-        if (lastNameCheckBox.isChecked()) stream = stream.filter(person -> person.lastName.contains(lastNameEditText.getText().toString().trim()));
-        if (memberCheckBox.getState() == CheckBoxTriStates.UNCHECKED) stream = stream.filter(person -> !person.member);
-        else if (memberCheckBox.getState() == CheckBoxTriStates.CHECKED) stream = stream.filter(person -> person.member);
-        if (activeCheckBox.getState() == CheckBoxTriStates.UNCHECKED) stream = stream.filter(person -> !person.active);
-        else if (activeCheckBox.getState() == CheckBoxTriStates.CHECKED) stream = stream.filter(person -> person.active);
+    private void search() {
+        List<Person> result = new ArrayList<>();
 
-        List<Person> result = stream.collect(Collectors.toList());
+        for (Person person : persons) {
+            if (firstNameCheckBox.isChecked() && !person.firstName.contains(firstNameEditText.getText().toString().trim())) continue;
+            if (lastNameCheckBox.isChecked() && !person.lastName.contains(lastNameEditText.getText().toString().trim())) continue;
+            if (memberCheckBox.getState() == CheckBoxTriStates.UNCHECKED && person.member) continue;
+            else if (memberCheckBox.getState() == CheckBoxTriStates.CHECKED && !person.member) continue;
+            if (activeCheckBox.getState() == CheckBoxTriStates.UNCHECKED && person.active) continue;
+            else if (activeCheckBox.getState() == CheckBoxTriStates.CHECKED && !person.active) continue;
+            result.add(person);
+        }
 
         if (sortLastName) personAdapter.setSort(PersonAdapter.SORT_LAST_NAME);
         else personAdapter.setSort(PersonAdapter.SORT_FIRST_NAME);
@@ -231,26 +231,18 @@ public class PersonDatabaseFragment extends Fragment implements CompoundButton.O
     }
 
     @Override
-    public void onReceiveSessionId(char[] sessionId, char[] cookie) {
-        if (sessionId == null) {
-            Intent intent = new Intent(getActivity(), LoginActivity.class);
-            intent.putExtra(LoginActivity.ERROR_MESSAGE, getString(R.string.database_login_failed));
-            startActivity(intent);
-            if (getActivity() != null) getActivity().finish();
-        } else {
-            this.sessionId = Arrays.copyOf(sessionId, sessionId.length);
-            this.cookie = Arrays.copyOf(cookie, cookie.length);
-            QEDDBPersonsList qeddbPersons = new QEDDBPersonsList();
-            qeddbPersons.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, this, sessionId, cookie);
-        }
-    }
+    public void onPageReceived(String tag, List<Person> persons) {
+        this.persons.clear();
+        personAdapter.clear();
 
-    @Override
-    public void onPersonsListReceived(List<Person> persons) {
         this.persons.addAll(persons);
         personAdapter.addAll(persons);
-        searchProgress.setVisibility(View.GONE);
-        personListView.setVisibility(View.VISIBLE);
+
+        searchProgress.post(() -> {
+            searchProgress.setVisibility(View.GONE);
+            personListView.setVisibility(View.VISIBLE);
+            searchButton.setEnabled(true);
+        });
 
         if (showPerson != 0 && !shownPerson) {
             showBottomSheetDialogFragment(String.valueOf(showPerson));
@@ -258,10 +250,31 @@ public class PersonDatabaseFragment extends Fragment implements CompoundButton.O
         }
     }
 
-    public void showBottomSheetDialogFragment(String personId) {
+    @Override
+    public void onNetworkError(String tag) {
+        Log.e(Application.LOG_TAG_ERROR, "networkError at " + tag);
+
+        offlineLabel.post(() -> {
+            offlineLabel.setVisibility(View.VISIBLE);
+            searchProgress.setVisibility(View.GONE);
+            personListView.setVisibility(View.GONE);
+        });
+
+//        Intent intent = new Intent(getActivity(), LoginActivity.class);
+//        intent.putExtra(LoginActivity.ERROR_MESSAGE, getString(R.string.database_login_failed));
+//        startActivity(intent);
+//        if (getActivity() != null) getActivity().finish();
+
+//        searchProgress.setVisibility(View.GONE);
+//        personListView.setVisibility(View.VISIBLE);
+//
+//        Toast.makeText(getContext(), R.string.error, Toast.LENGTH_LONG).show();
+    }
+
+    private void showBottomSheetDialogFragment(String personId) {
         assert getFragmentManager() != null;
 
-        PersonBottomSheet personBottomSheet = PersonBottomSheet.newInstance(sessionId, cookie, personId);
+        PersonBottomSheet personBottomSheet = PersonBottomSheet.newInstance(personId);
         personBottomSheet.show(getFragmentManager(), personBottomSheet.getTag());
     }
 }

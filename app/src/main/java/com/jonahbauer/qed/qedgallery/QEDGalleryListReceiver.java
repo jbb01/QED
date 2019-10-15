@@ -2,6 +2,7 @@ package com.jonahbauer.qed.qedgallery;
 
 import java.util.List;
 
+@Deprecated
 public interface QEDGalleryListReceiver {
-    void onGalleryListReceived(List<Gallery> galleries);
+    void onAlbumListReceived(List<Album> galleries);
 }

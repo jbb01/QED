@@ -12,6 +12,12 @@ import java.nio.charset.StandardCharsets;
 
 import javax.net.ssl.HttpsURLConnection;
 
+/**
+ * @deprecated
+ *
+ * a manual login is no longer required. {@link com.jonahbauer.qed.networking.AsyncLoadQEDPage} handles logging in.
+ */
+@Deprecated
 public class QEDDBLogin extends AsyncTask<QEDDBLoginReceiver, Void, Void> {
 
 
@@ -21,9 +27,9 @@ public class QEDDBLogin extends AsyncTask<QEDDBLoginReceiver, Void, Void> {
         if (receivers.length < 1) return null;
         receiver = receivers[0];
         try {
-            Application application = (Application) Application.getContext();
-            String username = application.loadData(application.getString(R.string.data_username_key), false);
-            String password = application.loadData(application.getString(R.string.data_password_key), true);
+            Application application = Application.getContext();
+            String username = application.loadData(Application.KEY_USERNAME, false);
+            String password = application.loadData(Application.KEY_PASSWORD, true);
 
             byte[] data = ("username=" + username + "&password=" + password + "&anmelden=anmelden").getBytes(StandardCharsets.UTF_8);
 
@@ -44,12 +50,15 @@ public class QEDDBLogin extends AsyncTask<QEDDBLoginReceiver, Void, Void> {
             String location = httpsURLConnection.getHeaderField("Location");
             String cookie = httpsURLConnection.getHeaderField("Set-Cookie");
             if (location == null)
-                receiver.onReceiveSessionId(null,null);
-            else
-                receiver.onReceiveSessionId(location.split("session_id2=")[1].toCharArray(), cookie.toCharArray());
+                receiver.onLoginFinish(false);
+            else {
+                application.saveData(cookie, Application.KEY_DATABASE_SESSIONID, true);
+                application.saveData(location.split("session_id2=")[1], Application.KEY_DATABASE_SESSIONID2, true);
+                receiver.onLoginFinish(true);
+            }
         } catch (java.io.IOException e) {
-            Log.e("","",e);
-            receiver.onReceiveSessionId(null,null);
+            Log.e(Application.LOG_TAG_ERROR,e.getMessage(), e);
+            receiver.onLoginFinish(false);
         }
         return null;
     }

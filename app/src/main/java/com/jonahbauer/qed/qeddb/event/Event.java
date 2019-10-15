@@ -1,6 +1,6 @@
 package com.jonahbauer.qed.qeddb.event;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.jonahbauer.qed.qeddb.person.Person;
 

@@ -1,114 +1,119 @@
 package com.jonahbauer.qed;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.security.keystore.KeyGenParameterSpec;
-import android.security.keystore.KeyProperties;
-import android.util.Base64;
 import android.util.Log;
+import android.widget.Toast;
+
+import androidx.security.crypto.EncryptedSharedPreferences;
+import androidx.security.crypto.MasterKeys;
 
 import java.io.IOException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
+import java.security.GeneralSecurityException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.KeyGenerator;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.IvParameterSpec;
-
 public class Application extends android.app.Application implements android.app.Application.ActivityLifecycleCallbacks {
-    public static boolean internetConnection;
-    private static Context context;
+    public static final String LOG_TAG_ERROR = "com.jonahbauer.qed::error";
+    @SuppressWarnings("unused")
+    public static final String LOG_TAG_DEBUG = "com.jonahbauer.qed::debug";
+
+    public static final String KEY_USERNAME = "username";
+    public static final String KEY_PASSWORD = "password";
+    public static final String KEY_USERID = "userid";
+
+    public static final String KEY_CHAT_PWHASH = "chat_pwhash";
+
+    public static final String KEY_GALLERY_PWHASH = "gallery_pwhash";
+    public static final String KEY_GALLERY_PHPSESSID = "gallery_phpsessid";
+
+    public static final String KEY_DATABASE_SESSION_COOKIE = "db_sessioncookie";
+    public static final String KEY_DATABASE_SESSIONID = "db_sessionid";
+    public static final String KEY_DATABASE_SESSIONID2 = "db_sessionid2";
+
+
+    private static final String ENCRYPTED_SHARED_PREFERENCE_FILE = "com.jonahbauer.qed_encrypted";
+
+
+    public static boolean online;
+
+    private static Application context;
     private Activity activity;
-    private CheckConnectionTask ping;
     private final Set<Activity> activeActivities;
+    private final Set<Activity> existingActivities;
     private boolean active;
+    private ConnectionStateMonitor connectionStateMonitor;
+
+    private String masterKeyAlias;
 
     {
         activeActivities = new HashSet<>();
-    }
-
-    public void setLastOnlineStatus(boolean lastOnlineStatus) {
-        ping.lastOnlineStatus = lastOnlineStatus;
+        existingActivities = new HashSet<>();
     }
 
     public String loadData(String key, boolean encrypted) {
         if (encrypted) {
             try {
-                // TODO require user authentication
-                String ivPwHash = getSharedPreferences(getString(R.string.preferences_shared_preferences), MODE_PRIVATE).getString(key, "");
-                String ivBase64 = ivPwHash.split("///")[0];
-                String pwHash = ivPwHash.split("///")[1];
-                byte[] pwHashBytes = Base64.decode(pwHash, Base64.NO_WRAP);
-                byte[] iv = Base64.decode(ivBase64, Base64.NO_WRAP);
+                KeyGenParameterSpec keyGenParameterSpec = MasterKeys.AES256_GCM_SPEC;
+                masterKeyAlias = MasterKeys.getOrCreate(keyGenParameterSpec);
+            } catch (GeneralSecurityException | IOException e) {
+                Toast.makeText(this, "Passwort konnte nicht gespeichert werden.", Toast.LENGTH_SHORT).show();
+            }
 
-                KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
-                keyStore.load(null);
-                SecretKey secretKey = (SecretKey) keyStore.getKey(key, null);
-                Cipher cipher = Cipher.getInstance("AES/CBC/PKCS7Padding");
-                cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(iv));
+            if (masterKeyAlias == null) {
+                Log.e(LOG_TAG_ERROR, "masterKeyAlias is null");
+                return null;
+            }
 
-                return new String(cipher.doFinal(pwHashBytes));
-            } catch (InvalidAlgorithmParameterException | KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException | CertificateException | NoSuchPaddingException | InvalidKeyException | IOException | BadPaddingException | IllegalBlockSizeException e) {
-                Log.e("", e.getMessage(), e);
-                return "";
+            try {
+                SharedPreferences sharedPreferences = EncryptedSharedPreferences
+                        .create(
+                                ENCRYPTED_SHARED_PREFERENCE_FILE,
+                                masterKeyAlias,
+                                context,
+                                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+                        );
+                return sharedPreferences.getString(key, null);
+            } catch (GeneralSecurityException | IOException e) {
+                Log.e(LOG_TAG_ERROR, e.getMessage(), e);
+                return null;
             }
         } else {
-            return getSharedPreferences(getString(R.string.preferences_shared_preferences), MODE_PRIVATE).getString(key, "");
+            return getSharedPreferences(getString(R.string.preferences_shared_preferences), MODE_PRIVATE).getString(key, null);
         }
     }
 
     public void saveData(String data, String key, boolean encrypted) {
         if (encrypted) {
             try {
-                KeyGenerator keyGenerator = KeyGenerator.getInstance(
-                        KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore");
+                KeyGenParameterSpec keyGenParameterSpec = MasterKeys.AES256_GCM_SPEC;
+                masterKeyAlias = MasterKeys.getOrCreate(keyGenParameterSpec);
+            } catch (GeneralSecurityException | IOException e) {
+                Toast.makeText(this, "Passwort konnte nicht gespeichert werden.", Toast.LENGTH_SHORT).show();
+            }
+            if (masterKeyAlias == null) {
+                Log.e(LOG_TAG_ERROR, "masterKeyAlias is null");
+                return;
+            }
+            try {
+                SharedPreferences sharedPreferences = EncryptedSharedPreferences
+                        .create(
+                                ENCRYPTED_SHARED_PREFERENCE_FILE,
+                                masterKeyAlias,
+                                context,
+                                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+                        );
 
-                KeyGenParameterSpec.Builder builder = new KeyGenParameterSpec.Builder(
-                        key,
-                        KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT);
-
-                builder
-                        .setKeySize(256)
-                        .setBlockModes(KeyProperties.BLOCK_MODE_CBC)
-                        .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_PKCS7);
-
-                keyGenerator.init(builder.build());
-                SecretKey secretKey = keyGenerator.generateKey();
-
-                KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
-
-                keyStore.load(null);
-
-                Cipher cipher = Cipher.getInstance("AES/CBC/PKCS7Padding");
-
-                cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-                byte[] encryptedBytes = cipher.doFinal(data.getBytes());
-                String pwHashEncrypted = Base64.encodeToString(encryptedBytes, Base64.NO_WRAP);
-                String iv = Base64.encodeToString(cipher.getIV(), Base64.NO_WRAP);
-
-                getSharedPreferences(getString(R.string.preferences_shared_preferences), MODE_PRIVATE).edit().putString(key, iv + "///" + pwHashEncrypted).apply();
-
-            } catch (CertificateException | IOException | NoSuchAlgorithmException | KeyStoreException | InvalidAlgorithmParameterException | NoSuchProviderException | NoSuchPaddingException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
-                Log.e("", e.getMessage(), e);
+                sharedPreferences.edit().putString(key, data).apply();
+            } catch (GeneralSecurityException | IOException e) {
+                Log.e(LOG_TAG_ERROR, e.getMessage(), e);
             }
         } else {
             getSharedPreferences(getString(R.string.preferences_shared_preferences), MODE_PRIVATE).edit().putString(key, data).apply();
@@ -119,11 +124,13 @@ public class Application extends android.app.Application implements android.app.
     public void onCreate() {
         super.onCreate();
         registerActivityLifecycleCallbacks(this);
-        ping = new CheckConnectionTask();
-        ping.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
         context = this;
 
-        Log.d("test", PreferenceManager.getDefaultSharedPreferencesName(context));
+        connectionStateMonitor = new ConnectionStateMonitor(this);
+        online = false;
+        connectionStateMonitor.enable();
+
         getSharedPreferences(getString(R.string.preferences_shared_preferences), MODE_PRIVATE).registerOnSharedPreferenceChangeListener((SharedPreferences sharedPreferences, String key) -> {
             SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
             Map<String, ?> all = sharedPreferences.getAll();
@@ -146,13 +153,14 @@ public class Application extends android.app.Application implements android.app.
     @Override
     public void onTerminate() {
         super.onTerminate();
-        if (ping !=null) ping.cancel(true);
+        if (connectionStateMonitor != null) connectionStateMonitor.disable();
         unregisterActivityLifecycleCallbacks(this);
     }
 
     @Override
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
         this.activity = activity;
+        existingActivities.add(activity);
     }
 
     @Override
@@ -192,6 +200,7 @@ public class Application extends android.app.Application implements android.app.
 
     @Override
     public void onActivityDestroyed(Activity activity) {
+        existingActivities.remove(activity);
     }
 
     private void onApplicationResumed() {
@@ -200,56 +209,22 @@ public class Application extends android.app.Application implements android.app.
     private void onApplicationPaused() {
     }
 
-    public static Context getContext() {
+    public static Application getContext() {
         return context;
     }
 
-    @SuppressLint("StaticFieldLeak")
-    class CheckConnectionTask extends AsyncTask<Void, Boolean, Boolean> {
-        boolean lastOnlineStatus = true;
-        int fails = 0;
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            while (!isCancelled()) {
-                if (!isOnline()) {
-                    fails++;
-                } else {
-                    fails = 0;
-                    publishProgress(true);
-                }
-                if (fails>2) publishProgress(false);
-                try {
-                    Thread.sleep(5000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-            return false;
+    public void setOnline(boolean online) {
+        if (!Application.online && online) {
+            if (activity!=null&&(activity instanceof Internet)) ((Internet)activity).onConnectionRegain();
+        } else if (Application.online && !online) {
+            if (activity!=null&&(activity instanceof Internet)) ((Internet)activity).onConnectionFail();
+        } else if (!Application.online) {
+            if (activity!=null&&(activity instanceof Internet)) ((Internet)activity).onConnectionFail();
         }
+        Application.online = online;
+    }
 
-        @Override
-        protected void onProgressUpdate(Boolean... values) {
-            super.onProgressUpdate(values);
-            if (!values[0]&&lastOnlineStatus) {
-                if (activity!=null&&(activity instanceof Internet)) ((Internet)activity).onConnectionFail();
-            } else if (values[0]&&!lastOnlineStatus) {
-                if (activity!=null&&(activity instanceof Internet)) ((Internet)activity).onConnectionRegain();
-            }
-            internetConnection = values[0];
-            lastOnlineStatus = values[0];
-        }
-
-        private boolean isOnline() {
-            Runtime runtime = Runtime.getRuntime();
-            try {
-                Process ipProcess = runtime.exec("/system/bin/ping -c 1 "+getString(R.string.chat_server_ping));
-                int exitValue = ipProcess.waitFor();
-                return (exitValue == 0);
-            } catch (IOException | InterruptedException e) {
-                e.printStackTrace();
-            }
-            return false;
-        }
+    public void finish() {
+        for (Activity activity : existingActivities) activity.finish();
     }
 }

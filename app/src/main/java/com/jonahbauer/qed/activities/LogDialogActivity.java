@@ -7,35 +7,38 @@ import android.icu.util.Calendar;
 import android.icu.util.TimeZone;
 import android.os.Bundle;
 import android.os.Message;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+
 import com.jonahbauer.qed.R;
+import com.jonahbauer.qed.activities.LogFragment.Mode;
 import com.jonahbauer.qed.logs.LogDateIntervalFragment;
 import com.jonahbauer.qed.logs.LogDateRecentFragment;
 import com.jonahbauer.qed.logs.LogPostRecentFragment;
 
 import java.text.DateFormat;
-import java.text.MessageFormat;
 import java.util.Date;
 
-import static com.jonahbauer.qed.activities.LogFragment.LOG_FROM;
-import static com.jonahbauer.qed.activities.LogFragment.LOG_LAST;
-import static com.jonahbauer.qed.activities.LogFragment.LOG_MODE_INTERVAL_DATE;
+import static com.jonahbauer.qed.activities.LogFragment.LOG_FROM_KEY;
+import static com.jonahbauer.qed.activities.LogFragment.LOG_LAST_KEY;
 import static com.jonahbauer.qed.activities.LogFragment.LOG_MODE_KEY;
-import static com.jonahbauer.qed.activities.LogFragment.LOG_MODE_RECENT_DATE;
-import static com.jonahbauer.qed.activities.LogFragment.LOG_MODE_RECENT_POSTS;
-import static com.jonahbauer.qed.activities.LogFragment.LOG_TO;
+import static com.jonahbauer.qed.activities.LogFragment.LOG_TO_KEY;
+import static com.jonahbauer.qed.activities.LogFragment.Mode.DATE_INTERVAL;
+import static com.jonahbauer.qed.activities.LogFragment.Mode.DATE_RECENT;
+import static com.jonahbauer.qed.activities.LogFragment.Mode.POST_INTERVAL;
+import static com.jonahbauer.qed.activities.LogFragment.Mode.POST_RECENT;
+import static com.jonahbauer.qed.activities.LogFragment.Mode.SINCE_OWN;
 
 public class LogDialogActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, DatePickerDialog.OnDateSetListener {
-    private String mode;
+    private Mode mode;
     private Date dateStart;
     private Date dateEnd;
 
@@ -67,15 +70,21 @@ public class LogDialogActivity extends AppCompatActivity implements AdapterView.
 
         fragmentTransaction = manager.beginTransaction();
 
-        if (getString(R.string.log_postrecent).equals(item)) {
+        if (POST_RECENT.modeStr.equals(item)) {
             fragmentTransaction.add(R.id.log_dialog_fragment_holder, new LogPostRecentFragment(), "");
-            mode = LOG_MODE_RECENT_POSTS;
-        } else if (getString(R.string.log_daterecent).equals(item)) {
+            mode = POST_RECENT;
+        } else if (DATE_RECENT.modeStr.equals(item)) {
             fragmentTransaction.add(R.id.log_dialog_fragment_holder, new LogDateRecentFragment(), "");
-            mode = LOG_MODE_RECENT_DATE;
-        } else if (getString(R.string.log_dateinterval).equals(item)) {
+            mode = DATE_RECENT;
+        } else if (DATE_INTERVAL.modeStr.equals(item)) {
             fragmentTransaction.add(R.id.log_dialog_fragment_holder, new LogDateIntervalFragment(), "");
-            mode = LOG_MODE_INTERVAL_DATE;
+            mode = DATE_INTERVAL;
+        } else if (POST_INTERVAL.modeStr.equals(item)) {
+            // TODO fragmentTransaction.add(R.id.log_dialog_fragment_holder, new LogDateIntervalFragment(), "");
+            mode = DATE_INTERVAL;
+        } else if (SINCE_OWN.modeStr.equals(item)) {
+            // TODO fragmentTransaction.add(R.id.log_dialog_fragment_holder, new LogDateIntervalFragment(), "");
+            mode = SINCE_OWN;
         }
 
         fragmentTransaction.commit();
@@ -91,22 +100,26 @@ public class LogDialogActivity extends AppCompatActivity implements AdapterView.
 
     public void ok(View view) {
         Intent resultIntent = new Intent();
-        resultIntent.putExtra(LOG_MODE_KEY, mode);
+        resultIntent.putExtra(LOG_MODE_KEY, mode.toString());
         switch (mode) {
-            case LOG_MODE_RECENT_POSTS: {
-                String last = ((EditText) findViewById(R.id.log_dialog_postrecent_editText)).getText().toString();
-                resultIntent.putExtra(LOG_LAST, last);
+            case POST_RECENT: {
+                Long last = Long.valueOf(((EditText) findViewById(R.id.log_dialog_postrecent_editText)).getText().toString().trim());
+                resultIntent.putExtra(LOG_LAST_KEY, last);
                 break;
             }
-            case LOG_MODE_RECENT_DATE: {
-                String last = ((EditText) findViewById(R.id.log_dialog_daterecent_editText)).getText().toString();
-                if (last.trim().equals("")) last = "1";
-                resultIntent.putExtra(LOG_LAST, String.valueOf(Integer.valueOf(last) * 3600));
+            case DATE_RECENT: {
+                Long last = Long.valueOf(((EditText) findViewById(R.id.log_dialog_daterecent_editText)).getText().toString().trim());
+                resultIntent.putExtra(LOG_LAST_KEY, last * 3600);
                 break;
             }
-            case LOG_MODE_INTERVAL_DATE: {
-                resultIntent.putExtra(LOG_FROM, (dateStart != null)? MessageFormat.format("{0,date,dd.MM.yyyy}", dateStart): "");
-                resultIntent.putExtra(LOG_TO, (dateEnd != null)? MessageFormat.format("{0,date,dd.MM.yyyy}", dateEnd): "");
+            case DATE_INTERVAL: {
+                resultIntent.putExtra(LOG_FROM_KEY, (dateStart != null) ? dateStart.getTime() : 0);
+                resultIntent.putExtra(LOG_TO_KEY, (dateEnd != null) ? dateEnd.getTime() : 0);
+                break;
+            }
+            case POST_INTERVAL:
+            case SINCE_OWN: {
+                // TODO
                 break;
             }
         }

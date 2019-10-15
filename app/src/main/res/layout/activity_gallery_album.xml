@@ -1,25 +1,222 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@color/album_background"
     tools:context="com.jonahbauer.qed.activities.GalleryAlbumActivity">
 
-    <android.support.v7.widget.Toolbar
+    <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
         android:theme="@style/AppTheme.AppBarOverlay" />
 
+
+    <TextView
+        android:id="@+id/label_offline"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/offline_mode"
+        android:textAlignment="center"
+        android:gravity="center"
+        android:textSize="16sp"
+        android:background="@color/colorBackground"
+        android:textColor="@color/offline_label_font"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/toolbar"/>
+
+    <LinearLayout
+        android:id="@+id/album_search_filters"
+        android:layout_below="@id/label_offline"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="false"
+        android:paddingBottom="7dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/chat_database_search_background"
+            android:elevation="5dp"
+            tools:ignore="UselessParent">
+            <TableLayout
+                android:id="@+id/expand"
+                android:visibility="gone"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentTop="true"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="1dp"
+                    android:paddingEnd="1dp">
+                    <RadioButton
+                        android:id="@+id/album_photographer_radio_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginEnd="10dp"
+                        android:textColor="@color/album_search_headers"
+                        android:text="@string/album_photographer_radio_button" />
+                    <Spinner
+                        android:id="@+id/album_photographer_spinner"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="6dp"
+                        android:textSize="16sp"
+                        android:spinnerMode="dialog"/>
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="1dp"
+                    android:paddingEnd="1dp">
+                    <RadioButton
+                        android:id="@+id/album_date_radio_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginEnd="10dp"
+                        android:textColor="@color/album_search_headers"
+                        android:text="@string/album_date_radio_button" />
+                    <Spinner
+                        android:id="@+id/album_date_spinner"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="6dp"
+                        android:textSize="16sp"
+                        android:spinnerMode="dialog" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="1dp"
+                    android:paddingEnd="1dp">
+                    <RadioButton
+                        android:id="@+id/album_category_radio_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginEnd="10dp"
+                        android:textColor="@color/album_search_headers"
+                        android:text="@string/album_category_radio_button" />
+                    <Spinner
+                        android:id="@+id/album_category_spinner"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="6dp"
+                        android:textSize="16sp"
+                        android:spinnerMode="dialog"/>
+                </TableRow>
+            </TableLayout>
+
+            <Button
+                android:id="@+id/search_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_below="@id/expand"
+                android:background="@drawable/button"
+                android:paddingStart="@dimen/activity_horizontal_margin"
+                android:paddingEnd="@dimen/activity_horizontal_margin"
+                android:text="@string/database_search_button"
+                android:textColor="@color/colorAccent"/>
+
+            <TextView
+                android:id="@+id/album_hits"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="6dp"
+                android:paddingEnd="6dp"
+                android:layout_alignTop="@id/search_button"
+                android:layout_alignBottom="@id/search_button"
+                android:layout_toEndOf="@id/search_button"
+                android:layout_toStartOf="@id/expand_checkBox"
+                android:layout_below="@id/expand"
+                android:gravity="center_vertical" />
+
+            <CheckBox
+                android:id="@+id/expand_checkBox"
+                android:paddingEnd="10dp"
+                tools:ignore="RtlSymmetry"
+                android:layout_alignParentEnd="true"
+                android:layout_alignTop="@id/search_button"
+                android:layout_alignBottom="@id/search_button"
+                android:layout_below="@id/expand"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:button="@drawable/ic_arrow_down_accent_animation"/>
+
+        </RelativeLayout>
+    </LinearLayout>
+
+    <ProgressBar
+        android:layout_below="@id/album_search_filters"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:paddingTop="15dp"
+        android:gravity="center_horizontal"
+        android:id="@+id/progress_bar"
+        style="?android:attr/progressBarStyleLarge"
+        android:visibility="visible"
+        tools:visibility="gone"/>
+
     <GridView
         android:id="@+id/image_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:numColumns="2"
+        android:layout_below="@id/album_search_filters"
+        android:numColumns="3"
+        android:translationY="-7dp"
+        android:translationZ="-1dp"
+        android:layout_marginBottom="-6dp"
+        android:paddingTop="5dp"
         android:fastScrollEnabled="true"
         android:fastScrollAlwaysVisible="true"
-        tools:listitem="@layout/list_item_image"/>
+        android:scrollbarStyle="outsideOverlay"
+        android:paddingEnd="?android:attr/scrollbarSize"
+        android:clipToPadding="false"
+        android:visibility="gone"
+        android:verticalSpacing="4dp"
+        android:horizontalSpacing="4dp"
+        tools:visibility="visible"
+        tools:listitem="@layout/list_item_image"
+        tools:ignore="RtlSymmetry" />
 
-</LinearLayout>
+    <TextView
+        android:id="@+id/empty_album"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/album_search_filters"
+        android:layout_alignBottom="@id/image_container"
+        android:layout_alignTop="@id/image_container"
+        android:layout_alignStart="@id/image_container"
+        android:layout_alignEnd="@id/image_container"
+        android:visibility="gone"
+        android:textSize="20sp"
+        android:gravity="center"
+        android:text="@string/empty_album"/>
+
+</RelativeLayout>

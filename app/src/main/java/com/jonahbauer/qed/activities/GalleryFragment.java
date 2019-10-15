@@ -1,11 +1,10 @@
 package com.jonahbauer.qed.activities;
 
 import android.content.Intent;
-import android.os.AsyncTask;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,32 +13,46 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
+import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.R;
-import com.jonahbauer.qed.qedgallery.Gallery;
-import com.jonahbauer.qed.qedgallery.GalleryAdapter;
-import com.jonahbauer.qed.qedgallery.QEDGalleryList;
-import com.jonahbauer.qed.qedgallery.QEDGalleryListReceiver;
-import com.jonahbauer.qed.qedgallery.QEDGalleryLogin;
-import com.jonahbauer.qed.qedgallery.QEDGalleryLoginReceiver;
+import com.jonahbauer.qed.database.GalleryDatabase;
+import com.jonahbauer.qed.database.GalleryDatabaseReceiver;
+import com.jonahbauer.qed.networking.QEDGalleryPages;
+import com.jonahbauer.qed.networking.QEDPageReceiver;
+import com.jonahbauer.qed.qedgallery.Album;
+import com.jonahbauer.qed.qedgallery.AlbumAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class GalleryFragment extends Fragment implements QEDGalleryLoginReceiver, QEDGalleryListReceiver {
+public class GalleryFragment extends Fragment implements QEDPageReceiver<List<Album>>, GalleryDatabaseReceiver {
     private ListView galleryListView;
     private ProgressBar searchProgress;
-    private char[] userid;
-    private char[] sessionid;
-    private char[] pwhash;
+    private TextView offlineLabel;
 
-    private GalleryAdapter galleryAdapter;
+    private boolean online;
+
+    private SharedPreferences sharedPreferences;
+
+    private AlbumAdapter galleryAdapter;
+    private GalleryDatabase galleryDatabase;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        QEDGalleryLogin qedGalleryLogin = new QEDGalleryLogin();
-        qedGalleryLogin.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, this);
+
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        online = false;
+
+        galleryDatabase = new GalleryDatabase();
+        galleryDatabase.init(getContext(), this);
     }
 
     @Nullable
@@ -47,22 +60,28 @@ public class GalleryFragment extends Fragment implements QEDGalleryLoginReceiver
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_gallery, container, false);
 
-        galleryAdapter = new GalleryAdapter(getContext(), new ArrayList<>());
+        galleryAdapter = new AlbumAdapter(getContext(), new ArrayList<>());
 
         galleryListView = view.findViewById(R.id.gallery_list_container);
         galleryListView.setAdapter(galleryAdapter);
         galleryListView.setOnItemClickListener((parent, view1, position, id) -> {
-            Gallery gallery = galleryAdapter.getItem((int) id);
+            Album album = galleryAdapter.getItem((int) id);
 
-            Intent intent = new Intent(GalleryFragment.this.getContext(), GalleryAlbumActivity.class);
-            intent.putExtra(GalleryAlbumActivity.GALLERY_ALBUM_KEY, gallery);
-            intent.putExtra(GalleryAlbumActivity.GALLERY_PWHASH_KEY, pwhash);
-            intent.putExtra(GalleryAlbumActivity.GALLERY_SESSIONID_KEY, sessionid);
-            intent.putExtra(GalleryAlbumActivity.GALLERY_USERID_KEY, userid);
-            startActivity(intent);
+            if (album == null) return;
+            if (online || album.imageListDownloaded) {
+                Intent intent = new Intent(GalleryFragment.this.getContext(), GalleryAlbumActivity.class);
+                intent.putExtra(GalleryAlbumActivity.GALLERY_ALBUM_KEY, album);
+                startActivity(intent);
+            } else {
+                Toast.makeText(getContext(), getString(R.string.album_not_downloaded), Toast.LENGTH_SHORT).show();
+            }
         });
 
         searchProgress = view.findViewById(R.id.search_progress);
+        offlineLabel = view.findViewById(R.id.label_offline);
+
+        if (!sharedPreferences.getBoolean(getString(R.string.preferences_gallery_offline_mode_key), false))
+            offlineLabel.setOnClickListener(v -> switchToOnlineMode());
 
         galleryAdapter.notifyDataSetChanged();
 
@@ -70,19 +89,30 @@ public class GalleryFragment extends Fragment implements QEDGalleryLoginReceiver
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    public void onResume() {
+        super.onResume();
+
+        if (!sharedPreferences.getBoolean(getString(R.string.preferences_gallery_offline_mode_key), false))
+            switchToOnlineMode();
+        else
+            switchToOfflineMode();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_log, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         return false;
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        galleryDatabase.close();
     }
 
     @Override
@@ -91,26 +121,59 @@ public class GalleryFragment extends Fragment implements QEDGalleryLoginReceiver
     }
 
     @Override
-    public void onReceiveSessionId(char[] sessionId, char[] pwhash, char[] userid) {
-        if (sessionId == null || pwhash == null || userid == null) {
-            Intent intent = new Intent(getActivity(), LoginActivity.class);
-            intent.putExtra(LoginActivity.ERROR_MESSAGE, getString(R.string.gallery_login_failed));
-            startActivity(intent);
-            if (getActivity() != null) getActivity().finish();
-        } else {
-            this.sessionid = sessionId;
-            this.pwhash = pwhash;
-            this.userid = userid;
-            QEDGalleryList qedGalleryList = new QEDGalleryList();
-            qedGalleryList.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, this, sessionId, pwhash, userid);
-        }
-    }
-
-    @Override
-    public void onGalleryListReceived(List<Gallery> galleries) {
-        galleryAdapter.addAll(galleries);
+    public void onPageReceived(String tag, List<Album> albums) {
+        galleryAdapter.clear();
+        galleryAdapter.addAll(albums);
         galleryAdapter.notifyDataSetChanged();
         searchProgress.setVisibility(View.GONE);
         galleryListView.setVisibility(View.VISIBLE);
+
+        galleryDatabase.insertAllAlbums(albums, false);
+        online = true;
+    }
+
+    @Override
+    public void onNetworkError(String tag) {
+        Log.e(Application.LOG_TAG_ERROR, "networkError at: " + tag);
+        switchToOfflineMode();
+
+    }
+
+    @Override
+    public void onReceiveResult(List items) {}
+
+    @Override
+    public void onDatabaseError() {}
+
+    @Override
+    public void onInsertAllUpdate(int done, int total) {}
+
+    private void switchToOfflineMode() {
+        online = false;
+        offlineLabel.post(() -> {
+            offlineLabel.setVisibility(View.VISIBLE);
+            Toast.makeText(getContext(), offlineLabel.getContext().getString(R.string.login_failed_switching_to_offline), Toast.LENGTH_SHORT).show();
+        });
+
+        galleryListView.post(() -> {
+            galleryAdapter.clear();
+            galleryAdapter.addAll(galleryDatabase.getAlbums());
+            galleryAdapter.notifyDataSetChanged();
+        });
+
+        searchProgress.post(() -> {
+            searchProgress.setVisibility(View.GONE);
+            galleryListView.setVisibility(View.VISIBLE);
+        });
+    }
+
+    private void switchToOnlineMode() {
+        searchProgress.post(() -> {
+            searchProgress.setVisibility(View.VISIBLE);
+            galleryListView.setVisibility(View.GONE);
+            offlineLabel.setVisibility(View.GONE);
+        });
+
+        QEDGalleryPages.getAlbumList(getClass().toString(), this);
     }
 }

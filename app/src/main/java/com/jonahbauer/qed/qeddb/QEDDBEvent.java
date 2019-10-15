@@ -16,10 +16,14 @@ import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import javax.net.ssl.HttpsURLConnection;
 
+/**
+ * @deprecated
+ * use {@link com.jonahbauer.qed.networking.AsyncLoadQEDPage} instead
+ */
+@Deprecated()
 public class QEDDBEvent extends AsyncTask<Object, Void, String[]> {
     private QEDDBEventReceiver receiver;
 
@@ -30,36 +34,33 @@ public class QEDDBEvent extends AsyncTask<Object, Void, String[]> {
 
     @Override
     protected String[] doInBackground(Object...objects) {
-        char[] sessionId;
-        char[] cookie;
         String eventId;
 
-        if (objects.length < 4) return null;
+        if (objects.length < 2) return null;
         if (objects[0] instanceof QEDDBEventReceiver) receiver = (QEDDBEventReceiver) objects[0];
         else return null;
 
-        if (objects[1] instanceof char[]) sessionId = (char[]) objects[1];
-        else return null;
-
-        if (objects[2] instanceof char[]) cookie = (char[]) objects[2];
-        else return null;
-
-        if (objects[3] instanceof String) {
+        if (objects[1] instanceof String) {
             event = new Event();
-            eventId = (String) objects[3];
-        } else if (objects[3] instanceof Event) {
-            event = (Event) objects[3];
+            eventId = (String) objects[1];
+        } else if (objects[1] instanceof Event) {
+            event = (Event) objects[1];
             eventId = event.id;
         } else return null;
+
+        Application application = Application.getContext();
+        String sessionId = application.loadData(Application.KEY_DATABASE_SESSIONID, true);
+        String sessionId2 = application.loadData(Application.KEY_DATABASE_SESSIONID2, true);
+        if (sessionId == null || sessionId2 == null) return null;
 
         String[] result = new String[2];
         for (int i = 1 ; i <= 2; i++) {
             try {
-                HttpsURLConnection httpsURLConnection = (HttpsURLConnection) new URL(String.format(Application.getContext().getString(R.string.database_server_event), String.valueOf(sessionId), eventId, String.valueOf(i))).openConnection();
+                HttpsURLConnection httpsURLConnection = (HttpsURLConnection) new URL(String.format(Application.getContext().getString(R.string.database_server_event), sessionId2, eventId, String.valueOf(i))).openConnection();
                 httpsURLConnection.setRequestMethod("POST");
                 httpsURLConnection.setDoOutput(true);
                 httpsURLConnection.setInstanceFollowRedirects(false);
-                httpsURLConnection.setRequestProperty("Cookie", String.valueOf(cookie));
+                httpsURLConnection.setRequestProperty("Cookie", sessionId);
                 httpsURLConnection.setUseCaches(false);
                 httpsURLConnection.connect();
 
@@ -194,9 +195,17 @@ public class QEDDBEvent extends AsyncTask<Object, Void, String[]> {
                         case "abgemeldet":
                             person.type = Person.MemberType.MEMBER_OPT_OUT;
                             break;
+                        case "teilgenommen":
+                            person.type = Person.MemberType.MEMBER_PARTICIPATED;
+                            break;
                     }
 
-                    if (event.organizer.stream().map(p -> p.firstName + p.lastName).collect(Collectors.toList()).contains(person.firstName + person.lastName)) person.type = Person.MemberType.ORGA;
+                    for (Person organizer : event.organizer) {
+                        if ((organizer.firstName + organizer.lastName).equals(person.firstName + person.lastName)) {
+                            person.type = Person.MemberType.ORGA;
+                            break;
+                        }
+                    }
 
                     event.members.add(person);
                 }

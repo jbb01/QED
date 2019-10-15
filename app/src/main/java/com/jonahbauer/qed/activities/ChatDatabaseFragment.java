@@ -3,13 +3,9 @@ package com.jonahbauer.qed.activities;
 import android.graphics.Shader;
 import android.graphics.drawable.Animatable;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.Transformation;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -17,8 +13,10 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.chat.Message;
@@ -161,57 +159,59 @@ public class ChatDatabaseFragment extends Fragment implements CompoundButton.OnC
     }
 
     private static void expand(final View v, int duration) {
-        v.getLayoutParams().height = 1;
         v.setVisibility(View.VISIBLE);
-
-        v.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
-        final int targetHeight = v.getMeasuredHeight();
-
-        Animation a = new Animation() {
-            @Override
-            protected void applyTransformation(float interpolatedTime, Transformation t) {
-                v.getLayoutParams().height = interpolatedTime == 1
-                        ? LayoutParams.WRAP_CONTENT
-                        : (int) (targetHeight * interpolatedTime);
-                v.requestLayout();
-            }
-
-            @Override
-            public boolean willChangeBounds() {
-                return true;
-            }
-        };
-
-        a.setDuration(duration);
-        v.startAnimation(a);
+//        v.getLayoutParams().height = 1;
+//        v.setVisibility(View.VISIBLE);
+//
+//        v.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+//        final int targetHeight = v.getMeasuredHeight();
+//
+//        Animation a = new Animation() {
+//            @Override
+//            protected void applyTransformation(float interpolatedTime, Transformation t) {
+//                v.getLayoutParams().height = interpolatedTime == 1
+//                        ? LayoutParams.WRAP_CONTENT
+//                        : (int) (targetHeight * interpolatedTime);
+//                v.requestLayout();
+//            }
+//
+//            @Override
+//            public boolean willChangeBounds() {
+//                return true;
+//            }
+//        };
+//
+//        a.setDuration(duration);
+//        v.startAnimation(a);
     }
 
     private static void collapse(final View v, int duration) {
-        final int initialHeight = v.getMeasuredHeight();
-
-        Animation a = new Animation()
-        {
-            @Override
-            protected void applyTransformation(float interpolatedTime, Transformation t) {
-                if(interpolatedTime == 1){
-                    v.setVisibility(View.GONE);
-                }else{
-                    v.getLayoutParams().height = initialHeight - (int)(initialHeight * interpolatedTime);
-                    v.requestLayout();
-                }
-            }
-
-            @Override
-            public boolean willChangeBounds() {
-                return true;
-            }
-        };
-
-        a.setDuration(duration);
-        v.startAnimation(a);
+        v.setVisibility(View.GONE);
+//        final int initialHeight = v.getMeasuredHeight();
+//
+//        Animation a = new Animation()
+//        {
+//            @Override
+//            protected void applyTransformation(float interpolatedTime, Transformation t) {
+//                if(interpolatedTime == 1){
+//                    v.setVisibility(View.GONE);
+//                }else{
+//                    v.getLayoutParams().height = initialHeight - (int)(initialHeight * interpolatedTime);
+//                    v.requestLayout();
+//                }
+//            }
+//
+//            @Override
+//            public boolean willChangeBounds() {
+//                return true;
+//            }
+//        };
+//
+//        a.setDuration(duration);
+//        v.startAnimation(a);
     }
 
-    public void search() {
+    private void search() {
         if (!checkFilters()) return;
 
         ArrayList<String> filters = new ArrayList<>();
@@ -403,7 +403,6 @@ public class ChatDatabaseFragment extends Fragment implements CompoundButton.OnC
             localError = false;
             boolean isNumber = true;
             try {
-                //noinspection ResultOfMethodCallIgnored
                 Integer.valueOf(idEditText.getText().toString());
             } catch (NumberFormatException e) {
                 isNumber = false;
@@ -414,9 +413,9 @@ public class ChatDatabaseFragment extends Fragment implements CompoundButton.OnC
                     if (!(idEditTextText.matches("\\d*-\\d*") || isNumber)) localError = true;
                     else {
                         String[] ids = idEditTextText.split("-");
-                        if (ids.length > 0 && !ids[0].isEmpty()) //noinspection ResultOfMethodCallIgnored
+                        if (ids.length > 0 && !ids[0].isEmpty())
                             Integer.valueOf(ids[0]);
-                        if (ids.length > 1 && !ids[1].isEmpty()) //noinspection ResultOfMethodCallIgnored
+                        if (ids.length > 1 && !ids[1].isEmpty())
                             Integer.valueOf(ids[1]);
                     }
                 }

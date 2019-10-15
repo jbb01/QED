@@ -5,26 +5,81 @@ import android.util.Log;
 
 import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.R;
+import com.jonahbauer.qed.networking.login.InvalidCredentialsException;
 
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import javax.net.ssl.HttpsURLConnection;
 
+@Deprecated
 public class QEDGalleryLogin extends AsyncTask<QEDGalleryLoginReceiver, Void, Void> {
-
-
     @Override
     protected Void doInBackground(QEDGalleryLoginReceiver... receivers) {
         QEDGalleryLoginReceiver receiver;
         if (receivers.length < 1) return null;
         receiver = receivers[0];
+
+        if (tryLogin()) {
+            receiver.onLoginFinish(true);
+            return null;
+        }
+
+        if (receiver != null) try {
+            receiver.onLoginFinish(login());
+        } catch (InvalidCredentialsException e) {
+            receiver.onLoginError();
+        }
+
+        return null;
+    }
+
+    private boolean tryLogin() {
+        Application application = Application.getContext();
+
+        String phpsessid = application.loadData(Application.KEY_GALLERY_PHPSESSID, true);
+        String pwhash = application.loadData(Application.KEY_GALLERY_PWHASH, true);
+        String userId = application.loadData(Application.KEY_USERID, false);
+
+        if (phpsessid == null || pwhash == null || userId == null) return false;
+
         try {
-            Application application = (Application) Application.getContext();
-            String username = application.loadData(application.getString(R.string.data_username_key), false);
-            String password = application.loadData(application.getString(R.string.data_password_key), true);
+            HttpsURLConnection httpsURLConnection = (HttpsURLConnection) new URL(application.getString(R.string.gallery_server_main)).openConnection();
+            httpsURLConnection.setRequestMethod("POST");
+            httpsURLConnection.setDoInput(true);
+            httpsURLConnection.setInstanceFollowRedirects(false);
+            httpsURLConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            httpsURLConnection.setRequestProperty("charset", "utf-8");
+            httpsURLConnection.setRequestProperty("Cookie", "userid=" + userId + "; pwhash=" + pwhash + "; PHPSESSID=" + phpsessid);
+            httpsURLConnection.setUseCaches(false);
+
+            httpsURLConnection.connect();
+
+            String location = httpsURLConnection.getHeaderField("Location");
+
+            if (location == null)
+                return false;
+            else if (location.equals("album_list.php"))
+                return true;
+            else if (location.equals("account.php"))
+                return false;
+            else
+                return false;
+        } catch (IOException e) {
+            Log.e(Application.LOG_TAG_ERROR, e.getMessage(), e);
+        }
+
+        return false;
+    }
+
+    public static boolean login() throws InvalidCredentialsException {
+        try {
+            Application application = Application.getContext();
+            String username = application.loadData(Application.KEY_USERNAME, false);
+            String password = application.loadData(Application.KEY_PASSWORD, true);
 
             byte[] data = ("username=" + username + "&password=" + password + "&login=Einloggen").getBytes(StandardCharsets.UTF_8);
 
@@ -52,8 +107,9 @@ public class QEDGalleryLogin extends AsyncTask<QEDGalleryLoginReceiver, Void, Vo
             httpsURLConnection.disconnect();
 
 
-            if (cookies == null)
-                receiver.onReceiveSessionId(null, null, null);
+            if (cookies == null) {
+                return false;
+            }
 
             for (String str : cookies) {
                 if (str.startsWith("PHPSESSID=")) phpsessid = str.split("=")[1].split(";")[0];
@@ -61,15 +117,18 @@ public class QEDGalleryLogin extends AsyncTask<QEDGalleryLoginReceiver, Void, Vo
                 else if (str.startsWith("pwhash=")) pwhash = str.split("=")[1].split(";")[0];
             }
 
-            if (phpsessid == null || userid == null || pwhash == null)
-                receiver.onReceiveSessionId(null, null, null);
+            if (phpsessid == null || userid == null || pwhash == null) {
+                throw new InvalidCredentialsException();
+            }
 
-            receiver.onReceiveSessionId(phpsessid.toCharArray(), pwhash.toCharArray(), application.loadData(application.getString(R.string.data_userid_key), false).toCharArray());
+            application.saveData(pwhash, Application.KEY_GALLERY_PWHASH, true);
+            application.saveData(phpsessid, Application.KEY_GALLERY_PHPSESSID, true);
+            application.saveData(userid, Application.KEY_USERID, false);
 
+            return true;
         } catch (java.io.IOException e) {
-            Log.e("","",e);
-            receiver.onReceiveSessionId(null,null, null);
+            Log.e(Application.LOG_TAG_ERROR,e.getMessage(), e);
+            return false;
         }
-        return null;
     }
 }

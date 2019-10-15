@@ -10,7 +10,7 @@
     android:clipToPadding="false"
     android:clipChildren="false">
 
-    <ImageView
+    <!--<ImageView
         android:id="@+id/background"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -18,7 +18,7 @@
         android:layout_alignParentTop="true"
         android:contentDescription="@string/background"
         android:scaleType="centerCrop"
-        android:src="@drawable/background_part" />
+        android:src="@drawable/background_part" />-->
 
     <TextView
         android:id="@+id/date_banner"
@@ -42,7 +42,8 @@
         android:background="#00ffffff"
         android:divider="#00ffffff"
         android:dividerHeight="@dimen/message_divider"
-        android:clipToPadding="false"
+        android:clipToPadding="true"
+        android:clipChildren="false"
         android:layout_above="@id/strip"
         android:layout_alignParentStart="true"
         android:choiceMode="none"
@@ -83,7 +84,7 @@
         android:elevation="6dp"
         android:maxLines="5"/>
 
-    <android.support.design.widget.FloatingActionButton
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/button_send"
         android:layout_width="@dimen/send_button_size"
         android:layout_height="@dimen/send_button_size"
@@ -109,7 +110,7 @@
         android:clipToPadding="false"
         android:clipChildren="false"
         android:gravity="center">
-        <android.support.design.widget.FloatingActionButton
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/scroll_down_Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -136,7 +137,7 @@
         android:clipChildren="false"
         android:gravity="center">
 
-        <android.support.design.widget.FloatingActionButton
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/quick_settings_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -146,7 +147,7 @@
             app:backgroundTint="@color/floating_action_button_background"
             app:rippleColor="@color/floating_action_button_ripple"/>
 
-        <android.support.design.widget.FloatingActionButton
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/quick_settings_channel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -156,7 +157,7 @@
             app:backgroundTint="@color/floating_action_button_background"
             app:rippleColor="@color/floating_action_button_ripple"/>
 
-        <android.support.design.widget.FloatingActionButton
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/quick_settings"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

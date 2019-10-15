@@ -1,5 +1,11 @@
 package com.jonahbauer.qed.qeddb;
 
+/**
+ * @deprecated
+ *
+ * replaced with {@link com.jonahbauer.qed.networking.login.QEDLoginReceiver}
+ */
+@Deprecated
 public interface QEDDBLoginReceiver {
-    void onReceiveSessionId(char[] sessionId, char[] cookie);
+    void onLoginFinish(boolean success);
 }

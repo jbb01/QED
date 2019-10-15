@@ -6,17 +6,21 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.design.widget.TextInputLayout;
-import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.material.textfield.TextInputLayout;
 import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.Internet;
 import com.jonahbauer.qed.R;
+import com.jonahbauer.qed.networking.AsyncLoadQEDPage;
+import com.jonahbauer.qed.networking.AsyncLoadQEDPageToStream;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -28,6 +32,8 @@ import javax.net.ssl.HttpsURLConnection;
 
 public class LoginActivity extends AppCompatActivity implements Internet {
     public static final String ERROR_MESSAGE = "errorMessage";
+    public static final String DONT_START_MAIN = "dontStartMain";
+
     private UserLoginTask authTask = null;
 
     private EditText usernameView;
@@ -37,12 +43,8 @@ public class LoginActivity extends AppCompatActivity implements Internet {
     private View progressView;
     private View loginFormView;
 
-    private final String KEY_USERID = Application.getContext().getString(R.string.data_userid_key);
-    private final String KEY_PWHASH = Application.getContext().getString(R.string.data_pwhash_key);
-    private final String KEY_USERNAME = Application.getContext().getString(R.string.data_username_key);
-    private final String KEY_PASSWORD = Application.getContext().getString(R.string.data_password_key);
-
     private boolean doubleBackToExitPressedOnce = false;
+    private boolean dontStartMain;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +73,7 @@ public class LoginActivity extends AppCompatActivity implements Internet {
         Button mUsernameSignInButton = findViewById(R.id.username_sign_in_button);
         mUsernameSignInButton.setOnClickListener(view -> attemptLogin());
 
+        dontStartMain = getIntent().getBooleanExtra(DONT_START_MAIN, false);
         String errorMessage = getIntent().getStringExtra(ERROR_MESSAGE);
         if (errorMessage != null) {
             Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
@@ -120,7 +123,7 @@ public class LoginActivity extends AppCompatActivity implements Internet {
     @Override
     public void onBackPressed() {
         if (doubleBackToExitPressedOnce) {
-            super.onBackPressed();
+            ((Application)getApplication()).finish();
             return;
         }
 
@@ -132,15 +135,19 @@ public class LoginActivity extends AppCompatActivity implements Internet {
 
     @Override
     public void onConnectionFail() {
-        passwordLayout.setError(getString(R.string.cant_connect));
-        passwordView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_error_red, 0);
-        passwordView.requestFocus();
+        passwordLayout.post(() -> {
+            passwordLayout.setError(getString(R.string.cant_connect));
+            passwordView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_error_red, 0);
+            passwordView.requestFocus();
+        });
     }
 
     @Override
     public void onConnectionRegain() {
-        passwordLayout.setError(null);
-        passwordView.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+        passwordLayout.post(() -> {
+            passwordLayout.setError(null);
+            passwordView.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+        });
     }
 
     /**
@@ -152,6 +159,8 @@ public class LoginActivity extends AppCompatActivity implements Internet {
         private final String mUsername;
         private final String mPassword;
 
+        private boolean networkError;
+
         UserLoginTask(String username, String password) {
             mUsername = username;
             mPassword = password;
@@ -159,7 +168,7 @@ public class LoginActivity extends AppCompatActivity implements Internet {
 
         @Override
         protected Boolean doInBackground(Void... params) {
-//            if (!Application.internetConnection) return false;
+//            if (!Application.online) return false;
             try {
                 URL url = new URL(getString(R.string.chat_server_login));
                 HttpsURLConnection logInConnection = (HttpsURLConnection) url.openConnection();
@@ -190,9 +199,9 @@ public class LoginActivity extends AppCompatActivity implements Internet {
                     if ("Set-Cookie".equalsIgnoreCase(logInConnection.getHeaderFieldKey(i))) {
                         String header = logInConnection.getHeaderField(i);
                         if (header.startsWith("userid"))
-                            ((Application)getApplication()).saveData(String.valueOf(Integer.valueOf(header.split("=")[1].split(";")[0])), KEY_USERID, false);
+                            ((Application)getApplication()).saveData(String.valueOf(Integer.valueOf(header.split("=")[1].split(";")[0])), Application.KEY_USERID, false);
                         else if (header.startsWith("pwhash"))
-                            ((Application)getApplication()).saveData(header.split("=")[1].split(";")[0], KEY_PWHASH, true);
+                            ((Application)getApplication()).saveData(header.split("=")[1].split(";")[0], Application.KEY_CHAT_PWHASH, true);
                     }
                 }
 
@@ -220,7 +229,8 @@ public class LoginActivity extends AppCompatActivity implements Internet {
                 }
 
             } catch (IOException e) {
-                e.printStackTrace();
+                Log.e(Application.LOG_TAG_ERROR, e.getMessage(), e);
+                networkError = true;
             }
             return false;
         }
@@ -231,15 +241,21 @@ public class LoginActivity extends AppCompatActivity implements Internet {
             showProgress(false);
 
             if (success) {
-                ((Application)getApplication()).saveData(mUsername, KEY_USERNAME, false);
-                ((Application)getApplication()).saveData(mPassword, KEY_PASSWORD, true);
+                AsyncLoadQEDPage.forcedLogin = false;
+                AsyncLoadQEDPageToStream.forcedLogin = false;
+                ((Application)getApplication()).saveData(mUsername, Application.KEY_USERNAME, false);
+                ((Application)getApplication()).saveData(mPassword, Application.KEY_PASSWORD, true);
+
                 getSharedPreferences(getString(R.string.preferences_shared_preferences),MODE_PRIVATE).edit().putBoolean(getString(R.string.preferences_loggedIn_key),true).apply();
-                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                startActivity(intent);
+
+                if (!dontStartMain) {
+                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    startActivity(intent);
+                }
                 LoginActivity.this.finish();
                 finish();
             } else {
-                if (Application.internetConnection) {
+                if (!networkError) {
                     passwordLayout.setError(getString(R.string.login_error_incorrect_data));
                     passwordView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_error_red, 0);
                     passwordView.requestFocus();

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/gallery"
+    android:id="@+id/album"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingStart="@dimen/event_padding_horizontal"
@@ -15,7 +15,7 @@
         android:id="@+id/gallery_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:backgroundTint="@color/gallery_background"
+        android:backgroundTint="@color/album_background"
         android:orientation="vertical"
         android:elevation="1dp"
         tools:ignore="UselessParent">
@@ -33,6 +33,7 @@
             android:src="@drawable/ic_gallery_icon"
             android:adjustViewBounds="true"
             android:layout_gravity="center"
+            android:contentDescription="@string/thumbnail"
             tools:tint="@android:color/holo_green_dark"/>
 
         <TextView
@@ -42,10 +43,11 @@
             android:layout_toEndOf="@id/gallery_icon"
             android:layout_alignParentTop="true"
             android:gravity="start"
-            android:textColor="@color/gallery_list_text"
+            android:textColor="@color/album_list_text"
             android:textSize="@dimen/gallery_name_size"
             android:textStyle="bold"
-            android:paddingVertical="14sp"
+            android:paddingTop="14sp"
+            android:paddingBottom="14sp"
             tools:text="Akademie 2018"/>
     </RelativeLayout>
 </RelativeLayout>

@@ -1,21 +1,29 @@
 package com.jonahbauer.qed.qeddb.person;
 
-import android.support.v4.util.Pair;
+import android.util.Log;
 
+import androidx.annotation.NonNull;
+import androidx.core.util.Pair;
+
+import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.qeddb.event.Event;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Person {
+@SuppressWarnings("unused")
+public class Person implements Serializable {
     public int id;
     public String firstName;
+    String comparableFirstName;
     public String lastName;
+    String comparableLastName;
     public String birthday;
     public String email;
     public String homeStation;
@@ -38,6 +46,7 @@ public class Person {
         management = new ArrayList<>();
     }
 
+    @NonNull
     @Override
     public String toString() {
         Field[] fields = Person.class.getDeclaredFields();
@@ -65,10 +74,10 @@ public class Person {
 
             return builder.toString();
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            Log.e(Application.LOG_TAG_ERROR, e.getMessage(), e);
         }
 
-        return null;
+        return "";
     }
 
     @SuppressWarnings("unused")
@@ -97,6 +106,23 @@ public class Person {
     }
 
     public enum MemberType {
-        ORGA, MEMBER_CONFIRMED, MEMBER_OPEN, MEMBER_OPT_OUT
+        ORGA, MEMBER_PARTICIPATED, MEMBER_CONFIRMED, MEMBER_OPEN, MEMBER_OPT_OUT;
+
+        @Override
+        public String toString() {
+            switch (this) {
+                case ORGA:
+                    return "Orga";
+                case MEMBER_PARTICIPATED:
+                    return "teilgenommen";
+                case MEMBER_CONFIRMED:
+                    return "bestätigt";
+                case MEMBER_OPEN:
+                    return "offen";
+                case MEMBER_OPT_OUT:
+                    return "abgemeldet";
+            }
+            return "null";
+        }
     }
 }

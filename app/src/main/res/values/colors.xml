@@ -95,9 +95,13 @@
     <color name="event_big_name">@android:color/black</color>
     <color name="event_icons">#868686</color>
 
-    <!-- Gallery -->
-    <color name="gallery_list_text">@android:color/black</color>
-    <color name="gallery_background">@android:color/white</color>
-    <color name="gallery_list_divider">#f0f0f0</color>
+    <!-- Album -->
+    <color name="album_list_text">@android:color/black</color>
+    <color name="album_background">@android:color/white</color>
+    <color name="album_list_divider">#f0f0f0</color>
+    <color name="album_search_headers">@android:color/black</color>
+    <color name="album_info_headers">@android:color/black</color>
+    <color name="image_info_headers">@android:color/black</color>
+    <color name="offline_label_font">#383838</color>
 
 </resources>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <integer name="expand_time">250</integer>
+    <integer name="expand_time">0</integer>
 
     <integer name="checkbox_change_1">200</integer>
     <integer name="checkbox_change_2">200</integer>

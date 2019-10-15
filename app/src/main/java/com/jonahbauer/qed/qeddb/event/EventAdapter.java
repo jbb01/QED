@@ -2,13 +2,14 @@ package com.jonahbauer.qed.qeddb.event;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
 
 import com.jonahbauer.qed.R;
 
@@ -94,6 +95,7 @@ public class EventAdapter extends ArrayAdapter<Event> {
         eventList.sort(Comparator.reverseOrder());
     }
 
+    @SuppressWarnings("unused")
     public void add(int index, Event event) {
         eventList.add(index, event);
         eventList.sort(Comparator.reverseOrder());

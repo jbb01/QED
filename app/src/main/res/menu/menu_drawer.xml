@@ -40,10 +40,12 @@
             android:id="@+id/nav_gallery_title"
             android:title="@string/drawer_gallery_heading">
             <menu>
-                <item
-                    android:id="@+id/nav_gallery"
-                    android:icon="@drawable/ic_drawer_gallery"
-                    android:title="@string/drawer_gallery"/>
+                <group android:checkableBehavior="single">
+                    <item
+                        android:id="@+id/nav_gallery"
+                        android:icon="@drawable/ic_drawer_gallery"
+                        android:title="@string/drawer_gallery"/>
+                </group>
             </menu>
         </item>
         <item

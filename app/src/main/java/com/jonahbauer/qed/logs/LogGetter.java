@@ -2,7 +2,6 @@ package com.jonahbauer.qed.logs;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.R;
@@ -18,9 +17,8 @@ import java.util.stream.Collectors;
 
 import javax.net.ssl.HttpsURLConnection;
 
+@Deprecated
 public class LogGetter extends AsyncTask<Object, String, Boolean> {
-    private final String KEY_USERID = Application.getContext().getString(R.string.data_userid_key);
-    private final String KEY_PWHASH = Application.getContext().getString(R.string.data_pwhash_key);
     private String log;
     private LogReceiver receiver;
     private boolean oom;
@@ -47,11 +45,13 @@ public class LogGetter extends AsyncTask<Object, String, Boolean> {
             URL url = new URL(context.getString(R.string.chat_server_history)+"?"+options);
             logConnection = (HttpsURLConnection) url.openConnection();
 
+            Application application = Application.getContext();
+
             logConnection.setDoInput(true);
             logConnection.setReadTimeout(0);
             logConnection.setConnectTimeout(2 * 1000);
             logConnection.setRequestMethod("GET");
-            logConnection.setRequestProperty("Cookie", "pwhash=" + ((Application) Application.getContext()).loadData(KEY_PWHASH, true) + ";userid=" + ((Application) Application.getContext()).loadData(KEY_USERID, false));
+            logConnection.setRequestProperty("Cookie", "pwhash=" + application.loadData(Application.KEY_CHAT_PWHASH, true) + ";userid=" + application.loadData(Application.KEY_USERID, false));
             logConnection.connect();
 
             inLog = new BufferedInputStream(logConnection.getInputStream());
@@ -72,9 +72,9 @@ public class LogGetter extends AsyncTask<Object, String, Boolean> {
 
             return true;
         } catch (IOException e) {
-            Log.e("com.jonahbauer.qed", e.getMessage(), e);
+            receiver.onLogError();
+            return false;
         } catch (OutOfMemoryError e) {
-            Log.e("com.jonahbauer.qed", e.getMessage(), e);
             oom = true;
 
             if (sbLog != null)
@@ -92,7 +92,6 @@ public class LogGetter extends AsyncTask<Object, String, Boolean> {
                 logConnection.disconnect();
             }
         }
-        return false;
     }
 
     @Override

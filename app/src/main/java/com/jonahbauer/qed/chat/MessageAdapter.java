@@ -1,10 +1,10 @@
 package com.jonahbauer.qed.chat;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Outline;
 import android.graphics.drawable.LayerDrawable;
-import android.support.annotation.NonNull;
 import android.text.util.Linkify;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -14,6 +14,8 @@ import android.view.ViewOutlineProvider;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
 
 import com.jonahbauer.qed.R;
 
@@ -25,12 +27,14 @@ public class MessageAdapter extends ArrayAdapter<Message> {
     private final Context context;
     private final List<Message> messageList;
     private final boolean extended;
+    private SharedPreferences sharedPreferences;
 
     public MessageAdapter(Context context, @NonNull List<Message> messageList, boolean extended) {
         super(context, R.layout.list_item_message, messageList);
         this.context = context;
         this.messageList = messageList;
         this.extended = extended;
+        sharedPreferences = getContext().getSharedPreferences(getContext().getString(R.string.preferences_shared_preferences), Context.MODE_PRIVATE);
     }
 
     public MessageAdapter(Context context, List<Message> messageList) {
@@ -41,13 +45,14 @@ public class MessageAdapter extends ArrayAdapter<Message> {
     @Override
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         final Message message = messageList.get(position);
+
         boolean isDate = false;
         if (message.bottag == -6473 && message.id == -6473 && message.channel.equals("date")) {
             isDate = true;
         }
 
         View view;
-        if (convertView!=null && ((isDate && convertView.findViewById(R.id.date) != null) || (!isDate && convertView.findViewById(R.id.message) != null))) {
+        if (convertView != null && ((isDate && convertView.findViewById(R.id.date) != null) || (!isDate && convertView.findViewById(R.id.message) != null))) {
             view = convertView;
         } else {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -70,7 +75,8 @@ public class MessageAdapter extends ArrayAdapter<Message> {
         if (message.userName != null) name += " | " + message.userName;
 
         if (extended) {
-            ((TextView) view.findViewById(R.id.message_id)).setText(String.valueOf("#" + message.id));
+            String messageId = "#" + message.id;
+            ((TextView) view.findViewById(R.id.message_id)).setText(messageId);
             ((TextView) view.findViewById(R.id.message_channel)).setText("".equals(message.channel) ? "(main)" : ("(" + message.channel + ")"));
         }
 
@@ -108,7 +114,7 @@ public class MessageAdapter extends ArrayAdapter<Message> {
         }
 
 
-        if (view.getContext().getSharedPreferences(view.getContext().getString(R.string.preferences_shared_preferences), Context.MODE_PRIVATE).getBoolean(view.getContext().getString(R.string.preferences_showLinks_key),true)) {
+        if (sharedPreferences.getBoolean(view.getContext().getString(R.string.preferences_showLinks_key),true)) {
             ((TextView) view.findViewById(R.id.message_message)).setLinksClickable(true);
             Linkify.addLinks((TextView) view.findViewById(R.id.message_message), Linkify.WEB_URLS);
         }

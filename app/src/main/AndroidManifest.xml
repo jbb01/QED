@@ -2,7 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.jonahbauer.qed">
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:name=".Application"
@@ -11,11 +14,15 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
-        <activity
-            android:name=".activities.GalleryAlbumActivity"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:screenOrientation="portrait"/>
+        <provider
+            android:name=".GenericFileProvider"
+            android:authorities="com.jonahbauer.qed.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths"/>
+        </provider>
 
         <activity
             android:name=".activities.LoginActivity"
@@ -23,37 +30,53 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".activities.MainActivity"
-            android:label="@string/title_fragment_chat"
+            android:label="@string/app_name"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateVisible|adjustResize"
-            android:launchMode="singleTask">
+            android:hardwareAccelerated="true"
+            android:windowSoftInputMode="stateVisible|adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <!-- Accepts URIs that begin with "example://gizmos” -->
-                <data android:scheme="https"
+
+                <data
                     android:host="qeddb.qed-verein.de"
-                    android:pathPrefix="/personen.php" />
-                <data android:scheme="https"
+                    android:pathPrefix="/personen.php"
+                    android:scheme="https" />
+                <data
                     android:host="qeddb.qed-verein.de"
-                    android:pathPrefix="/veranstaltungen.php" />
-                <data android:scheme="https"
+                    android:pathPrefix="/veranstaltungen.php"
+                    android:scheme="https" />
+                <data
                     android:host="chat.qed-verein.de"
-                    android:pathPrefix="/index.html" />
-                <data android:scheme="http"
+                    android:pathPrefix="/index.html"
+                    android:scheme="https" />
+                <data
                     android:host="chat.qed-verein.de"
-                    android:pathPrefix="/index.html" />
+                    android:pathPrefix="/index.html"
+                    android:scheme="http" />
+                <data
+                    android:host="qedgallery.qed-verein.de"
+                    android:pathPrefix="/album_view.php"
+                    android:scheme="https" />
+                <data
+                    android:host="qedgallery.qed-verein.de"
+                    android:pathPrefix="/album_list.php"
+                    android:scheme="https" />
+                <data
+                    android:host="qedgallery.qed-verein.de"
+                    android:pathPrefix="/image_view.php"
+                    android:scheme="https" />
             </intent-filter>
-
         </activity>
-
         <activity
             android:name=".activities.SettingsActivity"
             android:label="@string/title_activity_settings"
@@ -64,12 +87,21 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activities.MainActivity" />
         </activity>
-
         <activity
             android:name=".activities.LogDialogActivity"
             android:label="@string/title_activity_log_dialog"
             android:parentActivityName=".activities.MainActivity"
             android:theme="@style/AppTheme.Dialog.MinWidth" />
+        <activity
+            android:name=".activities.GalleryAlbumActivity"
+            android:label="@string/title_activity_album"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activities.ImageActivity"
+            android:label="@string/title_activity_image"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 
 </manifest>

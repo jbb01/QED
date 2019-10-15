@@ -1,15 +1,22 @@
 <resources>
-    <!-- Chat -->
-    <string name="chat_server_ping">chat.qed-verein.de</string>
-    <string name="chat_server_login">https://chat.qed-verein.de/rubychat/account</string>
-    <string name="chat_server_history">https://chat.qed-verein.de/rubychat/history</string>
-    <string name="chat_websocket">wss://chat.qed-verein.de/websocket</string>
-    <string name="chat_version">20171030131648</string>
-    <string name="database_server_login">https://www.qeddb.qed-verein.de/index.php</string>
-    <string name="database_server_person">https://www.qeddb.qed-verein.de/person.php?session_id2=%s&amp;person=%s&amp;tab=%s</string>
-    <string name="database_server_persons">https://www.qeddb.qed-verein.de/personen.php?session_id2=%s&amp;tables_weitere_daten=1</string>
-    <string name="database_server_events">https://www.qeddb.qed-verein.de/veranstaltungen.php?session_id2=%s</string>
-    <string name="database_server_event">https://www.qeddb.qed-verein.de/veranstaltung.php?session_id2=%s&amp;veranstaltung=%s&amp;tab=%s</string>
+    <!-- Servers -->
+    <string name="chat_server_ping" translatable="false">chat.qed-verein.de</string>
+    <string name="chat_server_login" translatable="false">https://chat.qed-verein.de/rubychat/account</string>
+    <string name="chat_server_history" translatable="false">https://chat.qed-verein.de/rubychat/history</string>
+    <string name="chat_websocket" translatable="false">wss://chat.qed-verein.de/websocket</string>
+    <string name="chat_version" translatable="false">20171030131648</string>
+
+    <string name="database_server_login" translatable="false">https://www.qeddb.qed-verein.de/</string>
+    <string name="database_server_person" translatable="false">https://www.qeddb.qed-verein.de/person.php?session_id2={@sessionid2}&amp;person=%s&amp;tab=%s</string>
+    <string name="database_server_persons" translatable="false">https://www.qeddb.qed-verein.de/personen.php?session_id2={@sessionid2}&amp;tables_weitere_daten=1</string>
+    <string name="database_server_events" translatable="false">https://www.qeddb.qed-verein.de/veranstaltungen.php?session_id2={@sessionid2}</string>
+    <string name="database_server_event" translatable="false">https://www.qeddb.qed-verein.de/veranstaltung.php?session_id2={@sessionid2}&amp;veranstaltung=%s&amp;tab=%s</string>
+
+    <string name="gallery_server_list" translatable="false">https://qedgallery.qed-verein.de/album_list.php</string>
+    <string name="gallery_server_album" translatable="false">https://qedgallery.qed-verein.de/album_view.php?page=0&amp;albumid=</string>
+    <string name="gallery_server_login" translatable="false">https://qedgallery.qed-verein.de/account.php</string>
+    <string name="gallery_server_main" translatable="false">https://qedgallery.qed-verein.de/</string>
+    <string name="gallery_server_image_info" translatable="false">https://qedgallery.qed-verein.de/image_view.php?imageid=</string>
 
 
     <!-- General -->
@@ -26,6 +33,12 @@
     <string name="content_description_divider">Trennlinie</string>
     <string name="background">background</string>
     <string name="coming_soon">Coming soon</string>
+    <string name="error">Fehler!</string>
+    <string name="info">Info</string>
+    <string name="delete">Löschen</string>
+    <string name="yes">Ja</string>
+    <string name="no">Nein</string>
+    <string name="offline_mode">Offline-Modus</string>
 
     <!-- Chat Fragment -->
     <string name="title_fragment_chat">Chat</string>
@@ -33,6 +46,7 @@
     <string name="chat_button_send">Senden</string>
     <string name="chat_message_hint">Nachricht schreiben</string>
     <string name="chat_scroll_down_button_content_description">Nach unten scrollen</string>
+    <string name="chat_empty_message">Du bist im Begriff eine leere Nachricht zu senden. Möchtest du fortfahren?</string>
 
     <!-- Login Activity -->
     <string name="title_activity_login">Anmelden</string>
@@ -46,6 +60,7 @@
     <string name="database_hits">Treffer</string>
     <string name="database_search_button">Suchen</string>
     <string name="database_save_done">Gespeichert</string>
+    <string name="database_offline">Keine Verbindung zum Internet möglich.\nDie Datenbank ist offline nicht verfügbar.</string>
     <!-- Chat Database Fragment -->
     <string name="title_fragment_chat_database">Datenbank</string>
     <string name="chat_database_channel_checkbox">Channel</string>
@@ -94,33 +109,43 @@
     <string name="event_subtitle_max_members">Maximale Teilnehmerzahl</string>
     <string name="event_subtitle_hotel">Übernachtungen</string>
 
-    <!-- Data Key -->
-    <string name="data_pwhash_key">pwhash</string>
-    <string name="data_userid_key">userid</string>
-    <string name="data_username_key">username</string>
-    <string name="data_password_key">password</string>
-
     <!-- Preference Keys -->
-    <string name="preferences_shared_preferences">com.jonahbauer.qed_preferences</string>
-    <string name="preferences_name_key">name</string>
-    <string name="preferences_channel_key">channel</string>
-    <string name="preferences_showSense_key">showSense</string>
-    <string name="preferences_publicId_key">publicId</string>
-    <string name="preferences_showLinks_key">showLinks</string>
-    <string name="preferences_katex_key">katex</string>
+    <string name="preferences_shared_preferences" translatable="false">com.jonahbauer.qed_preferences</string>
+    <string name="preferences_name_key" translatable="false">name</string>
+    <string name="preferences_channel_key" translatable="false">channel</string>
+    <string name="preferences_showSense_key" translatable="false">showSense</string>
+    <string name="preferences_publicId_key" translatable="false">publicId</string>
+    <string name="preferences_showLinks_key" translatable="false">showLinks</string>
+    <string name="preferences_katex_key" translatable="false">katex</string>
 
-    <string name="preferences_loggedIn_key">loggedIn</string>
-    <string name="preferences_drawerSelection_key">drawerSelection</string>
+    <string name="preferences_loggedIn_key" translatable="false">loggedIn</string>
+    <string name="preferences_drawerSelection_key" translatable="false">drawerSelection</string>
+
+    <string name="preferences_gallery_delete_thumbnails_key" translatable="false">delete_thumbnails</string>
+    <string name="preferences_gallery_delete_images_key" translatable="false">delete_images</string>
+    <string name="preferences_gallery_save_public_key" translatable="false">save_public</string>
+    <string name="preferences_gallery_offline_mode_key" translatable="false">gallery_offline_mode</string>
+    <string name="preferences_gallery_show_dir_key" translatable="false">show_gallery_dir</string>
 
     <!-- Preference Activity -->
     <string name="title_activity_settings">Einstellungen</string>
     <string name="preferences_header_chat">Chat</string>
+    <string name="preferences_header_gallery">Galerie</string>
     <string name="preferences_chat_name_title">Name</string>
     <string name="preferences_chat_channel_title">Channel</string>
     <string name="preferences_chat_showSense_title">Sinn anzeigen</string>
     <string name="preferences_chat_publicId_title">Öffentliche ID</string>
     <string name="preferences_chat_showLinks_title">Links anzeigen</string>
     <string name="preferences_chat_katex_title">KaTex Rendering</string>
+    <string name="preferences_gallery_delete_thumbnails">Gespeicherte Thumbnails löschen</string>
+    <string name="preferences_gallery_delete_images">Intern gespeicherte Bilder löschen</string>
+    <string name="preferences_Gallery_offline_mode">Offline-Modus</string>
+    <string name="preferences_gallery_offline_mode_true_summary">Die Galerie verwendet nur bereit heruntergeladene Daten. Einige Funktionen sind nur eingeschränkt verwendbar.</string>
+    <string name="preferences_gallery_offline_mode_false_summary">Alle Features sind uneingeschränkt verwendbar. Bilder werden heruntergeladen, sobald benötigt.</string>
+    <string name="preferences_gallery_show_dir">Speicherort öffnen</string>
+    <string name="confirm_delete_thumbnails">Möchtest du wirklich alle gespeicherten Thumbnails löschen?</string>
+    <string name="confirm_delete_images">Möchtest du wirklich alle gespeicherten Bilder löschen?</string>
+    <string name="preferences_gallery_save_public">Bilder extern speichern</string>
 
     <!-- Navigation Drawer -->
     <string name="drawer_chat_heading">Chat</string>
@@ -145,7 +170,8 @@
     <string name="log_subtitle_post_recent">Letzte{0,choice,1#r|2# {0}} Post{0,choice,1#|2#s}</string>
     <string name="log_action_save">In Datenbank speichern</string>
     <string name="log_wait_for_save">Bitte warte bis das Speichern abgeschlossen ist.</string>
-    <string name="log_error">Fehler!</string>
+    <string name="log_downloading">Chatlog wird heruntergeladen… (%s MiB)</string>
+    <string name="log_parsing">JSON wird geparst… (%s)</string>
 
     <!-- Log Dialog Activity -->
     <string name="title_activity_log_dialog">Logs</string>
@@ -166,13 +192,40 @@
         <item>@string/log_dateinterval</item>
     </string-array>
 
-    <!-- Gallery Fragment + Activity -->
+    <!-- Album Fragment + Activity -->
     <string name="title_fragment_gallery">Galerie</string>
-    <string name="gallery_server_list">https://qedgallery.qed-verein.de/album_list.php</string>
-    <string name="gallery_server_album">https://qedgallery.qed-verein.de/album_view.php?page=0&amp;albumid=</string>
-    <string name="gallery_server_login">https://qedgallery.qed-verein.de/account.php</string>
     <string name="gallery_login_failed">Galerie Login fehlgeschlagen</string>
-    <string name="gallery_server_thumbnail">https://qedgallery.qed-verein.de/image.php?type=thumbnail&amp;imageid=</string>
+    <string name="gallery_server_image">https://qedgallery.qed-verein.de/image.php?type=%s&amp;imageid=%s</string>
+    <string name="album_photographer_radio_button">Fotograph</string>
+    <string name="album_date_radio_button">Datum</string>
+    <string name="album_category_radio_button">Kategorie</string>
+    <string name="album_info_creator">Albumersteller</string>
+    <string name="album_info_creation_date">Erstellt am</string>
+    <string name="album_info_creation_dates">Aufgenommen</string>
+    <string name="title_activity_album">Album</string>
+    <string name="gallery_folder_images">gallery/images</string>
+    <string name="gallery_folder_thumbnails">gallery/thumbnails</string>
+    <string name="preferences_gallery_save_public_false_summary">Heruntergeladene Bilder werden so gespeichert, dass sie nur von dieser App gelesen werden können</string>
+    <string name="preferences_gallery_save_public_true_summary">Heruntergeladene Bilder werden für alle Apps zugänglich gespeichert</string>
+
+    <!-- Image Activity -->
+    <string name="title_activity_image">Foto</string>
+    <string name="image_suffix_original"> (original)</string>
+    <string name="image_already_original">Das ist bereits die Originaldatei, möchtest du sie erneut herunterladen?</string>
+    <string name="image_download_non_picture">Du bist im Begriff eine Audio- oder Video-Datei herunterzuladen. Eine WLAN-Verbindung wird empfohlen. Möchtest du fortfahren?</string>
+    <string name="image_async_still_running">Es laufen noch Downloads. Wenn du jetzt zurück gehst werden sie abgebrochen. Möchtest du fortfahren?</string>
+    <string name="image_info_album">Album:</string>
+    <string name="image_info_owner">Besitzer:</string>
+    <string name="image_info_upload_date">Hochgeladen am:</string>
+    <string name="image_info_format">Format:</string>
+    <string name="image_info_path">Pfad:</string>
+    <string name="image_info_creation_date">Erstellt am:</string>
+    <string name="empty_album">Dieses Album ist leer</string>
+    <string name="login_failed_switching_to_offline">Login fehlgeschlagen.</string>
+    <string name="album_not_downloaded">Dieses Album ist nicht heruntergeladen.</string>
+    <string name="image_not_downloaded">Dieses Bild ist nicht heruntergeladen.</string>
+    <string name="no_file_explorer">Es konnte kein Dateiexplorer gefunden werden.</string>
+    <string name="thumbnail">thumbnail</string>
 
     <!-- Sonstiges -->
 

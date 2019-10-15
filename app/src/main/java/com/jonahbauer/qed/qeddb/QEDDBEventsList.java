@@ -20,31 +20,33 @@ import java.util.regex.Pattern;
 
 import javax.net.ssl.HttpsURLConnection;
 
-public class QEDDBEventsList extends AsyncTask<Object, Void, String> {
+/**
+ * @deprecated
+ * use {@link com.jonahbauer.qed.networking.AsyncLoadQEDPage} instead
+ */
+@Deprecated
+public class QEDDBEventsList extends AsyncTask<QEDDBEventsListReceiver, Void, String> {
     private QEDDBEventsListReceiver receiver;
 
     private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.GERMANY);
 
     @Override
-    protected String doInBackground(Object...objects) {
-        char[] sessionId;
-        char[] cookie;
-        if (objects.length < 3) return null;
-        if (objects[0] instanceof QEDDBEventsListReceiver) receiver = (QEDDBEventsListReceiver) objects[0];
-        else return null;
+    protected String doInBackground(QEDDBEventsListReceiver...qeddbEventsListReceivers) {
+        if (qeddbEventsListReceivers.length == 0) return null;
+        receiver = qeddbEventsListReceivers[0];
+        if (receiver == null) return null;
 
-        if (objects[1] instanceof char[]) sessionId = (char[]) objects[1];
-        else return null;
-
-        if (objects[2] instanceof char[]) cookie = (char[]) objects[2];
-        else return null;
+        Application application = Application.getContext();
+        String sessionId = application.loadData(Application.KEY_DATABASE_SESSIONID, true);
+        String sessionId2 = application.loadData(Application.KEY_DATABASE_SESSIONID2, true);
+        if (sessionId == null || sessionId2 == null) return null;
 
         try {
-            HttpsURLConnection httpsURLConnection = (HttpsURLConnection) new URL(String.format(Application.getContext().getString(R.string.database_server_events),String.valueOf(sessionId))).openConnection();
+            HttpsURLConnection httpsURLConnection = (HttpsURLConnection) new URL(String.format(Application.getContext().getString(R.string.database_server_events), sessionId2)).openConnection();
             httpsURLConnection.setRequestMethod("POST");
             httpsURLConnection.setDoOutput(true);
             httpsURLConnection.setInstanceFollowRedirects(false);
-            httpsURLConnection.setRequestProperty("Cookie", String.valueOf(cookie));
+            httpsURLConnection.setRequestProperty("Cookie", sessionId);
             httpsURLConnection.setUseCaches(false);
             httpsURLConnection.connect();
 
