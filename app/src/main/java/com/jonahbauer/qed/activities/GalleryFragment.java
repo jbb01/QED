@@ -1,10 +1,12 @@
 package com.jonahbauer.qed.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,8 +28,8 @@ import com.jonahbauer.qed.database.GalleryDatabase;
 import com.jonahbauer.qed.database.GalleryDatabaseReceiver;
 import com.jonahbauer.qed.networking.QEDGalleryPages;
 import com.jonahbauer.qed.networking.QEDPageReceiver;
-import com.jonahbauer.qed.qedgallery.Album;
-import com.jonahbauer.qed.qedgallery.AlbumAdapter;
+import com.jonahbauer.qed.qedgallery.album.Album;
+import com.jonahbauer.qed.qedgallery.album.AlbumAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,6 +60,9 @@ public class GalleryFragment extends Fragment implements QEDPageReceiver<List<Al
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Context context = new ContextThemeWrapper(getActivity(), Application.darkMode ? R.style.AppTheme_Dark_Gallery : R.style.AppTheme_Gallery);
+        inflater = inflater.cloneInContext(context);
+
         View view = inflater.inflate(R.layout.fragment_gallery, container, false);
 
         galleryAdapter = new AlbumAdapter(getContext(), new ArrayList<>());

@@ -12,7 +12,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
-        android:text="@string/log_dialog_postrecent_before" />
+        android:text="@string/log_dialog_postrecent_before"
+        android:labelFor="@id/log_dialog_postrecent_editText"/>
 
     <EditText
         android:paddingTop="@dimen/activity_vertical_margin"
@@ -28,7 +29,8 @@
         android:ems="10"
         android:inputType="number"
         android:selectAllOnFocus="true"
-        android:theme="@style/AppTheme" />
+        android:theme="@style/AppTheme"
+        android:importantForAutofill="no" />
 
     <TextView
         android:paddingTop="@dimen/activity_vertical_margin"

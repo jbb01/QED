@@ -32,6 +32,7 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceFragment;
 import androidx.preference.PreferenceFragmentCompat;
 
+import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.R;
 
 import org.apache.commons.io.FileUtils;
@@ -78,6 +79,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Sha
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(Application.darkMode ? R.style.AppTheme_Dark_Settings : R.style.AppTheme_Settings);
+
         super.onCreate(savedInstanceState);
         getListView().setDivider(new ColorDrawable(Color.parseColor("#FFDDDDDD")));
         getListView().setDividerHeight(2);
@@ -127,7 +130,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Sha
     protected boolean isValidFragment(String fragmentName) {
         return PreferenceFragmentCompat.class.getName().equals(fragmentName)
                 || ChatPreferenceFragment.class.getName().equals(fragmentName)
-                || GalleryPreferenceFragment.class.getName().equals(fragmentName);
+                || GalleryPreferenceFragment.class.getName().equals(fragmentName)
+                || GeneralPreferenceFragment.class.getName().equals(fragmentName);
     }
 
     @Override
@@ -156,8 +160,31 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Sha
             addPreferencesFromResource(R.xml.pref_chat);
             setHasOptionsMenu(true);
 
-            ((SettingsActivity) getActivity()).bindPreferenceSummaryToValue(findPreference(getString(R.string.preferences_name_key)));
-            ((SettingsActivity) getActivity()).bindPreferenceSummaryToValue(findPreference(getString(R.string.preferences_channel_key)));
+            ((SettingsActivity) getActivity()).bindPreferenceSummaryToValue(findPreference(getString(R.string.preferences_chat_name_key)));
+            ((SettingsActivity) getActivity()).bindPreferenceSummaryToValue(findPreference(getString(R.string.preferences_chat_channel_key)));
+        }
+
+        @Override
+        public void onCreatePreferences(Bundle bundle, String s) {}
+
+        @Override
+        public boolean onOptionsItemSelected(MenuItem item) {
+            int id = item.getItemId();
+            if (id == android.R.id.home) {
+                startActivity(new Intent(getActivity(), SettingsActivity.class));
+                return true;
+            }
+            return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    public static class GeneralPreferenceFragment extends PreferenceFragment {
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            addPreferencesFromResource(R.xml.pref_general);
+            setHasOptionsMenu(true);
         }
 
         @Override

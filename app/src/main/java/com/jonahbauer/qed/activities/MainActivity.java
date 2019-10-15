@@ -40,6 +40,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(Application.darkMode ? R.style.AppTheme_Dark_NoActionBar : R.style.AppTheme_NoActionBar);
+
         super.onCreate(savedInstanceState);
 
         // NetworkTest.testNetwork();
@@ -50,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         handleIntent(intent);
 
 
-        if (!sharedPreferences.getBoolean(getString(R.string.preferences_loggedIn_key),false)) {
+        if (!sharedPreferences.getBoolean(getString(R.string.preferences_general_loggedIn_key),false)) {
             Intent intent2 = new Intent(this, LoginActivity.class);
             startActivity(intent2);
             finish();
@@ -89,7 +91,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         actionbar.setDisplayHomeAsUpEnabled(true);
         actionbar.setHomeAsUpIndicator(R.drawable.ic_menu);
 
-        navView.setCheckedItem(sharedPreferences.getInt(getString(R.string.preferences_drawerSelection_key), R.id.nav_chat));
+        navView.setCheckedItem(sharedPreferences.getInt(getString(R.string.preferences_general_drawerSelection_key), R.id.nav_chat));
         reloadFragment(false);
     }
 
@@ -155,9 +157,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 return true; }
         }
 
-        if (sharedPreferences.getInt(getString(R.string.preferences_drawerSelection_key),R.id.nav_chat) != menuItem.getItemId()) {
+        if (sharedPreferences.getInt(getString(R.string.preferences_general_drawerSelection_key),R.id.nav_chat) != menuItem.getItemId()) {
             sharedPreferences.edit()
-                    .putInt(getString(R.string.preferences_drawerSelection_key), menuItem.getItemId()).apply();
+                    .putInt(getString(R.string.preferences_general_drawerSelection_key), menuItem.getItemId()).apply();
             shouldReloadFragment = true;
 //            navView.postDelayed(() -> reloadFragment(false), 250);
         }
@@ -168,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public void reloadFragment(boolean onlyTitle) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        switch (sharedPreferences.getInt(getString(R.string.preferences_drawerSelection_key),R.id.nav_chat)) {
+        switch (sharedPreferences.getInt(getString(R.string.preferences_general_drawerSelection_key),R.id.nav_chat)) {
             case R.id.nav_chat:
                 if (!onlyTitle) {
                     fragment = new ChatFragment();
@@ -243,32 +245,32 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 if (host != null) if (host.equals("qeddb.qed-verein.de")) {
                     if (path !=null) if (path.startsWith("/personen.php")) {
-                        sharedPreferences.edit().putInt(getString(R.string.preferences_drawerSelection_key), R.id.nav_database_persons).apply();
+                        sharedPreferences.edit().putInt(getString(R.string.preferences_general_drawerSelection_key), R.id.nav_database_persons).apply();
                         PersonDatabaseFragment.showPerson = Integer.valueOf(queries.getOrDefault("person", "0"));
                         PersonDatabaseFragment.shownPerson = false;
                     }
                     else if (path.startsWith("/veranstaltungen.php")) {
-                        sharedPreferences.edit().putInt(getString(R.string.preferences_drawerSelection_key), R.id.nav_database_events).apply();
+                        sharedPreferences.edit().putInt(getString(R.string.preferences_general_drawerSelection_key), R.id.nav_database_events).apply();
                         EventDatabaseFragment.showEventId = Integer.valueOf(queries.getOrDefault("veranstaltung", "0"));
                         EventDatabaseFragment.shownEvent = false;
                     }
                 } else if (host.equals("chat.qed-verein.de")) {
                     if (path !=null) if (path.startsWith("/index.html")) {
                         SharedPreferences.Editor editor = sharedPreferences.edit();
-                        editor.putInt(getString(R.string.preferences_drawerSelection_key), R.id.nav_chat);
-                        editor.putString(getString(R.string.preferences_channel_key), queries.getOrDefault("channel", ""));
+                        editor.putInt(getString(R.string.preferences_general_drawerSelection_key), R.id.nav_chat);
+                        editor.putString(getString(R.string.preferences_chat_channel_key), queries.getOrDefault("channel", ""));
                         editor.apply();
                     }
                 } else if (host.equals("qedgallery.qed-verein.de")) {
                     if (path !=null) if (path.startsWith("/album_list.php")) {
                         SharedPreferences.Editor editor = sharedPreferences.edit();
-                        editor.putInt(getString(R.string.preferences_drawerSelection_key), R.id.nav_gallery).apply();
+                        editor.putInt(getString(R.string.preferences_general_drawerSelection_key), R.id.nav_gallery).apply();
                     } else if (path.startsWith("/album_view.php")) {
                         SharedPreferences.Editor editor = sharedPreferences.edit();
-                        editor.putInt(getString(R.string.preferences_drawerSelection_key), R.id.nav_gallery).apply();
+                        editor.putInt(getString(R.string.preferences_general_drawerSelection_key), R.id.nav_gallery).apply();
                     } else if (path.startsWith("/image_view.php")) {
                         SharedPreferences.Editor editor = sharedPreferences.edit();
-                        editor.putInt(getString(R.string.preferences_drawerSelection_key), R.id.nav_gallery).apply();
+                        editor.putInt(getString(R.string.preferences_general_drawerSelection_key), R.id.nav_gallery).apply();
                     }
                 }
             }

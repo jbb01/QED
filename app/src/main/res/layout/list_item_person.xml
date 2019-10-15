@@ -27,7 +27,7 @@
             android:layout_alignTop="@id/person_name"
             android:layout_alignBottom="@id/person_email"
             android:gravity="center"
-            android:textColor="#000"
+            android:textColor="?attr/textColorPrimary"
             tools:text="M"/>
 
         <ImageView
@@ -55,7 +55,7 @@
             android:layout_alignBottom="@id/person_initials_circle"
             android:gravity="center"
             android:textStyle="bold"
-            android:textColor="@color/person_database_initials"
+            android:textColor="?attr/textColorTertiary"
             tools:text="MM"/>
 
         <TextView
@@ -65,7 +65,7 @@
             android:layout_toEndOf="@id/person_initials_circle"
             android:layout_alignParentTop="true"
             android:gravity="start"
-            android:textColor="@color/person_database_text"
+            android:textColor="?attr/textColorPrimary"
             android:textSize="@dimen/person_name_size"
             android:textStyle="bold"
             tools:text="Max Mustermann"/>
@@ -81,7 +81,7 @@
             android:paddingStart="5dp"
             android:paddingEnd="0dp"
             android:gravity="start|center_vertical"
-            android:textColor="@color/person_database_active"
+            android:textColor="?attr/textColorSecondary"
             android:textSize="@dimen/person_active_size"
             tools:text="(inaktiv)"/>
 
@@ -93,7 +93,7 @@
             android:layout_alignParentEnd="true"
             android:layout_below="@id/person_name"
             android:gravity="start"
-            android:textColor="@color/person_database_email"
+            android:textColor="?attr/textColorSecondary"
             android:textSize="@dimen/person_email_size"
             tools:text="max.mustermann@email.com"/>
     </RelativeLayout>

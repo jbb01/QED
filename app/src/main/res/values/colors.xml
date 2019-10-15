@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Standard Colors -->
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorPrimaryLight">#52509E</color>
@@ -14,94 +15,32 @@
     <color name="colorAccentDark2">#00675b</color>
     <color name="colorAccentLight2">#52c7b8</color>
 
+    <color name="colorBackgroundLight">#fff</color>
     <color name="colorBackground">#F0EDE8</color>
     <color name="colorBackgroundAccent">#DCDBD6</color>
 
-    <!-- Icons -->
-    <color name="menu_items">@android:color/white</color>
-    <color name="setting_items">@color/colorAccent</color>
+    <color name="colorListDivider">#e0e0e0</color>
 
-    <!-- Floating Action Button -->
-    <color name="floating_action_button_background">#FFFFFF</color>
-    <color name="floating_action_button_ripple">#e6e6e6</color>
-    <color name="floating_action_button_foreground">#999999</color>
 
-    <!-- Progressbar -->
-    <color name="progressbar_background_start">@color/colorBackground</color>
-    <color name="progressbar_background_center">@color/colorBackground</color>
-    <color name="progressbar_background_end">@color/colorBackground</color>
-    <color name="progressbar_progress_start">#cc3366</color>
-    <color name="progressbar_progress_center">#ff4080</color>
-    <color name="progressbar_progress_end">#99264d</color>
+    <!-- Inverted Colors -->
+    <color name="colorPrimaryInverted">#C0AE4A</color>
+    <color name="colorPrimaryDarkInverted">#CFC060</color>
+    <color name="colorPrimaryLightInverted">#ADAF61</color>
+    <color name="colorAccentInverted">#00BF7E</color>
+    <color name="colorAccentDarkInverted">#39FFAA</color>
+    <color name="colorAccentLightInverted">#00864F</color>
 
-    <!-- Chat Activity -->
-    <color name="chat_background">@color/colorBackground</color>
-    <color name="chat_message_background">@android:color/white</color>
-    <color name="chat_message_text">@android:color/black</color>
-    <color name="chat_message_date">#E04D4D4D</color>
-    <color name="chat_date">#D4EAF5</color>
-    <color name="chat_date_text">#545F63</color>
+    <color name="colorPrimary2Inverted">#0A0A0A</color>
+    <color name="colorPrimaryDark2Inverted">#8A8A8A</color>
+    <color name="colorPrimaryLight2Inverted">#000000</color>
+    <color name="colorAccent2Inverted">#FF6977</color>
+    <color name="colorAccentDark2Inverted">#FF98A4</color>
+    <color name="colorAccentLight2Inverted">#AD3847</color>
 
-    <!-- Log Activity -->
-    <color name="log_subtitle_background">@color/colorBackground</color>
-    <color name="log_subtitle_font">#383838</color>
-    <color name="log_background">@color/colorBackground</color>
+    <color name="colorBackgroundLightInverted">#000</color>
+    <color name="colorBackgroundInverted">#0F1217</color>
+    <color name="colorBackgroundAccentInverted">#232429</color>
 
-    <!-- Chat Database Activity -->
-    <color name="chat_database_background">@color/colorBackground</color>
-    <color name="chat_database_search_background">@android:color/white</color>
-    <color name="chat_database_search_headers">@android:color/black</color>
-
-    <!-- Person Database Activity -->
-    <color name="person_database_background">@android:color/white</color>
-    <color name="person_database_search_background">@android:color/white</color>
-    <color name="person_database_search_headers">@android:color/black</color>
-    <color name="person_database_divider">#f0f0f0</color>
-    <color name="person_database_text">@android:color/black</color>
-    <color name="person_database_email">#383838</color>
-    <color name="person_database_active">#383838</color>
-    <color name="person_database_initials">@android:color/white</color>
-
-    <!-- Event Database Activity -->
-    <color name="event_database_background">@android:color/white</color>
-    <color name="event_database_search_background">@android:color/white</color>
-    <color name="event_database_search_headers">@android:color/black</color>
-    <color name="event_database_divider">#f0f0f0</color>
-    <color name="event_database_text">@android:color/black</color>
-    <color name="event_database_time">#383838</color>
-
-    <!-- Login Activity -->
-    <color name="login_background">@android:color/white</color>
-
-    <!-- Settings Activity -->
-    <color name="settings_background">@android:color/white</color>
-
-    <!-- MessageDialog Activity -->
-    <color name="message_dialog_background">@android:color/white</color>
-    <color name="message_dialog_divider">#f0f0f0</color>
-
-    <!-- Navigation Drawer -->
-    <color name="navigation_drawer_icons">#868686</color>
-
-    <!-- Person Bottom Sheet -->
-    <color name="person_background">@android:color/white</color>
-    <color name="person_tab_header">@android:color/white</color>
-    <color name="person_big_name">@android:color/black</color>
-    <color name="person_icons">#868686</color>
-
-    <!-- Event Bottom Sheet -->
-    <color name="event_background">@android:color/white</color>
-    <color name="event_tab_header">@android:color/white</color>
-    <color name="event_big_name">@android:color/black</color>
-    <color name="event_icons">#868686</color>
-
-    <!-- Album -->
-    <color name="album_list_text">@android:color/black</color>
-    <color name="album_background">@android:color/white</color>
-    <color name="album_list_divider">#f0f0f0</color>
-    <color name="album_search_headers">@android:color/black</color>
-    <color name="album_info_headers">@android:color/black</color>
-    <color name="image_info_headers">@android:color/black</color>
-    <color name="offline_label_font">#383838</color>
+    <color name="colorListDividerInverted">#1F1F1F</color>
 
 </resources>

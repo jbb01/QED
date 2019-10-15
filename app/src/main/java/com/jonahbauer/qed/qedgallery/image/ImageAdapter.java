@@ -1,4 +1,4 @@
-package com.jonahbauer.qed.qedgallery;
+package com.jonahbauer.qed.qedgallery.image;
 
 import android.content.Context;
 import android.graphics.Bitmap;

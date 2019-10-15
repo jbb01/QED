@@ -1,7 +1,9 @@
 package com.jonahbauer.qed.activities;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,6 +54,10 @@ public class EventDatabaseFragment extends Fragment implements QEDPageReceiver<L
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Context context = new ContextThemeWrapper(getActivity(), Application.darkMode ? R.style.AppTheme_Dark_EventDatabase : R.style.AppTheme_EventDatabase);
+        inflater = inflater.cloneInContext(context);
+
         View view = inflater.inflate(R.layout.fragment_events_database, container, false);
 
         eventListView = view.findViewById(R.id.event_list_view);

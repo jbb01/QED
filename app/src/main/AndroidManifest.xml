@@ -27,6 +27,7 @@
         <activity
             android:name=".activities.LoginActivity"
             android:label="@string/title_activity_login"
+            android:theme="@style/AppTheme.Login"
             android:screenOrientation="portrait" />
         <activity
             android:name=".activities.MainActivity"
@@ -82,21 +83,17 @@
             android:label="@string/title_activity_settings"
             android:parentActivityName=".activities.MainActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoListDivider">
+            android:theme="@style/AppTheme.Settings">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activities.MainActivity" />
         </activity>
-        <activity
-            android:name=".activities.LogDialogActivity"
-            android:label="@string/title_activity_log_dialog"
-            android:parentActivityName=".activities.MainActivity"
-            android:theme="@style/AppTheme.Dialog.MinWidth" />
+
         <activity
             android:name=".activities.GalleryAlbumActivity"
             android:label="@string/title_activity_album"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar.Album" />
         <activity
             android:name=".activities.ImageActivity"
             android:label="@string/title_activity_image"

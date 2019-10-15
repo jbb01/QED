@@ -3,10 +3,13 @@ package com.jonahbauer.qed.activities;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,6 +43,8 @@ import java.util.List;
 
 public class PersonBottomSheet extends BottomSheetDialogFragment implements QEDPageReceiver<Person> {
     private static final String EXTRA_PERSON_ID = "personId";
+
+    private Context context;
 
     private float dp;
 
@@ -89,6 +94,10 @@ public class PersonBottomSheet extends BottomSheetDialogFragment implements QEDP
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        context = new ContextThemeWrapper(getActivity(), Application.darkMode ? R.style.AppTheme_Dark_BottomSheetDialog_PersonBottomSheet : R.style.AppTheme_BottomSheetDialog_PersonBottomSheet);
+        
+        inflater = inflater.cloneInContext(context);
+        
         View view = inflater.inflate(R.layout.bottom_sheet_person, container);
 
         dp = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1, getResources().getDisplayMetrics());
@@ -222,26 +231,29 @@ public class PersonBottomSheet extends BottomSheetDialogFragment implements QEDP
     private View addListItem(LinearLayout list, TableRow row, String title, String subtitle) {
         row.setVisibility(View.VISIBLE);
 
-        assert getContext() != null;
-
-        LinearLayout linearLayout = new LinearLayout(getContext());
+        LinearLayout linearLayout = new LinearLayout(context);
         linearLayout.setOrientation(LinearLayout.VERTICAL);
 
-        TextView titleTextView = new TextView(getContext());
+        assert context != null;
+
+        TypedArray attr = context.obtainStyledAttributes(new int[]{R.attr.textColorPrimary, R.attr.textColorSecondary, android.R.attr.listDivider});
+
+        TextView titleTextView = new TextView(context);
         titleTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
-        titleTextView.setTextColor(getContext().getColor(android.R.color.black));
+        titleTextView.setTextColor(attr.getColor(0, Color.BLACK));
         titleTextView.setText(title);
         linearLayout.addView(titleTextView);
 
         if (subtitle != null) {
-            TextView subtitleTextView = new TextView(getContext());
+            TextView subtitleTextView = new TextView(context);
             subtitleTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
             subtitleTextView.setText(subtitle);
+            subtitleTextView.setTextColor(attr.getColor(1, Color.GRAY));
             linearLayout.addView(subtitleTextView);
         }
 
-        ImageView dividerImageView = new ImageView(getContext());
-        dividerImageView.setImageResource(R.drawable.person_divider);
+        ImageView dividerImageView = new ImageView(context);
+        dividerImageView.setImageDrawable(attr.getDrawable(2));
         LinearLayout.LayoutParams dividerLayoutParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1, getResources().getDisplayMetrics())
@@ -255,6 +267,8 @@ public class PersonBottomSheet extends BottomSheetDialogFragment implements QEDP
         linearLayout.addView(dividerImageView, dividerLayoutParams);
 
         list.addView(linearLayout);
+
+        attr.recycle();
 
         return linearLayout;
     }
@@ -347,7 +361,7 @@ public class PersonBottomSheet extends BottomSheetDialogFragment implements QEDP
                 EventDatabaseFragment.showEventId = 0;
                 EventDatabaseFragment.showEvent = event.name;
                 EventDatabaseFragment.shownEvent = false;
-                getContext().getSharedPreferences(getString(R.string.preferences_shared_preferences), Context.MODE_PRIVATE).edit().putInt(getString(R.string.preferences_drawerSelection_key), R.id.nav_database_events).apply();
+                getContext().getSharedPreferences(getString(R.string.preferences_shared_preferences), Context.MODE_PRIVATE).edit().putInt(getString(R.string.preferences_general_drawerSelection_key), R.id.nav_database_events).apply();
                 ((MainActivity)getActivity()).reloadFragment(false);
                 dismiss();
             }

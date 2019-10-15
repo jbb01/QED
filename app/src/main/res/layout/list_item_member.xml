@@ -39,7 +39,7 @@
             android:layout_toEndOf="@id/header"
             android:layout_alignParentTop="true"
             android:gravity="start"
-            android:textColor="#000000"
+            android:textColor="?attr/textColorPrimary"
             android:textSize="@dimen/person_name_size"
             android:textStyle="bold"
             tools:text="Max Mustermann"/>
@@ -51,6 +51,7 @@
             android:layout_toEndOf="@id/header"
             android:layout_alignParentEnd="true"
             android:layout_below="@id/event_member_name"
+            android:textColor="?attr/textColorSecondary"
             android:gravity="start"
             android:textSize="@dimen/person_email_size"
             tools:text="max.mustermann@email.com"/>

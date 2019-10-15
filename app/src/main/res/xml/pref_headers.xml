@@ -3,6 +3,11 @@
     <!-- These settings headers are only used on tablets. -->
 
     <header
+        android:fragment="com.jonahbauer.qed.activities.SettingsActivity$GeneralPreferenceFragment"
+        android:icon="@drawable/ic_settings_general"
+        android:title="@string/preferences_header_general" />
+
+    <header
         android:fragment="com.jonahbauer.qed.activities.SettingsActivity$ChatPreferenceFragment"
         android:icon="@drawable/ic_settings_chat"
         android:title="@string/preferences_header_chat" />

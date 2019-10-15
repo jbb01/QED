@@ -35,9 +35,9 @@ import com.jonahbauer.qed.networking.QEDGalleryPages;
 import com.jonahbauer.qed.networking.QEDGalleryPages.Filter;
 import com.jonahbauer.qed.networking.QEDPageReceiver;
 import com.jonahbauer.qed.qeddb.person.Person;
-import com.jonahbauer.qed.qedgallery.Album;
-import com.jonahbauer.qed.qedgallery.Image;
-import com.jonahbauer.qed.qedgallery.ImageAdapter;
+import com.jonahbauer.qed.qedgallery.album.Album;
+import com.jonahbauer.qed.qedgallery.image.Image;
+import com.jonahbauer.qed.qedgallery.image.ImageAdapter;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -89,6 +89,8 @@ public class GalleryAlbumActivity extends AppCompatActivity implements QEDPageRe
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(Application.darkMode ? R.style.AppTheme_Dark_NoActionBar_Album : R.style.AppTheme_NoActionBar_Album);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gallery_album);
 
@@ -323,11 +325,11 @@ public class GalleryAlbumActivity extends AppCompatActivity implements QEDPageRe
                 if (isChecked) {
                     buttonView.setButtonDrawable(R.drawable.ic_arrow_up_accent_animation);
                     ((Animatable) Objects.requireNonNull(buttonView.getButtonDrawable())).start();
-                    expand(expand, getResources().getInteger(R.integer.expand_time));
+                    expand(expand);
                 } else {
                     buttonView.setButtonDrawable(R.drawable.ic_arrow_down_accent_animation);
                     ((Animatable) Objects.requireNonNull(buttonView.getButtonDrawable())).start();
-                    collapse(expand, getResources().getInteger(R.integer.expand_time));
+                    collapse(expand);
                 }
                 break;
             case R.id.album_photographer_radio_button:
@@ -354,7 +356,7 @@ public class GalleryAlbumActivity extends AppCompatActivity implements QEDPageRe
         }
     }
 
-    private static void expand(final View v, int duration) {
+    private static void expand(final View v) {
         v.setVisibility(View.VISIBLE);
 //        v.getLayoutParams().height = 1;
 //        v.setVisibility(View.VISIBLE);
@@ -381,7 +383,7 @@ public class GalleryAlbumActivity extends AppCompatActivity implements QEDPageRe
 //        v.startAnimation(a);
     }
 
-    private static void collapse(final View v, int duration) {
+    private static void collapse(final View v) {
         v.setVisibility(View.GONE);
 //        final int initialHeight = v.getMeasuredHeight();
 //

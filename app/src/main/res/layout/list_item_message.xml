@@ -16,7 +16,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/background_message"
-        android:backgroundTint="@color/chat_message_background"
+        android:backgroundTint="?attr/messageBackgroundColorPrimary"
         android:orientation="vertical"
         android:elevation="3dp"
         android:clipToPadding="false"
@@ -27,8 +27,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="start"
-            android:textColor="@color/chat_message_text"
             android:textSize="@dimen/message_text_size"
+            android:textColor="?attr/messageTextColorPrimary"
             android:textStyle="bold"
             tools:text="Max Mustermann"/>
 
@@ -36,7 +36,7 @@
             android:id="@+id/message_message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/chat_message_text"
+            android:textColor="?attr/messageTextColorPrimary"
             android:clickable="false"
             android:focusable="false"
             android:textSize="@dimen/message_text_size"
@@ -48,7 +48,7 @@
             android:layout_height="wrap_content"
             android:gravity="end"
             android:layout_gravity="end"
-            android:textColor="@color/chat_message_date"
+            android:textColor="?attr/messageTextColorSecondary"
             android:textSize="@dimen/message_time_size"
             tools:text="13:37"/>
 </LinearLayout>

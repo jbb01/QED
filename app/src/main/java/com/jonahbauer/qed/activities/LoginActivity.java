@@ -48,9 +48,11 @@ public class LoginActivity extends AppCompatActivity implements Internet {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(Application.darkMode ? R.style.AppTheme_Dark_Login : R.style.AppTheme_Login);
+
         super.onCreate(savedInstanceState);
 
-        getSharedPreferences(getString(R.string.preferences_shared_preferences),MODE_PRIVATE).edit().putBoolean(getString(R.string.preferences_loggedIn_key),false).apply();
+        getSharedPreferences(getString(R.string.preferences_shared_preferences),MODE_PRIVATE).edit().putBoolean(getString(R.string.preferences_general_loggedIn_key),false).apply();
 
         setContentView(R.layout.activity_login);
         usernameView = findViewById(R.id.username);
@@ -246,7 +248,7 @@ public class LoginActivity extends AppCompatActivity implements Internet {
                 ((Application)getApplication()).saveData(mUsername, Application.KEY_USERNAME, false);
                 ((Application)getApplication()).saveData(mPassword, Application.KEY_PASSWORD, true);
 
-                getSharedPreferences(getString(R.string.preferences_shared_preferences),MODE_PRIVATE).edit().putBoolean(getString(R.string.preferences_loggedIn_key),true).apply();
+                getSharedPreferences(getString(R.string.preferences_shared_preferences),MODE_PRIVATE).edit().putBoolean(getString(R.string.preferences_general_loggedIn_key),true).apply();
 
                 if (!dontStartMain) {
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);

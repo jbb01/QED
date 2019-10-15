@@ -1,4 +1,4 @@
-package com.jonahbauer.qed.qedgallery;
+package com.jonahbauer.qed.qedgallery.album;
 
 import android.util.Log;
 
@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 
 import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.qeddb.person.Person;
+import com.jonahbauer.qed.qedgallery.image.Image;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;

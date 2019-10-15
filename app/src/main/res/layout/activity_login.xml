@@ -9,7 +9,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:background="@color/login_background"
+    android:background="?attr/colorBackground"
     tools:context=".activities.LoginActivity">
 
     <!-- Login progress -->
@@ -47,7 +47,8 @@
                     android:hint="@string/login_prompt_username"
                     android:inputType="text"
                     android:maxLines="1"
-                    android:singleLine="true" />
+                    android:singleLine="true"
+                    android:importantForAutofill="no" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -66,7 +67,8 @@
                     android:imeOptions="actionUnspecified"
                     android:inputType="textPassword"
                     android:maxLines="1"
-                    android:singleLine="true" />
+                    android:singleLine="true"
+                    android:importantForAutofill="no" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -80,7 +82,7 @@
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp"
                 android:background="@drawable/button"
-                android:textColor="@color/colorAccent"
+                android:textColor="?attr/colorAccent"
                 android:text="@string/login_action_sign_in" />
 
         </LinearLayout>

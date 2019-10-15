@@ -6,8 +6,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 
-import com.jonahbauer.qed.qedgallery.Album;
-import com.jonahbauer.qed.qedgallery.Image;
+import com.jonahbauer.qed.qedgallery.album.Album;
+import com.jonahbauer.qed.qedgallery.image.Image;
 
 import java.util.ArrayList;
 import java.util.Date;

@@ -7,7 +7,7 @@
         android:right="5dp">
         <shape
             android:shape="oval"
-            android:tint="@color/event_database_divider">
+            android:tint="?attr/colorListDivider">
             <padding
                 android:left="10dp"
                 android:right="10dp" />

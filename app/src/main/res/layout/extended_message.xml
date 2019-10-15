@@ -25,7 +25,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textColor="@color/chat_message_text"
+                android:textColor="?attr/messageTextColorPrimary"
                 android:textSize="@dimen/message_text_size"
                 android:textStyle="italic" />
 
@@ -33,7 +33,7 @@
                 android:id="@+id/message_id"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/chat_message_text"
+                android:textColor="?attr/messageTextColorPrimary"
                 android:textSize="@dimen/message_text_size"
                 android:layout_marginStart="3dp"
                 android:textAlignment="textEnd" />
@@ -48,7 +48,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="start"
-                android:textColor="@color/chat_message_text"
+                android:textColor="?attr/messageTextColorPrimary"
                 android:textSize="@dimen/message_text_size"
                 android:textStyle="bold" />
 
@@ -57,7 +57,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAlignment="textEnd"
-                android:textColor="@color/chat_message_text"
+                android:textColor="?attr/messageTextColorPrimary"
                 android:layout_marginStart="3dp"
                 android:textSize="@dimen/message_text_size" />
         </TableRow>
@@ -66,7 +66,7 @@
             android:id="@+id/message_message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/chat_message_text"
+            android:textColor="?attr/messageTextColorPrimary"
             android:textSize="@dimen/message_text_size" />
 
     </TableLayout>

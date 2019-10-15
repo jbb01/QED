@@ -3,20 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/chat_database_background"
+    android:background="?attr/colorBackground"
     android:id="@+id/fragment"
     tools:context=".activities.ChatDatabaseFragment">
-
-    <ImageView
-        android:id="@+id/background"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentBottom="true"
-        android:translationZ="-1dp"
-        android:contentDescription="@string/background"/>
 
     <LinearLayout
         android:id="@+id/database_search_filters"
@@ -31,7 +20,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/chat_database_search_background"
+            android:background="?attr/colorBackgroundSecondary"
             android:elevation="5dp"
             tools:ignore="UselessParent">
             <TableLayout
@@ -54,7 +43,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
                         android:layout_marginEnd="10dp"
-                        android:textColor="@color/chat_database_search_headers"
+                        android:textColor="?attr/textColorPrimary"
                         android:text="@string/chat_database_channel_checkbox" />
                     <EditText
                         android:id="@+id/database_channel_editText"
@@ -64,7 +53,8 @@
                         android:layout_marginEnd="6dp"
                         android:textSize="16sp"
                         android:hint="@string/chat_database_channel_hint"
-                        android:inputType="text" />
+                        android:inputType="text"
+                        android:importantForAutofill="no" />
                 </TableRow>
 
                 <TableRow
@@ -78,7 +68,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
                         android:layout_marginEnd="10dp"
-                        android:textColor="@color/chat_database_search_headers"
+                        android:textColor="?attr/textColorPrimary"
                         android:text="@string/chat_database_message_checkbox" />
                     <EditText
                         android:id="@+id/database_message_editText"
@@ -88,7 +78,8 @@
                         android:layout_marginEnd="6dp"
                         android:textSize="16sp"
                         android:hint="@string/chat_database_message_hint"
-                        android:inputType="text" />
+                        android:inputType="text"
+                        android:importantForAutofill="no" />
                 </TableRow>
 
                 <TableRow
@@ -102,7 +93,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
                         android:layout_marginEnd="10dp"
-                        android:textColor="@color/chat_database_search_headers"
+                        android:textColor="?attr/textColorPrimary"
                         android:text="@string/chat_database_name_checkbox" />
                     <EditText
                         android:id="@+id/database_name_editText"
@@ -112,7 +103,8 @@
                         android:layout_marginEnd="6dp"
                         android:textSize="16sp"
                         android:hint="@string/chat_database_name_hint"
-                        android:inputType="text" />
+                        android:inputType="text"
+                        android:importantForAutofill="no" />
                 </TableRow>
 
                 <TableRow
@@ -126,7 +118,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
                         android:layout_marginEnd="10dp"
-                        android:textColor="@color/chat_database_search_headers"
+                        android:textColor="?attr/textColorPrimary"
                         android:text="@string/chat_database_dateFrom_checkbox" />
                     <EditText
                         android:id="@+id/database_dateFrom_editText"
@@ -136,7 +128,8 @@
                         android:layout_marginEnd="6dp"
                         android:textSize="16sp"
                         android:hint="@string/chat_database_dateFrom_hint"
-                        android:inputType="datetime" />
+                        android:inputType="datetime"
+                        android:importantForAutofill="no" />
                 </TableRow>
 
                 <TableRow
@@ -150,7 +143,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
                         android:layout_marginEnd="10dp"
-                        android:textColor="@color/chat_database_search_headers"
+                        android:textColor="?attr/textColorPrimary"
                         android:text="@string/chat_database_dateTo_checkbox" />
                     <EditText
                         android:id="@+id/database_dateTo_editText"
@@ -160,7 +153,8 @@
                         android:layout_marginEnd="6dp"
                         android:textSize="16sp"
                         android:hint="@string/chat_database_dateTo_hint"
-                        android:inputType="datetime" />
+                        android:inputType="datetime"
+                        android:importantForAutofill="no" />
                 </TableRow>
 
                 <TableRow
@@ -174,7 +168,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
                         android:layout_marginEnd="10dp"
-                        android:textColor="@color/chat_database_search_headers"
+                        android:textColor="?attr/textColorPrimary"
                         android:text="@string/chat_database_id_checkbox" />
                     <EditText
                         android:id="@+id/database_id_editText"
@@ -184,7 +178,8 @@
                         android:layout_marginEnd="6dp"
                         android:textSize="16sp"
                         android:hint="@string/chat_database_id_hint"
-                        android:inputType="text" />
+                        android:inputType="text"
+                        android:importantForAutofill="no" />
                 </TableRow>
             </TableLayout>
 
@@ -198,7 +193,7 @@
                 android:paddingStart="@dimen/activity_horizontal_margin"
                 android:paddingEnd="@dimen/activity_horizontal_margin"
                 android:text="@string/database_search_button"
-                android:textColor="@color/colorAccent"/>
+                android:textColor="?attr/colorAccent"/>
 
             <TextView
                 android:id="@+id/database_hits"
@@ -206,6 +201,7 @@
                 android:layout_height="wrap_content"
                 android:paddingStart="6dp"
                 android:paddingEnd="6dp"
+                android:textColor="?attr/textColorSecondary"
                 android:layout_alignTop="@id/search_button"
                 android:layout_alignBottom="@id/search_button"
                 android:layout_toEndOf="@id/search_button"

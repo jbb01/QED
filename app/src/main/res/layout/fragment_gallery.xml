@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/album_background"
+    android:background="?attr/colorBackground"
     tools:context=".activities.GalleryFragment">
 
     <ProgressBar
@@ -30,8 +30,8 @@
         android:textAlignment="center"
         android:gravity="center"
         android:textSize="16sp"
-        android:background="@color/colorBackground"
-        android:textColor="@color/offline_label_font"
+        android:background="?attr/colorBackgroundSecondary"
+        android:textColor="?attr/textColorSecondary"
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
         android:visibility="gone"
@@ -47,8 +47,8 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:id="@+id/gallery_list_container"
-        android:background="@color/album_background"
-        android:divider="@drawable/person_divider"
+        android:background="?attr/colorBackground"
+        android:divider="?android:attr/listDivider"
         android:dividerHeight="@dimen/person_divider"
         android:scrollbarStyle="outsideInset"
         android:fastScrollAlwaysVisible="true"

@@ -1,8 +1,10 @@
 package com.jonahbauer.qed.activities;
 
+import android.content.Context;
 import android.graphics.drawable.Animatable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -74,6 +76,10 @@ public class PersonDatabaseFragment extends Fragment implements CompoundButton.O
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), Application.darkMode ? R.style.AppTheme_Dark_PersonDatabase : R.style.AppTheme_PersonDatabase);
+        inflater = inflater.cloneInContext(contextThemeWrapper);
+
         View view = inflater.inflate(R.layout.fragment_persons_database, container, false);
 
         CheckBox expandCheckBox = view.findViewById(R.id.expand_checkBox);
@@ -92,7 +98,7 @@ public class PersonDatabaseFragment extends Fragment implements CompoundButton.O
         RadioButton sortByFirstNameRadioButton = view.findViewById(R.id.database_sort_first_name_radio_button);
         RadioButton sortByLastNameRadioButton = view.findViewById(R.id.database_sort_last_name_radio_button);
 
-        personAdapter = new PersonAdapter(getContext(), new ArrayList<>(), PersonAdapter.SORT_FIRST_NAME, view.findViewById(R.id.fixed_header));
+        personAdapter = new PersonAdapter(contextThemeWrapper, new ArrayList<>(), PersonAdapter.SORT_FIRST_NAME, view.findViewById(R.id.fixed_header));
         personListView.setAdapter(personAdapter);
         personListView.setOnScrollListener(personAdapter);
         personListView.setOnItemClickListener((parent, view1, position, id) -> showBottomSheetDialogFragment(String.valueOf(Objects.requireNonNull(personAdapter.getItem((int) id)).id)));

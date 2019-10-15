@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/event_background"
+    android:background="?attr/colorBackground"
     tools:context=".activities.EventBottomSheet">
 
     <TabHost
@@ -21,7 +21,7 @@
 
             <TabWidget
                 android:id="@android:id/tabs"
-                android:background="@color/event_tab_header"
+                android:background="?attr/colorBackgroundSecondary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
 
@@ -38,7 +38,7 @@
                 android:id="@android:id/tabcontent"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/person_background"
+                android:background="?attr/colorBackground"
                 android:visibility="gone">
 
                 <TableLayout
@@ -57,7 +57,7 @@
                             android:layout_height="wrap_content"
                             android:layout_column="1"
                             android:padding="5dp"
-                            android:textColor="@color/event_big_name"
+                            android:textColor="?attr/textColorPrimary"
                             android:textSize="30sp"
                             tools:text="Akademie 2019"/>
                     </TableRow>
@@ -84,20 +84,21 @@
                                 android:id="@+id/event_time_text"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:textColor="#000000"
+                                android:textColor="?attr/textColorPrimary"
                                 android:textSize="18sp"
                                 tools:text="23.08.2019 - 01.09.2019"/>
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textSize="14sp"
+                                android:textColor="?attr/textColorSecondary"
                                 android:text="@string/event_subtitle_time"/>
                             <ImageView
                                 android:layout_width="match_parent"
                                 android:layout_height="1dp"
                                 android:layout_marginTop="5dp"
                                 android:layout_marginBottom="5dp"
-                                android:src="@drawable/event_divider"
+                                android:src="?android:attr/listDivider"
                                 android:contentDescription="@string/content_description_icon"/>
                         </LinearLayout>
                     </TableRow>
@@ -123,20 +124,21 @@
                                 android:id="@+id/event_deadline_text"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:textColor="#000000"
+                                android:textColor="?attr/textColorPrimary"
                                 android:textSize="18sp"
                                 tools:text="22.08.2019"/>
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textSize="14sp"
+                                android:textColor="?attr/textColorSecondary"
                                 android:text="@string/event_subtitle_deadline"/>
                             <ImageView
                                 android:layout_width="match_parent"
                                 android:layout_height="1dp"
                                 android:layout_marginTop="5dp"
                                 android:layout_marginBottom="5dp"
-                                android:src="@drawable/event_divider"
+                                android:src="?android:attr/divider"
                                 android:contentDescription="@string/content_description_icon"/>
                         </LinearLayout>
                     </TableRow>
@@ -162,20 +164,21 @@
                                 android:id="@+id/event_cost_text"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:textColor="#000000"
+                                android:textColor="?attr/textColorPrimary"
                                 android:textSize="18sp"
                                 tools:text="99999"/>
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textSize="14sp"
+                                android:textColor="?attr/textColorSecondary"
                                 android:text="@string/event_subtitle_cost"/>
                             <ImageView
                                 android:layout_width="match_parent"
                                 android:layout_height="1dp"
                                 android:layout_marginTop="5dp"
                                 android:layout_marginBottom="5dp"
-                                android:src="@drawable/event_divider"
+                                android:src="?android:attr/divider"
                                 android:contentDescription="@string/content_description_icon"/>
                         </LinearLayout>
                     </TableRow>
@@ -201,20 +204,21 @@
                                 android:id="@+id/event_max_member_text"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:textColor="#000000"
+                                android:textColor="?attr/textColorPrimary"
                                 android:textSize="18sp"
                                 tools:text="60"/>
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textSize="14sp"
+                                android:textColor="?attr/textColorSecondary"
                                 android:text="@string/event_subtitle_max_members"/>
                             <ImageView
                                 android:layout_width="match_parent"
                                 android:layout_height="1dp"
                                 android:layout_marginTop="5dp"
                                 android:layout_marginBottom="5dp"
-                                android:src="@drawable/event_divider"
+                                android:src="?android:attr/divider"
                                 android:contentDescription="@string/content_description_icon"/>
                         </LinearLayout>
                     </TableRow>
@@ -242,20 +246,21 @@
                                 android:id="@+id/event_hotel_text"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:textColor="#000000"
+                                android:textColor="?attr/textColorPrimary"
                                 android:textSize="18sp"
                                 tools:text="7"/>
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textSize="14sp"
+                                android:textColor="?attr/textColorSecondary"
                                 android:text="@string/event_subtitle_hotel"/>
                             <ImageView
                                 android:layout_width="match_parent"
                                 android:layout_height="1dp"
                                 android:layout_marginTop="5dp"
                                 android:layout_marginBottom="5dp"
-                                android:src="@drawable/event_divider"
+                                android:src="?android:attr/divider"
                                 android:contentDescription="@string/content_description_icon"/>
                         </LinearLayout>
                     </TableRow>
@@ -291,7 +296,7 @@
                         android:id="@+id/event_member_list"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:divider="@drawable/event_divider"
+                        android:divider="?android:attr/listDivider"
                         android:dividerHeight="1dp"
                         android:fastScrollEnabled="true"
                         android:fastScrollAlwaysVisible="true"

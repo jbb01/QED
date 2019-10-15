@@ -30,6 +30,7 @@ public class Event implements Comparable<Event> {
         members = new ArrayList<>();
     }
 
+    @NonNull
     @Override
     public String toString() {
         Field[] fields = Event.class.getDeclaredFields();
@@ -49,7 +50,7 @@ public class Event implements Comparable<Event> {
 
             for (int i = 0; i < fields.length; i++) {
                 Object value = fields[i].get(this);
-                builder.append("\"").append(fields[i].getName()).append("\":\"").append(value.toString()).append("\"");
+                builder.append("\"").append(fields[i].getName()).append("\":\"").append(value != null ? value.toString() : "null").append("\"");
 
                 if (i < fields.length - 1) builder.append(", ");
                 else builder.append("}");
@@ -60,7 +61,7 @@ public class Event implements Comparable<Event> {
             e.printStackTrace();
         }
 
-        return null;
+        return "";
     }
 
     @Override

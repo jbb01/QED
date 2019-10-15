@@ -12,7 +12,7 @@
             android:layout_height="wrap_content"
             android:layout_width="0dp"
             android:layout_weight="0.4"
-            android:textColor="@color/album_info_headers"
+            android:textColor="?attr/textColorPrimary"
             android:textSize="18sp"
             android:layout_gravity="center_vertical"
             android:text="@string/album_info_creator"/>
@@ -22,6 +22,7 @@
             android:layout_width="0dp"
             android:layout_weight="0.6"
             android:textSize="16sp"
+            android:textColor="?attr/textColorSecondary"
             android:layout_gravity="center_vertical"/>
     </TableRow>
     <TableRow
@@ -33,7 +34,7 @@
             android:layout_height="wrap_content"
             android:layout_width="0dp"
             android:layout_weight="0.4"
-            android:textColor="@color/album_info_headers"
+            android:textColor="?attr/textColorPrimary"
             android:textSize="18sp"
             android:layout_gravity="center_vertical"
             android:text="@string/album_info_creation_date"/>
@@ -43,6 +44,7 @@
             android:layout_width="0dp"
             android:layout_weight="0.6"
             android:textSize="16sp"
+            android:textColor="?attr/textColorSecondary"
             android:layout_gravity="center_vertical"/>
     </TableRow>
     <TableRow
@@ -54,7 +56,7 @@
             android:layout_height="wrap_content"
             android:layout_width="0dp"
             android:layout_weight="0.4"
-            android:textColor="@color/album_info_headers"
+            android:textColor="?attr/textColorPrimary"
             android:textSize="18sp"
             android:layout_gravity="center_vertical"
             android:text="@string/album_info_creation_dates"/>
@@ -64,6 +66,7 @@
             android:layout_width="0dp"
             android:layout_weight="0.6"
             android:textSize="16sp"
+            android:textColor="?attr/textColorSecondary"
             android:layout_gravity="center_vertical"/>
     </TableRow>
 </TableLayout>

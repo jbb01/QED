@@ -3,10 +3,13 @@ package com.jonahbauer.qed.activities;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -53,6 +56,8 @@ public class EventBottomSheet extends BottomSheetDialogFragment implements QEDPa
     };
 
     private Event event;
+
+    private Context context;
 
     private boolean receivedError;
     private boolean dismissed;
@@ -103,6 +108,9 @@ public class EventBottomSheet extends BottomSheetDialogFragment implements QEDPa
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        context = new ContextThemeWrapper(getActivity(), Application.darkMode ? R.style.AppTheme_Dark_BottomSheetDialog_EventBottomSheet : R.style.AppTheme_BottomSheetDialog_EventBottomSheet);
+        inflater = inflater.cloneInContext(context);
+
         View view = inflater.inflate(R.layout.bottom_sheet_event, container);
 
         progressBar = view.findViewById(R.id.progress_bar);
@@ -210,26 +218,29 @@ public class EventBottomSheet extends BottomSheetDialogFragment implements QEDPa
     private View addListItem(LinearLayout list, TableRow row, String title, @SuppressWarnings("SameParameterValue") String subtitle) {
         row.setVisibility(View.VISIBLE);
 
-        LinearLayout linearLayout = new LinearLayout(getContext());
+        LinearLayout linearLayout = new LinearLayout(context);
         linearLayout.setOrientation(LinearLayout.VERTICAL);
 
-        assert getContext() != null;
+        assert context != null;
 
-        TextView titleTextView = new TextView(getContext());
+        TypedArray attr = context.obtainStyledAttributes(new int[]{R.attr.textColorPrimary, R.attr.textColorSecondary, android.R.attr.listDivider});
+
+        TextView titleTextView = new TextView(context);
         titleTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
-        titleTextView.setTextColor(getContext().getColor(android.R.color.black));
+        titleTextView.setTextColor(attr.getColor(0, Color.BLACK));
         titleTextView.setText(title);
         linearLayout.addView(titleTextView);
 
         if (subtitle != null) {
-            TextView subtitleTextView = new TextView(getContext());
+            TextView subtitleTextView = new TextView(context);
             subtitleTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
             subtitleTextView.setText(subtitle);
+            subtitleTextView.setTextColor(attr.getColor(1, Color.GRAY));
             linearLayout.addView(subtitleTextView);
         }
 
-        ImageView dividerImageView = new ImageView(getContext());
-        dividerImageView.setImageResource(R.drawable.person_divider);
+        ImageView dividerImageView = new ImageView(context);
+        dividerImageView.setImageDrawable(attr.getDrawable(2));
         LinearLayout.LayoutParams dividerLayoutParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1, getResources().getDisplayMetrics())
@@ -243,6 +254,8 @@ public class EventBottomSheet extends BottomSheetDialogFragment implements QEDPa
         linearLayout.addView(dividerImageView, dividerLayoutParams);
 
         list.addView(linearLayout);
+
+        attr.recycle();
 
         return linearLayout;
     }
@@ -262,6 +275,8 @@ public class EventBottomSheet extends BottomSheetDialogFragment implements QEDPa
         @NonNull
         @Override
         protected View getItemView(Person person, @Nullable View convertView, @NonNull ViewGroup parent, LayoutInflater inflater) {
+            inflater = inflater.cloneInContext(context);
+
             View view = inflater.inflate(R.layout.list_item_member, parent, false);
 
             String name = person.firstName + " " + person.lastName;
@@ -299,7 +314,7 @@ public class EventBottomSheet extends BottomSheetDialogFragment implements QEDPa
             if (person != null && getActivity() != null) {
                 PersonDatabaseFragment.showPerson = person.id;
                 PersonDatabaseFragment.shownPerson = false;
-                getContext().getSharedPreferences(getString(R.string.preferences_shared_preferences), Context.MODE_PRIVATE).edit().putInt(getString(R.string.preferences_drawerSelection_key), R.id.nav_database_persons).apply();
+                getContext().getSharedPreferences(getString(R.string.preferences_shared_preferences), Context.MODE_PRIVATE).edit().putInt(getString(R.string.preferences_general_drawerSelection_key), R.id.nav_database_persons).apply();
                 ((MainActivity) getActivity()).reloadFragment(false);
                 dismiss();
             }

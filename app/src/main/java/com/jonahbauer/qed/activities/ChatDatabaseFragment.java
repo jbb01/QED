@@ -1,8 +1,9 @@
 package com.jonahbauer.qed.activities;
 
-import android.graphics.Shader;
+import android.content.Context;
 import android.graphics.drawable.Animatable;
 import android.os.Bundle;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,7 +11,6 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -18,12 +18,12 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.chat.Message;
 import com.jonahbauer.qed.chat.MessageAdapter;
 import com.jonahbauer.qed.database.ChatDatabase;
 import com.jonahbauer.qed.database.ChatDatabaseReceiver;
-import com.jonahbauer.qed.layoutStuff.TileDrawable;
 import com.szagurskii.patternedtextwatcher.PatternedTextWatcher;
 
 import java.util.ArrayList;
@@ -37,7 +37,6 @@ import static com.jonahbauer.qed.database.ChatDatabaseContract.ChatEntry.COLUMN_
 import static com.jonahbauer.qed.database.ChatDatabaseContract.ChatEntry.COLUMN_NAME_NAME;
 import static com.jonahbauer.qed.database.ChatDatabaseContract.ChatEntry.TABLE_NAME;
 
-@SuppressWarnings("ConstantConditions")
 public class ChatDatabaseFragment extends Fragment implements CompoundButton.OnCheckedChangeListener, ChatDatabaseReceiver {
     private ChatDatabase database;
     private MessageAdapter messageAdapter;
@@ -62,11 +61,13 @@ public class ChatDatabaseFragment extends Fragment implements CompoundButton.OnC
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Context context = new ContextThemeWrapper(getActivity(), Application.darkMode ? R.style.AppTheme_Dark_ChatDatabase : R.style.AppTheme_ChatDatabase);
+        inflater = inflater.cloneInContext(context);
+
         super.onCreate(savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_chat_database, container, false);
 
         messageListView = view.findViewById(R.id.message_list_view);
-        ImageView background = view.findViewById(R.id.background);
         expand = view.findViewById(R.id.expand);
         searchButton = view.findViewById(R.id.search_button);
         searchProgress = view.findViewById(R.id.search_progress);
@@ -87,9 +88,6 @@ public class ChatDatabaseFragment extends Fragment implements CompoundButton.OnC
         
         database = new ChatDatabase();
         database.init(getContext(), this);
-
-        TileDrawable tileDrawable  = new TileDrawable(getContext().getDrawable(R.drawable.background_part), Shader.TileMode.REPEAT);
-        background.setImageDrawable(tileDrawable);
 
         messageAdapter = new MessageAdapter(getContext(),new ArrayList<>(), true);
         messageListView.setAdapter(messageAdapter);
@@ -124,11 +122,11 @@ public class ChatDatabaseFragment extends Fragment implements CompoundButton.OnC
                 if (isChecked) {
                     buttonView.setButtonDrawable(R.drawable.ic_arrow_up_accent_animation);
                     ((Animatable) Objects.requireNonNull(buttonView.getButtonDrawable())).start();
-                    expand(expand, getResources().getInteger(R.integer.expand_time));
+                    expand(expand);
                 } else {
                     buttonView.setButtonDrawable(R.drawable.ic_arrow_down_accent_animation);
                     ((Animatable) Objects.requireNonNull(buttonView.getButtonDrawable())).start();
-                    collapse(expand, getResources().getInteger(R.integer.expand_time));
+                    collapse(expand);
                 }
                 break;
             case R.id.database_channel_checkbox:
@@ -158,7 +156,7 @@ public class ChatDatabaseFragment extends Fragment implements CompoundButton.OnC
         }
     }
 
-    private static void expand(final View v, int duration) {
+    private static void expand(final View v) {
         v.setVisibility(View.VISIBLE);
 //        v.getLayoutParams().height = 1;
 //        v.setVisibility(View.VISIBLE);
@@ -185,7 +183,7 @@ public class ChatDatabaseFragment extends Fragment implements CompoundButton.OnC
 //        v.startAnimation(a);
     }
 
-    private static void collapse(final View v, int duration) {
+    private static void collapse(final View v) {
         v.setVisibility(View.GONE);
 //        final int initialHeight = v.getMeasuredHeight();
 //

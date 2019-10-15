@@ -15,7 +15,7 @@
         android:id="@+id/gallery_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:backgroundTint="@color/album_background"
+        android:backgroundTint="?attr/colorBackground"
         android:orientation="vertical"
         android:elevation="1dp"
         tools:ignore="UselessParent">
@@ -43,7 +43,7 @@
             android:layout_toEndOf="@id/gallery_icon"
             android:layout_alignParentTop="true"
             android:gravity="start"
-            android:textColor="@color/album_list_text"
+            android:textColor="?attr/textColorPrimary"
             android:textSize="@dimen/gallery_name_size"
             android:textStyle="bold"
             android:paddingTop="14sp"

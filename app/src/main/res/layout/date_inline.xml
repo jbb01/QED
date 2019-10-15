@@ -15,7 +15,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/background_message_extended"
-        android:backgroundTint="@color/chat_date"
+        android:backgroundTint="?attr/messageBackgroundColorSecondary"
         android:textSize="@dimen/message_date_size"
-        android:textColor="@color/chat_date_text"/>
+        android:textColor="?attr/messageTextColorTertiary"/>
 </RelativeLayout>

@@ -33,7 +33,7 @@ import com.jonahbauer.qed.networking.QEDGalleryPages;
 import com.jonahbauer.qed.networking.QEDGalleryPages.Mode;
 import com.jonahbauer.qed.networking.QEDPageReceiver;
 import com.jonahbauer.qed.networking.QEDPageStreamReceiver;
-import com.jonahbauer.qed.qedgallery.Image;
+import com.jonahbauer.qed.qedgallery.image.Image;
 
 import java.io.File;
 import java.io.FileOutputStream;

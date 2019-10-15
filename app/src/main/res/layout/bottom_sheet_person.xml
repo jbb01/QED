@@ -4,7 +4,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/person_background"
+    android:background="?attr/colorBackground"
     tools:context=".activities.PersonBottomSheet">
 
     <TabHost
@@ -21,7 +21,7 @@
 
             <TabWidget
                 android:id="@android:id/tabs"
-                android:background="@color/person_tab_header"
+                android:background="?attr/colorBackgroundSecondary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
 
@@ -38,8 +38,9 @@
                 android:id="@android:id/tabcontent"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/person_background"
-                android:visibility="gone">
+                android:background="?attr/colorBackground"
+                android:visibility="gone"
+                tools:visibility="visible">
                 <TableLayout
                     android:id="@+id/tab1"
                     android:layout_width="match_parent"
@@ -56,7 +57,7 @@
                             android:layout_height="wrap_content"
                             android:layout_column="1"
                             android:padding="5dp"
-                            android:textColor="@color/person_big_name"
+                            android:textColor="?attr/textColorPrimary"
                             android:textSize="30sp"/>
                     </TableRow>
 
@@ -64,7 +65,8 @@
                         android:id="@+id/person_phone_row"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:visibility="gone">
+                        android:visibility="gone"
+                        tools:visibility="visible">
                         <ImageView
                             android:layout_width="50dp"
                             android:layout_height="50dp"
@@ -87,7 +89,8 @@
                         android:id="@+id/person_mail_row"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:visibility="gone">
+                        android:visibility="gone"
+                        tools:visibility="visible">
                         <ImageView
                             android:layout_width="50dp"
                             android:layout_height="50dp"
@@ -110,7 +113,8 @@
                         android:id="@+id/person_address_row"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:visibility="gone">
+                        android:visibility="gone"
+                        tools:visibility="visible">
                         <ImageView
                             android:layout_width="50dp"
                             android:layout_height="50dp"
@@ -133,7 +137,8 @@
                         android:id="@+id/person_station_row"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:visibility="gone">
+                        android:visibility="gone"
+                        tools:visibility="visible">
                         <ImageView
                             android:layout_width="50dp"
                             android:layout_height="50dp"
@@ -156,7 +161,8 @@
                         android:id="@+id/person_birthday_row"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:visibility="gone">
+                        android:visibility="gone"
+                        tools:visibility="visible">
                         <ImageView
                             android:layout_width="50dp"
                             android:layout_height="50dp"
@@ -206,7 +212,7 @@
                                 android:id="@+id/person_active_text"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:textColor="#000000"
+                                android:textColor="?attr/textColorPrimary"
                                 android:paddingTop="10sp"
                                 android:paddingBottom="4sp"
                                 android:textSize="18sp"
@@ -216,7 +222,7 @@
                                 android:layout_height="1dp"
                                 android:layout_marginTop="5dp"
                                 android:layout_marginBottom="5dp"
-                                android:src="@drawable/person_divider"
+                                android:src="?android:attr/divider"
                                 android:contentDescription="@string/content_description_icon"/>
                         </LinearLayout>
                     </TableRow>
@@ -250,14 +256,14 @@
                                 android:id="@+id/person_memberSince_text"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:textColor="#000000"
+                                android:textColor="?attr/textColorPrimary"
                                 android:textSize="18sp"/>
                             <ImageView
                                 android:layout_width="match_parent"
                                 android:layout_height="1dp"
                                 android:layout_marginTop="5dp"
                                 android:layout_marginBottom="5dp"
-                                android:src="@drawable/person_divider"
+                                android:src="?android:attr/divider"
                                 android:contentDescription="@string/content_description_icon"/>
                         </LinearLayout>
                     </TableRow>
@@ -301,7 +307,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:divider="@drawable/person_divider_padded"
+                            android:divider="?android:attr/listDivider"
                             android:dividerHeight="1dp"
                             android:paddingStart="5dp"
                             android:paddingEnd="5dp"

@@ -9,6 +9,7 @@ import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -79,6 +80,9 @@ public class ChatFragment extends Fragment implements Internet, AbsListView.OnSc
     private SharedPreferences sharedPreferences;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Context context = new ContextThemeWrapper(getActivity(), Application.darkMode ? R.style.AppTheme_Dark_Chat : R.style.AppTheme_Chat);
+        inflater = inflater.cloneInContext(context);
+
         super.onCreate(savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_chat, container, false);
 
@@ -104,7 +108,6 @@ public class ChatFragment extends Fragment implements Internet, AbsListView.OnSc
         quickSettingsChannel.hide();
         quickSettings.setAlpha(0.35f);
 
-        Context context = getContext();
         quickSettingsName.setOnClickListener(a -> {
             AlertDialog.Builder inputDialog = new AlertDialog.Builder(context);
 
@@ -113,14 +116,14 @@ public class ChatFragment extends Fragment implements Internet, AbsListView.OnSc
             View editTextView = LayoutInflater.from(inputDialog.getContext()).inflate(R.layout.alert_dialog_edit_text, null);
 
             EditText inputEditText = editTextView.findViewById(R.id.input);
-            inputEditText.setText(sharedPreferences.getString(getString(R.string.preferences_name_key), ""));
+            inputEditText.setText(sharedPreferences.getString(getString(R.string.preferences_chat_name_key), ""));
 
             inputDialog.setView(editTextView);
 
             inputDialog.setNegativeButton(getString(R.string.cancel), (dialog, which) -> dialog.cancel());
 
             inputDialog.setPositiveButton(getString(R.string.ok), (dialog, which) -> {
-                sharedPreferences.edit().putString(getString(R.string.preferences_name_key), inputEditText.getText().toString()).apply();
+                sharedPreferences.edit().putString(getString(R.string.preferences_chat_name_key), inputEditText.getText().toString()).apply();
                 dialog.dismiss();
             });
 
@@ -135,14 +138,14 @@ public class ChatFragment extends Fragment implements Internet, AbsListView.OnSc
             View editTextView = LayoutInflater.from(inputDialog.getContext()).inflate(R.layout.alert_dialog_edit_text, null);
 
             EditText inputEditText = editTextView.findViewById(R.id.input);
-            inputEditText.setText(sharedPreferences.getString(getString(R.string.preferences_channel_key), ""));
+            inputEditText.setText(sharedPreferences.getString(getString(R.string.preferences_chat_channel_key), ""));
 
             inputDialog.setView(editTextView);
 
             inputDialog.setNegativeButton(getString(R.string.cancel), (dialog, which) -> dialog.cancel());
 
             inputDialog.setPositiveButton(getString(R.string.ok), (dialog, which) -> {
-                sharedPreferences.edit().putString(getString(R.string.preferences_channel_key), inputEditText.getText().toString()).apply();
+                sharedPreferences.edit().putString(getString(R.string.preferences_chat_channel_key), inputEditText.getText().toString()).apply();
                 reload();
                 dialog.dismiss();
             });
@@ -247,11 +250,11 @@ public class ChatFragment extends Fragment implements Internet, AbsListView.OnSc
         }, 5000);
     }
 
-    private void addPost(Message message, int position, boolean notify, boolean checkDate) {
+    private void addPost(Message message, @SuppressWarnings("SameParameterValue") int position, boolean notify, boolean checkDate) {
         assert getContext() != null;
 
         if (message.id < topPosition) topPosition = message.id;
-        if (message.bottag == 1 && getContext().getSharedPreferences(getString(R.string.preferences_shared_preferences),MODE_PRIVATE).getBoolean(getString(R.string.preferences_showSense_key),false)) return;
+        if (message.bottag == 1 && getContext().getSharedPreferences(getString(R.string.preferences_shared_preferences),MODE_PRIVATE).getBoolean(getString(R.string.preferences_chat_showSense_key),false)) return;
 
         if (messageAdapter!=null) {
             messageListView.post(() -> {
@@ -327,7 +330,7 @@ public class ChatFragment extends Fragment implements Internet, AbsListView.OnSc
         OkHttpClient client = new OkHttpClient.Builder().connectTimeout(5, TimeUnit.SECONDS).build();
         Request.Builder builder = new Request.Builder().url(
                 getString(R.string.chat_websocket)
-                        + "?channel=" + getContext().getSharedPreferences(getString(R.string.preferences_shared_preferences),MODE_PRIVATE).getString(getString(R.string.preferences_channel_key), "")
+                        + "?channel=" + getContext().getSharedPreferences(getString(R.string.preferences_shared_preferences),MODE_PRIVATE).getString(getString(R.string.preferences_chat_channel_key), "")
                         + "&version=" + "2"
                         + "&position=" + position);
         builder.addHeader("Origin", "https://chat.qed-verein.de");
@@ -375,11 +378,11 @@ public class ChatFragment extends Fragment implements Internet, AbsListView.OnSc
         sending = true;
         try {
             JSONObject json = new JSONObject();
-            json.put("channel", getContext().getSharedPreferences(getString(R.string.preferences_shared_preferences),MODE_PRIVATE).getString(getString(R.string.preferences_channel_key), ""));
-            json.put("name", getContext().getSharedPreferences(getString(R.string.preferences_shared_preferences),MODE_PRIVATE).getString(getString(R.string.preferences_name_key), ""));
+            json.put("channel", getContext().getSharedPreferences(getString(R.string.preferences_shared_preferences),MODE_PRIVATE).getString(getString(R.string.preferences_chat_channel_key), ""));
+            json.put("name", getContext().getSharedPreferences(getString(R.string.preferences_shared_preferences),MODE_PRIVATE).getString(getString(R.string.preferences_chat_name_key), ""));
             json.put("message", messageEditText.getText().toString());
             json.put("delay", Long.toString(position));
-            json.put("publicid", getContext().getSharedPreferences(getString(R.string.preferences_shared_preferences),MODE_PRIVATE).getBoolean(getString(R.string.preferences_publicId_key), false) ? 1 : 0);
+            json.put("publicid", getContext().getSharedPreferences(getString(R.string.preferences_shared_preferences),MODE_PRIVATE).getBoolean(getString(R.string.preferences_chat_publicId_key), false) ? 1 : 0);
             websocket.send(json.toString());
             messageEditText.setText("");
             messageEditText.requestFocus();

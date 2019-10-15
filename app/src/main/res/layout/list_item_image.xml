@@ -9,7 +9,7 @@
     android:padding="5dp"
     android:clipToPadding="false"
     android:layout_gravity="center"
-    android:background="#fff"
+    android:background="?attr/colorForeground"
     android:descendantFocusability="blocksDescendants">
 
     <ImageView
@@ -38,6 +38,7 @@
         app:layout_constraintEnd_toEndOf="@id/thumbnail"
         app:layout_constraintBottom_toBottomOf="parent"
         android:textAlignment="center"
+        android:textColor="?attr/textColorTertiary"
         android:gravity="center"
         android:textSize="16sp"
         android:maxLines="1"

@@ -1,4 +1,8 @@
-package com.jonahbauer.qed.qedgallery;
+package com.jonahbauer.qed.qedgallery.image;
+
+import androidx.annotation.NonNull;
+
+import com.jonahbauer.qed.qedgallery.album.Album;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -22,6 +26,7 @@ public class Image implements Serializable {
         available = true;
     }
 
+    @NonNull
     @Override
     public String toString() {
         Field[] fields = Image.class.getDeclaredFields();
@@ -41,7 +46,7 @@ public class Image implements Serializable {
 
             for (int i = 0; i < fields.length; i++) {
                 Object value = fields[i].get(this);
-                builder.append("\"").append(fields[i].getName()).append("\":\"").append(value.toString()).append("\"");
+                builder.append("\"").append(fields[i].getName()).append("\":\"").append(value != null ? value.toString() : "null").append("\"");
 
                 if (i < fields.length - 1) builder.append(", ");
                 else builder.append("}");
@@ -52,6 +57,6 @@ public class Image implements Serializable {
             e.printStackTrace();
         }
 
-        return null;
+        return "";
     }
 }

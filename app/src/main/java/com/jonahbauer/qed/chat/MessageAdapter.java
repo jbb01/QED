@@ -28,6 +28,7 @@ public class MessageAdapter extends ArrayAdapter<Message> {
     private final List<Message> messageList;
     private final boolean extended;
     private SharedPreferences sharedPreferences;
+    private LayoutInflater inflater;
 
     public MessageAdapter(Context context, @NonNull List<Message> messageList, boolean extended) {
         super(context, R.layout.list_item_message, messageList);
@@ -35,6 +36,8 @@ public class MessageAdapter extends ArrayAdapter<Message> {
         this.messageList = messageList;
         this.extended = extended;
         sharedPreferences = getContext().getSharedPreferences(getContext().getString(R.string.preferences_shared_preferences), Context.MODE_PRIVATE);
+
+        inflater = LayoutInflater.from(context);
     }
 
     public MessageAdapter(Context context, List<Message> messageList) {
@@ -55,7 +58,6 @@ public class MessageAdapter extends ArrayAdapter<Message> {
         if (convertView != null && ((isDate && convertView.findViewById(R.id.date) != null) || (!isDate && convertView.findViewById(R.id.message) != null))) {
             view = convertView;
         } else {
-            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             if (extended) view = Objects.requireNonNull(inflater).inflate(R.layout.extended_message, parent, false);
             else view = Objects.requireNonNull(inflater).inflate(isDate ? R.layout.date_inline : R.layout.list_item_message, parent, false);
         }
@@ -114,7 +116,7 @@ public class MessageAdapter extends ArrayAdapter<Message> {
         }
 
 
-        if (sharedPreferences.getBoolean(view.getContext().getString(R.string.preferences_showLinks_key),true)) {
+        if (sharedPreferences.getBoolean(view.getContext().getString(R.string.preferences_chat_showLinks_key),true)) {
             ((TextView) view.findViewById(R.id.message_message)).setLinksClickable(true);
             Linkify.addLinks((TextView) view.findViewById(R.id.message_message), Linkify.WEB_URLS);
         }

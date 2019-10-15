@@ -1,37 +1,140 @@
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Base application theme. -->
     <style name="AppTheme" parent="Base.Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
+        <item name="colorPrimaryLight">@color/colorPrimaryLight</item>
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccentLight">@color/colorAccentLight</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:colorBackground">@color/colorBackground</item>
+        <item name="colorAccentDark">@color/colorAccentDark</item>
+
+        <item name="colorMenuItems">@android:color/white</item>
+        <item name="colorSettingsIcons">@color/colorAccent</item>
+        <item name="colorNavDrawerIcons">#787878</item>
+        <item name="colorQuickSettingsIcons">?attr/colorSettingsIcons</item>
+        <item name="colorListDivider">@color/colorListDivider</item>
+
+        <item name="colorBackground">@color/colorBackground</item>
+        <item name="colorBackgroundSecondary">@android:color/white</item>
+        <item name="colorBackgroundTertiary">@android:color/white</item>
         <item name="bottomSheetDialogTheme">@style/AppTheme.BottomSheetDialog</item>
+        <item name="colorForeground">@android:color/white</item>
+
+        <item name="textColorPrimary">@android:color/black</item>
+        <item name="textColorSecondary">#383838</item>
+        <item name="textColorTertiary">@android:color/white</item>
+
+        <item name="android:divider">@drawable/divider</item>
+        <item name="android:listDivider">?android:attr/divider</item>
+
+        <item name="messageTextColorPrimary">@android:color/black</item>
+        <item name="messageTextColorSecondary">#383838</item>
+        <item name="messageTextColorTertiary">#545F63</item>
+        <item name="messageBackgroundColorPrimary">@android:color/white</item>
+        <item name="messageBackgroundColorSecondary">#D4EAF5</item>
+
+        <item name="floatingActionButtonBackgroundColor">@android:color/white</item>
+        <item name="floatingActionButtonRippleColor">#e6e6e6</item>
+        <item name="floatingActionButtonForegroundColor">#999999</item>
     </style>
+
+    <style name="AppTheme.Login">
+        <item name="colorBackground">@android:color/white</item>
+    </style>
+
+    <style name="AppTheme.PersonDatabase">
+        <item name="colorBackground">@android:color/white</item>
+        <item name="colorBackgroundSecondary">@android:color/white</item>
+    </style>
+
+    <style name="AppTheme.EventDatabase">
+        <item name="colorBackground">@android:color/white</item>
+    </style>
+
+    <style name="AppTheme.Log">
+        <item name="colorBackground">@color/colorBackground</item>
+        <item name="colorBackgroundSecondary">@android:color/white</item>
+    </style>
+
+    <style name="AppTheme.ChatDatabase">
+        <item name="colorBackground">@color/colorBackground</item>
+        <item name="colorBackgroundSecondary">@android:color/white</item>
+    </style>
+
+    <style name="AppTheme.Chat">
+        <item name="colorBackground">@color/colorBackground</item>
+        <item name="colorForeground">@android:color/white</item>
+    </style>
+
+    <style name="AppTheme.Settings">
+        <item name="colorBackground">@android:color/white</item>
+    </style>
+
+    <style name="AppTheme.Gallery">
+        <item name="colorBackground">@android:color/white</item>
+        <item name="colorBackgroundSecondary">@color/colorBackground</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar.Album">
+        <item name="colorBackground">@android:color/white</item>
+        <item name="colorBackgroundSecondary">@android:color/white</item>
+        <item name="colorBackgroundTertiary">@color/colorBackground</item>
+        <item name="colorForeground">@android:color/white</item>
+        <item name="textColorTertiary">@android:color/black</item>
+    </style>
+
+
+
+
+
+
 
     <style name="AppTheme.BottomSheetDialog" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="colorPrimaryLight">@color/colorPrimaryLight2</item>
         <item name="colorPrimary">@color/colorPrimary2</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark2</item>
+        <item name="colorAccentLight">@color/colorAccentLight2</item>
         <item name="colorAccent">@color/colorAccent2</item>
+        <item name="colorAccentDark">@color/colorAccentDark2</item>
+
+        <item name="colorListDivider">@color/colorListDivider</item>
+
+        <item name="colorBackground">@color/colorBackground</item>
+        <item name="colorBackgroundSecondary">@android:color/white</item>
+        <item name="colorBackgroundTertiary">@android:color/white</item>
+        <item name="bottomSheetDialogTheme">@style/AppTheme.BottomSheetDialog</item>
+        <item name="colorForeground">@android:color/white</item>
+
+        <item name="textColorPrimary">@android:color/black</item>
+        <item name="textColorSecondary">#383838</item>
+        <item name="textColorTertiary">@android:color/white</item>
+
+        <item name="android:divider">@drawable/divider</item>
+        <item name="android:listDivider">?android:attr/divider</item>
     </style>
 
-    <style name="AppTheme.Dialog" parent="Theme.AppCompat.Light.Dialog">
+    <style name="AppTheme.BottomSheetDialog.EventBottomSheet">
+        <item name="colorBackground">@android:color/white</item>
+        <item name="colorBackgroundSecondary">@android:color/white</item>
+        <item name="colorForeground">#868686</item>
+    </style>
+
+    <style name="AppTheme.BottomSheetDialog.PersonBottomSheet">
+        <item name="colorBackground">@android:color/white</item>
+        <item name="colorBackgroundSecondary">@android:color/white</item>
+        <item name="colorForeground">#868686</item>
+    </style>
+
+
+
+
+    <style name="DatePicker" parent="Theme.AppCompat.Light.Dialog">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+
         <item name="android:windowMinWidthMajor">0%</item>
         <item name="android:windowMinWidthMinor">0%</item>
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-    </style>
-
-    <style name="AppTheme.Dialog.MinWidth" parent="Theme.AppCompat.Light.Dialog.MinWidth">
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-    </style>
-
-    <style name="AppTheme.NoListDivider" parent="AppTheme">
-        <item name="android:listDivider">@null</item>
     </style>
 
     <style name="AppTheme.NoActionBar">

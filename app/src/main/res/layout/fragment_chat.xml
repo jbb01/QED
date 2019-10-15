@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".activities.ChatFragment"
-    android:background="@color/chat_background"
+    android:background="?attr/colorBackground"
     android:id="@+id/fragment"
     android:clipToPadding="false"
     android:clipChildren="false">
@@ -29,9 +29,9 @@
         android:layout_alignParentTop="true"
         android:layout_centerInParent="true"
         android:background="@drawable/background_message_extended"
-        android:backgroundTint="@color/chat_date"
+        android:backgroundTint="?attr/messageBackgroundColorSecondary"
         android:textSize="@dimen/message_date_size"
-        android:textColor="@color/chat_date_text"
+        android:textColor="?attr/messageTextColorTertiary"
         android:layout_marginTop="3dp"
         android:visibility="gone"/>
 
@@ -82,7 +82,8 @@
         android:singleLine="false"
         android:scrollbars="vertical"
         android:elevation="6dp"
-        android:maxLines="5"/>
+        android:maxLines="5"
+        android:importantForAutofill="no" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/button_send"
@@ -93,10 +94,12 @@
         android:layout_marginStart="6dp"
         android:layout_marginEnd="6dp"
         android:layout_marginBottom="6dp"
-        app:backgroundTint="@android:color/white"
+        app:backgroundTint="?attr/floatingActionButtonBackgroundColor"
+        app:rippleColor="?attr/floatingActionButtonRippleColor"
         app:fabCustomSize="48dp"
         android:src="@drawable/ic_send"
-        android:theme="@style/AppTheme"
+        android:tint="?attr/colorAccent"
+        android:foregroundTint="?attr/colorAccent"
         android:contentDescription="@string/chat_button_send"/>
 
 
@@ -115,8 +118,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:fabSize="mini"
-            app:backgroundTint="@color/floating_action_button_background"
-            app:rippleColor="@color/floating_action_button_ripple"
+            app:backgroundTint="?attr/floatingActionButtonBackgroundColor"
+            app:rippleColor="?attr/floatingActionButtonRippleColor"
+            android:foregroundTint="?attr/floatingActionButtonForegroundColor"
             android:src="@drawable/ic_double_arrow_down"
             android:contentDescription="@string/chat_scroll_down_button_content_description"
             android:visibility="visible"
@@ -144,8 +148,8 @@
             android:layout_margin="3dp"
             android:src="@drawable/ic_quick_settings_name"
             app:fabSize="mini"
-            app:backgroundTint="@color/floating_action_button_background"
-            app:rippleColor="@color/floating_action_button_ripple"/>
+            app:backgroundTint="?attr/floatingActionButtonBackgroundColor"
+            app:rippleColor="?attr/floatingActionButtonRippleColor"/>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/quick_settings_channel"
@@ -154,8 +158,8 @@
             android:layout_margin="3dp"
             android:src="@drawable/ic_quick_settings_channel"
             app:fabSize="mini"
-            app:backgroundTint="@color/floating_action_button_background"
-            app:rippleColor="@color/floating_action_button_ripple"/>
+            app:backgroundTint="?attr/floatingActionButtonBackgroundColor"
+            app:rippleColor="?attr/floatingActionButtonRippleColor"/>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/quick_settings"
@@ -163,10 +167,10 @@
             android:layout_height="wrap_content"
             android:layout_margin="3dp"
             android:src="@drawable/ic_drawer_settings"
-            android:tint="@color/colorAccent"
+            android:tint="?attr/colorAccent"
             app:fabSize="mini"
-            app:backgroundTint="@color/floating_action_button_background"
-            app:rippleColor="@color/floating_action_button_ripple"/>
+            app:backgroundTint="?attr/floatingActionButtonBackgroundColor"
+            app:rippleColor="?attr/floatingActionButtonRippleColor"/>
 
     </LinearLayout>
 

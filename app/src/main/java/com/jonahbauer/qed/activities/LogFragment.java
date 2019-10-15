@@ -1,18 +1,25 @@
 package com.jonahbauer.qed.activities;
 
-import android.app.Activity;
-import android.content.Intent;
+import android.app.AlertDialog;
+import android.app.DatePickerDialog;
+import android.content.Context;
+import android.icu.util.TimeZone;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,6 +37,7 @@ import com.jonahbauer.qed.database.ChatDatabaseReceiver;
 import com.jonahbauer.qed.networking.QEDChatPages;
 import com.jonahbauer.qed.networking.QEDPageStreamReceiver;
 
+import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -37,16 +45,23 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
+
+import static com.jonahbauer.qed.activities.LogFragment.Mode.DATE_INTERVAL;
+import static com.jonahbauer.qed.activities.LogFragment.Mode.DATE_RECENT;
+import static com.jonahbauer.qed.activities.LogFragment.Mode.POST_INTERVAL;
+import static com.jonahbauer.qed.activities.LogFragment.Mode.POST_RECENT;
+import static com.jonahbauer.qed.activities.LogFragment.Mode.SINCE_OWN;
 
 @SuppressWarnings("SameParameterValue")
 public class LogFragment extends Fragment implements ChatDatabaseReceiver, QEDPageStreamReceiver {
     private static final String downloadProgressString = Application.getContext().getString(R.string.log_downloading);
     private static final String parseProgressString = Application.getContext().getString(R.string.log_parsing);
-    static final String LOG_MODE_KEY = "mode";
+    private static final String LOG_MODE_KEY = "mode";
     private static final String LOG_CHANNEL_KEY = "channel";
-    static final String LOG_LAST_KEY = "last";
-    static final String LOG_FROM_KEY = "from";
-    static final String LOG_TO_KEY = "to";
+    private static final String LOG_LAST_KEY = "last";
+    private static final String LOG_FROM_KEY = "from";
+    private static final String LOG_TO_KEY = "to";
     private static final String LOG_SKIP_KEY = "skip";
 
     private Mode mode;
@@ -93,6 +108,9 @@ public class LogFragment extends Fragment implements ChatDatabaseReceiver, QEDPa
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Context context = new ContextThemeWrapper(getActivity(), Application.darkMode ? R.style.AppTheme_Dark_Log : R.style.AppTheme_Log);
+        inflater = inflater.cloneInContext(context);
+
         View view = inflater.inflate(R.layout.fragment_log, container, false);
 
 //        ImageView background = view.findViewById(R.id.background);
@@ -105,8 +123,137 @@ public class LogFragment extends Fragment implements ChatDatabaseReceiver, QEDPa
         parseProgress = view.findViewById(R.id.progress_parse_text);
 
         subtitle.setOnClickListener((View v) -> {
-            Intent intent = new Intent(getActivity(), LogDialogActivity.class);
-            startActivityForResult(intent, 0);
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
+
+            alertDialogBuilder.setTitle(R.string.title_activity_log_dialog);
+
+            View view1 = LayoutInflater.from(getContext()).inflate(R.layout.alert_dialog_log_mode, null);
+
+            Map<String, Long> data = new HashMap<>();
+            AtomicReference<Mode> mode = new AtomicReference<>();
+            AtomicReference<Date> dateStart = new AtomicReference<>();
+            AtomicReference<Date> dateEnd = new AtomicReference<>();
+            String channel = "";
+
+            Date date = android.icu.util.Calendar.getInstance(TimeZone.getDefault()).getTime();
+            dateStart.set(date);
+            dateEnd.set(date);
+
+            View fragmentPostRecent = view1.findViewById(R.id.log_fragment_postrecent);
+            View fragmentDateRecent = view1.findViewById(R.id.log_fragment_daterecent);
+            View fragmentDateInterval = view1.findViewById(R.id.log_fragment_dateinterval);
+
+            EditText postRecentLast = view1.findViewById(R.id.log_dialog_postrecent_editText);
+            EditText dateRecentLast = view1.findViewById(R.id.log_dialog_daterecent_editText);
+            EditText dateIntervalStart = view1.findViewById(R.id.log_dialog_dateinterval_editText_from);
+            EditText dateIntervalEnd = view1.findViewById(R.id.log_dialog_dateinterval_editText_to);
+
+
+            DatePickerDialog.OnDateSetListener dateSetListener = (view2, year, month, dayOfMonth) -> {
+                android.icu.util.Calendar cal = android.icu.util.Calendar.getInstance();
+                cal.set(android.icu.util.Calendar.YEAR,year);
+                cal.set(android.icu.util.Calendar.MONTH,month);
+                cal.set(android.icu.util.Calendar.DAY_OF_MONTH, dayOfMonth);
+                Date dateTemp = cal.getTime();
+                DateFormat dateFormat = android.text.format.DateFormat.getDateFormat(context);
+                if (view2.getId() == R.id.log_dialog_datepicker_start) {
+                    dateStart.set(dateTemp);
+                    dateIntervalStart.setText(dateFormat.format(dateTemp));
+                } else if (view2.getId() == R.id.log_dialog_datepicker_end) {
+                    dateEnd.set(dateTemp);
+                    dateIntervalEnd.setText(dateFormat.format(dateTemp));
+                }
+            };
+
+            View.OnClickListener dateEditTextClickListener = v1 -> {
+                android.icu.util.Calendar calendar = android.icu.util.Calendar.getInstance(TimeZone.getDefault());
+
+                DatePickerDialog dialog = new DatePickerDialog(context, R.style.DatePicker, dateSetListener,
+                        calendar.get(android.icu.util.Calendar.YEAR), calendar.get(android.icu.util.Calendar.MONTH),
+                        calendar.get(android.icu.util.Calendar.DAY_OF_MONTH));
+
+                dialog.setButton(DatePickerDialog.BUTTON_POSITIVE, getString(R.string.ok), (dialog1, which) -> {
+                    DatePicker datePicker = dialog.getDatePicker();
+                    dateSetListener.onDateSet(datePicker, datePicker.getYear(), datePicker.getMonth(), datePicker.getDayOfMonth());
+                });
+                dialog.setButton(DatePickerDialog.BUTTON_NEGATIVE, getString(R.string.cancel), (android.os.Message) null);
+
+                dialog.show();
+
+                if (v1.equals(dateIntervalStart)) {
+                    dialog.getDatePicker().setId(R.id.log_dialog_datepicker_start);
+                } else if (v1.equals(dateIntervalEnd)) {
+                    dialog.getDatePicker().setId(R.id.log_dialog_datepicker_end);
+                }
+            };
+
+            dateIntervalStart.setOnClickListener(dateEditTextClickListener);
+            dateIntervalEnd.setOnClickListener(dateEditTextClickListener);
+
+
+            Spinner spinner = view1.findViewById(R.id.log_dialog_mode_spinner);
+            spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    Spinner spinner = (Spinner) parent;
+                    String item = (String) spinner.getItemAtPosition(position);
+
+                    if (POST_RECENT.modeStr.equals(item)) {
+                        fragmentPostRecent.setVisibility(View.VISIBLE);
+                        fragmentDateRecent.setVisibility(View.GONE);
+                        fragmentDateInterval.setVisibility(View.GONE);
+                        mode.set(POST_RECENT);
+                    } else if (DATE_RECENT.modeStr.equals(item)) {
+                        fragmentPostRecent.setVisibility(View.GONE);
+                        fragmentDateRecent.setVisibility(View.VISIBLE);
+                        fragmentDateInterval.setVisibility(View.GONE);
+                        mode.set(DATE_RECENT);
+                    } else if (DATE_INTERVAL.modeStr.equals(item)) {
+                        fragmentPostRecent.setVisibility(View.GONE);
+                        fragmentDateRecent.setVisibility(View.GONE);
+                        fragmentDateInterval.setVisibility(View.VISIBLE);
+                        mode.set(DATE_INTERVAL);
+                    } else if (POST_INTERVAL.modeStr.equals(item)) {
+                        // TODO fragmentTransaction.add(R.id.log_dialog_fragment_holder, new LogDateIntervalFragment(), "");
+                        mode.set(POST_INTERVAL);
+                    } else if (SINCE_OWN.modeStr.equals(item)) {
+                        // TODO fragmentTransaction.add(R.id.log_dialog_fragment_holder, new LogDateIntervalFragment(), "");
+                        mode.set(SINCE_OWN);
+                    }
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {}
+            });
+
+            alertDialogBuilder.setPositiveButton(R.string.ok, (dialog, which) -> {
+                switch (mode.get()) {
+                    case POST_RECENT:
+                        data.put(LOG_LAST_KEY, Long.valueOf(postRecentLast.getText().toString().trim()));
+                        break;
+                    case DATE_RECENT:
+                        data.put(LOG_LAST_KEY, 3600 * Long.valueOf(dateRecentLast.getText().toString().trim()));
+                        break;
+                    case DATE_INTERVAL:
+                        data.put(LOG_FROM_KEY, dateStart.get().getTime());
+                        data.put(LOG_TO_KEY, dateEnd.get().getTime());
+                        break;
+                }
+
+                reload(mode.get(), channel, data);
+                dialog.dismiss();
+            });
+
+            alertDialogBuilder.setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss());
+
+            alertDialogBuilder.setView(view1);
+
+            alertDialogBuilder.show();
+
+
+
+//            Intent intent = new Intent(getActivity(), LogDialogActivity.class);
+//            startActivityForResult(intent, 0);
         });
 
 //        TileDrawable tileDrawable  = new TileDrawable(view.getContext().getDrawable(R.drawable.background_part), Shader.TileMode.REPEAT);
@@ -142,7 +289,7 @@ public class LogFragment extends Fragment implements ChatDatabaseReceiver, QEDPa
 
         data.put(LOG_SKIP_KEY, skip);
 
-        messageAdapter = new MessageAdapter(view.getContext(), new ArrayList<>());
+        messageAdapter = new MessageAdapter(context, new ArrayList<>());
         messageListView.setAdapter(messageAdapter);
 
         messageListView.setPadding(messageListView.getPaddingLeft(),
@@ -161,6 +308,15 @@ public class LogFragment extends Fragment implements ChatDatabaseReceiver, QEDPa
     }
 
     public void reload() {
+        reload(null, null, null);
+    }
+    public void reload(Mode mode, String channel, Map<String,Long> data) {
+        if (data != null) {
+            this.data = data;
+        }
+        if (mode != null) this.mode = mode;
+        if (channel != null) this.channel = channel;
+
         downloadProgress.setText(String.format(downloadProgressString, "0"));
         parseProgress.setText(String.format(parseProgressString, "0/0"));
         searchProgressBar.setVisibility(View.VISIBLE);
@@ -168,29 +324,29 @@ public class LogFragment extends Fragment implements ChatDatabaseReceiver, QEDPa
         messageListView.setVisibility(View.GONE);
         String subtitle = "";
 
-        switch (mode) {
+        switch (this.mode) {
             case POST_RECENT: {
-                Long last = data.get(LOG_LAST_KEY);
-                options = "mode=" + mode.modeStr;
+                Long last = this.data.get(LOG_LAST_KEY);
+                options = "mode=" + this.mode.modeStr;
                 options += "&last=" + last;
                 subtitle = MessageFormat.format(getString(R.string.log_subtitle_post_recent), last != null ? last : 200);
                 break;
             }
             case DATE_RECENT: {
-                Long last = data.get(LOG_LAST_KEY);
-                options = "mode=" + mode.modeStr;
+                Long last = this.data.get(LOG_LAST_KEY);
+                options = "mode=" + this.mode.modeStr;
                 options += "&last=" + last;
                 subtitle = MessageFormat.format(getString(R.string.log_subtitle_date_recent), (last != null ? last : 86400) / 3600);
                 break;
             }
             case DATE_INTERVAL: {
-                Long from = data.get(LOG_FROM_KEY);
-                Long to = data.get(LOG_TO_KEY);
+                Long from = this.data.get(LOG_FROM_KEY);
+                Long to = this.data.get(LOG_TO_KEY);
 
                 Date dateFrom = new Date(from != null ? from : Calendar.getInstance().getTime().getTime());
                 Date dateTo = new Date(to != null ? to : (Calendar.getInstance().getTime().getTime() + 86_400_000));
 
-                options = "mode=" + mode.modeStr;
+                options = "mode=" + this.mode.modeStr;
                 options += "&from=" + MessageFormat.format("{0,date,yyyy-MM-dd}", dateFrom);
                 options += "&to=" + MessageFormat.format("{0,date,yyyy-MM-dd}", dateTo);
 
@@ -199,28 +355,15 @@ public class LogFragment extends Fragment implements ChatDatabaseReceiver, QEDPa
             }
         }
 
-        options += "&channel=" + channel;
+        options += "&channel=" + this.channel;
 
         this.subtitle.setText(subtitle);
 
         messageAdapter.clear();
 
+        if (logGetter != null) logGetter.cancel(true);
+
         logGetter = QEDChatPages.getChatLog(getClass().toString(), options, messageAdapter.getData(), this);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == 0 && resultCode == Activity.RESULT_OK) {
-            mode = Mode.valueOf(data.getStringExtra(LOG_MODE_KEY));
-            this.data.put(LOG_LAST_KEY, data.getLongExtra(LOG_LAST_KEY, 0));
-            this.data.put(LOG_FROM_KEY, data.getLongExtra(LOG_FROM_KEY, 0));
-            this.data.put(LOG_TO_KEY, data.getLongExtra(LOG_TO_KEY, 0));
-            this.data.put(LOG_SKIP_KEY, data.getLongExtra(LOG_SKIP_KEY, 0));
-
-            if (logGetter != null) logGetter.cancel(true);
-            logGetter = null;
-            reload();
-        }
     }
 
     @Override

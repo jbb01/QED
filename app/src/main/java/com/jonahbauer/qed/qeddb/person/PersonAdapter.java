@@ -22,6 +22,7 @@ import java.util.function.Function;
 public class PersonAdapter extends FixedHeaderAdapter<Person, Character> {
     public static final String SORT_FIRST_NAME = "firstName";
     public static final String SORT_LAST_NAME = "lastName";
+    private final Context context;
 
     private String sort;
 
@@ -41,11 +42,14 @@ public class PersonAdapter extends FixedHeaderAdapter<Person, Character> {
     public PersonAdapter(Context context, @NonNull List<Person> itemList, String sort, View fixedHeader) {
         super(context, itemList, headerMapFirstName, comparatorFirstName, fixedHeader);
         setSort(sort);
+        this.context = context;
     }
 
     @NonNull
     @Override
     protected View getItemView(Person person, @Nullable View convertView, @NonNull ViewGroup parent, LayoutInflater inflater) {
+        inflater = inflater.cloneInContext(context);
+
         View view;
         if (convertView != null) {
             view = convertView;

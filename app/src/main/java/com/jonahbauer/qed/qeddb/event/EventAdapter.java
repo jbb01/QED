@@ -20,13 +20,14 @@ import java.util.List;
 import java.util.Objects;
 
 public class EventAdapter extends ArrayAdapter<Event> {
-    private final Context context;
     private final List<Event> eventList;
+    private LayoutInflater inflater;
 
     public EventAdapter(Context context, List<Event> eventList) {
         super(context, R.layout.list_item_event, eventList);
-        this.context = context;
         this.eventList = eventList;
+
+        inflater = LayoutInflater.from(context);
     }
 
     @NonNull
@@ -38,7 +39,6 @@ public class EventAdapter extends ArrayAdapter<Event> {
         if (convertView != null) {
             view = convertView;
         } else {
-            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             view = Objects.requireNonNull(inflater).inflate(R.layout.list_item_event, parent, false);
         }
 

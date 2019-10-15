@@ -9,6 +9,7 @@ import android.security.keystore.KeyGenParameterSpec;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.security.crypto.EncryptedSharedPreferences;
 import androidx.security.crypto.MasterKeys;
 
@@ -41,6 +42,7 @@ public class Application extends android.app.Application implements android.app.
 
 
     public static boolean online;
+    public static boolean darkMode;
 
     private static Application context;
     private Activity activity;
@@ -122,7 +124,12 @@ public class Application extends android.app.Application implements android.app.
 
     @Override
     public void onCreate() {
+        SharedPreferences sharedPrefs = getSharedPreferences(getString(R.string.preferences_shared_preferences), MODE_PRIVATE);
+        darkMode = sharedPrefs.getBoolean(getString(R.string.preferences_general_dark_mode_key), true);
+        setTheme(darkMode ? R.style.AppTheme_Dark : R.style.AppTheme);
+
         super.onCreate();
+
         registerActivityLifecycleCallbacks(this);
 
         context = this;
@@ -158,18 +165,18 @@ public class Application extends android.app.Application implements android.app.
     }
 
     @Override
-    public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+    public void onActivityCreated(@NonNull Activity activity, Bundle savedInstanceState) {
         this.activity = activity;
         existingActivities.add(activity);
     }
 
     @Override
-    public void onActivityStarted(Activity activity) {
+    public void onActivityStarted(@NonNull Activity activity) {
         this.activity = activity;
     }
 
     @Override
-    public void onActivityResumed(Activity activity) {
+    public void onActivityResumed(@NonNull Activity activity) {
         if (activeActivities.size() == 0) {
             active = true;
             new Handler().postDelayed(() -> {
@@ -181,7 +188,7 @@ public class Application extends android.app.Application implements android.app.
     }
 
     @Override
-    public void onActivityPaused(Activity activity) {
+    public void onActivityPaused(@NonNull Activity activity) {
         activeActivities.remove(activity);
         if (activeActivities.size() == 0) {
             active = false;
@@ -192,14 +199,14 @@ public class Application extends android.app.Application implements android.app.
     }
 
     @Override
-    public void onActivityStopped(Activity activity) {
+    public void onActivityStopped(@NonNull Activity activity) {
     }
 
     @Override
-    public void onActivitySaveInstanceState(Activity activity, Bundle outState) {}
+    public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState) {}
 
     @Override
-    public void onActivityDestroyed(Activity activity) {
+    public void onActivityDestroyed(@NonNull Activity activity) {
         existingActivities.remove(activity);
     }
 
