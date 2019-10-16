@@ -3,7 +3,6 @@ package com.jonahbauer.qed.activities;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,6 +18,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.preference.PreferenceManager;
 
 import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.R;
@@ -26,8 +26,8 @@ import com.jonahbauer.qed.database.GalleryDatabase;
 import com.jonahbauer.qed.database.GalleryDatabaseReceiver;
 import com.jonahbauer.qed.networking.QEDGalleryPages;
 import com.jonahbauer.qed.networking.QEDPageReceiver;
-import com.jonahbauer.qed.qedgallery.Album;
-import com.jonahbauer.qed.qedgallery.AlbumAdapter;
+import com.jonahbauer.qed.qedgallery.album.Album;
+import com.jonahbauer.qed.qedgallery.album.AlbumAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +48,7 @@ public class GalleryFragment extends Fragment implements QEDPageReceiver<List<Al
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        assert getContext() != null;
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
         online = false;
 

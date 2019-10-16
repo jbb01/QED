@@ -17,175 +17,159 @@
     <string name="gallery_server_login" translatable="false">https://qedgallery.qed-verein.de/account.php</string>
     <string name="gallery_server_main" translatable="false">https://qedgallery.qed-verein.de/</string>
     <string name="gallery_server_image_info" translatable="false">https://qedgallery.qed-verein.de/image_view.php?imageid=</string>
+    <string name="gallery_server_image" translatable="false">https://qedgallery.qed-verein.de/image.php?type=%s&amp;imageid=%s</string>
 
 
     <!-- General -->
     <string name="app_name">QED</string>
     <string name="ok">OK</string>
-    <string name="cancel">Abbrechen</string>
-    <string name="double_back_to_exit_toast">Erneut drücken zum Verlassen</string>
-    <string name="cant_connect">Keine Verbindung zum Internet möglich</string>
-    <string name="no_internet">Etwas ist schief gelaufen. Bitte überprüfe deine Internetverbindung.</string>
-    <string name="database_login_failed">Datenbank Login fehlgeschlagen</string>
-    <string name="chat_login_failed">Chat Login fehlgeschlagen</string>
-    <string name="notQED">Diese App steht in keiner offiziellen Verbindung zum Quod Erat Demonstrandum e.V.</string>
+    <string name="cancel">Cancel</string>
+    <string name="no_internet">Something went wrong. Please check your network connection.</string>
+    <string name="notQED">This app is not related to the Quod Erat Demonstrandum e.V. in any official way.</string>
     <string name="content_description_icon">Icon</string>
-    <string name="content_description_divider">Trennlinie</string>
     <string name="background">background</string>
-    <string name="coming_soon">Coming soon</string>
-    <string name="error">Fehler!</string>
+    <string name="error">Error!</string>
     <string name="info">Info</string>
-    <string name="delete">Löschen</string>
-    <string name="yes">Ja</string>
-    <string name="no">Nein</string>
-    <string name="offline_mode">Offline-Modus</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="offline_mode">Offline-Mode</string>
+    <string name="thumbnail">thumbnail</string>
 
     <!-- Chat Fragment -->
     <string name="title_fragment_chat">Chat</string>
-    <string name="chat_refresh">Aktualisieren</string>
-    <string name="chat_button_send">Senden</string>
-    <string name="chat_message_hint">Nachricht schreiben</string>
-    <string name="chat_scroll_down_button_content_description">Nach unten scrollen</string>
-    <string name="chat_empty_message">Du bist im Begriff eine leere Nachricht zu senden. Möchtest du fortfahren?</string>
+    <string name="chat_button_send">Send</string>
 
     <!-- Login Activity -->
-    <string name="title_activity_login">Anmelden</string>
-    <string name="login_prompt_username">Benutzername</string>
-    <string name="login_prompt_password">Passwort</string>
-    <string name="login_action_sign_in">Anmelden</string>
-    <string name="login_action_sign_in_short">Anmelden</string>
-    <string name="login_error_incorrect_data">Logindaten sind ungültig</string>
+    <string name="title_activity_login">Sign In</string>
+    <string name="login_prompt_username">Username</string>
+    <string name="login_prompt_password">Password</string>
+    <string name="login_action_sign_in">Sign In</string>
+    <string name="login_action_sign_in_short">Sign In</string>
+    <string name="login_error_incorrect_data">Login data is invalid</string>
 
     <!-- Database -->
-    <string name="database_hits">Treffer</string>
-    <string name="database_search_button">Suchen</string>
-    <string name="database_save_done">Gespeichert</string>
-    <string name="database_offline">Keine Verbindung zum Internet möglich.\nDie Datenbank ist offline nicht verfügbar.</string>
+    <string name="database_offline">No internet connection.\nThe Database if not available when offline</string>
     <!-- Chat Database Fragment -->
-    <string name="title_fragment_chat_database">Datenbank</string>
+    <string name="title_fragment_chat_database">Database</string>
     <string name="chat_database_channel_checkbox">Channel</string>
     <string name="chat_database_channel_hint">Channel</string>
-    <string name="chat_database_message_checkbox">Nachricht</string>
-    <string name="chat_database_message_hint">Nachricht</string>
+    <string name="chat_database_message_checkbox">Message</string>
+    <string name="chat_database_message_hint">Message</string>
     <string name="chat_database_name_checkbox">Name</string>
     <string name="chat_database_name_hint">Name</string>
-    <string name="chat_database_dateFrom_checkbox">von</string>
+    <string name="chat_database_dateFrom_checkbox">from</string>
     <string name="chat_database_dateFrom_hint">yyyy-mm-dd hh:mm:ss</string>
-    <string name="chat_database_dateTo_checkbox">bis</string>
+    <string name="chat_database_dateTo_checkbox">until</string>
     <string name="chat_database_dateTo_hint">yyyy-mm-dd hh:mm:ss</string>
     <string name="chat_database_id_checkbox">ID</string>
-    <string name="chat_database_id_hint">vonID-bisID</string>
     <!-- Persons Database Fragment -->
-    <string name="title_fragment_persons_database">Personen</string>
-    <string name="persons_database_firstName_checkbox">Vorname</string>
-    <string name="persons_database_firstName_hint">Vorname</string>
-    <string name="persons_database_lastName_checkbox">Nachname</string>
-    <string name="persons_database_lastName_hint">Nachname</string>
-    <string name="persons_database_active_checkbox">Aktiv</string>
-    <string name="persons_database_member_checkbox">Mitglied</string>
-    <string name="persons_database_sort">Sortieren nach</string>
-    <string name="persons_database_sort_first_name">Vornamen</string>
-    <string name="persons_database_sort_last_name">Nachnamen</string>
+    <string name="title_fragment_persons_database">Persons</string>
+    <string name="persons_database_firstName_checkbox">First Name</string>
+    <string name="persons_database_firstName_hint">First Name</string>
+    <string name="persons_database_lastName_checkbox">Last Name</string>
+    <string name="persons_database_lastName_hint">Last Name</string>
+    <string name="persons_database_active_checkbox">Active</string>
+    <string name="persons_database_member_checkbox">Member</string>
+    <string name="persons_database_sort">Order By</string>
+    <string name="persons_database_sort_first_name">First Name</string>
+    <string name="persons_database_sort_last_name">Last Name</string>
     <!-- Events Database Fragment -->
-    <string name="title_fragment_events_database">Veranstaltungen</string>
+    <string name="title_fragment_events_database">Events</string>
 
     <!-- Person Bottom Sheet -->
-    <string name="person_tab_personal_data">Persönliche Daten</string>
+    <string name="person_tab_personal_data">Personal Data</string>
     <string name="person_tab_qed">QED</string>
-    <string name="person_subtitle_birthday">Geburtstag</string>
-    <string name="person_subtitle_station">Heimatbahnhof</string>
-    <string name="person_subtitle_email">Emailadresse</string>
-    <string name="person_subtitle_memberSince">Mitglied seit</string>
-    <string name="person_no_events">Hier gibt es nichts zu sehen!</string>
-    <string name="person_active">Aktiv</string>
-    <string name="person_inactive">Inaktiv</string>
+    <string name="person_subtitle_birthday">Birthday</string>
+    <string name="person_subtitle_station">Train Station</string>
+    <string name="person_subtitle_email">Email Address</string>
+    <string name="person_subtitle_memberSince">Member Since</string>
+    <string name="person_no_events">Nothing to see here!</string>
+    <string name="person_active">Active</string>
+    <string name="person_inactive">Inactive</string>
 
     <!-- Event Bottom Sheet -->
-    <string name="event_tab_overview">Übersicht</string>
-    <string name="event_tab_members">Teilnehmer</string>
-    <string name="event_subtitle_time">Zeitraum</string>
-    <string name="event_subtitle_deadline">Anmeldeschluss</string>
-    <string name="event_subtitle_cost">Kosten</string>
-    <string name="event_subtitle_max_members">Maximale Teilnehmerzahl</string>
-    <string name="event_subtitle_hotel">Übernachtungen</string>
+    <string name="event_tab_overview">Overview</string>
+    <string name="event_tab_members">Participants</string>
+    <string name="event_subtitle_time">Time Frame</string>
+    <string name="event_subtitle_deadline">Registration Deadline</string>
+    <string name="event_subtitle_cost">Costs</string>
+    <string name="event_subtitle_max_members">Maximum Number of Participants</string>
+    <string name="event_subtitle_hotel">Venue</string>
 
     <!-- Preference Keys -->
-    <string name="preferences_shared_preferences" translatable="false">com.jonahbauer.qed_preferences</string>
-    <string name="preferences_name_key" translatable="false">name</string>
-    <string name="preferences_channel_key" translatable="false">channel</string>
-    <string name="preferences_showSense_key" translatable="false">showSense</string>
-    <string name="preferences_publicId_key" translatable="false">publicId</string>
-    <string name="preferences_showLinks_key" translatable="false">showLinks</string>
-    <string name="preferences_katex_key" translatable="false">katex</string>
+    <string name="preferences_chat_name_key" translatable="false">name</string>
+    <string name="preferences_chat_channel_key" translatable="false">channel</string>
+    <string name="preferences_chat_showSense_key" translatable="false">showSense</string>
+    <string name="preferences_chat_publicId_key" translatable="false">publicId</string>
+    <string name="preferences_chat_showLinks_key" translatable="false">showLinks</string>
+    <string name="preferences_chat_katex_key" translatable="false">katex</string>
 
     <string name="preferences_loggedIn_key" translatable="false">loggedIn</string>
     <string name="preferences_drawerSelection_key" translatable="false">drawerSelection</string>
 
     <string name="preferences_gallery_delete_thumbnails_key" translatable="false">delete_thumbnails</string>
     <string name="preferences_gallery_delete_images_key" translatable="false">delete_images</string>
-    <string name="preferences_gallery_save_public_key" translatable="false">save_public</string>
     <string name="preferences_gallery_offline_mode_key" translatable="false">gallery_offline_mode</string>
     <string name="preferences_gallery_show_dir_key" translatable="false">show_gallery_dir</string>
 
     <!-- Preference Activity -->
-    <string name="title_activity_settings">Einstellungen</string>
+    <string name="title_activity_settings">Settings</string>
     <string name="preferences_header_chat">Chat</string>
-    <string name="preferences_header_gallery">Galerie</string>
+    <string name="preferences_header_gallery">Gallery</string>
+    <string name="preferences_header_general">General</string>
+
     <string name="preferences_chat_name_title">Name</string>
     <string name="preferences_chat_channel_title">Channel</string>
-    <string name="preferences_chat_showSense_title">Sinn anzeigen</string>
-    <string name="preferences_chat_publicId_title">Öffentliche ID</string>
-    <string name="preferences_chat_showLinks_title">Links anzeigen</string>
+    <string name="preferences_chat_showSense_title">Show Sense</string>
+    <string name="preferences_chat_publicId_title">Public ID</string>
+    <string name="preferences_chat_showLinks_title">Show Links</string>
     <string name="preferences_chat_katex_title">KaTex Rendering</string>
-    <string name="preferences_gallery_delete_thumbnails">Gespeicherte Thumbnails löschen</string>
-    <string name="preferences_gallery_delete_images">Intern gespeicherte Bilder löschen</string>
-    <string name="preferences_Gallery_offline_mode">Offline-Modus</string>
-    <string name="preferences_gallery_offline_mode_true_summary">Die Galerie verwendet nur bereit heruntergeladene Daten. Einige Funktionen sind nur eingeschränkt verwendbar.</string>
-    <string name="preferences_gallery_offline_mode_false_summary">Alle Features sind uneingeschränkt verwendbar. Bilder werden heruntergeladen, sobald benötigt.</string>
-    <string name="preferences_gallery_show_dir">Speicherort öffnen</string>
-    <string name="confirm_delete_thumbnails">Möchtest du wirklich alle gespeicherten Thumbnails löschen?</string>
-    <string name="confirm_delete_images">Möchtest du wirklich alle gespeicherten Bilder löschen?</string>
-    <string name="preferences_gallery_save_public">Bilder extern speichern</string>
+
+    <string name="preferences_gallery_delete_thumbnails">Delete saved thumbnails</string>
+    <string name="preferences_gallery_delete_images">Delete saved pictures</string>
+    <string name="preferences_Gallery_offline_mode">Offline Mode</string>
+    <string name="preferences_gallery_offline_mode_true_summary">No Pictures will be downloaded. Some features will only be available to a limited extent.</string>
+    <string name="preferences_gallery_offline_mode_false_summary">All features are unrestricted available. Pictures will be downloaded as needed.</string>
+    <string name="preferences_gallery_show_dir">Open storage directory</string>
+    <string name="confirm_delete_thumbnails">Are you sure you want to delete all the saved thumbnails?</string>
 
     <!-- Navigation Drawer -->
     <string name="drawer_chat_heading">Chat</string>
-    <string name="drawer_chat">Chat</string>
     <string name="drawer_chat_log">Log</string>
-    <string name="drawer_chat_db">Datenbank</string>
+    <string name="drawer_chat_db">Database</string>
 
-    <string name="drawer_database_heading">Datenbank</string>
-    <string name="drawer_persons">Personen</string>
-    <string name="drawer_events">Veranstaltungen</string>
+    <string name="drawer_database_heading">Database</string>
+    <string name="drawer_persons">Persons</string>
+    <string name="drawer_events">Events</string>
 
-    <string name="drawer_gallery_heading">Galerie</string>
-    <string name="drawer_gallery">Galerie</string>
+    <string name="drawer_gallery_heading">Gallery</string>
+    <string name="drawer_gallery">Gallery</string>
 
-    <string name="drawer_settings">Einstellungen</string>
-    <string name="drawer_logout">Abmelden</string>
+    <string name="drawer_settings">Settings</string>
+    <string name="drawer_logout">Sign Out</string>
 
     <!-- Log Fragment -->
     <string name="title_fragment_log">Log</string>
-    <string name="log_subtitle_date_interval">Posts vom {0,date,dd.MM.yyyy} bis zum {1,date,dd.MM.yyyy}</string>
-    <string name="log_subtitle_date_recent">Posts der letzten {0,choice,1#|2#{0} }Stunde{0,choice,1#|2#n}</string>
-    <string name="log_subtitle_post_recent">Letzte{0,choice,1#r|2# {0}} Post{0,choice,1#|2#s}</string>
-    <string name="log_action_save">In Datenbank speichern</string>
+    <string name="log_subtitle_date_interval">Posts from {0,date,dd.MM.yyyy} until {1,date,dd.MM.yyyy}</string>
+    <string name="log_subtitle_date_recent">Posts of the last {0,choice,1#|2#{0} }hour{0,choice,1#|2#s}</string>
+    <string name="log_subtitle_post_recent">Last{0,choice,1#|2# {0}} Post{0,choice,1#|2#s}</string>
+    <string name="log_action_save">Save to database</string>
     <string name="log_wait_for_save">Bitte warte bis das Speichern abgeschlossen ist.</string>
-    <string name="log_downloading">Chatlog wird heruntergeladen… (%s MiB)</string>
-    <string name="log_parsing">JSON wird geparst… (%s)</string>
+    <string name="log_downloading">Downloading chatlog… (%s MiB)</string>
+    <string name="log_parsing">Parsing JSON… (%s)</string>
 
     <!-- Log Dialog Activity -->
     <string name="title_activity_log_dialog">Logs</string>
-    <string name="log_dialog_mode_label">Modus</string>
-    <string name="log_dialog_postrecent_before">Letzte</string>
+    <string name="log_dialog_mode_label">Mode</string>
+    <string name="log_dialog_postrecent_before">Last</string>
     <string name="log_dialog_postrecent_after">Posts</string>
-    <string name="log_dialog_daterecent_before">Letzte</string>
-    <string name="log_dialog_daterecent_after">Stunden</string>
-    <string name="log_dialog_dateinterval_from">Von</string>
-    <string name="log_dialog_dateinterval_to">Bis</string>
+    <string name="log_dialog_daterecent_before">Last</string>
+    <string name="log_dialog_daterecent_after">Hours</string>
+    <string name="log_dialog_dateinterval_from">From</string>
+    <string name="log_dialog_dateinterval_to">Until</string>
     <string name="log_postrecent">postrecent</string>
     <string name="log_daterecent">daterecent</string>
     <string name="log_dateinterval">dateinterval</string>
-    <string name="log_oom">Out of Memory. Bitte weniger auf einmal.</string>
     <string-array name="modes">
         <item>@string/log_postrecent</item>
         <item>@string/log_daterecent</item>
@@ -193,39 +177,52 @@
     </string-array>
 
     <!-- Album Fragment + Activity -->
-    <string name="title_fragment_gallery">Galerie</string>
-    <string name="gallery_login_failed">Galerie Login fehlgeschlagen</string>
-    <string name="gallery_server_image">https://qedgallery.qed-verein.de/image.php?type=%s&amp;imageid=%s</string>
-    <string name="album_photographer_radio_button">Fotograph</string>
-    <string name="album_date_radio_button">Datum</string>
-    <string name="album_category_radio_button">Kategorie</string>
-    <string name="album_info_creator">Albumersteller</string>
-    <string name="album_info_creation_date">Erstellt am</string>
-    <string name="album_info_creation_dates">Aufgenommen</string>
+    <string name="title_fragment_gallery">Gallery</string>
+    <string name="gallery_login_failed">Gallery Login failed</string>
+    <string name="album_photographer_radio_button">Photographer</string>
+    <string name="album_date_radio_button">Dates</string>
+    <string name="album_category_radio_button">Category</string>
+    <string name="album_info_creator">Album Creator</string>
+    <string name="album_info_creation_date">Created on</string>
+    <string name="album_info_creation_dates">Taken on</string>
     <string name="title_activity_album">Album</string>
-    <string name="gallery_folder_images">gallery/images</string>
-    <string name="gallery_folder_thumbnails">gallery/thumbnails</string>
-    <string name="preferences_gallery_save_public_false_summary">Heruntergeladene Bilder werden so gespeichert, dass sie nur von dieser App gelesen werden können</string>
-    <string name="preferences_gallery_save_public_true_summary">Heruntergeladene Bilder werden für alle Apps zugänglich gespeichert</string>
+    <string name="gallery_folder_images" translatable="false">gallery/images</string>
+    <string name="gallery_folder_thumbnails" translatable="false">gallery/thumbnails</string>
 
     <!-- Image Activity -->
-    <string name="title_activity_image">Foto</string>
+    <string name="title_activity_image">Picture</string>
     <string name="image_suffix_original"> (original)</string>
-    <string name="image_already_original">Das ist bereits die Originaldatei, möchtest du sie erneut herunterladen?</string>
-    <string name="image_download_non_picture">Du bist im Begriff eine Audio- oder Video-Datei herunterzuladen. Eine WLAN-Verbindung wird empfohlen. Möchtest du fortfahren?</string>
-    <string name="image_async_still_running">Es laufen noch Downloads. Wenn du jetzt zurück gehst werden sie abgebrochen. Möchtest du fortfahren?</string>
+    <string name="image_already_original">This already is the original file. Do you wish to download it anew?</string>
+    <string name="image_async_still_running">There are still downloads running. If you leave they will be cancelled. Do you wish to continue?</string>
     <string name="image_info_album">Album:</string>
-    <string name="image_info_owner">Besitzer:</string>
-    <string name="image_info_upload_date">Hochgeladen am:</string>
+    <string name="image_info_owner">Owner:</string>
+    <string name="image_info_upload_date">Uploaded on:</string>
     <string name="image_info_format">Format:</string>
-    <string name="image_info_path">Pfad:</string>
-    <string name="image_info_creation_date">Erstellt am:</string>
-    <string name="empty_album">Dieses Album ist leer</string>
-    <string name="login_failed_switching_to_offline">Login fehlgeschlagen.</string>
-    <string name="album_not_downloaded">Dieses Album ist nicht heruntergeladen.</string>
-    <string name="image_not_downloaded">Dieses Bild ist nicht heruntergeladen.</string>
-    <string name="no_file_explorer">Es konnte kein Dateiexplorer gefunden werden.</string>
-    <string name="thumbnail">thumbnail</string>
+    <string name="image_info_path">Path:</string>
+    <string name="image_info_creation_date">Created on:</string>
+    <string name="empty_album">This album is empty</string>
+    <string name="login_failed_switching_to_offline">Login failed.</string>
+    <string name="image_not_downloaded">This picture is not downloaded</string>
+    <string name="no_file_explorer">No file explorer was found.</string>
+    <string name="cant_connect">No</string>
+    <string name="chat_database_id_hint">from</string>
+    <string name="chat_empty_message">You are about to send an empty message. Do you wish to continue?</string>
+    <string name="chat_login_failed">Chat login failed</string>
+    <string name="chat_message_hint">Write a message</string>
+    <string name="chat_refresh">Refresh</string>
+    <string name="chat_scroll_down_button_content_description">Scroll Down</string>
+    <string name="coming_soon">Coming soon</string>
+    <string name="confirm_delete_images">Are you sure you want to delete all the saved thumbnails?</string>
+    <string name="content_description_divider">Divider</string>
+    <string name="database_hits">Hits</string>
+    <string name="database_login_failed">Database login failed</string>
+    <string name="database_save_done">Saved</string>
+    <string name="database_search_button">Search</string>
+    <string name="delete">Delete</string>
+    <string name="double_back_to_exit_toast">Press again to exit</string>
+    <string name="drawer_chat">Chat</string>
+    <string name="album_not_downloaded">This album is not downloaded</string>
+    <string name="image_download_non_picture">You are about to download an audio or video file. A WLAN connection is recommanded. Do you wish to continue?</string>
 
     <!-- Sonstiges -->
 

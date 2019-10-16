@@ -16,6 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.preference.PreferenceManager;
 
 import com.jonahbauer.qed.R;
 
@@ -34,7 +35,7 @@ public class MessageAdapter extends ArrayAdapter<Message> {
         this.context = context;
         this.messageList = messageList;
         this.extended = extended;
-        sharedPreferences = getContext().getSharedPreferences(getContext().getString(R.string.preferences_shared_preferences), Context.MODE_PRIVATE);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
     public MessageAdapter(Context context, List<Message> messageList) {
@@ -114,7 +115,7 @@ public class MessageAdapter extends ArrayAdapter<Message> {
         }
 
 
-        if (sharedPreferences.getBoolean(view.getContext().getString(R.string.preferences_showLinks_key),true)) {
+        if (sharedPreferences.getBoolean(view.getContext().getString(R.string.preferences_chat_showLinks_key),true)) {
             ((TextView) view.findViewById(R.id.message_message)).setLinksClickable(true);
             Linkify.addLinks((TextView) view.findViewById(R.id.message_message), Linkify.WEB_URLS);
         }

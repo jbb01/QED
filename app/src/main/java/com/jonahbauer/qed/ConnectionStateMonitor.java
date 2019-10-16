@@ -6,6 +6,8 @@ import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.net.NetworkRequest;
 
+import androidx.annotation.NonNull;
+
 public class ConnectionStateMonitor extends ConnectivityManager.NetworkCallback {
 
     private final NetworkRequest networkRequest;
@@ -31,12 +33,12 @@ public class ConnectionStateMonitor extends ConnectivityManager.NetworkCallback 
     }
 
     @Override
-    public void onAvailable(Network network) {
+    public void onAvailable(@NonNull Network network) {
         application.setOnline(true);
     }
 
     @Override
-    public void onLost(Network network) {
+    public void onLost(@NonNull Network network) {
         application.setOnline(false);
     }
 

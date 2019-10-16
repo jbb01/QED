@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Animatable;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -26,6 +25,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.preference.PreferenceManager;
 
 import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.R;
@@ -35,9 +35,9 @@ import com.jonahbauer.qed.networking.QEDGalleryPages;
 import com.jonahbauer.qed.networking.QEDGalleryPages.Filter;
 import com.jonahbauer.qed.networking.QEDPageReceiver;
 import com.jonahbauer.qed.qeddb.person.Person;
-import com.jonahbauer.qed.qedgallery.Album;
-import com.jonahbauer.qed.qedgallery.Image;
-import com.jonahbauer.qed.qedgallery.ImageAdapter;
+import com.jonahbauer.qed.qedgallery.album.Album;
+import com.jonahbauer.qed.qedgallery.image.Image;
+import com.jonahbauer.qed.qedgallery.image.ImageAdapter;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -323,11 +323,11 @@ public class GalleryAlbumActivity extends AppCompatActivity implements QEDPageRe
                 if (isChecked) {
                     buttonView.setButtonDrawable(R.drawable.ic_arrow_up_accent_animation);
                     ((Animatable) Objects.requireNonNull(buttonView.getButtonDrawable())).start();
-                    expand(expand, getResources().getInteger(R.integer.expand_time));
+                    expand(expand);
                 } else {
                     buttonView.setButtonDrawable(R.drawable.ic_arrow_down_accent_animation);
                     ((Animatable) Objects.requireNonNull(buttonView.getButtonDrawable())).start();
-                    collapse(expand, getResources().getInteger(R.integer.expand_time));
+                    collapse(expand);
                 }
                 break;
             case R.id.album_photographer_radio_button:
@@ -354,57 +354,12 @@ public class GalleryAlbumActivity extends AppCompatActivity implements QEDPageRe
         }
     }
 
-    private static void expand(final View v, int duration) {
+    private static void expand(final View v) {
         v.setVisibility(View.VISIBLE);
-//        v.getLayoutParams().height = 1;
-//        v.setVisibility(View.VISIBLE);
-//
-//        v.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
-//        final int targetHeight = v.getMeasuredHeight();
-//
-//        Animation a = new Animation() {
-//            @Override
-//            protected void applyTransformation(float interpolatedTime, Transformation t) {
-//                v.getLayoutParams().height = interpolatedTime == 1
-//                        ? TableRow.LayoutParams.WRAP_CONTENT
-//                        : (int) (targetHeight * interpolatedTime);
-//                v.requestLayout();
-//            }
-//
-//            @Override
-//            public boolean willChangeBounds() {
-//                return true;
-//            }
-//        };
-//
-//        a.setDuration(duration);
-//        v.startAnimation(a);
     }
 
-    private static void collapse(final View v, int duration) {
+    private static void collapse(final View v) {
         v.setVisibility(View.GONE);
-//        final int initialHeight = v.getMeasuredHeight();
-//
-//        Animation a = new Animation()
-//        {
-//            @Override
-//            protected void applyTransformation(float interpolatedTime, Transformation t) {
-//                if(interpolatedTime == 1){
-//                    v.setVisibility(View.GONE);
-//                }else{
-//                    v.getLayoutParams().height = initialHeight - (int)(initialHeight * interpolatedTime);
-//                    v.requestLayout();
-//                }
-//            }
-//
-//            @Override
-//            public boolean willChangeBounds() {
-//                return true;
-//            }
-//        };
-//
-//        a.setDuration(duration);
-//        v.startAnimation(a);
     }
 
     @Override

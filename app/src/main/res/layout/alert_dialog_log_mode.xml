@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/log_dialog_mode_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignBottom="@id/log_dialog_mode_spinner"
+        android:gravity="center"
+        android:padding="16dp"
+        android:text="@string/log_dialog_mode_label" />
+
+    <Spinner
+        android:id="@+id/log_dialog_mode_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/log_dialog_mode_label"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:padding="16dp"
+        android:entries="@array/modes" />
+
+    <include
+        android:id="@+id/log_fragment_postrecent"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_below="@id/log_dialog_mode_spinner"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:visibility="visible"
+        layout="@layout/fragment_log_dialog_postrecent"/>
+
+    <include
+        android:id="@+id/log_fragment_daterecent"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_below="@id/log_fragment_postrecent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:visibility="gone"
+        layout="@layout/fragment_log_dialog_daterecent"/>
+
+    <include
+        android:id="@+id/log_fragment_dateinterval"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_below="@id/log_fragment_daterecent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:visibility="gone"
+        layout="@layout/fragment_log_dialog_dateinterval"/>
+
+    <LinearLayout
+        android:id="@+id/log_dialog_fragment_holder"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/log_fragment_dateinterval"
+        android:orientation="vertical">
+    </LinearLayout>
+
+</RelativeLayout>

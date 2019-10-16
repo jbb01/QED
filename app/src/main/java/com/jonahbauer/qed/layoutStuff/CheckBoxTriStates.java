@@ -7,6 +7,7 @@ import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.widget.CompoundButton;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.jonahbauer.qed.R;
@@ -167,6 +168,7 @@ public class CheckBoxTriStates extends androidx.appcompat.widget.AppCompatCheckB
             out.writeValue(state);
         }
 
+        @NonNull
         @Override
         public String toString() {
             return "CheckboxTriState.SavedState{"

@@ -1,4 +1,4 @@
-package com.jonahbauer.qed.qedgallery;
+package com.jonahbauer.qed.qedgallery.image;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -181,7 +181,6 @@ public class ImageAdapter extends ArrayAdapter<Image> implements GalleryDatabase
 
             AsyncTask async = QEDGalleryPages.getImage(tag, image, Mode.THUMBNAIL, fos, this);
 
-            Log.d(Application.LOG_TAG_DEBUG, tag + ": " + async.toString());
             asyncTasks.put(tag, async);
         } catch (IOException e) {
             Log.e(Application.LOG_TAG_ERROR, e.getMessage(), e);
@@ -248,7 +247,7 @@ public class ImageAdapter extends ArrayAdapter<Image> implements GalleryDatabase
         B second;
         C third;
 
-        public Triple(A a, B b, C c) {
+        Triple(A a, B b, C c) {
             first = a;
             second = b;
             third = c;

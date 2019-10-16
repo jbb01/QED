@@ -123,11 +123,11 @@ public class PersonDatabaseFragment extends Fragment implements CompoundButton.O
                 if (isChecked) {
                     buttonView.setButtonDrawable(R.drawable.ic_arrow_up_accent_animation);
                     ((Animatable) Objects.requireNonNull(buttonView.getButtonDrawable())).start();
-                    expand(expand, getResources().getInteger(R.integer.expand_time));
+                    expand(expand);
                 } else {
                     buttonView.setButtonDrawable(R.drawable.ic_arrow_down_accent_animation);
                     ((Animatable) Objects.requireNonNull(buttonView.getButtonDrawable())).start();
-                    collapse(expand, getResources().getInteger(R.integer.expand_time));
+                    collapse(expand);
                 }
                 break;
             case R.id.database_firstName_checkbox:
@@ -154,57 +154,12 @@ public class PersonDatabaseFragment extends Fragment implements CompoundButton.O
         }
     }
 
-    private static void expand(final View v, int duration) {
+    private static void expand(final View v) {
         v.setVisibility(View.VISIBLE);
-//        v.getLayoutParams().height = 1;
-//        v.setVisibility(View.VISIBLE);
-//
-//        v.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-//        final int targetHeight = v.getMeasuredHeight();
-//
-//        Animation a = new Animation() {
-//            @Override
-//            protected void applyTransformation(float interpolatedTime, Transformation t) {
-//                v.getLayoutParams().height = interpolatedTime == 1
-//                        ? LayoutParams.WRAP_CONTENT
-//                        : (int) (targetHeight * interpolatedTime);
-//                v.requestLayout();
-//            }
-//
-//            @Override
-//            public boolean willChangeBounds() {
-//                return true;
-//            }
-//        };
-//
-//        a.setDuration(duration);
-//        v.startAnimation(a);
     }
 
-    private static void collapse(final View v, int duration) {
+    private static void collapse(final View v) {
         v.setVisibility(View.GONE);
-//        final int initialHeight = v.getMeasuredHeight();
-//
-//        Animation a = new Animation()
-//        {
-//            @Override
-//            protected void applyTransformation(float interpolatedTime, Transformation t) {
-//                if(interpolatedTime == 1){
-//                    v.setVisibility(View.GONE);
-//                }else{
-//                    v.getLayoutParams().height = initialHeight - (int)(initialHeight * interpolatedTime);
-//                    v.requestLayout();
-//                }
-//            }
-//
-//            @Override
-//            public boolean willChangeBounds() {
-//                return true;
-//            }
-//        };
-//
-//        a.setDuration(duration);
-//        v.startAnimation(a);
     }
 
     private void search() {

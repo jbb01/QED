@@ -1,6 +1,5 @@
 package com.jonahbauer.qed.activities;
 
-import android.graphics.Shader;
 import android.graphics.drawable.Animatable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,7 +9,6 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -23,7 +21,6 @@ import com.jonahbauer.qed.chat.Message;
 import com.jonahbauer.qed.chat.MessageAdapter;
 import com.jonahbauer.qed.database.ChatDatabase;
 import com.jonahbauer.qed.database.ChatDatabaseReceiver;
-import com.jonahbauer.qed.layoutStuff.TileDrawable;
 import com.szagurskii.patternedtextwatcher.PatternedTextWatcher;
 
 import java.util.ArrayList;
@@ -37,7 +34,7 @@ import static com.jonahbauer.qed.database.ChatDatabaseContract.ChatEntry.COLUMN_
 import static com.jonahbauer.qed.database.ChatDatabaseContract.ChatEntry.COLUMN_NAME_NAME;
 import static com.jonahbauer.qed.database.ChatDatabaseContract.ChatEntry.TABLE_NAME;
 
-@SuppressWarnings("ConstantConditions")
+
 public class ChatDatabaseFragment extends Fragment implements CompoundButton.OnCheckedChangeListener, ChatDatabaseReceiver {
     private ChatDatabase database;
     private MessageAdapter messageAdapter;
@@ -66,7 +63,6 @@ public class ChatDatabaseFragment extends Fragment implements CompoundButton.OnC
         View view = inflater.inflate(R.layout.fragment_chat_database, container, false);
 
         messageListView = view.findViewById(R.id.message_list_view);
-        ImageView background = view.findViewById(R.id.background);
         expand = view.findViewById(R.id.expand);
         searchButton = view.findViewById(R.id.search_button);
         searchProgress = view.findViewById(R.id.search_progress);
@@ -87,9 +83,6 @@ public class ChatDatabaseFragment extends Fragment implements CompoundButton.OnC
         
         database = new ChatDatabase();
         database.init(getContext(), this);
-
-        TileDrawable tileDrawable  = new TileDrawable(getContext().getDrawable(R.drawable.background_part), Shader.TileMode.REPEAT);
-        background.setImageDrawable(tileDrawable);
 
         messageAdapter = new MessageAdapter(getContext(),new ArrayList<>(), true);
         messageListView.setAdapter(messageAdapter);
@@ -124,11 +117,11 @@ public class ChatDatabaseFragment extends Fragment implements CompoundButton.OnC
                 if (isChecked) {
                     buttonView.setButtonDrawable(R.drawable.ic_arrow_up_accent_animation);
                     ((Animatable) Objects.requireNonNull(buttonView.getButtonDrawable())).start();
-                    expand(expand, getResources().getInteger(R.integer.expand_time));
+                    expand(expand);
                 } else {
                     buttonView.setButtonDrawable(R.drawable.ic_arrow_down_accent_animation);
                     ((Animatable) Objects.requireNonNull(buttonView.getButtonDrawable())).start();
-                    collapse(expand, getResources().getInteger(R.integer.expand_time));
+                    collapse(expand);
                 }
                 break;
             case R.id.database_channel_checkbox:
@@ -158,57 +151,12 @@ public class ChatDatabaseFragment extends Fragment implements CompoundButton.OnC
         }
     }
 
-    private static void expand(final View v, int duration) {
+    private static void expand(final View v) {
         v.setVisibility(View.VISIBLE);
-//        v.getLayoutParams().height = 1;
-//        v.setVisibility(View.VISIBLE);
-//
-//        v.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
-//        final int targetHeight = v.getMeasuredHeight();
-//
-//        Animation a = new Animation() {
-//            @Override
-//            protected void applyTransformation(float interpolatedTime, Transformation t) {
-//                v.getLayoutParams().height = interpolatedTime == 1
-//                        ? LayoutParams.WRAP_CONTENT
-//                        : (int) (targetHeight * interpolatedTime);
-//                v.requestLayout();
-//            }
-//
-//            @Override
-//            public boolean willChangeBounds() {
-//                return true;
-//            }
-//        };
-//
-//        a.setDuration(duration);
-//        v.startAnimation(a);
     }
 
-    private static void collapse(final View v, int duration) {
+    private static void collapse(final View v) {
         v.setVisibility(View.GONE);
-//        final int initialHeight = v.getMeasuredHeight();
-//
-//        Animation a = new Animation()
-//        {
-//            @Override
-//            protected void applyTransformation(float interpolatedTime, Transformation t) {
-//                if(interpolatedTime == 1){
-//                    v.setVisibility(View.GONE);
-//                }else{
-//                    v.getLayoutParams().height = initialHeight - (int)(initialHeight * interpolatedTime);
-//                    v.requestLayout();
-//                }
-//            }
-//
-//            @Override
-//            public boolean willChangeBounds() {
-//                return true;
-//            }
-//        };
-//
-//        a.setDuration(duration);
-//        v.startAnimation(a);
     }
 
     private void search() {

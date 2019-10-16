@@ -1,8 +1,8 @@
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <SwitchPreference
         android:defaultValue="false"
-        android:key="@string/preferences_publicId_key"
+        android:key="@string/preferences_chat_publicId_key"
         android:selectAllOnFocus="true"
         android:singleLine="true"
         android:title="@string/preferences_chat_publicId_title"
@@ -10,7 +10,7 @@
 
     <SwitchPreference
         android:defaultValue="false"
-        android:key="@string/preferences_showSense_key"
+        android:key="@string/preferences_chat_showSense_key"
         android:selectAllOnFocus="true"
         android:singleLine="true"
         android:title="@string/preferences_chat_showSense_title"
@@ -18,7 +18,7 @@
 
     <SwitchPreference
         android:defaultValue="true"
-        android:key="@string/preferences_showLinks_key"
+        android:key="@string/preferences_chat_showLinks_key"
         android:selectAllOnFocus="true"
         android:singleLine="true"
         android:title="@string/preferences_chat_showLinks_title"
@@ -26,7 +26,7 @@
 
     <SwitchPreference
         android:defaultValue="true"
-        android:key="@string/preferences_katex_key"
+        android:key="@string/preferences_chat_katex_key"
         android:selectAllOnFocus="true"
         android:singleLine="true"
         android:title="@string/preferences_chat_katex_title"
@@ -35,7 +35,7 @@
     <EditTextPreference
         android:defaultValue="@null"
         android:inputType="text"
-        android:key="@string/preferences_name_key"
+        android:key="@string/preferences_chat_name_key"
         android:maxLines="1"
         android:selectAllOnFocus="true"
         android:singleLine="true"
@@ -45,11 +45,11 @@
     <EditTextPreference
         android:defaultValue="@null"
         android:inputType="text"
-        android:key="@string/preferences_channel_key"
+        android:key="@string/preferences_chat_channel_key"
         android:maxLines="1"
         android:selectAllOnFocus="true"
         android:singleLine="true"
         android:title="@string/preferences_chat_channel_title"
         android:icon="@drawable/ic_settings_channel" />
 
-</PreferenceScreen>
+</androidx.preference.PreferenceScreen>

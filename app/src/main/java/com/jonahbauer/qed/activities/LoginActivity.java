@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceManager;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.jonahbauer.qed.Application;
@@ -50,7 +51,7 @@ public class LoginActivity extends AppCompatActivity implements Internet {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        getSharedPreferences(getString(R.string.preferences_shared_preferences),MODE_PRIVATE).edit().putBoolean(getString(R.string.preferences_loggedIn_key),false).apply();
+        PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean(getString(R.string.preferences_loggedIn_key),false).apply();
 
         setContentView(R.layout.activity_login);
         usernameView = findViewById(R.id.username);
@@ -246,7 +247,7 @@ public class LoginActivity extends AppCompatActivity implements Internet {
                 ((Application)getApplication()).saveData(mUsername, Application.KEY_USERNAME, false);
                 ((Application)getApplication()).saveData(mPassword, Application.KEY_PASSWORD, true);
 
-                getSharedPreferences(getString(R.string.preferences_shared_preferences),MODE_PRIVATE).edit().putBoolean(getString(R.string.preferences_loggedIn_key),true).apply();
+                PreferenceManager.getDefaultSharedPreferences(LoginActivity.this).edit().putBoolean(getString(R.string.preferences_loggedIn_key),true).apply();
 
                 if (!dontStartMain) {
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);

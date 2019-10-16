@@ -1,15 +1,18 @@
-<preference-headers xmlns:android="http://schemas.android.com/apk/res/android">
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- These settings headers are only used on tablets. -->
+    <Preference
+        android:fragment="com.jonahbauer.qed.activities.SettingsActivity$GeneralPreferenceFragment"
+        android:icon="@drawable/ic_settings_general"
+        android:title="@string/preferences_header_general" />
 
-    <header
+    <Preference
         android:fragment="com.jonahbauer.qed.activities.SettingsActivity$ChatPreferenceFragment"
         android:icon="@drawable/ic_settings_chat"
         android:title="@string/preferences_header_chat" />
 
-    <header
+    <Preference
         android:fragment="com.jonahbauer.qed.activities.SettingsActivity$GalleryPreferenceFragment"
         android:icon="@drawable/ic_settings_gallery"
         android:title="@string/preferences_header_gallery" />
 
-</preference-headers>
+</androidx.preference.PreferenceScreen>

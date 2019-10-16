@@ -1,7 +1,6 @@
 package com.jonahbauer.qed.activities;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
@@ -19,7 +18,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -33,7 +31,7 @@ import com.jonahbauer.qed.networking.QEDGalleryPages;
 import com.jonahbauer.qed.networking.QEDGalleryPages.Mode;
 import com.jonahbauer.qed.networking.QEDPageReceiver;
 import com.jonahbauer.qed.networking.QEDPageStreamReceiver;
-import com.jonahbauer.qed.qedgallery.Image;
+import com.jonahbauer.qed.qedgallery.image.Image;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -66,12 +64,12 @@ public class ImageActivity extends AppCompatActivity implements GalleryDatabaseR
     private GalleryDatabase galleryDatabase;
     private boolean extended = false;
 
-    private List<Image> pending;
+//    private List<Image> pending;
     private boolean needsToGetInfo = false;
     private boolean needsToGetImage = false;
     private Mode mode = NORMAL;
 
-    private SharedPreferences sharedPreferences;
+//    private SharedPreferences sharedPreferences;
 
     private List<AsyncTask> asyncTasks;
 
@@ -81,10 +79,10 @@ public class ImageActivity extends AppCompatActivity implements GalleryDatabaseR
         setContentView(R.layout.activity_image);
         galleryDatabase = new GalleryDatabase();
         galleryDatabase.init(this, this);
-        sharedPreferences = getSharedPreferences(getString(R.string.preferences_shared_preferences), MODE_PRIVATE);
+//        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         asyncTasks = new ArrayList<>();
 
-        pending = new ArrayList<>();
+//        pending = new ArrayList<>();
 
         Intent intent = getIntent();
         image = (Image) intent.getSerializableExtra(GALLERY_IMAGE_KEY);
@@ -299,10 +297,10 @@ public class ImageActivity extends AppCompatActivity implements GalleryDatabaseR
 
 //        if (!savePublic) {
             // save to private storage
-            File dir = getExternalFilesDir(getString(R.string.gallery_folder_images));
-            assert dir != null;
-            if (!dir.exists()) dir.mkdirs();
-            file = new File(dir, image.id + "." + suffix);
+        File dir = getExternalFilesDir(getString(R.string.gallery_folder_images));
+        assert dir != null;
+        if (!dir.exists()) dir.mkdirs();
+        file = new File(dir, image.id + "." + suffix);
 //        } else {
 //            // save to public storage
 //            File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
@@ -418,17 +416,17 @@ public class ImageActivity extends AppCompatActivity implements GalleryDatabaseR
         });
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == 3141) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                pending.forEach(this::downloadImage);
-                pending.clear();
-            } else {
-                sharedPreferences.edit().putBoolean(getString(R.string.preferences_gallery_save_public_key), false).apply();
-            }
-        }
-    }
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+//        if (requestCode == 3141) {
+//            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                pending.forEach(this::downloadImage);
+//                pending.clear();
+//            } else {
+//                sharedPreferences.edit().putBoolean(getString(R.string.preferences_gallery_save_public_key), false).apply();
+//            }
+//        }
+//    }
 
     @Override
     public void onStreamError(String tag) {

@@ -88,11 +88,6 @@
                 android:value=".activities.MainActivity" />
         </activity>
         <activity
-            android:name=".activities.LogDialogActivity"
-            android:label="@string/title_activity_log_dialog"
-            android:parentActivityName=".activities.MainActivity"
-            android:theme="@style/AppTheme.Dialog.MinWidth" />
-        <activity
             android:name=".activities.GalleryAlbumActivity"
             android:label="@string/title_activity_album"
             android:screenOrientation="portrait"

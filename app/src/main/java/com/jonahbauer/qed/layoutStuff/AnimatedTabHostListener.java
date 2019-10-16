@@ -23,16 +23,15 @@ public class AnimatedTabHostListener implements TabHost.OnTabChangeListener
     private static final int ANIMATION_TIME = 150;
     private TabHost tabHost;
     private View previousView;
-    private View currentView;
-    public GestureDetector gestureDetector;
+    private GestureDetector gestureDetector;
     private int currentTab;
     private View.OnTouchListener touchListener;
 
     /**
      * Constructor that takes the TabHost as a parameter and sets previousView to the currentView at instantiation
      *
-     * @param context
-     * @param tabHost
+     * @param context context
+     * @param tabHost tabHost
      */
     @SuppressLint("ClickableViewAccessibility")
     public AnimatedTabHostListener(Context context, TabHost tabHost)
@@ -52,7 +51,7 @@ public class AnimatedTabHostListener implements TabHost.OnTabChangeListener
     public void onTabChanged(String tabId)
     {
 
-        currentView = tabHost.getCurrentView();
+        View currentView = tabHost.getCurrentView();
         if (tabHost.getCurrentTab() > currentTab)
         {
             previousView.setAnimation(outToLeftAnimation());
@@ -149,7 +148,7 @@ public class AnimatedTabHostListener implements TabHost.OnTabChangeListener
         /**
          * An empty constructor that uses the tabhosts content view to decide how many tabs there are.
          */
-        public MyGestureDetector()
+        MyGestureDetector()
         {
             maxTabs = tabHost.getTabContentView().getChildCount();
         }

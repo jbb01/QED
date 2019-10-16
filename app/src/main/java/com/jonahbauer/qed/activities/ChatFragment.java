@@ -22,6 +22,7 @@ import android.widget.ListView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.preference.PreferenceManager;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.jonahbauer.qed.Application;
@@ -38,6 +39,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
@@ -48,11 +50,10 @@ import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
 import okio.ByteString;
 
-import static android.content.Context.MODE_PRIVATE;
-
 public class ChatFragment extends Fragment implements Internet, AbsListView.OnScrollListener {
     private WebSocket websocket = null;
     private MessageAdapter messageAdapter;
+    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.GERMANY);
 
     private FloatingActionButton scrollDownButton;
     private ListView messageListView;
@@ -82,7 +83,6 @@ public class ChatFragment extends Fragment implements Internet, AbsListView.OnSc
         super.onCreate(savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_chat, container, false);
 
-//        ImageView background = view.findViewById(R.id.background);
         scrollDownButton = view.findViewById(R.id.scroll_down_Button);
         messageListView = view.findViewById(R.id.messageBox);
         messageEditText = view.findViewById(R.id.editText_message);
@@ -92,10 +92,7 @@ public class ChatFragment extends Fragment implements Internet, AbsListView.OnSc
         quickSettingsChannel = view.findViewById(R.id.quick_settings_channel);
 
         assert getContext() != null;
-        sharedPreferences = getContext().getSharedPreferences(getString(R.string.preferences_shared_preferences), MODE_PRIVATE);
-        
-//        TileDrawable tileDrawable  = new TileDrawable(view.getContext().getDrawable(R.drawable.background_part), Shader.TileMode.REPEAT);
-//        background.setImageDrawable(tileDrawable);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 
         messageEditText.setOnClickListener(a -> editTextClicked());
         sendButton.setOnClickListener(a -> send());
@@ -113,14 +110,14 @@ public class ChatFragment extends Fragment implements Internet, AbsListView.OnSc
             View editTextView = LayoutInflater.from(inputDialog.getContext()).inflate(R.layout.alert_dialog_edit_text, null);
 
             EditText inputEditText = editTextView.findViewById(R.id.input);
-            inputEditText.setText(sharedPreferences.getString(getString(R.string.preferences_name_key), ""));
+            inputEditText.setText(sharedPreferences.getString(getString(R.string.preferences_chat_name_key), ""));
 
             inputDialog.setView(editTextView);
 
             inputDialog.setNegativeButton(getString(R.string.cancel), (dialog, which) -> dialog.cancel());
 
             inputDialog.setPositiveButton(getString(R.string.ok), (dialog, which) -> {
-                sharedPreferences.edit().putString(getString(R.string.preferences_name_key), inputEditText.getText().toString()).apply();
+                sharedPreferences.edit().putString(getString(R.string.preferences_chat_name_key), inputEditText.getText().toString()).apply();
                 dialog.dismiss();
             });
 
@@ -135,14 +132,14 @@ public class ChatFragment extends Fragment implements Internet, AbsListView.OnSc
             View editTextView = LayoutInflater.from(inputDialog.getContext()).inflate(R.layout.alert_dialog_edit_text, null);
 
             EditText inputEditText = editTextView.findViewById(R.id.input);
-            inputEditText.setText(sharedPreferences.getString(getString(R.string.preferences_channel_key), ""));
+            inputEditText.setText(sharedPreferences.getString(getString(R.string.preferences_chat_channel_key), ""));
 
             inputDialog.setView(editTextView);
 
             inputDialog.setNegativeButton(getString(R.string.cancel), (dialog, which) -> dialog.cancel());
 
             inputDialog.setPositiveButton(getString(R.string.ok), (dialog, which) -> {
-                sharedPreferences.edit().putString(getString(R.string.preferences_channel_key), inputEditText.getText().toString()).apply();
+                sharedPreferences.edit().putString(getString(R.string.preferences_chat_channel_key), inputEditText.getText().toString()).apply();
                 reload();
                 dialog.dismiss();
             });
@@ -247,11 +244,11 @@ public class ChatFragment extends Fragment implements Internet, AbsListView.OnSc
         }, 5000);
     }
 
-    private void addPost(Message message, int position, boolean notify, boolean checkDate) {
+    private void addPost(Message message, @SuppressWarnings("SameParameterValue") int position, boolean notify, boolean checkDate) {
         assert getContext() != null;
 
         if (message.id < topPosition) topPosition = message.id;
-        if (message.bottag == 1 && getContext().getSharedPreferences(getString(R.string.preferences_shared_preferences),MODE_PRIVATE).getBoolean(getString(R.string.preferences_showSense_key),false)) return;
+        if (message.bottag == 1 && sharedPreferences.getBoolean(getString(R.string.preferences_chat_showSense_key),false)) return;
 
         if (messageAdapter!=null) {
             messageListView.post(() -> {
@@ -265,7 +262,9 @@ public class ChatFragment extends Fragment implements Internet, AbsListView.OnSc
 
                     if (!date.equals(lastDate)) {
                         try {
-                            date = android.text.format.DateFormat.getLongDateFormat(getContext()).format(new SimpleDateFormat("yyyy-MM-dd", Locale.GERMANY).parse(date)).toUpperCase();
+                            Date d = sdf.parse(date);
+                            if (d != null)
+                                date = android.text.format.DateFormat.getLongDateFormat(getContext()).format(d).toUpperCase();
                         } catch (ParseException ignored) {}
                         if (position == -1)
                             messageAdapter.add(new Message("date", "date", date, -6473, "date", "date", -6473, -6473, "date"));
@@ -327,7 +326,7 @@ public class ChatFragment extends Fragment implements Internet, AbsListView.OnSc
         OkHttpClient client = new OkHttpClient.Builder().connectTimeout(5, TimeUnit.SECONDS).build();
         Request.Builder builder = new Request.Builder().url(
                 getString(R.string.chat_websocket)
-                        + "?channel=" + getContext().getSharedPreferences(getString(R.string.preferences_shared_preferences),MODE_PRIVATE).getString(getString(R.string.preferences_channel_key), "")
+                        + "?channel=" + sharedPreferences.getString(getString(R.string.preferences_chat_channel_key), "")
                         + "&version=" + "2"
                         + "&position=" + position);
         builder.addHeader("Origin", "https://chat.qed-verein.de");
@@ -375,11 +374,11 @@ public class ChatFragment extends Fragment implements Internet, AbsListView.OnSc
         sending = true;
         try {
             JSONObject json = new JSONObject();
-            json.put("channel", getContext().getSharedPreferences(getString(R.string.preferences_shared_preferences),MODE_PRIVATE).getString(getString(R.string.preferences_channel_key), ""));
-            json.put("name", getContext().getSharedPreferences(getString(R.string.preferences_shared_preferences),MODE_PRIVATE).getString(getString(R.string.preferences_name_key), ""));
+            json.put("channel", sharedPreferences.getString(getString(R.string.preferences_chat_channel_key), ""));
+            json.put("name", sharedPreferences.getString(getString(R.string.preferences_chat_name_key), ""));
             json.put("message", messageEditText.getText().toString());
             json.put("delay", Long.toString(position));
-            json.put("publicid", getContext().getSharedPreferences(getString(R.string.preferences_shared_preferences),MODE_PRIVATE).getBoolean(getString(R.string.preferences_publicId_key), false) ? 1 : 0);
+            json.put("publicid", sharedPreferences.getBoolean(getString(R.string.preferences_chat_publicId_key), false) ? 1 : 0);
             websocket.send(json.toString());
             messageEditText.setText("");
             messageEditText.requestFocus();

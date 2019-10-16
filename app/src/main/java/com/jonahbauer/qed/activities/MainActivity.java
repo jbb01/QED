@@ -17,6 +17,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.preference.PreferenceManager;
 
 import com.google.android.material.navigation.NavigationView;
 import com.jonahbauer.qed.Application;
@@ -44,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         // NetworkTest.testNetwork();
 
-        sharedPreferences = getSharedPreferences(getString(R.string.preferences_shared_preferences), MODE_PRIVATE);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         Intent intent = getIntent();
         handleIntent(intent);
@@ -256,7 +257,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     if (path !=null) if (path.startsWith("/index.html")) {
                         SharedPreferences.Editor editor = sharedPreferences.edit();
                         editor.putInt(getString(R.string.preferences_drawerSelection_key), R.id.nav_chat);
-                        editor.putString(getString(R.string.preferences_channel_key), queries.getOrDefault("channel", ""));
+                        editor.putString(getString(R.string.preferences_chat_channel_key), queries.getOrDefault("channel", ""));
                         editor.apply();
                     }
                 } else if (host.equals("qedgallery.qed-verein.de")) {

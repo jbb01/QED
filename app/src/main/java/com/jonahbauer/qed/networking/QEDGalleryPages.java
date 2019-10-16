@@ -9,8 +9,8 @@ import androidx.annotation.Nullable;
 import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.qeddb.person.Person;
-import com.jonahbauer.qed.qedgallery.Album;
-import com.jonahbauer.qed.qedgallery.Image;
+import com.jonahbauer.qed.qedgallery.album.Album;
+import com.jonahbauer.qed.qedgallery.image.Image;
 
 import java.io.OutputStream;
 import java.text.ParseException;

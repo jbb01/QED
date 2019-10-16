@@ -66,7 +66,7 @@ public class Person implements Serializable {
 
             for (int i = 0; i < fields.length; i++) {
                 Object value = fields[i].get(this);
-                builder.append("\"").append(fields[i].getName()).append("\":\"").append(value.toString()).append("\"");
+                builder.append("\"").append(fields[i].getName()).append("\":\"").append(value != null ? value.toString() : "null").append("\"");
 
                 if (i < fields.length - 1) builder.append(", ");
                 else builder.append("}");

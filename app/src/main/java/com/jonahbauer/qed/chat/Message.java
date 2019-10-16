@@ -11,6 +11,7 @@ import org.json.JSONObject;
 
 import java.nio.charset.StandardCharsets;
 
+@SuppressWarnings("unused")
 public class Message {
     public final String name;
     public final String message;
@@ -47,6 +48,7 @@ public class Message {
                 + "\"bottag\":\"" + bottag + "\", "
                 + "\"channel\":\"" + channel + "\"}";
     }
+
 
     public int compareTo(Message other) {
         return Integer.compare(id,other.id);
