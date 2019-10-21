@@ -242,29 +242,38 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     else if (parts.length > 0) queries.put(parts[0], "");
                 }
 
+                // QED-DB
                 if (host != null) if (host.equals("qeddb.qed-verein.de")) {
-                    if (path !=null) if (path.startsWith("/personen.php")) {
-                        sharedPreferences.edit().putInt(getString(R.string.preferences_drawerSelection_key), R.id.nav_database_persons).apply();
-                        PersonDatabaseFragment.showPerson = Integer.valueOf(queries.getOrDefault("person", "0"));
-                        PersonDatabaseFragment.shownPerson = false;
+                    if (path != null) if (path.startsWith("/personen.php")) {
+                        String person = queries.getOrDefault("person", null);
+                        if (person != null) {
+                            PersonBottomSheet personBottomSheet = PersonBottomSheet.newInstance(person);
+                            personBottomSheet.show(getSupportFragmentManager(), personBottomSheet.getTag());
+                            return false;
+                        } else {
+                            sharedPreferences.edit().putInt(getString(R.string.preferences_drawerSelection_key), R.id.nav_database_persons).apply();
+                            return true;
+                        }
                     }
                     else if (path.startsWith("/veranstaltungen.php")) {
                         sharedPreferences.edit().putInt(getString(R.string.preferences_drawerSelection_key), R.id.nav_database_events).apply();
-                        EventDatabaseFragment.showEventId = Integer.valueOf(queries.getOrDefault("veranstaltung", "0"));
-                        EventDatabaseFragment.shownEvent = false;
+                        String event = queries.getOrDefault("veranstaltung", null);
+                        if (event != null) {
+                            EventDatabaseFragment.showEventId = Integer.valueOf(event);
+                            EventDatabaseFragment.shownEvent = false;
+                        }
                     }
+                // QED-Chat
                 } else if (host.equals("chat.qed-verein.de")) {
-                    if (path !=null) if (path.startsWith("/index.html")) {
+                    if (path != null) if (path.startsWith("/index.html")) {
                         SharedPreferences.Editor editor = sharedPreferences.edit();
                         editor.putInt(getString(R.string.preferences_drawerSelection_key), R.id.nav_chat);
                         editor.putString(getString(R.string.preferences_chat_channel_key), queries.getOrDefault("channel", ""));
                         editor.apply();
                     }
+                // QED-Gallery
                 } else if (host.equals("qedgallery.qed-verein.de")) {
-                    if (path !=null) if (path.startsWith("/album_list.php")) {
-                        SharedPreferences.Editor editor = sharedPreferences.edit();
-                        editor.putInt(getString(R.string.preferences_drawerSelection_key), R.id.nav_gallery).apply();
-                    } else if (path.startsWith("/album_view.php")) {
+                    if (path != null) if (path.startsWith("/album_list.php")) {
                         SharedPreferences.Editor editor = sharedPreferences.edit();
                         editor.putInt(getString(R.string.preferences_drawerSelection_key), R.id.nav_gallery).apply();
                     } else if (path.startsWith("/image_view.php")) {

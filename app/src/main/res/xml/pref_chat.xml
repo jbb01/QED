@@ -1,55 +1,82 @@
-<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <SwitchPreference
-        android:defaultValue="false"
-        android:key="@string/preferences_chat_publicId_key"
-        android:selectAllOnFocus="true"
-        android:singleLine="true"
-        android:title="@string/preferences_chat_publicId_title"
-        android:icon="@drawable/ic_settings_id"/>
+    <PreferenceCategory
+        app:title="@string/preferences_header_general">
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="@string/preferences_chat_publicId_key"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="@string/preferences_chat_publicId_title"
+            android:icon="@drawable/ic_settings_id"/>
 
-    <SwitchPreference
-        android:defaultValue="false"
-        android:key="@string/preferences_chat_showSense_key"
-        android:selectAllOnFocus="true"
-        android:singleLine="true"
-        android:title="@string/preferences_chat_showSense_title"
-        android:icon="@drawable/ic_settings_botblock" />
+        <EditTextPreference
+            android:defaultValue="@null"
+            android:inputType="text"
+            android:key="@string/preferences_chat_name_key"
+            android:maxLines="1"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="@string/preferences_chat_name_title"
+            android:icon="@drawable/ic_settings_name" />
 
-    <SwitchPreference
-        android:defaultValue="true"
-        android:key="@string/preferences_chat_showLinks_key"
-        android:selectAllOnFocus="true"
-        android:singleLine="true"
-        android:title="@string/preferences_chat_showLinks_title"
-        android:icon="@drawable/ic_settings_link" />
+        <EditTextPreference
+            android:defaultValue="@null"
+            android:inputType="text"
+            android:key="@string/preferences_chat_channel_key"
+            android:maxLines="1"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="@string/preferences_chat_channel_title"
+            android:icon="@drawable/ic_settings_channel" />
 
-    <SwitchPreference
-        android:defaultValue="true"
-        android:key="@string/preferences_chat_katex_key"
-        android:selectAllOnFocus="true"
-        android:singleLine="true"
-        android:title="@string/preferences_chat_katex_title"
-        android:icon="@drawable/ic_settings_math" />
+    </PreferenceCategory>
 
-    <EditTextPreference
-        android:defaultValue="@null"
-        android:inputType="text"
-        android:key="@string/preferences_chat_name_key"
-        android:maxLines="1"
-        android:selectAllOnFocus="true"
-        android:singleLine="true"
-        android:title="@string/preferences_chat_name_title"
-        android:icon="@drawable/ic_settings_name" />
+    <PreferenceCategory
+        app:title="@string/preferences_chat_group_appearance">
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="@string/preferences_chat_showSense_key"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="@string/preferences_chat_showSense_title"
+            android:icon="@drawable/ic_settings_botblock" />
 
-    <EditTextPreference
-        android:defaultValue="@null"
-        android:inputType="text"
-        android:key="@string/preferences_chat_channel_key"
-        android:maxLines="1"
-        android:selectAllOnFocus="true"
-        android:singleLine="true"
-        android:title="@string/preferences_chat_channel_title"
-        android:icon="@drawable/ic_settings_channel" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="@string/preferences_chat_showLinks_key"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="@string/preferences_chat_showLinks_title"
+            android:icon="@drawable/ic_settings_link" />
+
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="@string/preferences_chat_katex_key"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="@string/preferences_chat_katex_title"
+            android:icon="@drawable/ic_settings_math" />
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="@string/preferences_chat_colorful_messages_key"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="@string/preferences_chat_colorful_messages_title"
+            android:icon="@drawable/ic_settings_colorful_messages" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:title="@string/preferences_chat_group_database">
+        <Preference
+            android:defaultValue="false"
+            android:key="@string/preferences_chat_delete_db_key"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="@string/preferences_chat_delete_db_title"
+            android:icon="@drawable/ic_settings_delete_database" />
+    </PreferenceCategory>
 
 </androidx.preference.PreferenceScreen>

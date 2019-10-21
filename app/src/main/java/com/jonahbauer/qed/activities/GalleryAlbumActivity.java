@@ -3,6 +3,7 @@ package com.jonahbauer.qed.activities;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Animatable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -44,6 +45,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -103,7 +105,7 @@ public class GalleryAlbumActivity extends AppCompatActivity implements QEDPageRe
         galleryDatabase.init(this, this);
 
         Intent intent = getIntent();
-        album = (Album) intent.getSerializableExtra(GALLERY_ALBUM_KEY);
+        handleIntent(intent);
 
         if (album == null) finish();
 
@@ -417,5 +419,52 @@ public class GalleryAlbumActivity extends AppCompatActivity implements QEDPageRe
         offlineLabel.postDelayed(() -> ImageAdapter.receivedError = false, 5000);
 
         QEDGalleryPages.getAlbum(getClass().toString(), album, null, this);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        handleIntent(intent);
+        super.onNewIntent(intent);
+    }
+
+    private void handleIntent(Intent intent) {
+        Object obj = intent.getSerializableExtra(GALLERY_ALBUM_KEY);
+        if (obj instanceof Album) {
+            album = (Album) obj;
+            return;
+        }
+
+        if (Intent.ACTION_VIEW.equals(intent.getAction())) {
+            Uri data = intent.getData();
+            if (data != null) {
+                String host = data.getHost();
+                String path = data.getPath();
+
+                String query = data.getQuery();
+                Map<String, String> queries = new HashMap<>();
+                if (query != null) for (String q : query.split("&")) {
+                    String[] parts = q.split("=");
+                    if (parts.length > 1) queries.put(parts[0], parts[1]);
+                    else if (parts.length > 0) queries.put(parts[0], "");
+                }
+                if (host != null) if (host.equals("qedgallery.qed-verein.de")) {
+                    if (path != null) if (path.startsWith("/album_view.php")) {
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putInt(getString(R.string.preferences_drawerSelection_key), R.id.nav_gallery).apply();
+
+                        String albumIdStr = queries.getOrDefault("albumid", null);
+                        if (albumIdStr != null) {
+                            try {
+                                int id = Integer.parseInt(albumIdStr);
+                                album = new Album();
+                                album.id = id;
+                            } catch (NumberFormatException ignored) {
+                                Toast.makeText(this, R.string.error, Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }

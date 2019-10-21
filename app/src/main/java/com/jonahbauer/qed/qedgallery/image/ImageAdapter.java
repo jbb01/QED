@@ -167,9 +167,7 @@ public class ImageAdapter extends ArrayAdapter<Image> implements GalleryDatabase
     }
 
     private void downloadImage(String tag, Image image) {
-        File dir = getContext().getExternalFilesDir(getContext().getString(R.string.gallery_folder_thumbnails));
-
-        assert dir != null;
+        File dir = new File(getContext().getExternalCacheDir(), "gallery/thumbnails");
 
         if (!dir.exists()) dir.mkdirs();
         File file = new File(dir, image.id + ".jpeg");

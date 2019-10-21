@@ -116,8 +116,8 @@ public class MessageAdapter extends ArrayAdapter<Message> {
 
 
         if (sharedPreferences.getBoolean(view.getContext().getString(R.string.preferences_chat_showLinks_key),true)) {
-            ((TextView) view.findViewById(R.id.message_message)).setLinksClickable(true);
-            Linkify.addLinks((TextView) view.findViewById(R.id.message_message), Linkify.WEB_URLS);
+            messageView.setLinksClickable(true);
+            Linkify.addLinks(messageView, Linkify.WEB_URLS);
         }
 
         int color = -Color.parseColor("#" + message.color);
@@ -135,7 +135,12 @@ public class MessageAdapter extends ArrayAdapter<Message> {
 
         hsv[1] = 1-(1-hsv[1])*0.3f;
 
-        ((TextView)view.findViewById(R.id.message_name)).setTextColor(Color.HSVToColor(hsv));
+        color = Color.HSVToColor(hsv);
+
+        nameView.setTextColor(color);
+        if (!extended && sharedPreferences.getBoolean(view.getContext().getString(R.string.preferences_chat_colorful_messages_key), false)) {
+            messageView.setTextColor(color);
+        }
 
         return view;
     }

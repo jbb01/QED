@@ -113,5 +113,13 @@ public class ChatDatabase {
         asyncTasks.add(async);
         async.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, ChatDatabaseAsync.Mode.QUERY, chatDatabaseHelper, receiver, sql, selectionArgs);
     }
+
+    public void clear() {
+        SQLiteDatabase writableDatabase = chatDatabaseHelper.getWritableDatabase();
+        writableDatabase.beginTransaction();
+        chatDatabaseHelper.clear(writableDatabase);
+        writableDatabase.setTransactionSuccessful();
+        writableDatabase.endTransaction();
+    }
 }
 

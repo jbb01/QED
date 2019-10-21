@@ -17,6 +17,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -38,7 +39,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.jonahbauer.qed.networking.QEDGalleryPages.Mode.NORMAL;
 import static com.jonahbauer.qed.networking.QEDGalleryPages.Mode.ORIGINAL;
@@ -85,7 +88,7 @@ public class ImageActivity extends AppCompatActivity implements GalleryDatabaseR
 //        pending = new ArrayList<>();
 
         Intent intent = getIntent();
-        image = (Image) intent.getSerializableExtra(GALLERY_IMAGE_KEY);
+        handleIntent(intent);
 
         if (image == null) finish();
 
@@ -431,7 +434,6 @@ public class ImageActivity extends AppCompatActivity implements GalleryDatabaseR
     @Override
     public void onStreamError(String tag) {
         Log.e(Application.LOG_TAG_ERROR, "streamError at: " + tag);
-        // TODO
     }
 
     @Override
@@ -455,5 +457,53 @@ public class ImageActivity extends AppCompatActivity implements GalleryDatabaseR
 
         String progressString = percentage + "% (" + doneStr + "MiB)";
         progressText.setText(progressString);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        handleIntent(intent);
+        showImage(image);
+        super.onNewIntent(intent);
+    }
+
+    private void handleIntent(Intent intent) {
+        Object obj = intent.getSerializableExtra(GALLERY_IMAGE_KEY);
+        if (obj instanceof Image) {
+            image = (Image) obj;
+            return;
+        }
+
+        if (Intent.ACTION_VIEW.equals(intent.getAction())) {
+            Uri data = intent.getData();
+            if (data != null) {
+                String host = data.getHost();
+                String path = data.getPath();
+
+                String query = data.getQuery();
+                Map<String, String> queries = new HashMap<>();
+                if (query != null) for (String q : query.split("&")) {
+                    String[] parts = q.split("=");
+                    if (parts.length > 1) queries.put(parts[0], parts[1]);
+                    else if (parts.length > 0) queries.put(parts[0], "");
+                }
+                if (host != null) if (host.equals("qedgallery.qed-verein.de")) {
+                    if (path != null) if (path.startsWith("/image_view.php")) {
+//                        SharedPreferences.Editor editor = sharedPreferences.edit();
+//                        editor.putInt(getString(R.string.preferences_drawerSelection_key), R.id.nav_gallery).apply();
+
+                        String imageIdStr = queries.getOrDefault("imageid", null);
+                        if (imageIdStr != null) {
+                            try {
+                                int id = Integer.parseInt(imageIdStr);
+                                image = new Image();
+                                image.id = id;
+                            } catch (NumberFormatException ignored) {
+                                Toast.makeText(this, R.string.error, Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }

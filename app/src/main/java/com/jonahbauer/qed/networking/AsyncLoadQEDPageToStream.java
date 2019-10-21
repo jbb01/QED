@@ -278,7 +278,7 @@ public class AsyncLoadQEDPageToStream extends AsyncTask<Void, Long, String> {
     }
 
     private void copyStream(InputStream in, OutputStream out, long contentLength) throws IOException {
-        byte[] buffer = new byte[4 * 1024];
+        byte[] buffer = new byte[4 * 1024]; // 4 kilobyte
         long count = 0;
         int n;
         int i = 0;
@@ -286,7 +286,7 @@ public class AsyncLoadQEDPageToStream extends AsyncTask<Void, Long, String> {
             out.write(buffer, 0, n);
             count += n;
             i++;
-            if (i == 256) {
+            if (i == 64) { // 64*4 = 256 kilobyte
                 i = 0;
                 publishProgress(count, contentLength);
             }

@@ -18,6 +18,7 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
 import com.jonahbauer.qed.R;
+import com.jonahbauer.qed.database.ChatDatabase;
 
 import org.apache.commons.io.FileUtils;
 
@@ -84,7 +85,9 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
         }
     }
 
-    public static class ChatPreferenceFragment extends PreferenceFragmentCompat {
+    public static class ChatPreferenceFragment extends PreferenceFragmentCompat implements Preference.OnPreferenceClickListener {
+        private Preference deleteDatabase;
+
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.pref_chat, rootKey);
@@ -92,7 +95,10 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
 
             EditTextPreference name = findPreference(getString(R.string.preferences_chat_name_key));
             EditTextPreference channel = findPreference(getString(R.string.preferences_chat_channel_key));
-
+            deleteDatabase = findPreference(getString(R.string.preferences_chat_delete_db_key));
+            
+            if (deleteDatabase != null)
+                deleteDatabase.setOnPreferenceClickListener(this);
             if (name != null)
                 name.setSummaryProvider(EditTextPreference.SimpleSummaryProvider.getInstance());
             if (channel != null)
@@ -107,6 +113,27 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
                 return true;
             }
             return super.onOptionsItemSelected(item);
+        }
+
+        @Override
+        public boolean onPreferenceClick(Preference preference) {
+            Context context = getActivity();
+            if (context == null) return false;
+
+            if (preference.equals(deleteDatabase)) {
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
+                alertDialog.setMessage(R.string.confirm_delete_database);
+                alertDialog.setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss());
+                alertDialog.setPositiveButton(R.string.delete, (dialog, which) -> {
+                    ChatDatabase db = new ChatDatabase();
+                    db.init(getContext(), null);
+                    db.clear();
+                    db.close();
+                });
+                alertDialog.show();
+                return true;
+            }
+            return false;
         }
     }
 
@@ -138,8 +165,8 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
                 alertDialog.setMessage(R.string.confirm_delete_images);
                 alertDialog.setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss());
                 alertDialog.setPositiveButton(R.string.delete, (dialog, which) -> {
-                    File dir = context.getExternalFilesDir(context.getString(R.string.gallery_folder_images));
-                    if (dir != null && dir.exists()) {
+                    File dir = new File(context.getExternalCacheDir(), context.getString(R.string.gallery_folder_images));
+                    if (dir.exists()) {
                         try {
                             FileUtils.cleanDirectory(dir);
                         } catch (IOException ignored) {

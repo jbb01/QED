@@ -24,7 +24,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.util.Pair;
-import androidx.preference.PreferenceManager;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.jonahbauer.qed.Application;
@@ -141,6 +140,7 @@ public class PersonBottomSheet extends BottomSheetDialogFragment implements QEDP
 
     @Override
     public void onPageReceived(String tag, Person person) {
+        Log.d(Application.LOG_TAG_DEBUG, "pageReceived");
         if (person == null) {
             Toast.makeText(getContext(), R.string.no_internet, Toast.LENGTH_SHORT).show();
             this.dismiss();
@@ -342,16 +342,27 @@ public class PersonBottomSheet extends BottomSheetDialogFragment implements QEDP
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            Event event = eventList.get(position).first;
-
-            if (event != null && getActivity() != null) {
-                EventDatabaseFragment.showEventId = 0;
-                EventDatabaseFragment.showEvent = event.name;
-                EventDatabaseFragment.shownEvent = false;
-                PreferenceManager.getDefaultSharedPreferences(getContext()).edit().putInt(getString(R.string.preferences_drawerSelection_key), R.id.nav_database_events).apply();
-                ((MainActivity)getActivity()).reloadFragment(false);
-                dismiss();
-            }
+//            Event event = eventList.get(position).first;
+//
+//            if (event != null && getActivity() != null) {
+//                Event eventTmp = new Event();
+//                eventTmp.id = event.id;
+//
+//                EventBottomSheet eventBottomSheet = EventBottomSheet.newInstance(eventTmp);
+//                if (getFragmentManager() != null) {
+//                    eventBottomSheet.show(getFragmentManager(), eventBottomSheet.getTag());
+//                    dismiss();
+//                } else {
+//                    Toast.makeText(PersonBottomSheet.this.getContext(), R.string.error, Toast.LENGTH_SHORT).show();
+//                }
+//
+//                EventDatabaseFragment.showEventId = 0;
+//                EventDatabaseFragment.showEvent = event.name;
+//                EventDatabaseFragment.shownEvent = false;
+//                PreferenceManager.getDefaultSharedPreferences(getContext()).edit().putInt(getString(R.string.preferences_drawerSelection_key), R.id.nav_database_events).apply();
+//                ((MainActivity)getActivity()).reloadFragment(false);
+//                dismiss();
+//            }
         }
     }
 }

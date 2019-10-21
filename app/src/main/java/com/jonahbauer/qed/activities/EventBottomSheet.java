@@ -23,7 +23,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.preference.PreferenceManager;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.jonahbauer.qed.Application;
@@ -298,11 +297,13 @@ public class EventBottomSheet extends BottomSheetDialogFragment implements QEDPa
             Person person = itemList.get(position);
 
             if (person != null && getActivity() != null) {
-                PersonDatabaseFragment.showPerson = person.id;
-                PersonDatabaseFragment.shownPerson = false;
-                PreferenceManager.getDefaultSharedPreferences(getContext()).edit().putInt(getString(R.string.preferences_drawerSelection_key), R.id.nav_database_persons).apply();
-                ((MainActivity) getActivity()).reloadFragment(false);
-                dismiss();
+                PersonBottomSheet personBottomSheet = PersonBottomSheet.newInstance(String.valueOf(person.id));
+                if (getFragmentManager() != null) {
+                    personBottomSheet.show(getFragmentManager(), personBottomSheet.getTag());
+                    dismiss();
+                } else {
+                    Toast.makeText(EventBottomSheet.this.getContext(), R.string.error, Toast.LENGTH_SHORT).show();
+                }
             }
         }
     }

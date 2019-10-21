@@ -48,9 +48,6 @@ public class PersonDatabaseFragment extends Fragment implements CompoundButton.O
     private TextView offlineLabel;
     private Button searchButton;
 
-    static int showPerson;
-    static boolean shownPerson;
-
     private boolean sortLastName = false;
 
     @Override
@@ -198,11 +195,6 @@ public class PersonDatabaseFragment extends Fragment implements CompoundButton.O
             personListView.setVisibility(View.VISIBLE);
             searchButton.setEnabled(true);
         });
-
-        if (showPerson != 0 && !shownPerson) {
-            showBottomSheetDialogFragment(String.valueOf(showPerson));
-            shownPerson = true;
-        }
     }
 
     @Override

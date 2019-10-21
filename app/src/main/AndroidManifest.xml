@@ -65,15 +65,7 @@
                     android:scheme="http" />
                 <data
                     android:host="qedgallery.qed-verein.de"
-                    android:pathPrefix="/album_view.php"
-                    android:scheme="https" />
-                <data
-                    android:host="qedgallery.qed-verein.de"
                     android:pathPrefix="/album_list.php"
-                    android:scheme="https" />
-                <data
-                    android:host="qedgallery.qed-verein.de"
-                    android:pathPrefix="/image_view.php"
                     android:scheme="https" />
             </intent-filter>
         </activity>
@@ -91,12 +83,36 @@
             android:name=".activities.GalleryAlbumActivity"
             android:label="@string/title_activity_album"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="qedgallery.qed-verein.de"
+                    android:pathPrefix="/album_view.php"
+                    android:scheme="https" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".activities.ImageActivity"
             android:label="@string/title_activity_image"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="qedgallery.qed-verein.de"
+                    android:pathPrefix="/image_view.php"
+                    android:scheme="https" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

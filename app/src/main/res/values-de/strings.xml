@@ -53,7 +53,6 @@
     <string name="preferences_header_gallery">Galerie</string>
     <string name="preferences_header_chat">Chat</string>
     <string name="preferences_gallery_show_dir">Speicherort öffnen</string>
-    <string name="preferences_gallery_save_public_true_summary">Heruntergeladene Bilder werden für alle Apps zugänglich gespeichert</string>
     <string name="album_photographer_radio_button">Fotograph</string>
     <string name="album_not_downloaded">Dieses Album ist nicht heruntergeladen.</string>
     <string name="album_info_creator">Albumersteller</string>
@@ -150,4 +149,10 @@
     <string name="log_subtitle_date_recent">Posts der letzten {0,choice,1#|2#{0} }Stunde{0,choice,1#|2#n}</string>
     <string name="log_subtitle_post_recent">Letzte{0,choice,1#r|2# {0}} Post{0,choice,1#|2#s}</string>
     <string name="image_download_non_picture">Du bist im Begriff eine Audio- oder Video-Datei herunterzuladen. Eine WLAN-Verbindung wird empfohlen. Möchtest du fortfahren?</string>
+    <string name="preferences_chat_group_appearance">Darstellung</string>
+    <string name="preferences_chat_colorful_messages_title">Farbige Nachrichten</string>
+    <string name="preferences_chat_group_database">Chat-Datenbank</string>
+    <string name="preferences_chat_delete_db_title">Chat-Datenbank löschen</string>
+    <string name="confirm_delete_database">Möchtest du wirklich die gesamte Offline-Chat-Datenbank löschen?</string>
+    <string name="preferences_gallery_group_fs">Dateisystem</string>
 </resources>

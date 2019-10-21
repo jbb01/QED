@@ -70,7 +70,7 @@ public class GalleryDatabase {
         if (image.name != null) value.put(ImageEntry.COLUMN_NAME_NAME, image.name);
         if (image.path != null) value.put(ImageEntry.COLUMN_NAME_PATH, image.path);
         if (image.thumbnailPath != null) value.put(ImageEntry.COLUMN_NAME_THUMBNAIL_PATH, image.thumbnailPath);
-        if (image.album.id != 0) value.put(ImageEntry.COLUMN_NAME_ALBUM_ID, image.album.id);
+        if (image.album != null && image.album.id != 0) value.put(ImageEntry.COLUMN_NAME_ALBUM_ID, image.album.id);
         if (image.format != null) value.put(ImageEntry.COLUMN_NAME_FORMAT, image.format);
         if (image.owner != null) value.put(ImageEntry.COLUMN_NAME_OWNER, image.owner);
         if (image.uploadDate != null) value.put(ImageEntry.COLUMN_NAME_UPLOAD_DATE, image.uploadDate.getTime());

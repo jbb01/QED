@@ -103,6 +103,7 @@
     <string name="preferences_chat_publicId_key" translatable="false">publicId</string>
     <string name="preferences_chat_showLinks_key" translatable="false">showLinks</string>
     <string name="preferences_chat_katex_key" translatable="false">katex</string>
+    <string name="preferences_chat_delete_db_key" translatable="false">delete_chat_db</string>
 
     <string name="preferences_loggedIn_key" translatable="false">loggedIn</string>
     <string name="preferences_drawerSelection_key" translatable="false">drawerSelection</string>
@@ -111,6 +112,7 @@
     <string name="preferences_gallery_delete_images_key" translatable="false">delete_images</string>
     <string name="preferences_gallery_offline_mode_key" translatable="false">gallery_offline_mode</string>
     <string name="preferences_gallery_show_dir_key" translatable="false">show_gallery_dir</string>
+    <string name="preferences_chat_colorful_messages_key" translatable="false">colorful_messages</string>
 
     <!-- Preference Activity -->
     <string name="title_activity_settings">Settings</string>
@@ -118,13 +120,19 @@
     <string name="preferences_header_gallery">Gallery</string>
     <string name="preferences_header_general">General</string>
 
+    <string name="preferences_chat_group_database">Chat Database</string>
+    <string name="preferences_chat_group_appearance">Appearance</string>
     <string name="preferences_chat_name_title">Name</string>
     <string name="preferences_chat_channel_title">Channel</string>
     <string name="preferences_chat_showSense_title">Show Sense</string>
     <string name="preferences_chat_publicId_title">Public ID</string>
     <string name="preferences_chat_showLinks_title">Show Links</string>
     <string name="preferences_chat_katex_title">KaTex Rendering</string>
+    <string name="preferences_chat_colorful_messages_title">Colorful Messages</string>
+    <string name="preferences_chat_delete_db_title">Delete Chat Database</string>
+    <string name="confirm_delete_database">Are you sure you want to delete the offline chat database?</string>
 
+    <string name="preferences_gallery_group_fs">File System</string>
     <string name="preferences_gallery_delete_thumbnails">Delete saved thumbnails</string>
     <string name="preferences_gallery_delete_images">Delete saved pictures</string>
     <string name="preferences_Gallery_offline_mode">Offline Mode</string>
@@ -132,6 +140,7 @@
     <string name="preferences_gallery_offline_mode_false_summary">All features are unrestricted available. Pictures will be downloaded as needed.</string>
     <string name="preferences_gallery_show_dir">Open storage directory</string>
     <string name="confirm_delete_thumbnails">Are you sure you want to delete all the saved thumbnails?</string>
+    <string name="confirm_delete_images">Are you sure you want to delete all the saved images?</string>
 
     <!-- Navigation Drawer -->
     <string name="drawer_chat_heading">Chat</string>
@@ -212,7 +221,6 @@
     <string name="chat_refresh">Refresh</string>
     <string name="chat_scroll_down_button_content_description">Scroll Down</string>
     <string name="coming_soon">Coming soon</string>
-    <string name="confirm_delete_images">Are you sure you want to delete all the saved thumbnails?</string>
     <string name="content_description_divider">Divider</string>
     <string name="database_hits">Hits</string>
     <string name="database_login_failed">Database login failed</string>
@@ -223,7 +231,6 @@
     <string name="drawer_chat">Chat</string>
     <string name="album_not_downloaded">This album is not downloaded</string>
     <string name="image_download_non_picture">You are about to download an audio or video file. A WLAN connection is recommanded. Do you wish to continue?</string>
-
     <!-- Sonstiges -->
 
 </resources>
