@@ -133,6 +133,7 @@ public class GalleryDatabaseAsync extends AsyncTask<Object, Integer, Boolean> {
             if (image.album.id != 0) value.put(GalleryDatabaseContract.ImageEntry.COLUMN_NAME_ALBUM_ID, image.album.id);
             if (image.format != null) value.put(GalleryDatabaseContract.ImageEntry.COLUMN_NAME_FORMAT, image.format);
             if (image.owner != null) value.put(GalleryDatabaseContract.ImageEntry.COLUMN_NAME_OWNER, image.owner);
+            if (image.albumName != null) value.put(GalleryDatabaseContract.ImageEntry.COLUMN_NAME_ALBUM_NAME, image.albumName);
 
             value.put(GalleryDatabaseContract.ImageEntry.COLUMN_NAME_ORDER, i.get());
 

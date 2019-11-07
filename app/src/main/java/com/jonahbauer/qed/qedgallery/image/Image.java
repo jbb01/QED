@@ -14,6 +14,7 @@ import java.util.Date;
 
 public class Image implements Serializable {
     public Album album;
+    public String albumName;
     public int id;
     public String format;
     public String thumbnailPath;

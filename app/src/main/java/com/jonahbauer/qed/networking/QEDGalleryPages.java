@@ -47,7 +47,9 @@ public abstract class QEDGalleryPages {
                         String id = matcher.group(1);
                         String name = matcher.group(2);
                         Album album = new Album();
-                        album.id = Integer.valueOf(id);
+                        try {
+                            album.id = id != null ? Integer.parseInt(id) : 0;
+                        } catch (NumberFormatException ignored) {}
                         album.name = name;
                         albums.add(album);
                     }
@@ -91,8 +93,11 @@ public abstract class QEDGalleryPages {
                     while (matcher.find()) {
                         String id = matcher.group(1);
                         Image image = new Image();
-                        image.id = Integer.valueOf(id);
+                        try {
+                            image.id = id != null ? Integer.parseInt(id) : 0;
+                        } catch (NumberFormatException ignored) {}
                         image.album = album;
+                        image.albumName = album.name;
                         image.name = matcher.group(2);
                         albumTemp.images.add(image);
                     }
@@ -100,8 +105,12 @@ public abstract class QEDGalleryPages {
                     albumTemp.persons.clear();
                     Matcher matcher1 = Pattern.compile("album_view\\.php\\?albumid=\\d*&amp;page=1&amp;byowner=(\\d*)'>Bilder von ([^<]*)").matcher(string);
                     while (matcher1.find()) {
+                        String group1 = matcher1.group(1);
+
                         Person person = new Person();
-                        person.id = Integer.valueOf(matcher1.group(1));
+                        try {
+                            person.id = group1 != null ? Integer.parseInt(group1) : 0;
+                        } catch (NumberFormatException ignored) {}
                         person.firstName = matcher1.group(2);
                         albumTemp.persons.add(person);
                     }
@@ -111,14 +120,15 @@ public abstract class QEDGalleryPages {
                     Matcher matcher2 = Pattern.compile("album_view\\.php\\?albumid=\\d*&amp;page=1&amp;byday=([\\d\\-]*)").matcher(string);
                     while (matcher2.find()) {
                         try {
-                            albumTemp.dates.add(sdf.parse(matcher2.group(1)));
+                            String group1 = matcher2.group(1);
+                            albumTemp.dates.add(group1 != null ? sdf.parse(group1) : null);
                         } catch (ParseException ignored) {}
                     }
 
                     albumTemp.categories.clear();
                     Matcher matcher3 = Pattern.compile("album_view\\.php\\?albumid=\\d*&amp;page=1&amp;bycategory=([^']*)").matcher(string);
                     while (matcher3.find()) {
-                        if (matcher3.group(1).equals(""))
+                        if ("".equals(matcher3.group(1)))
                             albumTemp.categories.add("Sonstige");
                         else
                             albumTemp.categories.add(Uri.decode(matcher3.group(1)));
@@ -160,21 +170,26 @@ public abstract class QEDGalleryPages {
                 (String string) -> {
                     Matcher matcher = Pattern.compile("<th>([^<]*):</th><td>([^<]*)</td>").matcher(string);
                     while (matcher.find()) {
-                        switch (matcher.group(1)) {
+                        String group1 = matcher.group(1);
+                        String group2 = matcher.group(2);
+                        if (group1 != null) switch (group1) {
+                            case "Album":
+                                image.albumName = group2;
+                                break;
                             case "Besitzer":
-                                image.owner = matcher.group(2);
+                                image.owner = group2;
                                 break;
                             case "Dateiformat":
-                                image.format = matcher.group(2);
+                                image.format = group2;
                                 break;
                             case "Hochgeladen am":
                                 try {
-                                    image.uploadDate = simpleDateFormat.parse(matcher.group(2));
+                                    image.uploadDate = group2 != null ? simpleDateFormat.parse(group2) : null;
                                 } catch (ParseException ignored) {}
                                 break;
                             case "Aufgenommen am":
                                 try {
-                                    image.creationDate = simpleDateFormat.parse(matcher.group(2));
+                                    image.creationDate = group2 != null ? simpleDateFormat.parse(group2) : null;
                                 } catch (ParseException ignored) {}
                                 break;
                         }

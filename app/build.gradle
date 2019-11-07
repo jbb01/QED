@@ -2,26 +2,44 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 29
+
     defaultConfig {
         applicationId "com.jonahbauer.qed"
         minSdkVersion 24
         targetSdkVersion 29
         versionCode 1
-        versionName "2.2.1"
+        versionName "2.2.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    flavorDimensions "googleServices"
+
+    productFlavors {
+        noGoogle {
+            dimension "googleServices"
+            versionNameSuffix "-no_google"
+        }
+
+        withGoogle {
+            dimension "googleServices"
+        }
+    }
+
     compileOptions {
         targetCompatibility 1.8
         sourceCompatibility 1.8
     }
 }
+
+apply plugin: 'com.android.application'
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
@@ -40,7 +58,12 @@ dependencies {
     implementation 'com.szagurskii:patternedtextwatcher:0.5.0'
     implementation 'com.squareup.okhttp3:okhttp:3.11.0'
     implementation 'com.x5dev:chunk-templates:3.0.1'
+
+    withGoogleImplementation 'com.google.firebase:firebase-messaging:20.0.0'
+
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 }
+
+apply plugin: 'com.google.gms.google-services'

@@ -36,6 +36,9 @@ public class Application extends android.app.Application implements android.app.
     public static final String KEY_DATABASE_SESSIONID = "db_sessionid";
     public static final String KEY_DATABASE_SESSIONID2 = "db_sessionid2";
 
+    public static final String KEY_FCM_DEVICE_TOKEN = "fcmDeviceToken";
+    public static final String KEY_FCM_RSA_KEY = "fcmRsaKeyPair";
+
 
     private static final String ENCRYPTED_SHARED_PREFERENCE_FILE = "com.jonahbauer.qed_encrypted";
 

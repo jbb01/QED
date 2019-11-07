@@ -9,7 +9,7 @@ import static com.jonahbauer.qed.database.GalleryDatabaseContract.ImageEntry;
 
 class GalleryDatabaseHelper extends SQLiteOpenHelper {
     // If you change the database schema, you must increment the database version.
-    private static final int DATABASE_VERSION = 9;
+    private static final int DATABASE_VERSION = 10;
     private static final String DATABASE_NAME = "gallery.db";
 
     private static final String SQL_CREATE_ENTRIES_ALBUM = "CREATE TABLE " + AlbumEntry.TABLE_NAME + " (" +
@@ -29,6 +29,7 @@ class GalleryDatabaseHelper extends SQLiteOpenHelper {
             ImageEntry.COLUMN_NAME_PATH + " TEXT," +
             ImageEntry.COLUMN_NAME_THUMBNAIL_PATH + " TEXT," +
             ImageEntry.COLUMN_NAME_FORMAT + " TEXT," +
+            ImageEntry.COLUMN_NAME_ALBUM_NAME + " TEXT," +
             ImageEntry.COLUMN_NAME_UPLOAD_DATE + " INTEGER," +
             ImageEntry.COLUMN_NAME_CREATION_DATE + " INTEGER," +
             ImageEntry.COLUMN_NAME_IS_ORIGINAL + " INTEGER," +

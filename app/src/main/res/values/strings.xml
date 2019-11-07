@@ -105,6 +105,8 @@
     <string name="preferences_chat_katex_key" translatable="false">katex</string>
     <string name="preferences_chat_delete_db_key" translatable="false">delete_chat_db</string>
 
+    <string name="preferences_ping_notification_key" translatable="false">pushPings</string>
+
     <string name="preferences_loggedIn_key" translatable="false">loggedIn</string>
     <string name="preferences_drawerSelection_key" translatable="false">drawerSelection</string>
 

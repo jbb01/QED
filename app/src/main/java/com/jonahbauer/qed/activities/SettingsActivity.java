@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -16,9 +17,12 @@ import androidx.fragment.app.Fragment;
 import androidx.preference.EditTextPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.SwitchPreference;
 
+import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.database.ChatDatabase;
+import com.jonahbauer.qed.pingNotifications.PingNotifications;
 
 import org.apache.commons.io.FileUtils;
 
@@ -78,10 +82,36 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
         }
     }
 
-    public static class GeneralPreferenceFragment extends PreferenceFragmentCompat {
+    public static class GeneralPreferenceFragment extends PreferenceFragmentCompat implements Preference.OnPreferenceClickListener {
+        private SwitchPreference pingNotifications;
+
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.pref_general, rootKey);
+
+            Log.d(Application.LOG_TAG_DEBUG, "usesFcm: " + getResources().getBoolean(R.bool.usesFCM));
+            if (getResources().getBoolean(R.bool.usesFCM)) {
+                pingNotifications = findPreference(getString(R.string.preferences_ping_notification_key));
+                if (pingNotifications != null)
+                    pingNotifications.setOnPreferenceClickListener(this);
+
+                EditTextPreference pushPingServer = findPreference("pushPingServer");
+                if (pushPingServer != null) {
+                    pushPingServer.setOnPreferenceClickListener(this);
+                    pushPingServer.setSummaryProvider(EditTextPreference.SimpleSummaryProvider.getInstance());
+                }
+            }
+        }
+
+        @Override
+        public boolean onPreferenceClick(Preference preference) {
+            if (preference.equals(pingNotifications)) {
+                if (pingNotifications.isChecked()) {
+                    PingNotifications.getInstance(getContext()).registrationStage0();
+                }
+            }
+
+            return false;
         }
     }
 

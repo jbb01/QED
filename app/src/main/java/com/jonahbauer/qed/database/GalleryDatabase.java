@@ -75,6 +75,7 @@ public class GalleryDatabase {
         if (image.owner != null) value.put(ImageEntry.COLUMN_NAME_OWNER, image.owner);
         if (image.uploadDate != null) value.put(ImageEntry.COLUMN_NAME_UPLOAD_DATE, image.uploadDate.getTime());
         if (image.creationDate != null) value.put(ImageEntry.COLUMN_NAME_CREATION_DATE, image.creationDate.getTime());
+        if (image.albumName != null) value.put(ImageEntry.COLUMN_NAME_ALBUM_NAME, image.albumName);
 
         long row;
 
@@ -125,7 +126,7 @@ public class GalleryDatabase {
     public Image getImageData(Image image) {
         SQLiteDatabase galleryReadable = galleryDatabaseHelper.getReadableDatabase();
         galleryReadable.beginTransaction();
-        Cursor cursor = galleryReadable.query(ImageEntry.TABLE_NAME, new String[] {ImageEntry.COLUMN_NAME_PATH, ImageEntry.COLUMN_NAME_UPLOAD_DATE, ImageEntry.COLUMN_NAME_FORMAT, ImageEntry.COLUMN_NAME_NAME, ImageEntry.COLUMN_NAME_OWNER, ImageEntry.COLUMN_NAME_THUMBNAIL_PATH, ImageEntry.COLUMN_NAME_IS_ORIGINAL, ImageEntry.COLUMN_NAME_CREATION_DATE}, ImageEntry.COLUMN_NAME_ID + "=?", new String[] {String.valueOf(image.id)}, null, null, null);
+        Cursor cursor = galleryReadable.query(ImageEntry.TABLE_NAME, new String[] {ImageEntry.COLUMN_NAME_PATH, ImageEntry.COLUMN_NAME_UPLOAD_DATE, ImageEntry.COLUMN_NAME_FORMAT, ImageEntry.COLUMN_NAME_NAME, ImageEntry.COLUMN_NAME_OWNER, ImageEntry.COLUMN_NAME_THUMBNAIL_PATH, ImageEntry.COLUMN_NAME_IS_ORIGINAL, ImageEntry.COLUMN_NAME_CREATION_DATE, ImageEntry.COLUMN_NAME_ALBUM_NAME}, ImageEntry.COLUMN_NAME_ID + "=?", new String[] {String.valueOf(image.id)}, null, null, null);
 
         if (cursor.moveToFirst()) {
             image.path = cursor.getString(0);
@@ -134,6 +135,7 @@ public class GalleryDatabase {
             image.name = cursor.getString(3);
             image.owner = cursor.getString(4);
             image.thumbnailPath = cursor.getString(5);
+            image.albumName = cursor.getString(8);
             image.creationDate = new Date(cursor.getLong(7));
             boolean original = cursor.getInt(6) == 1;
             if (original) image.original = true;

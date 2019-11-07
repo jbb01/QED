@@ -156,12 +156,14 @@ public class ImageActivity extends AppCompatActivity implements GalleryDatabaseR
 
             View view = LayoutInflater.from(this).inflate(R.layout.alert_dialog_image_info, null);
 
-            ((TextView)view.findViewById(R.id.image_album)).setText(image.album.name != null ? image.album.name : String.valueOf(image.album.id));
-            ((TextView)view.findViewById(R.id.image_owner)).setText(image.owner);
-            ((TextView)view.findViewById(R.id.image_upload_date)).setText(MessageFormat.format("{0,date,dd.MM.yyyy HH:mm:ss}", image.uploadDate));
-            ((TextView)view.findViewById(R.id.image_creation_date)).setText(MessageFormat.format("{0,date,dd.MM.yyyy HH:mm:ss}", image.creationDate));
-            ((TextView)view.findViewById(R.id.image_format)).setText(image.format);
-            ((TextView)view.findViewById(R.id.image_path)).setText(image.path);
+            if (image.album != null && image.album.name != null) ((TextView)view.findViewById(R.id.image_album)).setText(image.album.name);
+            else if (image.albumName != null ) ((TextView)view.findViewById(R.id.image_album)).setText(image.albumName);
+            else if (image.album != null && image.album.id != 0)  ((TextView)view.findViewById(R.id.image_album)).setText(String.valueOf(image.album.id));
+            if (image.owner != null) ((TextView)view.findViewById(R.id.image_owner)).setText(image.owner);
+            if (image.uploadDate != null) ((TextView)view.findViewById(R.id.image_upload_date)).setText(MessageFormat.format("{0,date,dd.MM.yyyy HH:mm:ss}", image.uploadDate));
+            if (image.creationDate != null) ((TextView)view.findViewById(R.id.image_creation_date)).setText(MessageFormat.format("{0,date,dd.MM.yyyy HH:mm:ss}", image.creationDate));
+            if (image.format != null) ((TextView)view.findViewById(R.id.image_format)).setText(image.format);
+            if (image.path != null) ((TextView)view.findViewById(R.id.image_path)).setText(image.path);
 
             alertDialogBuilder.setView(view);
             alertDialogBuilder.setNeutralButton(R.string.ok, (dialog, which) -> dialog.dismiss());

@@ -24,6 +24,7 @@ final class GalleryDatabaseContract {
         static final String COLUMN_NAME_NAME = "imageName";
         static final String COLUMN_NAME_OWNER = "imageOwner";
         static final String COLUMN_NAME_ALBUM_ID = "imageAlbumId";
+        static final String COLUMN_NAME_ALBUM_NAME = "imageAlbumName";
         static final String COLUMN_NAME_THUMBNAIL_PATH = "imageThumbnailPath";
         static final String COLUMN_NAME_PATH = "imagePath";
         static final String COLUMN_NAME_FORMAT = "imageFormat";
