@@ -13,6 +13,7 @@
         android:icon="@drawable/ic_qed_logo"
         android:label="@string/app_name"
         android:supportsRtl="true"
+        android:largeHeap="true"
         android:theme="@style/AppTheme">
         <provider
             android:name=".GenericFileProvider"
@@ -25,22 +26,43 @@
         </provider>
 
         <activity
-            android:name=".activities.LoginActivity"
-            android:label="@string/title_activity_login"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".activities.MainActivity"
-            android:label="@string/app_name"
-            android:launchMode="singleTask"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:hardwareAccelerated="true"
-            android:windowSoftInputMode="stateVisible|adjustResize">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+            android:name=".DeepLinkingActivity"
+            android:label="QED"
+            android:exported="true"
+            android:noHistory="true"
+            android:excludeFromRecents="true"
+            android:launchMode="singleInstance"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar">
 
-                <category android:name="android.intent.category.LAUNCHER" />
+            <!-- Image Activity -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="qedgallery.qed-verein.de"
+                    android:pathPrefix="/image_view.php"
+                    android:scheme="https" />
+
             </intent-filter>
+
+            <!-- Album Activity -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="qedgallery.qed-verein.de"
+                    android:pathPrefix="/album_view.php"
+                    android:scheme="https" />
+            </intent-filter>
+
+
+            <!-- Main Activity -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -69,6 +91,25 @@
                     android:scheme="https" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".activities.LoginActivity"
+            android:label="@string/title_activity_login"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activities.MainActivity"
+            android:label="@string/app_name"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:hardwareAccelerated="true"
+            android:windowSoftInputMode="stateVisible|adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".activities.SettingsActivity"
             android:label="@string/title_activity_settings"
@@ -84,34 +125,13 @@
             android:label="@string/title_activity_album"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data
-                    android:host="qedgallery.qed-verein.de"
-                    android:pathPrefix="/album_view.php"
-                    android:scheme="https" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".activities.ImageActivity"
             android:label="@string/title_activity_image"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data
-                    android:host="qedgallery.qed-verein.de"
-                    android:pathPrefix="/image_view.php"
-                    android:scheme="https" />
-            </intent-filter>
+            android:theme="@style/AppTheme.NoActionBar"
+            android:exported="false">
         </activity>
     </application>
 

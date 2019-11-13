@@ -88,6 +88,13 @@ public abstract class QEDGalleryPages {
                     if (filtersUsed) albumTemp = new Album();
                     else albumTemp = album;
 
+                    if (string.contains("AlbumNotFoundException")) return null;
+
+
+                    Matcher matcher0 = Pattern.compile("<h2>([^<]*) - Alle Bilder</h2>").matcher(string);
+                    if (matcher0.find())
+                        albumTemp.name = matcher0.group(1);
+
                     albumTemp.images.clear();
                     Matcher matcher = Pattern.compile("image\\.php\\?imageid=(\\d*)&amp;type=thumbnail' alt='([^']*)'").matcher(string);
                     while (matcher.find()) {
@@ -172,6 +179,7 @@ public abstract class QEDGalleryPages {
                     while (matcher.find()) {
                         String group1 = matcher.group(1);
                         String group2 = matcher.group(2);
+
                         if (group1 != null) switch (group1) {
                             case "Album":
                                 image.albumName = group2;
@@ -229,7 +237,7 @@ public abstract class QEDGalleryPages {
     public enum Filter {
         BY_DATE("&byday="), BY_PERSON("&byowner="), BY_CATEGORY("&bycategory=");
 
-        private String query;
+        private final String query;
 
         Filter(String query) {
             this.query = query;
@@ -239,7 +247,7 @@ public abstract class QEDGalleryPages {
     public enum Mode {
         THUMBNAIL("thumbnail"), NORMAL("normal"), ORIGINAL("original");
 
-        private String query;
+        private final String query;
 
         Mode(String query) {
             this.query = query;

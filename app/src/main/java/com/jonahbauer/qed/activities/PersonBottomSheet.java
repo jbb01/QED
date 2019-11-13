@@ -140,7 +140,6 @@ public class PersonBottomSheet extends BottomSheetDialogFragment implements QEDP
 
     @Override
     public void onPageReceived(String tag, Person person) {
-        Log.d(Application.LOG_TAG_DEBUG, "pageReceived");
         if (person == null) {
             Toast.makeText(getContext(), R.string.no_internet, Toast.LENGTH_SHORT).show();
             this.dismiss();
@@ -267,8 +266,8 @@ public class PersonBottomSheet extends BottomSheetDialogFragment implements QEDP
     }
 
     private class EventListAdapter extends ArrayAdapter<Pair<Event,String>> implements AdapterView.OnItemClickListener {
-        private List<Pair<Event, String>> eventList;
-        private Context context;
+        private final List<Pair<Event, String>> eventList;
+        private final Context context;
 
         EventListAdapter(Context context, @NonNull List<Pair<Event,String>> eventList) {
             super(context, 0, eventList);

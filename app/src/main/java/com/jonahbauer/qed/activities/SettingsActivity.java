@@ -20,8 +20,10 @@ import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.SwitchPreference;
 
 import com.jonahbauer.qed.Application;
+import com.jonahbauer.qed.BuildConfig;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.database.ChatDatabase;
+import com.jonahbauer.qed.database.GalleryDatabase;
 import com.jonahbauer.qed.pingNotifications.PingNotifications;
 
 import org.apache.commons.io.FileUtils;
@@ -89,8 +91,8 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.pref_general, rootKey);
 
-            Log.d(Application.LOG_TAG_DEBUG, "usesFcm: " + getResources().getBoolean(R.bool.usesFCM));
-            if (getResources().getBoolean(R.bool.usesFCM)) {
+            Log.d(Application.LOG_TAG_DEBUG, "usesFcm: " + BuildConfig.usesFCM);
+            if (BuildConfig.usesFCM) {
                 pingNotifications = findPreference(getString(R.string.preferences_ping_notification_key));
                 if (pingNotifications != null)
                     pingNotifications.setOnPreferenceClickListener(this);
@@ -152,7 +154,7 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
 
             if (preference.equals(deleteDatabase)) {
                 AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
-                alertDialog.setMessage(R.string.confirm_delete_database);
+                alertDialog.setMessage(R.string.confirm_delete_chat_database);
                 alertDialog.setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss());
                 alertDialog.setPositiveButton(R.string.delete, (dialog, which) -> {
                     ChatDatabase db = new ChatDatabase();
@@ -171,6 +173,7 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
     public static class GalleryPreferenceFragment extends PreferenceFragmentCompat implements Preference.OnPreferenceClickListener {
         private Preference deleteThumbnails;
         private Preference deleteImages;
+        private Preference deleteDatabase;
         private Preference showDir;
 
         @Override
@@ -180,9 +183,11 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
             deleteThumbnails = findPreference(getString(R.string.preferences_gallery_delete_thumbnails_key));
             deleteImages = findPreference(getString(R.string.preferences_gallery_delete_images_key));
             showDir = findPreference(getString(R.string.preferences_gallery_show_dir_key));
+            deleteDatabase = findPreference(getString(R.string.preferences_gallery_delete_db_key));
             deleteThumbnails.setOnPreferenceClickListener(this);
             deleteImages.setOnPreferenceClickListener(this);
             showDir.setOnPreferenceClickListener(this);
+            deleteDatabase.setOnPreferenceClickListener(this);
         }
 
         @Override
@@ -195,8 +200,8 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
                 alertDialog.setMessage(R.string.confirm_delete_images);
                 alertDialog.setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss());
                 alertDialog.setPositiveButton(R.string.delete, (dialog, which) -> {
-                    File dir = new File(context.getExternalCacheDir(), context.getString(R.string.gallery_folder_images));
-                    if (dir.exists()) {
+                    File dir = context.getExternalFilesDir(getString(R.string.gallery_folder_images));
+                    if (dir != null && dir.exists()) {
                         try {
                             FileUtils.cleanDirectory(dir);
                         } catch (IOException ignored) {
@@ -210,8 +215,8 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
                 alertDialog.setMessage(R.string.confirm_delete_thumbnails);
                 alertDialog.setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss());
                 alertDialog.setPositiveButton(R.string.delete, (dialog, which) -> {
-                    File dir = context.getExternalFilesDir(context.getString(R.string.gallery_folder_thumbnails));
-                    if (dir != null && dir.exists()) {
+                    File dir = new File(context.getExternalCacheDir(), context.getString(R.string.gallery_folder_thumbnails));
+                    if (dir.exists()) {
                         try {
                             FileUtils.cleanDirectory(dir);
                         } catch (IOException ignored) {
@@ -244,6 +249,18 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
                     startActivity(intent2);
                 }
 
+                return true;
+            } else if (preference.equals(deleteDatabase)) {
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
+                alertDialog.setMessage(R.string.confirm_delete_gallery_database);
+                alertDialog.setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss());
+                alertDialog.setPositiveButton(R.string.delete, (dialog, which) -> {
+                    GalleryDatabase db = new GalleryDatabase();
+                    db.init(getContext(), null);
+                    db.clear();
+                    db.close();
+                });
+                alertDialog.show();
                 return true;
             }
             return false;

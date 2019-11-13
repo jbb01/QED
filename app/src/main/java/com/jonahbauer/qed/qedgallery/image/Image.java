@@ -11,8 +11,30 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Image implements Serializable {
+    static final Set<String> videoFileExtensions = new HashSet<>();
+    static final Set<String> audioFileExtensions = new HashSet<>();
+
+    static {
+        videoFileExtensions.add("mp4");
+        videoFileExtensions.add("mkv");
+        videoFileExtensions.add("flv");
+        videoFileExtensions.add("mov");
+        videoFileExtensions.add("avi");
+        videoFileExtensions.add("wmv");
+        videoFileExtensions.add("mpeg");
+
+        audioFileExtensions.add("wav");
+        audioFileExtensions.add("mp3");
+        audioFileExtensions.add("ogg");
+        audioFileExtensions.add("m4a");
+        audioFileExtensions.add("flac");
+        audioFileExtensions.add("opus");
+    }
+
     public Album album;
     public String albumName;
     public int id;
@@ -35,6 +57,7 @@ public class Image implements Serializable {
     public String toString() {
         Field[] fields = Image.class.getDeclaredFields();
         Object[] fieldsObject = Arrays.stream(fields).filter(field -> {
+            if (field.getName().equals("album")) return false;
             try {
                 return !(field.getName().equals("$change") || field.getName().equals("serialVersionUID") || field.get(this) == null);
             } catch (IllegalAccessException e) {

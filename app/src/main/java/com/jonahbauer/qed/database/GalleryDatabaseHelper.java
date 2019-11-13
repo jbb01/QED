@@ -54,6 +54,10 @@ class GalleryDatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        clear(db);
+    }
+
+    public void clear(SQLiteDatabase db) {
         db.execSQL(SQL_DELETE_ENTRIES_ALBUM);
         db.execSQL(SQL_DELETE_ENTRIES_IMAGES);
         onCreate(db);

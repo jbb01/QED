@@ -34,9 +34,10 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 
+import static com.jonahbauer.qed.qedgallery.image.Image.audioFileExtensions;
+import static com.jonahbauer.qed.qedgallery.image.Image.videoFileExtensions;
+
 public class ImageAdapter extends ArrayAdapter<Image> implements GalleryDatabaseReceiver, QEDPageStreamReceiver {
-    private static final Set<String> videoFileExtensions = new HashSet<>();
-    private static final Set<String> audioFileExtensions = new HashSet<>();
     private final GalleryAlbumActivity context;
     private final List<Image> imageList;
 
@@ -52,23 +53,6 @@ public class ImageAdapter extends ArrayAdapter<Image> implements GalleryDatabase
     public static boolean receivedError = false;
 
     private Random random;
-
-    static {
-        videoFileExtensions.add("mp4");
-        videoFileExtensions.add("mkv");
-        videoFileExtensions.add("flv");
-        videoFileExtensions.add("mov");
-        videoFileExtensions.add("avi");
-        videoFileExtensions.add("wmv");
-        videoFileExtensions.add("mpeg");
-
-        audioFileExtensions.add("wav");
-        audioFileExtensions.add("mp3");
-        audioFileExtensions.add("ogg");
-        audioFileExtensions.add("m4a");
-        audioFileExtensions.add("flac");
-        audioFileExtensions.add("opus");
-    }
 
     public ImageAdapter(GalleryAlbumActivity context, List<Image> imageList, boolean offlineMode) {
         super(context, R.layout.list_item_image, imageList);
@@ -135,6 +119,7 @@ public class ImageAdapter extends ArrayAdapter<Image> implements GalleryDatabase
                 thumbnail.setImageBitmap(bmp);
                 thumbnail.setVisibility(View.VISIBLE);
                 progressBar.setVisibility(View.GONE);
+                image.available = true;
                 return;
             }
         }
@@ -146,18 +131,46 @@ public class ImageAdapter extends ArrayAdapter<Image> implements GalleryDatabase
         }
 
         if (offlineMode) {
-            int drawableId = R.drawable.ic_gallery_empty_image;
-            if (videoFileExtensions.contains(fileExtension)) {
-                drawableId = R.drawable.ic_gallery_empty_video;
-            } else if (audioFileExtensions.contains(fileExtension)) {
-                drawableId = R.drawable.ic_gallery_empty_audio;
+            if (image.path == null) image.path = galleryDatabase.getImagePath(image);
+            image.available = image.path != null && new File(image.path).exists();
+
+            int drawableId;
+            if (image.available) {
+                drawableId = R.drawable.ic_gallery_image;
+                if (videoFileExtensions.contains(fileExtension)) {
+                    drawableId = R.drawable.ic_gallery_video;
+                } else if (audioFileExtensions.contains(fileExtension)) {
+                    drawableId = R.drawable.ic_gallery_audio;
+                }
+            } else {
+                drawableId = R.drawable.ic_gallery_empty_image;
+                if (videoFileExtensions.contains(fileExtension)) {
+                    drawableId = R.drawable.ic_gallery_empty_video;
+                } else if (audioFileExtensions.contains(fileExtension)) {
+                    drawableId = R.drawable.ic_gallery_empty_audio;
+                }
             }
 
             thumbnail.setImageDrawable(getContext().getDrawable(drawableId));
             thumbnail.setVisibility(View.VISIBLE);
             progressBar.setVisibility(View.GONE);
-            image.available = false;
             return;
+        } else {
+            if (videoFileExtensions.contains(fileExtension)) {
+                thumbnail.setImageDrawable(getContext().getDrawable(R.drawable.ic_gallery_video));
+                thumbnail.setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.GONE);
+                image.available = true;
+                return;
+            }
+
+            if (audioFileExtensions.contains(fileExtension)) {
+                thumbnail.setImageDrawable(getContext().getDrawable(R.drawable.ic_gallery_audio));
+                thumbnail.setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.GONE);
+                image.available = true;
+                return;
+            }
         }
 
         thumbnail.setVisibility(View.GONE);
@@ -167,7 +180,7 @@ public class ImageAdapter extends ArrayAdapter<Image> implements GalleryDatabase
     }
 
     private void downloadImage(String tag, Image image) {
-        File dir = new File(getContext().getExternalCacheDir(), "gallery/thumbnails");
+        File dir = new File(getContext().getExternalCacheDir(), context.getString(R.string.gallery_folder_thumbnails));
 
         if (!dir.exists()) dir.mkdirs();
         File file = new File(dir, image.id + ".jpeg");
@@ -241,9 +254,9 @@ public class ImageAdapter extends ArrayAdapter<Image> implements GalleryDatabase
     }
 
     private class Triple<A,B,C> {
-        A first;
-        B second;
-        C third;
+        final A first;
+        final B second;
+        final C third;
 
         Triple(A a, B b, C c) {
             first = a;

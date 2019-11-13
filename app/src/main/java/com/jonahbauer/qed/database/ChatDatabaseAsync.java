@@ -24,67 +24,46 @@ import static com.jonahbauer.qed.database.ChatDatabaseContract.ChatEntry.COLUMN_
 import static com.jonahbauer.qed.database.ChatDatabaseContract.ChatEntry.TABLE_NAME;
 
 public class ChatDatabaseAsync extends AsyncTask<Object, Integer, Boolean> {
-    private static int insertsRunning = 0;
-    private ChatDatabaseHelper databaseHelper;
     private Mode mode;
     private ChatDatabaseReceiver receiver;
 
+    private SQLiteDatabase sqLiteDatabase;
+
+    private String query;
+    private String[] queryArgs;
+
+    private List<Message> insertAll;
+
+    ChatDatabaseAsync(SQLiteDatabase sqLiteDatabase, ChatDatabaseReceiver receiver, String query, String[] queryArgs) {
+        this.mode = Mode.QUERY;
+        this.sqLiteDatabase = sqLiteDatabase;
+        this.receiver = receiver;
+        this.query = query;
+        this.queryArgs = queryArgs;
+    }
+
+    ChatDatabaseAsync(SQLiteDatabase sqLiteDatabase, ChatDatabaseReceiver receiver, List<Message> messages) {
+        this.mode = Mode.INSERT_ALL;
+        this.sqLiteDatabase = sqLiteDatabase;
+        this.receiver = receiver;
+        this.insertAll = messages;
+    }
+
     @Override
     protected Boolean doInBackground(Object... objects) {
-        if (objects.length < 2) return false;
-        else {
-            if (objects[0] instanceof Mode) mode = (Mode) objects[0];
-            else return false;
-
-            if (objects[1] instanceof ChatDatabaseHelper) databaseHelper = (ChatDatabaseHelper) objects[1];
-            else return false;
-        }
-
         switch (mode) {
             case QUERY:
-                if (objects.length < 4) return false;
-                else {
-                    String query;
-                    String[] args;
-
-                    if (objects[2] instanceof ChatDatabaseReceiver) receiver = (ChatDatabaseReceiver) objects[2];
-                    else return false;
-
-                    if (objects[3] instanceof String) query = (String) objects[3];
-                    else return false;
-
-                    if (objects.length >= 5) {
-                        if (objects[4] != null) {
-                            if (objects[4] instanceof String[]) args = (String[]) objects[4];
-                            else args = null;
-                        } else args = null;
-                    } else args = null;
-
-                    query(receiver, query, args);
-                    return true;
-                }
+                query(receiver, query, queryArgs);
+                break;
             case INSERT_ALL:
-                if (objects.length < 3) return false;
-                else {
-                    List messages;
-
-                    if (objects[2] instanceof List) messages = (List) objects[2];
-                    else return false;
-
-                    if (objects.length >= 4) if (objects[3] instanceof ChatDatabaseReceiver) receiver = (ChatDatabaseReceiver) objects[3];
-
-                    //noinspection unchecked
-                    insertAll((List<Message>) messages);
-                    return true;
-                }
+                insertAll(insertAll);
+                break;
         }
         return true;
     }
 
     private void query(ChatDatabaseReceiver receiver, String query, String[] args) {
-        SQLiteDatabase database = databaseHelper.getReadableDatabase();
-
-        Cursor cursor = database.rawQuery(query, args);
+        Cursor cursor = sqLiteDatabase.rawQuery(query, args);
 
         List<Message> messages = new ArrayList<>();
 
@@ -103,16 +82,12 @@ public class ChatDatabaseAsync extends AsyncTask<Object, Integer, Boolean> {
         }
 
         cursor.close();
-        database.close();
 
         receiver.onReceiveResult(messages);
     }
 
     private void insertAll(List<Message> messages) {
-        insertsRunning ++;
-        SQLiteDatabase chatLogWritable = databaseHelper.getWritableDatabase();
-
-        chatLogWritable.beginTransaction();
+        sqLiteDatabase.beginTransaction();
 
         AtomicInteger i = new AtomicInteger();
         int j = messages.size();
@@ -130,17 +105,14 @@ public class ChatDatabaseAsync extends AsyncTask<Object, Integer, Boolean> {
             value.put(COLUMN_NAME_CHANNEL, message.channel);
 
             try {
-                chatLogWritable.insertOrThrow(TABLE_NAME, null, value);
+                sqLiteDatabase.insertOrThrow(TABLE_NAME, null, value);
             } catch (SQLiteConstraintException ignored) {}
 
             publishProgress(i.incrementAndGet(), j);
         }
 
-        chatLogWritable.setTransactionSuccessful();
-        chatLogWritable.endTransaction();
-
-        insertsRunning --;
-        if (insertsRunning == 0) chatLogWritable.close();
+        sqLiteDatabase.setTransactionSuccessful();
+        sqLiteDatabase.endTransaction();
     }
 
     @Override

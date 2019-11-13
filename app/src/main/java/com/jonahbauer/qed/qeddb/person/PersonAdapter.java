@@ -23,20 +23,20 @@ public class PersonAdapter extends FixedHeaderAdapter<Person, Character> {
     public static final String SORT_FIRST_NAME = "firstName";
     public static final String SORT_LAST_NAME = "lastName";
 
-    private String sort;
-
-    private static Comparator<Person> comparatorFirstName = Comparator.comparing(
+    private static final Comparator<Person> comparatorFirstName = Comparator.comparing(
             person -> {
                 if (person.comparableFirstName == null) person.comparableFirstName = (person.firstName + " " + person.lastName).replaceAll("Ö", "O").replaceAll("Ü", "U").replaceAll("Ä","A");
                 return person.comparableFirstName;
             });
-    private static Comparator<Person> comparatorLastName = Comparator.comparing(
+    private static final Comparator<Person> comparatorLastName = Comparator.comparing(
             person -> {
                 if (person.comparableLastName == null) person.comparableLastName = (person.lastName + " " + person.firstName).replaceAll("Ö", "O").replaceAll("Ü", "U").replaceAll("Ä","A");
                 return person.comparableLastName;
             });
-    private static Function<Person, Character> headerMapFirstName = person -> person.firstName.toUpperCase().toUpperCase().replaceAll("Ö", "O").replaceAll("Ü", "U").replaceAll("Ä","A").charAt(0);
-    private static Function<Person, Character> headerMapLastName = person -> person.lastName.toUpperCase().toUpperCase().replaceAll("Ö", "O").replaceAll("Ü", "U").replaceAll("Ä","A").charAt(0);
+    private static final Function<Person, Character> headerMapFirstName = person -> person.firstName.toUpperCase().toUpperCase().replaceAll("Ö", "O").replaceAll("Ü", "U").replaceAll("Ä","A").charAt(0);
+    private static final Function<Person, Character> headerMapLastName = person -> person.lastName.toUpperCase().toUpperCase().replaceAll("Ö", "O").replaceAll("Ü", "U").replaceAll("Ä","A").charAt(0);
+
+    private String sort;
 
     public PersonAdapter(Context context, @NonNull List<Person> itemList, String sort, View fixedHeader) {
         super(context, itemList, headerMapFirstName, comparatorFirstName, fixedHeader);

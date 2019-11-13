@@ -26,7 +26,6 @@ import static com.jonahbauer.qed.database.ChatDatabaseContract.ChatEntry.TABLE_N
 public class ChatDatabase {
     private ChatDatabaseHelper chatDatabaseHelper;
     private long lastId = Long.MIN_VALUE;
-    private int insertsRunning = 0;
     private ChatDatabaseReceiver receiver;
     private List<ChatDatabaseAsync> asyncTasks;
 
@@ -37,6 +36,9 @@ public class ChatDatabase {
     }
 
     public void close() {
+        chatDatabaseHelper.getWritableDatabase().close();
+        chatDatabaseHelper.getReadableDatabase().close();
+
         if (chatDatabaseHelper != null) chatDatabaseHelper.close();
         asyncTasks.forEach(async -> {
             if (!async.isCancelled()) async.cancel(true);
@@ -45,7 +47,6 @@ public class ChatDatabase {
 
     @SuppressWarnings("UnusedReturnValue")
     public long insert(Message message) {
-        insertsRunning ++;
         ContentValues value = new ContentValues();
         value.put(COLUMN_NAME_ID,message.id);
         value.put(COLUMN_NAME_USERID,message.userId);
@@ -67,15 +68,13 @@ public class ChatDatabase {
 
         if (lastId > 0 && message.id > lastId) lastId = message.id;
 
-        insertsRunning --;
-        if (insertsRunning == 0) chatLogWritable.close();
         return row;
     }
 
     public void insertAll(List<Message> messages) {
-        ChatDatabaseAsync async = new ChatDatabaseAsync();
+        ChatDatabaseAsync async = new ChatDatabaseAsync(chatDatabaseHelper.getWritableDatabase(), receiver, messages);
         asyncTasks.add(async);
-        async.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, ChatDatabaseAsync.Mode.INSERT_ALL, chatDatabaseHelper, messages, receiver);
+        async.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     public long getLastId() {
@@ -109,9 +108,9 @@ public class ChatDatabase {
     }
 
     public void query(String sql, String[] selectionArgs) {
-        ChatDatabaseAsync async = new ChatDatabaseAsync();
+        ChatDatabaseAsync async = new ChatDatabaseAsync(chatDatabaseHelper.getReadableDatabase(), receiver, sql, selectionArgs);
         asyncTasks.add(async);
-        async.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, ChatDatabaseAsync.Mode.QUERY, chatDatabaseHelper, receiver, sql, selectionArgs);
+        async.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     public void clear() {

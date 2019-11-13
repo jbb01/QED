@@ -1,6 +1,7 @@
 package com.jonahbauer.qed.activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
@@ -19,10 +20,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
+import androidx.preference.PreferenceManager;
 
 import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.R;
@@ -46,11 +49,13 @@ import java.util.Map;
 import static com.jonahbauer.qed.networking.QEDGalleryPages.Mode.NORMAL;
 import static com.jonahbauer.qed.networking.QEDGalleryPages.Mode.ORIGINAL;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class ImageActivity extends AppCompatActivity implements GalleryDatabaseReceiver, QEDPageReceiver<Image>, QEDPageStreamReceiver {
     public static final String GALLERY_IMAGE_KEY = "galleryImage";
 
     private ImageView imageView;
     private TextView imageName;
+    private TextView imageError;
     private Image image;
     private View overlayTop;
     private View overlayBottom;
@@ -65,30 +70,36 @@ public class ImageActivity extends AppCompatActivity implements GalleryDatabaseR
     private ImageButton infoButton;
 
     private GalleryDatabase galleryDatabase;
+    private SharedPreferences sharedPreferences;
+
     private boolean extended = false;
 
-//    private List<Image> pending;
     private boolean needsToGetInfo = false;
     private boolean needsToGetImage = false;
     private Mode mode = NORMAL;
 
-//    private SharedPreferences sharedPreferences;
+    private File downloadTmp;
+    private File target;
 
     private List<AsyncTask> asyncTasks;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Intent intent = getIntent();
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        if (!handleIntent(intent, this)) {
+            super.finish();
+            Toast.makeText(this, R.string.error, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         setContentView(R.layout.activity_image);
         galleryDatabase = new GalleryDatabase();
         galleryDatabase.init(this, this);
-//        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         asyncTasks = new ArrayList<>();
-
-//        pending = new ArrayList<>();
-
-        Intent intent = getIntent();
-        handleIntent(intent);
 
         if (image == null) finish();
 
@@ -96,12 +107,12 @@ public class ImageActivity extends AppCompatActivity implements GalleryDatabaseR
         windowDecor = window.getDecorView();
         windowDecor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
 
-
         overlayTop = findViewById(R.id.gallery_image_overlay_top);
         overlayBottom = findViewById(R.id.gallery_image_overlay_bottom);
         progressBarIndeterminate = findViewById(R.id.progress_bar_indeterminate);
         progressBar = findViewById(R.id.progress_bar);
         progressText = findViewById(R.id.progress_text);
+        imageError = findViewById(R.id.gallery_image_error);
         imageView = findViewById(R.id.gallery_image);
         imageView.setOnClickListener(v -> changeExtended());
 
@@ -115,7 +126,6 @@ public class ImageActivity extends AppCompatActivity implements GalleryDatabaseR
             intent2.setAction(android.content.Intent.ACTION_VIEW);
             intent2.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
-            //Log.d("test", image.format + "//" + image.path);
             Uri uri = FileProvider.getUriForFile(this, "com.jonahbauer.qed.fileprovider", new File(image.path));
 
             List<ResolveInfo> resInfoList = getPackageManager().queryIntentActivities(intent2, PackageManager.MATCH_DEFAULT_ONLY);
@@ -131,17 +141,22 @@ public class ImageActivity extends AppCompatActivity implements GalleryDatabaseR
 
         downloadButton = findViewById(R.id.image_download);
         downloadButton.setOnClickListener(v -> {
+            if (sharedPreferences.getBoolean(getString(R.string.preferences_gallery_offline_mode_key), false)) {
+                Toast.makeText(this, R.string.offline_mode_not_available, Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             if (!image.original) {
                 mode = ORIGINAL;
                 needsToGetImage = true;
-                showImage(image);
+                setImage(image);
             } else {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setMessage(R.string.image_already_original);
                 builder.setPositiveButton(R.string.yes, (dialog, which) -> {
                     mode = ORIGINAL;
                     needsToGetImage = true;
-                    showImage(image);
+                    setImage(image);
                 });
                 builder.setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss());
                 builder.show();
@@ -172,9 +187,12 @@ public class ImageActivity extends AppCompatActivity implements GalleryDatabaseR
         });
         infoButton.setEnabled(false);
 
-        showImage(image);
+        setImage(image);
     }
 
+    /**
+     * Prompt when downloads are running and change transition to fade
+     */
     @Override
     public void finish() {
         for (AsyncTask asyncTask : asyncTasks) {
@@ -186,6 +204,7 @@ public class ImageActivity extends AppCompatActivity implements GalleryDatabaseR
                     super.finish();
                     overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
                     for (AsyncTask asyncTask2 : asyncTasks) asyncTask2.cancel(true);
+                    if (downloadTmp != null && downloadTmp.exists()) downloadTmp.delete();
                 });
                 builder.setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss());
                 builder.show();
@@ -198,8 +217,13 @@ public class ImageActivity extends AppCompatActivity implements GalleryDatabaseR
         for (AsyncTask asyncTask : asyncTasks) asyncTask.cancel(true);
     }
 
-    public void changeExtended() {
-        if (!extended) {
+    /**
+     * show/hide overlay with buttons
+     */
+    public void changeExtended() {changeExtended(!extended);}
+    public void changeExtended(boolean extended) {
+        this.extended = extended;
+        if (extended) {
             windowDecor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
             overlayTop.setVisibility(View.VISIBLE);
             overlayBottom.setVisibility(View.VISIBLE);
@@ -210,40 +234,29 @@ public class ImageActivity extends AppCompatActivity implements GalleryDatabaseR
             overlayBottom.setVisibility(View.GONE);
             window.setStatusBarColor(Color.TRANSPARENT);
         }
-        extended = !extended;
     }
 
-    public void showImage(Image image) {
+    /**
+     * If the image is available it will be shown.
+     * Otherwise it will be downloaded
+     *
+     * For non image resources a icon is shown if the file is available otherwise the user will be prompted to confirm the download
+     *
+     * If required (e.g. after launching the activity via deep link) additional information about the image is collected
+     */
+    private void setImage(Image image) {
         this.image = image;
 
-        String name = image.name + (image.original ? getString(R.string.image_suffix_original) : "");
-        imageName.setText(name);
-        setImage(image, imageView, progressBarIndeterminate);
-    }
-
-    private void setImage(Image image, ImageView imageView, @Nullable ProgressBar progressBar) {
         launchButton.setEnabled(false);
         downloadButton.setEnabled(false);
         infoButton.setEnabled(false);
+        imageError.setVisibility(View.GONE);
 
         image = galleryDatabase.getImageData(image);
-        String path = image.path;
         if (mode == ORIGINAL) image.original = true;
 
         if (image.name == null || image.owner == null || image.uploadDate == null || image.format == null) {
             needsToGetInfo = true;
-        }
-
-        boolean noPicture = false;
-        if (image.format != null) {
-            String type = image.format.split("/")[0];
-            if (!type.equals("image")) {
-                path = image.thumbnailPath;
-                if (image.path == null) needsToGetImage = true;
-//                mode = ORIGINAL;
-//                image.original = true;
-                noPicture = true;
-            }
         }
 
         if (image.name != null) {
@@ -252,82 +265,119 @@ public class ImageActivity extends AppCompatActivity implements GalleryDatabaseR
         }
 
 
-        if (path != null) {
-            Bitmap bmp = BitmapFactory.decodeFile(path);
-            if (bmp != null) {
-                imageView.setImageBitmap(bmp);
+        String type = getType(image);
+        if (image.path != null && new File(image.path).exists()) {
+            switch (type) {
+                case "image":
+                    Bitmap bmp = BitmapFactory.decodeFile(image.path);
+                    if (bmp != null) {
+                        imageView.setImageBitmap(bmp);
+                    }
+                    break;
+                case "video":
+                    imageView.setImageDrawable(getDrawable(R.drawable.ic_gallery_video));
+                    break;
+                case "audio":
+                    imageView.setImageDrawable(getDrawable(R.drawable.ic_gallery_audio));
+                    break;
             }
         } else {
             needsToGetImage = true;
         }
 
+
         if (needsToGetImage || needsToGetInfo) {
             imageView.setVisibility(View.GONE);
-            if (progressBar != null) progressBar.setVisibility(View.VISIBLE);
+            progressBarIndeterminate.setVisibility(View.VISIBLE);
         }
 
         if (needsToGetInfo) {
             needsToGetInfo = false;
-            QEDGalleryPages.getImageInfo(getClass().toString(), image, this);
+            asyncTasks.add(QEDGalleryPages.getImageInfo(getClass().toString(), image, this));
         } else if (needsToGetImage) {
             needsToGetImage = false;
-            if (noPicture) {
-                final Image image2 = image;
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setMessage(R.string.image_download_non_picture);
-                builder.setPositiveButton(R.string.yes, (dialog, which) -> {
-                    dialog.dismiss();
-                    downloadImage(image2);
-                });
-                builder.setNegativeButton(R.string.no, (dialog, which) -> finish());
-                builder.show();
-            } else {
+            if ("image".equals(type)) {
                 downloadImage(image);
+            } else {
+                downloadNonImage(image);
             }
         } else {
             imageView.setVisibility(View.VISIBLE);
-            if (progressBar != null) progressBar.setVisibility(View.GONE);
+            progressBarIndeterminate.setVisibility(View.GONE);
+            progressBar.setVisibility(View.GONE);
             launchButton.setEnabled(true);
             downloadButton.setEnabled(true);
             infoButton.setEnabled(true);
         }
     }
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
+    /**
+     * starts an async download for the specified image
+     */
     public void downloadImage(Image image) {
-//        boolean savePublic = sharedPreferences.getBoolean(getString(R.string.preferences_gallery_save_public_key), false);
-        File file;
+        downloadImage(image, 0);
+    }
+
+    /**
+     * @param overwriteOfflineMode overwrite offline (-1), don't overwrite (0), overwrite online (1)
+     */
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    public void downloadImage(Image image, int overwriteOfflineMode) {
+        changeExtended(true);
+
+        if (overwriteOfflineMode == -1 || (overwriteOfflineMode == 0 && sharedPreferences.getBoolean(getString(R.string.preferences_gallery_offline_mode_key), false))) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage(getString(R.string.image_overwrite_offline_mode));
+            builder.setTitle(R.string.offline_mode);
+            builder.setPositiveButton(R.string.yes, (dialog, which) -> {
+                downloadImage(image, 1);
+                dialog.dismiss();
+            });
+            builder.setNegativeButton(R.string.no, (dialog, which) -> {
+                onNetworkError(null);
+                dialog.dismiss();
+            });
+            builder.setCancelable(false);
+
+            builder.show();
+            return;
+        }
+
         String[] tmp = image.format.split("/");
         String suffix = tmp[1];
 
-//        if (!savePublic) {
-            // save to private storage
         File dir = getExternalFilesDir(getString(R.string.gallery_folder_images));
+        File dir2 = new File(getExternalCacheDir(), getString(R.string.gallery_folder_images));
         assert dir != null;
         if (!dir.exists()) dir.mkdirs();
-        file = new File(dir, image.id + "." + suffix);
-//        } else {
-//            // save to public storage
-//            File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-//            dir = new File(dir, "QEDGallery/");
-//            file = new File(dir, image.id + "." + suffix);
-//
-//            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-//                pending.add(image);
-//                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 3141);
-//                return;
-//            }
-//
-//            if (!file.exists()) dir.mkdirs();
-//        }
+        if (!dir2.exists()) dir2.mkdirs();
+
+        target = new File(dir, image.id + "." + suffix);
+        downloadTmp = new File(dir2, image.id + "." + suffix + ".tmp");
 
         try {
-            FileOutputStream fos = new FileOutputStream(file);
-            image.path = file.getAbsolutePath();
+            FileOutputStream fos = new FileOutputStream(downloadTmp);
+            image.path = target.getAbsolutePath();
             asyncTasks.add(QEDGalleryPages.getImage(getClass().toString(), image, mode, fos, this));
         } catch (IOException e) {
             Log.e(Application.LOG_TAG_ERROR, e.getMessage(), e);
         }
+    }
+
+    /**
+     * starts an async download for the specified non image resource after prompting the user for confirmation
+     */
+    private void downloadNonImage(final Image image) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.image_download_non_picture);
+        builder.setPositiveButton(R.string.yes, (dialog, which) -> {
+            dialog.dismiss();
+            mode = ORIGINAL;
+            image.original = true;
+            downloadImage(image);
+        });
+        builder.setNegativeButton(R.string.no, (dialog, which) -> finish());
+        builder.show();
     }
 
     @Override
@@ -339,22 +389,48 @@ public class ImageActivity extends AppCompatActivity implements GalleryDatabaseR
     @Override
     public void onInsertAllUpdate(int done, int total) {}
 
+    /**
+     * called when image download is done
+     *
+     * shows the image or a icon if a non image resource was downloaded
+     */
     @Override
     public void onPageReceived(String tag) {
+        if (downloadTmp != null && target != null && downloadTmp.exists()) {
+            if (target.exists()) target.delete();
+
+            if (!downloadTmp.renameTo(target)) {
+                onStreamError(tag);
+                return;
+            }
+            if (downloadTmp != null) {
+                downloadTmp.delete();
+            }
+
+            image.available = true;
+        } else {
+            onStreamError(tag);
+            return;
+        }
+
         galleryDatabase.insert(image, true);
 
-        String[] tmp = image.format.split("/");
-        String type = tmp[0];
-
-        if (type.equals("image")) {
-            //Log.d("test", "showed file");
-            imageView.setImageBitmap(BitmapFactory.decodeFile(image.path));
-        } else {
-            //Log.d("test", "showed thumbnail instead of file");
-            imageView.setImageBitmap(BitmapFactory.decodeFile(image.thumbnailPath));
+        switch (getType(image)) {
+            case "image":
+                //Log.d("test", "showed file");
+                imageView.setImageBitmap(BitmapFactory.decodeFile(image.path));
+                break;
+            case "video":
+                imageView.setImageResource(R.drawable.ic_gallery_video);
+                break;
+            case "audio":
+                imageView.setImageResource(R.drawable.ic_gallery_audio);
+                break;
         }
+
         imageView.setVisibility(View.VISIBLE);
         progressBarIndeterminate.setVisibility(View.GONE);
+        imageError.setVisibility(View.GONE);
         launchButton.setEnabled(true);
         downloadButton.setEnabled(true);
         infoButton.setEnabled(true);
@@ -362,80 +438,95 @@ public class ImageActivity extends AppCompatActivity implements GalleryDatabaseR
         onProgressUpdate(tag, 0,0);
     }
 
+    /**
+     * called after getting image info
+     *
+     * if image is still not available it will continue with downloading the image
+     *
+     * otherwise the image will be shown and the collected info will be written to the database
+     */
     @Override
     public void onPageReceived(String tag, Image image) {
-        String name = image.name + (image.original ? getString(R.string.image_suffix_original) : "");
-        imageName.setText(name);
-        changeExtended();
+        galleryDatabase.insert(image, true);
 
         if (needsToGetImage) {
             needsToGetImage = false;
-            boolean noPicture = !image.format.split("/")[0].equals("image");
-            if (noPicture && image.path != null) {
-                File file = new File(image.path);
-                if (file.exists()) {
-                    //Log.d("test", "showed thumbnail instead of file");
-                    imageView.setImageBitmap(BitmapFactory.decodeFile(image.thumbnailPath));
-                    imageView.setVisibility(View.VISIBLE);
-                    progressBarIndeterminate.setVisibility(View.GONE);
-                    launchButton.setEnabled(true);
-                    downloadButton.setEnabled(true);
-                    infoButton.setEnabled(true);
-                }
-            } else if (noPicture) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setMessage(R.string.image_download_non_picture);
-                builder.setPositiveButton(R.string.yes, (dialog, which) -> {
-                    dialog.dismiss();
-                    mode = ORIGINAL;
-                    image.original = true;
-                    downloadImage(image);
-                });
-                builder.setNegativeButton(R.string.no, (dialog, which) -> finish());
-                builder.show();
-            } else {
-                downloadImage(image);
-            }
+            setImage(image);
         } else {
             galleryDatabase.insert(image, true);
             imageView.setVisibility(View.VISIBLE);
             progressBarIndeterminate.setVisibility(View.GONE);
+            imageError.setVisibility(View.GONE);
             launchButton.setEnabled(true);
             downloadButton.setEnabled(true);
             infoButton.setEnabled(true);
         }
     }
 
+    /**
+     * if a network error occurred while downloading image file or data the thumbnail or a icon will be shown
+     */
     public void onNetworkError(String tag) {
-        Log.e(Application.LOG_TAG_ERROR, "networkError at: " + tag);
+        Log.e(Application.LOG_TAG_ERROR, "networkError at: " + tag, new Exception());
+
+        if (downloadTmp != null) downloadTmp.delete();
 
         imageView.post(() -> {
-            String title = image.name + " (thumbnail)";
+            String title = (image.name != null ? image.name : "null");
+
+            boolean available = false;
+
+            switch (getType(image)) {
+                case "image":
+                    Bitmap bm;
+
+                    bm = BitmapFactory.decodeFile(image.path);
+                    if (bm != null) {
+                        imageView.setImageBitmap(bm);
+                        available = true;
+                        break;
+                    }
+
+                    bm = BitmapFactory.decodeFile(image.thumbnailPath);
+                    if (bm != null) {
+                        imageView.setImageBitmap(bm);
+                        title += " (thumbnail)";
+                        break;
+                    }
+
+                    imageView.setImageResource(R.drawable.ic_gallery_empty_image);
+                    break;
+                case "audio":
+                    if (image.path != null && new File(image.path).exists()) {
+                        imageView.setImageResource(R.drawable.ic_gallery_audio);
+                        available = true;
+                    } else
+                        imageView.setImageResource(R.drawable.ic_gallery_empty_audio);
+                    break;
+                case "video":
+                    if (image.path != null && new File(image.path).exists()) {
+                        imageView.setImageResource(R.drawable.ic_gallery_video);
+                        available = true;
+                    } else
+                        imageView.setImageResource(R.drawable.ic_gallery_empty_video);
+                    break;
+            }
+
             imageName.setText(title);
-            imageView.setImageBitmap(BitmapFactory.decodeFile(image.thumbnailPath));
+
+            imageError.setVisibility(View.VISIBLE);
             imageView.setVisibility(View.VISIBLE);
             progressBarIndeterminate.setVisibility(View.GONE);
-            launchButton.setEnabled(false);
+            launchButton.setEnabled(available);
             downloadButton.setEnabled(false);
             infoButton.setEnabled(false);
         });
     }
 
-//    @Override
-//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-//        if (requestCode == 3141) {
-//            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                pending.forEach(this::downloadImage);
-//                pending.clear();
-//            } else {
-//                sharedPreferences.edit().putBoolean(getString(R.string.preferences_gallery_save_public_key), false).apply();
-//            }
-//        }
-//    }
-
     @Override
     public void onStreamError(String tag) {
         Log.e(Application.LOG_TAG_ERROR, "streamError at: " + tag);
+        onNetworkError(tag);
     }
 
     @Override
@@ -463,19 +554,25 @@ public class ImageActivity extends AppCompatActivity implements GalleryDatabaseR
 
     @Override
     protected void onNewIntent(Intent intent) {
-        handleIntent(intent);
-        showImage(image);
-        super.onNewIntent(intent);
+        boolean success = handleIntent(intent, this);
+
+        if (success) {
+            setImage(image);
+            super.onNewIntent(intent);
+        } else {
+            Toast.makeText(this, R.string.error, Toast.LENGTH_SHORT).show();
+            finish();
+        }
     }
 
-    private void handleIntent(Intent intent) {
+    public static boolean handleIntent(@NonNull Intent intent, @Nullable ImageActivity imageActivity) {
         Object obj = intent.getSerializableExtra(GALLERY_IMAGE_KEY);
         if (obj instanceof Image) {
-            image = (Image) obj;
-            return;
+            if (imageActivity != null) imageActivity.image = (Image) obj;
+            return true;
         }
 
-        if (Intent.ACTION_VIEW.equals(intent.getAction())) {
+        if (Intent.ACTION_VIEW.equals(intent.getAction()) || "com.jonahbauer.qed.action.SHOW_IMAGE".equals(intent.getAction())) {
             Uri data = intent.getData();
             if (data != null) {
                 String host = data.getHost();
@@ -487,6 +584,8 @@ public class ImageActivity extends AppCompatActivity implements GalleryDatabaseR
                     String[] parts = q.split("=");
                     if (parts.length > 1) queries.put(parts[0], parts[1]);
                     else if (parts.length > 0) queries.put(parts[0], "");
+                } else {
+                    return false;
                 }
                 if (host != null) if (host.equals("qedgallery.qed-verein.de")) {
                     if (path != null) if (path.startsWith("/image_view.php")) {
@@ -494,18 +593,30 @@ public class ImageActivity extends AppCompatActivity implements GalleryDatabaseR
 //                        editor.putInt(getString(R.string.preferences_drawerSelection_key), R.id.nav_gallery).apply();
 
                         String imageIdStr = queries.getOrDefault("imageid", null);
-                        if (imageIdStr != null) {
+                        if (imageIdStr != null && imageIdStr.matches("\\d+")) {
                             try {
                                 int id = Integer.parseInt(imageIdStr);
-                                image = new Image();
-                                image.id = id;
-                            } catch (NumberFormatException ignored) {
-                                Toast.makeText(this, R.string.error, Toast.LENGTH_SHORT).show();
-                            }
+                                if (imageActivity != null) imageActivity.image = new Image();
+                                if (imageActivity != null) imageActivity.image.id = id;
+                                return true;
+                            } catch (NumberFormatException ignored) {}
                         }
                     }
                 }
             }
         }
+        return false;
+    }
+
+
+    /**
+     * @return the type of the resource ("image", "video", "audio"). if no type is specified "image" will be used as a standard
+     */
+    private String getType(Image image) {
+        String type = "image";
+        if (image.format != null)
+            type = image.format.split("/")[0];
+
+        return type;
     }
 }

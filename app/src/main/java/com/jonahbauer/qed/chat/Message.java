@@ -9,10 +9,12 @@ import com.jonahbauer.qed.Application;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.nio.charset.StandardCharsets;
-
-@SuppressWarnings("unused")
+/**
+ * An object representing a message in the qed chat
+ */
 public class Message {
+    public static final Message PONG = new Message("PONG", "PONG", "PONG", 0, "PONG", "PONG", 0, 0, "PONG");
+
     public final String name;
     public final String message;
     public final String date;
@@ -54,11 +56,12 @@ public class Message {
         return Integer.compare(id,other.id);
     }
 
+    /**
+     * Parses a string as obtained by the chat web socket to a message object
+     * @param jsonMessage a json formatted message string
+     * @return a message object representing the given message, null if an error occurred
+     */
     public static Message interpretJSONMessage(String jsonMessage) {
-        return interpretJSONMessage(jsonMessage, true);
-    }
-
-    public static Message interpretJSONMessage(String jsonMessage, boolean format) {
         try {
             JSONObject json = new JSONObject(jsonMessage);
             String name = json.getString("name");
@@ -70,14 +73,6 @@ public class Message {
             int userid = json.optInt("user_id", -1);
             int id = json.getInt("id");
             int bottag = json.getInt("bottag");
-            if (format) {
-                name = new String(name.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
-                message = new String(message.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
-                username = new String(username.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
-                color = new String(color.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
-                date = new String(date.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
-                channel = new String(channel.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
-            }
             name = name.trim();
             if ("null".equals(username)) username = null;
             return new Message(name, message, date, userid, username, color, id, bottag, channel);

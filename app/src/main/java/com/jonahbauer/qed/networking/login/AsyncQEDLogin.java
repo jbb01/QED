@@ -7,8 +7,8 @@ import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.networking.NoNetworkException;
 
 public class AsyncQEDLogin extends AsyncTask<Void, Void, Void> {
-    private Feature feature;
-    private QEDLoginReceiver receiver;
+    private final Feature feature;
+    private final QEDLoginReceiver receiver;
 
     public AsyncQEDLogin(QEDLoginReceiver receiver, Feature feature) {
         this.receiver = receiver;

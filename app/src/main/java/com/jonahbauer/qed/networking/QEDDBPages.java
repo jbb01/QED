@@ -29,8 +29,8 @@ public abstract class QEDDBPages {
     public static AsyncTask[] getEvent(String tag, String eventId, QEDPageReceiver<Event> eventReceiver) {
         Application application = Application.getContext();
         QEDPageReceiver<Event> receiver = new QEDPageReceiver<Event>() {
-            private Event event = new Event();
-            private AtomicInteger done = new AtomicInteger();
+            private final Event event = new Event();
+            private final AtomicInteger done = new AtomicInteger();
 
             @Override
             public void onPageReceived(String tag2, Event out) {
@@ -113,7 +113,7 @@ public abstract class QEDDBPages {
                                 while (matcher2.find()) {
                                     String title = matcher2.group(1);
                                     String value = matcher2.group(2);
-                                    switch (title) {
+                                    if (title != null) switch (title) {
                                         case "Vorname":
                                             person.firstName = value;
                                             break;
@@ -151,14 +151,14 @@ public abstract class QEDDBPages {
                                 Matcher matcher3 = Pattern.compile("person=(\\d*)").matcher(data);
                                 if (matcher3.find()) {
                                     String id = matcher3.group(1);
-                                    person.id = Integer.valueOf(id);
+                                    if (id != null) person.id = Integer.valueOf(id);
                                 }
 
                                 Matcher matcher2 = Pattern.compile("<div class=\"[^\"]*\" title=\"([^\"]*)\">([^&]*)&nbsp;</div>").matcher(data);
                                 while (matcher2.find()) {
                                     String title = matcher2.group(1);
                                     String value = matcher2.group(2);
-                                    switch (title) {
+                                    if (title != null) switch (title) {
                                         case "Vorname":
                                             person.firstName = value;
                                             break;
@@ -239,19 +239,19 @@ public abstract class QEDDBPages {
                                 while (matcher3.find()) {
                                     String title = matcher3.group(1);
                                     String value = matcher3.group(2);
-                                    switch (title) {
+                                    if (title != null) switch (title) {
                                         case "Titel":
                                             event.name = value;
                                             break;
                                         case "Start":
                                             try {
-                                                event.start = simpleDateFormat.parse(value);
+                                                if (value != null) event.start = simpleDateFormat.parse(value);
                                             } catch (ParseException ignored) {}
                                             event.startString = value;
                                             break;
                                         case "Ende":
                                             try {
-                                                event.end = simpleDateFormat.parse(value);
+                                                if (value != null) event.end = simpleDateFormat.parse(value);
                                             } catch (ParseException ignored) {}
                                             event.endString = value;
                                             break;
@@ -265,7 +265,7 @@ public abstract class QEDDBPages {
                                             event.maxMember = value;
                                             break;
                                         case "&Uuml;bernachtung":
-                                            if (!value.trim().equals("(keine)")) event.hotel = value;
+                                            if (value != null && !value.trim().equals("(keine)")) event.hotel = value;
                                             break;
                                     }
                                 }
@@ -286,8 +286,8 @@ public abstract class QEDDBPages {
     public static AsyncTask[] getPerson(String tag, String personId, QEDPageReceiver<Person> personReceiver) {
         Application application = Application.getContext();
         QEDPageReceiver<Person> receiver = new QEDPageReceiver<Person>() {
-            private Person person = new Person();
-            private AtomicInteger done = new AtomicInteger();
+            private final Person person = new Person();
+            private final AtomicInteger done = new AtomicInteger();
 
             @Override
             public void onPageReceived(String tag2, Person out) {
@@ -399,7 +399,7 @@ public abstract class QEDDBPages {
                                 while (matcher2.find()) {
                                     String title = matcher2.group(1);
                                     String value = matcher2.group(2);
-                                    switch (title) {
+                                    if (title != null) switch (title) {
                                         case "Strasse":
                                             street = value;
                                             break;
@@ -435,7 +435,7 @@ public abstract class QEDDBPages {
                                 while (matcher2.find()) {
                                     String title = matcher2.group(1);
                                     String value = matcher2.group(2);
-                                    switch (title) {
+                                    if (title != null) switch (title) {
                                         case "Art":
                                             type = value;
                                             break;
@@ -472,7 +472,7 @@ public abstract class QEDDBPages {
                                 while (matcher2.find()) {
                                     String title = matcher2.group(1);
                                     String value = matcher2.group(2);
-                                    switch (title) {
+                                    if (title != null) switch (title) {
                                         case "Rolle":
                                             roll = value;
                                             break;
@@ -490,11 +490,11 @@ public abstract class QEDDBPages {
                                 Event event = new Event();
                                 event.name = eventTitle;
                                 try {
-                                    event.start = simpleDateFormat3.parse(start);
+                                    if (start != null) event.start = simpleDateFormat3.parse(start);
                                 } catch (ParseException ignored) {}
                                 event.startString = start;
                                 try {
-                                    event.end = simpleDateFormat3.parse(end);
+                                    if (end != null) event.end = simpleDateFormat3.parse(end);
                                 } catch (ParseException ignored) {}
                                 event.endString = end;
 
@@ -505,7 +505,7 @@ public abstract class QEDDBPages {
                                 while (matcher2.find()) {
                                     String title = matcher2.group(1);
                                     String value = matcher2.group(2);
-                                    switch (title) {
+                                    if(title != null) switch (title) {
                                         case "Rolle":
                                             roll = value;
                                             break;
@@ -557,27 +557,29 @@ public abstract class QEDDBPages {
                             for (String data2 : data.split("</div>")) {
                                 Matcher m3 = Pattern.compile("<div class=\".*\" title=\"(.*)\">(.*)&nbsp;").matcher(data2);
                                 while (m3.find()) {
-                                    switch (m3.group(1)) {
+                                    String title = m3.group(1);
+                                    String value = m2.group(2);
+                                    if (title != null) switch (title) {
                                         case "Vorname":
-                                            person.firstName = m3.group(2);
+                                            person.firstName = value;
                                             break;
                                         case "Nachname":
-                                            person.lastName = m3.group(2);
+                                            person.lastName = value;
                                             break;
                                         case "Emailadresse":
-                                            person.email = m3.group(2);
+                                            person.email = value;
                                             break;
                                         case "Aktiv":
-                                            person.active = m3.group(2).equals("aktiv");
+                                            person.active = "aktiv".equals(value);
                                             break;
                                         case "Geburtstag":
-                                            person.birthday = m3.group(2);
+                                            person.birthday = value;
                                             break;
                                         case "Mitglied seit":
-                                            person.memberSince = m3.group(2);
+                                            person.memberSince = value;
                                             break;
                                         case "Aktuell Mitglied":
-                                            person.member = m3.group(2).equals("Ja");
+                                            person.member = "Ja".equals(value);
                                             break;
                                     }
                                 }

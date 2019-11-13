@@ -21,11 +21,11 @@ public class AnimatedTabHostListener implements TabHost.OnTabChangeListener
 {
 
     private static final int ANIMATION_TIME = 150;
-    private TabHost tabHost;
+    private final TabHost tabHost;
     private View previousView;
-    private GestureDetector gestureDetector;
+    private final GestureDetector gestureDetector;
     private int currentTab;
-    private View.OnTouchListener touchListener;
+    private final View.OnTouchListener touchListener;
 
     /**
      * Constructor that takes the TabHost as a parameter and sets previousView to the currentView at instantiation
@@ -143,7 +143,7 @@ public class AnimatedTabHostListener implements TabHost.OnTabChangeListener
         private static final int SWIPE_MIN_DISTANCE = 120;
         private static final int SWIPE_MAX_OFF_PATH = 250;
         private static final int SWIPE_THRESHOLD_VELOCITY = 200;
-        private int maxTabs;
+        private final int maxTabs;
 
         /**
          * An empty constructor that uses the tabhosts content view to decide how many tabs there are.

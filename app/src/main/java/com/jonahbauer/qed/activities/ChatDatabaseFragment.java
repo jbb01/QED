@@ -160,6 +160,7 @@ public class ChatDatabaseFragment extends Fragment implements CompoundButton.OnC
     }
 
     private void search() {
+        // TODO not SQL injection safe !!!
         if (!checkFilters()) return;
 
         ArrayList<String> filters = new ArrayList<>();
@@ -208,6 +209,7 @@ public class ChatDatabaseFragment extends Fragment implements CompoundButton.OnC
             else sql.append(" AND ").append(filters.get(i));
         }
         sql.append(" ORDER BY " + COLUMN_NAME_ID + " ASC");
+        sql.append(" LIMIT 50000;");
 
         messageAdapter.clear();
 

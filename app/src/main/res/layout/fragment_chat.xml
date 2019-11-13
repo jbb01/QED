@@ -10,16 +10,6 @@
     android:clipToPadding="false"
     android:clipChildren="false">
 
-    <!--<ImageView
-        android:id="@+id/background"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:contentDescription="@string/background"
-        android:scaleType="centerCrop"
-        android:src="@drawable/background_part" />-->
-
     <TextView
         android:id="@+id/date_banner"
         android:elevation="1dp"
@@ -42,7 +32,7 @@
         android:background="#00ffffff"
         android:divider="#00ffffff"
         android:dividerHeight="@dimen/message_divider"
-        android:clipToPadding="true"
+        android:clipToPadding="false"
         android:clipChildren="false"
         android:layout_above="@id/strip"
         android:layout_alignParentStart="true"
@@ -50,8 +40,23 @@
         android:transcriptMode="normal"
         android:scrollbarStyle="outsideOverlay"
         android:paddingEnd="?android:attr/scrollbarSize"
+        android:visibility="gone"
+        tools:visibility="visible"
         tools:listitem="@layout/list_item_message"
         tools:ignore="RtlSymmetry" />
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:paddingTop="15dp"
+        android:gravity="center_horizontal"
+        style="?android:attr/progressBarStyleLarge"
+        android:visibility="visible" />
 
     <View
         android:id="@+id/strip"
@@ -82,7 +87,16 @@
         android:singleLine="false"
         android:scrollbars="vertical"
         android:elevation="6dp"
-        android:maxLines="5"/>
+        android:maxLines="5"
+        android:importantForAutofill="no" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="6dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:background="@color/chat_background" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/button_send"
@@ -132,7 +146,7 @@
         android:layout_above="@id/button_send"
         android:orientation="horizontal"
         android:paddingBottom="1dp"
-        android:layout_marginEnd="4dp"
+        android:layout_marginEnd="3dp"
         android:clipToPadding="false"
         android:clipChildren="false"
         android:gravity="center">
@@ -164,9 +178,9 @@
             android:layout_margin="3dp"
             android:src="@drawable/ic_drawer_settings"
             android:tint="@color/colorAccent"
-            app:fabSize="mini"
             app:backgroundTint="@color/floating_action_button_background"
-            app:rippleColor="@color/floating_action_button_ripple"/>
+            app:fabSize="mini"
+            app:rippleColor="@color/floating_action_button_ripple" />
 
     </LinearLayout>
 

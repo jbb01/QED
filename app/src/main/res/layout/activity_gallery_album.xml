@@ -206,7 +206,7 @@
         tools:ignore="RtlSymmetry" />
 
     <TextView
-        android:id="@+id/empty_album"
+        android:id="@+id/error_album"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/album_search_filters"
@@ -216,7 +216,6 @@
         android:layout_alignEnd="@id/image_container"
         android:visibility="gone"
         android:textSize="20sp"
-        android:gravity="center"
-        android:text="@string/empty_album"/>
+        android:gravity="center"/>
 
 </RelativeLayout>

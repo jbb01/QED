@@ -12,7 +12,8 @@
         android:paddingEnd="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_vertical_margin"
         android:paddingBottom="@dimen/activity_vertical_margin"
-        android:text="@string/log_dialog_dateinterval_from" />
+        android:text="@string/log_dialog_dateinterval_from"
+        android:labelFor="@id/log_dialog_dateinterval_editText_from"/>
 
     <EditText
         android:id="@+id/log_dialog_dateinterval_editText_from"
@@ -25,13 +26,13 @@
         android:ems="10"
         android:focusable="false"
         android:inputType="date"
-        android:onClick="pickDateIntervalStart"
         android:paddingStart="@dimen/activity_horizontal_margin"
         android:paddingEnd="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_vertical_margin"
         android:paddingBottom="@dimen/activity_vertical_margin"
         android:selectAllOnFocus="true"
-        android:theme="@style/AppTheme" />
+        android:theme="@style/AppTheme"
+        android:importantForAutofill="no" />
 
     <TextView
         android:id="@+id/log_dialog_dateinterval_to"
@@ -43,7 +44,8 @@
         android:paddingEnd="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_vertical_margin"
         android:paddingBottom="@dimen/activity_vertical_margin"
-        android:text="@string/log_dialog_dateinterval_to" />
+        android:text="@string/log_dialog_dateinterval_to"
+        android:labelFor="@id/log_dialog_dateinterval_editText_to"/>
 
     <EditText
         android:id="@+id/log_dialog_dateinterval_editText_to"
@@ -58,12 +60,12 @@
         android:ems="10"
         android:focusable="false"
         android:inputType="date"
-        android:onClick="pickDateIntervalEnd"
         android:paddingStart="@dimen/activity_horizontal_margin"
         android:paddingEnd="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_vertical_margin"
         android:paddingBottom="@dimen/activity_vertical_margin"
         android:selectAllOnFocus="true"
-        android:theme="@style/AppTheme" />
+        android:theme="@style/AppTheme"
+        android:importantForAutofill="no" />
 
 </RelativeLayout>

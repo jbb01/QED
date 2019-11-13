@@ -1,12 +1,16 @@
 package com.jonahbauer.qed.activities;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.icu.util.TimeZone;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -67,6 +71,9 @@ public class LogFragment extends Fragment implements ChatDatabaseReceiver, QEDPa
     private String channel;
     private Map<String, Long> data;
 
+    private String pathData;
+    private EditText pathEditText;
+
     private String options;
     private AsyncTask logGetter = null;
     private MessageAdapter messageAdapter;
@@ -78,6 +85,7 @@ public class LogFragment extends Fragment implements ChatDatabaseReceiver, QEDPa
     private TextView subtitle;
     private TextView downloadProgress;
     private TextView parseProgress;
+    private TextView labelError;
 
     private ChatDatabase database;
 
@@ -116,6 +124,7 @@ public class LogFragment extends Fragment implements ChatDatabaseReceiver, QEDPa
         subtitle = view.findViewById(R.id.log_subtitle);
         downloadProgress = view.findViewById(R.id.progress_download_text);
         parseProgress = view.findViewById(R.id.progress_parse_text);
+        labelError = view.findViewById(R.id.label_offline);
 
         Context context = getActivity();
 
@@ -184,6 +193,7 @@ public class LogFragment extends Fragment implements ChatDatabaseReceiver, QEDPa
         searchProgressBar.setVisibility(View.VISIBLE);
         progressTable.setVisibility(View.VISIBLE);
         messageListView.setVisibility(View.GONE);
+        labelError.setVisibility(View.GONE);
         String subtitle = "";
 
         switch (this.mode) {
@@ -215,6 +225,10 @@ public class LogFragment extends Fragment implements ChatDatabaseReceiver, QEDPa
                 subtitle = MessageFormat.format(getString(R.string.log_subtitle_date_interval), dateFrom, dateTo);
                 break;
             }
+            case FILE: {
+                subtitle = "File";
+                break;
+            }
         }
 
         options += "&channel=" + this.channel;
@@ -225,6 +239,11 @@ public class LogFragment extends Fragment implements ChatDatabaseReceiver, QEDPa
 
         if (logGetter != null) logGetter.cancel(true);
 
+        if (mode == Mode.FILE) {
+            options = "FILE" + pathData;
+        }
+
+        QEDChatPages.interruptAll();
         logGetter = QEDChatPages.getChatLog(getClass().toString(), options, messageAdapter.getData(), this);
     }
 
@@ -251,12 +270,13 @@ public class LogFragment extends Fragment implements ChatDatabaseReceiver, QEDPa
         View fragmentPostRecent = view1.findViewById(R.id.log_fragment_postrecent);
         View fragmentDateRecent = view1.findViewById(R.id.log_fragment_daterecent);
         View fragmentDateInterval = view1.findViewById(R.id.log_fragment_dateinterval);
+        View fragmentFile = view1.findViewById(R.id.log_fragment_file);
 
         EditText postRecentLast = view1.findViewById(R.id.log_dialog_postrecent_editText);
         EditText dateRecentLast = view1.findViewById(R.id.log_dialog_daterecent_editText);
         EditText dateIntervalStart = view1.findViewById(R.id.log_dialog_dateinterval_editText_from);
         EditText dateIntervalEnd = view1.findViewById(R.id.log_dialog_dateinterval_editText_to);
-
+        pathEditText = view1.findViewById(R.id.log_dialog_file_editText);
 
         DatePickerDialog.OnDateSetListener dateSetListener = (view2, year, month, dayOfMonth) -> {
             android.icu.util.Calendar cal = android.icu.util.Calendar.getInstance();
@@ -299,6 +319,15 @@ public class LogFragment extends Fragment implements ChatDatabaseReceiver, QEDPa
         dateIntervalStart.setOnClickListener(dateEditTextClickListener);
         dateIntervalEnd.setOnClickListener(dateEditTextClickListener);
 
+        pathEditText.setOnClickListener(v1 -> {
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            intent.setType("*/*");
+
+            Intent intent2 = Intent.createChooser(intent, "Choose a file");
+            startActivityForResult(intent2, 0b1001001001);
+        });
+
 
         Spinner spinner = view1.findViewById(R.id.log_dialog_mode_spinner);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -311,16 +340,19 @@ public class LogFragment extends Fragment implements ChatDatabaseReceiver, QEDPa
                     fragmentPostRecent.setVisibility(View.VISIBLE);
                     fragmentDateRecent.setVisibility(View.GONE);
                     fragmentDateInterval.setVisibility(View.GONE);
+                    if (fragmentFile != null) fragmentFile.setVisibility(View.GONE);
                     mode.set(POST_RECENT);
                 } else if (DATE_RECENT.modeStr.equals(item)) {
                     fragmentPostRecent.setVisibility(View.GONE);
                     fragmentDateRecent.setVisibility(View.VISIBLE);
                     fragmentDateInterval.setVisibility(View.GONE);
+                    if (fragmentFile != null) fragmentFile.setVisibility(View.GONE);
                     mode.set(DATE_RECENT);
                 } else if (DATE_INTERVAL.modeStr.equals(item)) {
                     fragmentPostRecent.setVisibility(View.GONE);
                     fragmentDateRecent.setVisibility(View.GONE);
                     fragmentDateInterval.setVisibility(View.VISIBLE);
+                    if (fragmentFile != null) fragmentFile.setVisibility(View.GONE);
                     mode.set(DATE_INTERVAL);
                 } else if (POST_INTERVAL.modeStr.equals(item)) {
                     // TODO fragmentTransaction.add(R.id.log_dialog_fragment_holder, new LogDateIntervalFragment(), "");
@@ -328,6 +360,12 @@ public class LogFragment extends Fragment implements ChatDatabaseReceiver, QEDPa
                 } else if (SINCE_OWN.modeStr.equals(item)) {
                     // TODO fragmentTransaction.add(R.id.log_dialog_fragment_holder, new LogDateIntervalFragment(), "");
                     mode.set(SINCE_OWN);
+                } else if (Mode.FILE.modeStr.equals(item)) {
+                    fragmentPostRecent.setVisibility(View.GONE);
+                    fragmentDateRecent.setVisibility(View.GONE);
+                    fragmentDateInterval.setVisibility(View.GONE);
+                    if (fragmentFile != null) fragmentFile.setVisibility(View.VISIBLE);
+                    mode.set(Mode.FILE);
                 }
             }
 
@@ -338,14 +376,24 @@ public class LogFragment extends Fragment implements ChatDatabaseReceiver, QEDPa
         alertDialogBuilder.setPositiveButton(R.string.ok, (dialog, which) -> {
             switch (mode.get()) {
                 case POST_RECENT:
-                    data.put(LOG_LAST_KEY, Long.valueOf(postRecentLast.getText().toString().trim()));
+                    try {
+                        data.put(LOG_LAST_KEY, Long.valueOf(postRecentLast.getText().toString().trim()));
+                    } catch (NumberFormatException e) {
+                        data.put(LOG_LAST_KEY, 0L);
+                    }
                     break;
                 case DATE_RECENT:
-                    data.put(LOG_LAST_KEY, 3600 * Long.valueOf(dateRecentLast.getText().toString().trim()));
+                    try {
+                        data.put(LOG_LAST_KEY, 3600 * Long.valueOf(dateRecentLast.getText().toString().trim()));
+                    } catch (NumberFormatException e) {
+                        data.put(LOG_LAST_KEY, 0L);
+                    }
                     break;
                 case DATE_INTERVAL:
                     data.put(LOG_FROM_KEY, dateStart.get().getTime());
                     data.put(LOG_TO_KEY, dateEnd.get().getTime());
+                    break;
+                case FILE:
                     break;
             }
 
@@ -384,12 +432,12 @@ public class LogFragment extends Fragment implements ChatDatabaseReceiver, QEDPa
     @Override
     public void onPause() {
         super.onPause();
-        if (logGetter!=null) logGetter.cancel(true);
+        if (logGetter != null) logGetter.cancel(true);
+        QEDChatPages.interruptAll();
     }
 
     @Override
     public void onPageReceived(String tag) {
-        Log.d(Application.LOG_TAG_DEBUG, tag + ": onPageReceived");
         messageAdapter.notifyDataSetChanged();
         searchProgressBar.setVisibility(View.GONE);
         progressTable.setVisibility(View.GONE);
@@ -398,33 +446,36 @@ public class LogFragment extends Fragment implements ChatDatabaseReceiver, QEDPa
 
     @Override
     public void onNetworkError(String tag) {
-        searchProgressBar.post(() -> {
+        new Handler(Looper.getMainLooper()).post(() -> {
+            labelError.setText(R.string.cant_connect);
+
             searchProgressBar.setVisibility(View.GONE);
             progressTable.setVisibility(View.GONE);
-            Toast.makeText(getContext(), R.string.error, Toast.LENGTH_LONG).show();
+            labelError.setVisibility(View.VISIBLE);
         });
     }
 
     @Override
     public void onStreamError(String tag) {
-        onNetworkError(tag);
+        new Handler(Looper.getMainLooper()).post(() -> {
+            searchProgressBar.setVisibility(View.GONE);
+            progressTable.setVisibility(View.GONE);
+            labelError.setVisibility(View.VISIBLE);
+        });
     }
 
     @Override
     public void onProgressUpdate(String tag, long done, long total) {
-        if (total == Integer.MIN_VALUE && done == Integer.MIN_VALUE) {
-            Log.d(Application.LOG_TAG_DEBUG, tag + ": download complete");
-        } else if (total == Integer.MIN_VALUE) {
+        if (total == Integer.MIN_VALUE && done != Integer.MIN_VALUE) {
             String mib = String.valueOf(done / 1_048_576);
             String dot = String.valueOf((done % 1_048_576) / 1_048_576d).substring(2, 3);
             if (dot.equals("")) dot = "0";
             downloadProgress.setText(String.format(downloadProgressString, mib + "." + dot));
-
-            Log.d(Application.LOG_TAG_DEBUG, tag + ": downloading: " + done / 1_048_576 + "MiB");
-        } else {
-            String parseProgressString = String.format(LogFragment.parseProgressString, done + "/" + total);
-            parseProgress.setText(parseProgressString);
-            Log.d(Application.LOG_TAG_DEBUG, tag + ": converting " + parseProgressString);
+        } else if (total != Integer.MIN_VALUE && done != Integer.MIN_VALUE) {
+            parseProgress.post(() -> {
+                String parseProgressString = String.format(LogFragment.parseProgressString, done + "/" + total);
+                parseProgress.setText(parseProgressString);
+            });
         }
     }
 
@@ -445,10 +496,21 @@ public class LogFragment extends Fragment implements ChatDatabaseReceiver, QEDPa
         }
     }
 
-    public enum Mode {
-        POST_RECENT("postrecent"), DATE_RECENT("daterecent"), DATE_INTERVAL("dateinterval"), POST_INTERVAL("postinterval"), SINCE_OWN("fromownpost");
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == 0b1001001001 && resultCode == Activity.RESULT_OK && data != null) {
+            Uri uri = data.getData();
+            if (uri != null) {
+                pathEditText.setText(uri.getPath());
+                pathData = uri.toString();
+            }
+        }
+    }
 
-        public String modeStr;
+    public enum Mode {
+        POST_RECENT("postrecent"), DATE_RECENT("daterecent"), DATE_INTERVAL("dateinterval"), POST_INTERVAL("postinterval"), SINCE_OWN("fromownpost"), FILE("file");
+
+        public final String modeStr;
 
         Mode(String modeStr) {
             this.modeStr = modeStr;

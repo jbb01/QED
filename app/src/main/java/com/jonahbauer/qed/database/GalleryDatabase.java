@@ -6,6 +6,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 
+import androidx.annotation.NonNull;
+
 import com.jonahbauer.qed.qedgallery.album.Album;
 import com.jonahbauer.qed.qedgallery.image.Image;
 
@@ -36,7 +38,7 @@ public class GalleryDatabase {
     }
 
     @SuppressWarnings("UnusedReturnValue")
-    public long insert(Album album, boolean insertOrUpdate) {
+    public long insert(@NonNull Album album, boolean insertOrUpdate) {
         insertsRunning ++;
         ContentValues value = new ContentValues();
         value.put(AlbumEntry.COLUMN_NAME_ID, album.id);
@@ -62,7 +64,7 @@ public class GalleryDatabase {
     }
 
     @SuppressWarnings("UnusedReturnValue")
-    public long insert(Image image, boolean insertOrUpdate) {
+    public long insert(@NonNull Image image, boolean insertOrUpdate) {
         insertsRunning ++;
         ContentValues value = new ContentValues();
         value.put(ImageEntry.COLUMN_NAME_ID, image.id);
@@ -105,7 +107,7 @@ public class GalleryDatabase {
         async.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, GalleryDatabaseAsync.Mode.INSERT_ALL_ALBUMS, galleryDatabaseHelper, list, insertOrUpdate, receiver);
     }
 
-    public String getImageThumbnailPath(Image image) {
+    public String getImageThumbnailPath(@NonNull Image image) {
         SQLiteDatabase galleryReadable = galleryDatabaseHelper.getReadableDatabase();
         galleryReadable.beginTransaction();
         Cursor cursor = galleryReadable.query(ImageEntry.TABLE_NAME, new String[] {ImageEntry.COLUMN_NAME_THUMBNAIL_PATH}, ImageEntry.COLUMN_NAME_ID + "=?", new String[] {String.valueOf(image.id)}, null, null, null);
@@ -123,7 +125,25 @@ public class GalleryDatabase {
         return imageThumbnailPath;
     }
 
-    public Image getImageData(Image image) {
+    public String getImagePath(@NonNull Image image) {
+        SQLiteDatabase galleryReadable = galleryDatabaseHelper.getReadableDatabase();
+        galleryReadable.beginTransaction();
+        Cursor cursor = galleryReadable.query(ImageEntry.TABLE_NAME, new String[] {ImageEntry.COLUMN_NAME_PATH}, ImageEntry.COLUMN_NAME_ID + "=?", new String[] {String.valueOf(image.id)}, null, null, null);
+
+        String imagePath = null;
+        if (cursor.moveToFirst()) {
+            imagePath = cursor.getString(0);
+        }
+
+        cursor.close();
+        galleryReadable.setTransactionSuccessful();
+        galleryReadable.endTransaction();
+        galleryReadable.close();
+
+        return imagePath;
+    }
+
+    public Image getImageData(@NonNull Image image) {
         SQLiteDatabase galleryReadable = galleryDatabaseHelper.getReadableDatabase();
         galleryReadable.beginTransaction();
         Cursor cursor = galleryReadable.query(ImageEntry.TABLE_NAME, new String[] {ImageEntry.COLUMN_NAME_PATH, ImageEntry.COLUMN_NAME_UPLOAD_DATE, ImageEntry.COLUMN_NAME_FORMAT, ImageEntry.COLUMN_NAME_NAME, ImageEntry.COLUMN_NAME_OWNER, ImageEntry.COLUMN_NAME_THUMBNAIL_PATH, ImageEntry.COLUMN_NAME_IS_ORIGINAL, ImageEntry.COLUMN_NAME_CREATION_DATE, ImageEntry.COLUMN_NAME_ALBUM_NAME}, ImageEntry.COLUMN_NAME_ID + "=?", new String[] {String.valueOf(image.id)}, null, null, null);
@@ -187,7 +207,7 @@ public class GalleryDatabase {
         return out;
     }
 
-    public List<Image> getImageList(Album album) {
+    public List<Image> getImageList(@NonNull Album album) {
         SQLiteDatabase galleryReadable = galleryDatabaseHelper.getReadableDatabase();
         galleryReadable.beginTransaction();
 
@@ -211,6 +231,32 @@ public class GalleryDatabase {
         cursor.close();
 
         return out;
+    }
+
+    public void getAlbumData(@NonNull Album album) {
+        SQLiteDatabase galleryReadable = galleryDatabaseHelper.getReadableDatabase();
+
+        try (Cursor cursor = galleryReadable.query(AlbumEntry.TABLE_NAME, new String[] {AlbumEntry.COLUMN_NAME_NAME, AlbumEntry.COLUMN_NAME_CREATOR_NAME, AlbumEntry.COLUMN_NAME_CREATION_DATE}, AlbumEntry.COLUMN_NAME_ID + "=" + album.id, null, null, null, null, "1")) {
+            if (cursor.moveToNext()) {
+                String name = cursor.getString(0);
+                String creatorName = cursor.getString(1);
+                String creationDate = cursor.getString(2);
+
+                if ((album.name == null || album.name.isEmpty()) && name != null) album.name = name;
+                if ((album.owner == null || album.owner.isEmpty()) && creatorName != null) album.owner = creatorName;
+                if ((album.creationDate == null || album.creationDate.isEmpty()) && creationDate != null) album.creationDate = creationDate;
+            }
+        }
+
+        galleryReadable.close();
+    }
+
+    public void clear() {
+        SQLiteDatabase writableDatabase = galleryDatabaseHelper.getWritableDatabase();
+        writableDatabase.beginTransaction();
+        galleryDatabaseHelper.clear(writableDatabase);
+        writableDatabase.setTransactionSuccessful();
+        writableDatabase.endTransaction();
     }
 }
 

@@ -9,9 +9,8 @@ import android.net.NetworkRequest;
 import androidx.annotation.NonNull;
 
 public class ConnectionStateMonitor extends ConnectivityManager.NetworkCallback {
-
+    private final Application application;
     private final NetworkRequest networkRequest;
-    private Application application;
 
     ConnectionStateMonitor(Application application) {
         networkRequest = new NetworkRequest.Builder().addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR).addTransportType(NetworkCapabilities.TRANSPORT_WIFI).build();

@@ -22,6 +22,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -73,9 +75,10 @@ public class GalleryAlbumActivity extends AppCompatActivity implements QEDPageRe
     private ArrayAdapter adapterDate;
     private ArrayAdapter adapterPhotographer;
 
-    private TextView emptyGalleryText;
+    private TextView albumErrorText;
 
     private MenuItem menuItemInfo;
+    private Toolbar toolbar;
 
     // -1: none
     // 0: photographer
@@ -92,9 +95,16 @@ public class GalleryAlbumActivity extends AppCompatActivity implements QEDPageRe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_gallery_album);
 
+        Intent intent = getIntent();
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        if (!handleIntent(intent, this)) {
+            super.finish();
+            Toast.makeText(this, R.string.error, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        setContentView(R.layout.activity_gallery_album);
 
         online = false;
         offlineLabel = findViewById(R.id.label_offline);
@@ -104,15 +114,13 @@ public class GalleryAlbumActivity extends AppCompatActivity implements QEDPageRe
         galleryDatabase = new GalleryDatabase();
         galleryDatabase.init(this, this);
 
-        Intent intent = getIntent();
-        handleIntent(intent);
-
         if (album == null) finish();
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(album.name);
 
         setSupportActionBar(toolbar);
+
         ActionBar actionbar = getSupportActionBar();
         assert actionbar != null;
         actionbar.setDisplayHomeAsUpEnabled(true);
@@ -133,7 +141,7 @@ public class GalleryAlbumActivity extends AppCompatActivity implements QEDPageRe
         spinnerCategory = findViewById(R.id.album_category_spinner);
         spinnerDate = findViewById(R.id.album_date_spinner);
         spinnerPhotographer = findViewById(R.id.album_photographer_spinner);
-        emptyGalleryText = findViewById(R.id.empty_album);
+        albumErrorText = findViewById(R.id.error_album);
         CheckBox expandCheckBox = findViewById(R.id.expand_checkBox);
         searchButton = findViewById(R.id.search_button);
 
@@ -236,18 +244,32 @@ public class GalleryAlbumActivity extends AppCompatActivity implements QEDPageRe
     }
 
     @Override
-    public void onPageReceived(String tag, Album album) {
+    public void onPageReceived(String tag, @Nullable Album album) {
         online = true;
         imageAdapter.setOfflineMode(false);
-        if (album.images == null || album.images.isEmpty()) {
-            emptyGalleryText.post(() -> emptyGalleryText.setVisibility(View.VISIBLE));
+
+        if (album == null) {
+            albumErrorText.setText(R.string.album_invalid);
+            albumErrorText.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(View.GONE);
+            return;
+        }
+
+        if (album.name != null && !album.name.equals("")) toolbar.setTitle(album.name);
+
+        if (album.images.isEmpty()) {
+            albumErrorText.post(() -> {
+                albumErrorText.setText(R.string.album_empty);
+                albumErrorText.setVisibility(View.VISIBLE);
+            });
             progressBar.setVisibility(View.GONE);
             imageAdapter.clear();
             imageAdapter.notifyDataSetChanged();
             searchButton.setEnabled(true);
             return;
         }
-        emptyGalleryText.setVisibility(View.GONE);
+
+        albumErrorText.setVisibility(View.GONE);
 
         imageAdapter.clear();
         imageAdapter.addAll(album.images);
@@ -263,7 +285,7 @@ public class GalleryAlbumActivity extends AppCompatActivity implements QEDPageRe
         this.album.dates.stream().sorted().map(date -> MessageFormat.format("{0,date,dd.MM.yyyy}", date)).forEach(adapterDate::add);
         adapterDate.notifyDataSetChanged();
 
-        if (this.album.images != null && !this.album.images.isEmpty()) {
+        if (!this.album.images.isEmpty()) {
             this.album.imageListDownloaded = true;
         }
 
@@ -396,17 +418,42 @@ public class GalleryAlbumActivity extends AppCompatActivity implements QEDPageRe
         online = false;
         offlineLabel.post(() -> {
             offlineLabel.setVisibility(View.VISIBLE);
-            Toast.makeText(getContext(), offlineLabel.getContext().getString(R.string.login_failed_switching_to_offline), Toast.LENGTH_SHORT).show();
+
+            if (!sharedPreferences.getBoolean(getString(R.string.preferences_gallery_offline_mode_key), false))
+                Toast.makeText(getContext(), offlineLabel.getContext().getString(R.string.login_failed_switching_to_offline), Toast.LENGTH_SHORT).show();
         });
 
         searchFilters.post(() -> searchFilters.setVisibility(View.GONE));
 
         imageGridView.post(() -> {
             imageAdapter.clear();
-            imageAdapter.addAll(galleryDatabase.getImageList(album));
-            imageAdapter.notifyDataSetChanged();
+
+            galleryDatabase.getAlbumData(album);
+
+            if (album.name != null && !album.name.equals("")) toolbar.setTitle(album.name);
+
+            boolean unknownAlbum = galleryDatabase.getAlbums().stream().noneMatch(album1 -> album1.id == album.id);
+            if (unknownAlbum) {
+                albumErrorText.setText(R.string.album_not_downloaded);
+                albumErrorText.setVisibility(View.VISIBLE);
+                imageGridView.setVisibility(View.GONE);
+                progressBar.setVisibility(View.GONE);
+                return;
+            }
+
+            List<Image> images = galleryDatabase.getImageList(album);
+            if (images == null || images.isEmpty()) {
+                albumErrorText.setText(R.string.album_empty);
+                albumErrorText.setVisibility(View.GONE);
+                imageGridView.setVisibility(View.GONE);
+            } else {
+                imageAdapter.addAll(galleryDatabase.getImageList(album));
+                imageAdapter.notifyDataSetChanged();
+                imageGridView.setVisibility(View.VISIBLE);
+                albumErrorText.setVisibility(View.GONE);
+            }
+
             progressBar.setVisibility(View.GONE);
-            imageGridView.setVisibility(View.VISIBLE);
         });
 
         imageAdapter.setOfflineMode(true);
@@ -423,18 +470,22 @@ public class GalleryAlbumActivity extends AppCompatActivity implements QEDPageRe
 
     @Override
     protected void onNewIntent(Intent intent) {
-        handleIntent(intent);
+        if (!handleIntent(intent, this)) {
+            super.finish();
+            Toast.makeText(this, R.string.error, Toast.LENGTH_SHORT).show();
+            return;
+        }
         super.onNewIntent(intent);
     }
 
-    private void handleIntent(Intent intent) {
+    public static boolean handleIntent(@NonNull Intent intent, @Nullable GalleryAlbumActivity activity) {
         Object obj = intent.getSerializableExtra(GALLERY_ALBUM_KEY);
         if (obj instanceof Album) {
-            album = (Album) obj;
-            return;
+            if (activity != null) activity.album = (Album) obj;
+            return true;
         }
 
-        if (Intent.ACTION_VIEW.equals(intent.getAction())) {
+        if (Intent.ACTION_VIEW.equals(intent.getAction()) || "com.jonahbauer.qed.action.SHOW_ALBUM".equals(intent.getAction())) {
             Uri data = intent.getData();
             if (data != null) {
                 String host = data.getHost();
@@ -449,22 +500,26 @@ public class GalleryAlbumActivity extends AppCompatActivity implements QEDPageRe
                 }
                 if (host != null) if (host.equals("qedgallery.qed-verein.de")) {
                     if (path != null) if (path.startsWith("/album_view.php")) {
-                        SharedPreferences.Editor editor = sharedPreferences.edit();
-                        editor.putInt(getString(R.string.preferences_drawerSelection_key), R.id.nav_gallery).apply();
+                        if (activity != null) {
+                            SharedPreferences.Editor editor = activity.sharedPreferences.edit();
+                            editor.putInt(activity.getString(R.string.preferences_drawerSelection_key), R.id.nav_gallery).apply();
+                        }
 
                         String albumIdStr = queries.getOrDefault("albumid", null);
-                        if (albumIdStr != null) {
+                        if (albumIdStr != null && albumIdStr.matches("\\d*")) {
                             try {
                                 int id = Integer.parseInt(albumIdStr);
-                                album = new Album();
-                                album.id = id;
-                            } catch (NumberFormatException ignored) {
-                                Toast.makeText(this, R.string.error, Toast.LENGTH_SHORT).show();
-                            }
+                                if (activity != null) {
+                                    activity.album = new Album();
+                                    activity.album.id = id;
+                                }
+                                return true;
+                            } catch (NumberFormatException ignored) {}
                         }
                     }
                 }
             }
         }
+        return false;
     }
 }

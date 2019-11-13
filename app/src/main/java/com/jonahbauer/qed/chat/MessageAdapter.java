@@ -28,7 +28,7 @@ public class MessageAdapter extends ArrayAdapter<Message> {
     private final Context context;
     private final List<Message> messageList;
     private final boolean extended;
-    private SharedPreferences sharedPreferences;
+    private final SharedPreferences sharedPreferences;
 
     public MessageAdapter(Context context, @NonNull List<Message> messageList, boolean extended) {
         super(context, R.layout.list_item_message, messageList);

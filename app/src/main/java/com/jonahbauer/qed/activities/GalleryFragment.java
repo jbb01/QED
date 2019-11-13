@@ -117,11 +117,6 @@ public class GalleryFragment extends Fragment implements QEDPageReceiver<List<Al
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-    }
-
-    @Override
     public void onPageReceived(String tag, List<Album> albums) {
         galleryAdapter.clear();
         galleryAdapter.addAll(albums);
@@ -153,7 +148,9 @@ public class GalleryFragment extends Fragment implements QEDPageReceiver<List<Al
         online = false;
         offlineLabel.post(() -> {
             offlineLabel.setVisibility(View.VISIBLE);
-            Toast.makeText(getContext(), offlineLabel.getContext().getString(R.string.login_failed_switching_to_offline), Toast.LENGTH_SHORT).show();
+
+            if (!sharedPreferences.getBoolean(getString(R.string.preferences_gallery_offline_mode_key), false))
+                Toast.makeText(getContext(), offlineLabel.getContext().getString(R.string.login_failed_switching_to_offline), Toast.LENGTH_SHORT).show();
         });
 
         galleryListView.post(() -> {

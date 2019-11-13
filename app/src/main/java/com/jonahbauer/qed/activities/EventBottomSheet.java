@@ -43,7 +43,7 @@ import java.util.function.Function;
 public class EventBottomSheet extends BottomSheetDialogFragment implements QEDPageReceiver<Event> {
     private static final String EXTRA_EVENT_ID = "eventId";
 
-    private static Comparator<Person> comparator = (p1, p2) -> {
+    private static final Comparator<Person> comparator = (p1, p2) -> {
         if (p1.type != p2.type) return p1.type.compareTo(p2.type);
         else {
             String name1 = p1.firstName + " " + p1.lastName;

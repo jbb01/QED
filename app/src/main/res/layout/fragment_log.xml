@@ -25,101 +25,111 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical" >-->
-            <ProgressBar
-                android:id="@+id/save_progress"
-                style="@android:style/Widget.ProgressBar.Horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:progressDrawable="@drawable/progressbar"
-                android:visibility="gone" />
+    <ProgressBar
+        android:id="@+id/save_progress"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:progressDrawable="@drawable/progressbar"
+        android:visibility="gone" />
 
-            <TextView
-                android:id="@+id/log_subtitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="16sp"
-                android:gravity="center"
-                android:textStyle="bold"
-                android:background="@color/log_subtitle_background"
-                android:textColor="@color/log_subtitle_font"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp"/>
+    <TextView
+        android:id="@+id/log_subtitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:background="@color/log_subtitle_background"
+        android:textColor="@color/log_subtitle_font"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"/>
 
-            <ProgressBar
-                android:id="@+id/search_progress"
-                style="?android:attr/progressBarStyleLarge"
+    <ProgressBar
+        android:id="@+id/search_progress"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="30dp"
+        android:visibility="visible"
+        tools:visibility="visible"
+        android:background="#00ffffff"
+        android:layout_gravity="center"/>
+
+    <TableLayout
+        android:id="@+id/progress_table"
+        android:visibility="visible"
+        tools:visibility="visible"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp">
+        <TableRow>
+            <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="30dp"
-                android:layout_marginBottom="30dp"
-                android:visibility="visible"
-                tools:visibility="visible"
-                android:background="#00ffffff"
-                android:layout_gravity="center"/>
-
-            <TableLayout
-                android:id="@+id/progress_table"
-                android:visibility="visible"
-                tools:visibility="visible"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp">
-                <TableRow>
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_column="1"
-                        android:src="@drawable/ic_log_download"
-                        android:padding="4dp"
-                        tools:ignore="ContentDescription" />
-                    <TextView
-                        android:id="@+id/progress_download_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_column="2"
-                        android:text="@string/log_downloading"
-                        android:gravity="center_vertical"
-                        android:paddingStart="10dp"
-                        android:paddingEnd="10dp"
-                        android:textSize="16sp" />
-                </TableRow>
-                <TableRow>
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_column="1"
-                        android:padding="4dp"
-                        android:src="@drawable/ic_log_converting"
-                        tools:ignore="ContentDescription" />
-                    <TextView
-                        android:id="@+id/progress_parse_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_column="2"
-                        android:text="@string/log_parsing"
-                        android:gravity="center_vertical"
-                        android:paddingStart="10dp"
-                        android:paddingEnd="10dp"
-                        android:textSize="16sp" />
-                </TableRow>
-
-            </TableLayout>
-
-            <ListView
-                android:layout_width="match_parent"
+                android:layout_column="1"
+                android:src="@drawable/ic_log_download"
+                android:padding="4dp"
+                tools:ignore="ContentDescription" />
+            <TextView
+                android:id="@+id/progress_download_text"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:id="@+id/log_message_container"
-                android:background="#00ffffff"
-                android:divider="#00ffffff"
-                android:dividerHeight="@dimen/message_divider"
-                android:clipToPadding="false"
-                android:visibility="gone"
-                android:scrollbarStyle="outsideOverlay"
-                android:fastScrollAlwaysVisible="true"
-                android:fastScrollEnabled="true"
-                tools:visibility="gone"
-                tools:ignore="RtlSymmetry" />
+                android:layout_column="2"
+                android:text="@string/log_downloading"
+                android:gravity="center_vertical"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:textSize="16sp" />
+        </TableRow>
+        <TableRow>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_column="1"
+                android:padding="4dp"
+                android:src="@drawable/ic_log_converting"
+                tools:ignore="ContentDescription" />
+            <TextView
+                android:id="@+id/progress_parse_text"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_column="2"
+                android:text="@string/log_parsing"
+                android:gravity="center_vertical"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:textSize="16sp" />
+        </TableRow>
+
+    </TableLayout>
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/log_message_container"
+        android:background="#00ffffff"
+        android:divider="#00ffffff"
+        android:dividerHeight="@dimen/message_divider"
+        android:clipToPadding="false"
+        android:visibility="gone"
+        android:scrollbarStyle="outsideOverlay"
+        android:fastScrollAlwaysVisible="true"
+        android:fastScrollEnabled="true"
+        tools:visibility="gone"
+        tools:ignore="RtlSymmetry" />
+
+    <TextView
+        android:id="@+id/label_offline"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:textAlignment="center"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:text="@string/no_internet"
+        android:visibility="gone"/>
     <!--</LinearLayout>
 </RelativeLayout>-->
 </LinearLayout>

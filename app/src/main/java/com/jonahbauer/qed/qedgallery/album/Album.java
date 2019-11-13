@@ -20,10 +20,10 @@ public class Album implements Serializable {
     public int id;
     public String owner;
     public String creationDate;
-    public List<Person> persons;
-    public List<Date> dates;
-    public List<String> categories;
-    public List<Image> images;
+    public final List<Person> persons;
+    public final List<Date> dates;
+    public final List<String> categories;
+    public final List<Image> images;
     public boolean imageListDownloaded;
 
     public Album() {

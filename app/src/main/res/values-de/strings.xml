@@ -69,7 +69,7 @@
     <string name="drawer_logout">Abmelden</string>
     <string name="drawer_persons">Personen</string>
     <string name="drawer_settings">Einstellungen</string>
-    <string name="empty_album">Dieses Album ist leer</string>
+    <string name="album_empty">Dieses Album ist leer</string>
     <string name="error">Fehler!</string>
     <string name="event_subtitle_cost">Kosten</string>
     <string name="event_subtitle_deadline">Anmeldeschluss</string>
@@ -103,6 +103,7 @@
     <string name="log_downloading">Chatlog wird heruntergeladen… (%s MiB)</string>
     <string name="log_parsing">JSON wird geparst… (%s)</string>
     <string name="log_postrecent">postrecent</string>
+    <string name="log_file">file</string>
     <string name="log_wait_for_save">Bitte warte bis das Speichern abgeschlossen ist.</string>
     <string name="login_action_sign_in">Anmelden</string>
     <string name="login_action_sign_in_short">Anmelden</string>
@@ -153,6 +154,13 @@
     <string name="preferences_chat_colorful_messages_title">Farbige Nachrichten</string>
     <string name="preferences_chat_group_database">Chat-Datenbank</string>
     <string name="preferences_chat_delete_db_title">Chat-Datenbank löschen</string>
-    <string name="confirm_delete_database">Möchtest du wirklich die gesamte Offline-Chat-Datenbank löschen?</string>
+    <string name="confirm_delete_chat_database">Möchtest du wirklich die gesamte Offline-Chat-Datenbank löschen?</string>
+    <string name="confirm_delete_gallery_database">Möchtest du wirklich die Galerie-Datenbank löschen?</string>
     <string name="preferences_gallery_group_fs">Dateisystem</string>
+    <string name="unknown_error">Ein unbekannter Fehler trat auf.</string>
+    <string name="preferences_gallery_delete_db_title">Galerie-Datenbank löschen</string>
+    <string name="offline_mode_not_available">Im Offline-Modus nicht verfügbar.</string>
+    <string name="album_invalid">Dieses Album existiert nicht.</string>
+    <string name="image_overwrite_offline_mode">Du befindest dich im Offline-Modus. Möchtest du das Bild trotzdem herunterladen?</string>
+    <string name="album_overwrite_offline_mode">Du befindest dich im Offline-Modus. Möchtest du das Album trotzdem herunterladen?</string>
 </resources>

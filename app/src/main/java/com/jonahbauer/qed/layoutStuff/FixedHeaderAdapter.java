@@ -24,18 +24,17 @@ import java.util.function.Function;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 public abstract class FixedHeaderAdapter<T, S> extends ArrayAdapter<T> implements SectionIndexer, AbsListView.OnScrollListener {
-    protected List<T> itemList;
+    protected final List<T> itemList;
     private Function<T,S> headerMap;
     private Comparator<? super T> comparator;
     private Object[] sections;
 
     private boolean notifyOnChange;
-    private List<Integer> headerPositions;
+    private final List<Integer> headerPositions;
 
-    private View fixedHeader;
-    private Set<View> invisibleViews;
-
-    private LayoutInflater layoutInflater;
+    private final View fixedHeader;
+    private final Set<View> invisibleViews;
+    private final LayoutInflater layoutInflater;
 
     public FixedHeaderAdapter(Context context, @NonNull List<T> itemList, @NonNull Function<T,S> headerMap, Comparator<? super T> comparator, View fixedHeader) {
         super(context, 0, itemList);

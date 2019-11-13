@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -43,12 +44,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // NetworkTest.testNetwork();
-
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         Intent intent = getIntent();
-        handleIntent(intent);
+        if (!handleIntent(intent, this)) {
+            super.finish();
+            Toast.makeText(this, R.string.error, Toast.LENGTH_SHORT).show();
+            return;
+        }
 
 
         if (!sharedPreferences.getBoolean(getString(R.string.preferences_loggedIn_key),false)) {
@@ -169,7 +172,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public void reloadFragment(boolean onlyTitle) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        switch (sharedPreferences.getInt(getString(R.string.preferences_drawerSelection_key),R.id.nav_chat)) {
+
+        int selected = sharedPreferences.getInt(getString(R.string.preferences_drawerSelection_key),R.id.nav_chat);
+        switch (selected) {
             case R.id.nav_chat:
                 if (!onlyTitle) {
                     fragment = new ChatFragment();
@@ -214,6 +219,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
         }
 
+        navView.setCheckedItem(selected);
+
         if (!onlyTitle) transaction.commit();
     }
 
@@ -227,8 +234,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (fragment != null && fragment instanceof Internet) ((Internet) fragment).onConnectionRegain();
     }
 
-    private boolean handleIntent(Intent intent) {
-        if (Intent.ACTION_VIEW.equals(intent.getAction())) {
+    public static boolean handleIntent(Intent intent, @Nullable MainActivity activity) {
+        if (activity != null) activity.shouldReloadFragment = false;
+
+        if ("android.intent.action.MAIN".equals(intent.getAction()) && intent.getCategories().contains("android.intent.category.LAUNCHER")) return true;
+
+        if (Intent.ACTION_VIEW.equals(intent.getAction()) || "com.jonahbauer.qed.action.SHOW".equals(intent.getAction())) {
             Uri data = intent.getData();
             if (data != null) {
                 String host = data.getHost();
@@ -244,54 +255,84 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 // QED-DB
                 if (host != null) if (host.equals("qeddb.qed-verein.de")) {
-                    if (path != null) if (path.startsWith("/personen.php")) {
-                        String person = queries.getOrDefault("person", null);
-                        if (person != null) {
-                            PersonBottomSheet personBottomSheet = PersonBottomSheet.newInstance(person);
-                            personBottomSheet.show(getSupportFragmentManager(), personBottomSheet.getTag());
-                            return false;
-                        } else {
-                            sharedPreferences.edit().putInt(getString(R.string.preferences_drawerSelection_key), R.id.nav_database_persons).apply();
+                    if (path != null) {
+                        if (path.startsWith("/personen.php")) {
+                            String person = queries.getOrDefault("person", null);
+                            if (activity != null) {
+                                if (person != null && person.matches("\\d+")) {
+                                    PersonBottomSheet personBottomSheet = PersonBottomSheet.newInstance(person);
+                                    personBottomSheet.show(activity.getSupportFragmentManager(), personBottomSheet.getTag());
+                                    activity.shouldReloadFragment = false;
+                                } else {
+                                    activity.sharedPreferences.edit().putInt(activity.getString(R.string.preferences_drawerSelection_key), R.id.nav_database_persons).apply();
+                                    activity.shouldReloadFragment = true;
+                                }
+                            }
+
                             return true;
-                        }
-                    }
-                    else if (path.startsWith("/veranstaltungen.php")) {
-                        sharedPreferences.edit().putInt(getString(R.string.preferences_drawerSelection_key), R.id.nav_database_events).apply();
-                        String event = queries.getOrDefault("veranstaltung", null);
-                        if (event != null) {
-                            EventDatabaseFragment.showEventId = Integer.valueOf(event);
-                            EventDatabaseFragment.shownEvent = false;
+                        } else if (path.startsWith("/veranstaltungen.php")) {
+                            if (activity != null) {
+                                activity.sharedPreferences.edit().putInt(activity.getString(R.string.preferences_drawerSelection_key), R.id.nav_database_events).apply();
+                                activity.shouldReloadFragment = true;
+                            }
+
+                            String event = queries.getOrDefault("veranstaltung", null);
+                            if (event != null && event.matches("\\d+")) {
+                                EventDatabaseFragment.showEventId = Integer.valueOf(event);
+                                EventDatabaseFragment.shownEvent = false;
+                            }
+
+                            return true;
                         }
                     }
                 // QED-Chat
                 } else if (host.equals("chat.qed-verein.de")) {
-                    if (path != null) if (path.startsWith("/index.html")) {
-                        SharedPreferences.Editor editor = sharedPreferences.edit();
-                        editor.putInt(getString(R.string.preferences_drawerSelection_key), R.id.nav_chat);
-                        editor.putString(getString(R.string.preferences_chat_channel_key), queries.getOrDefault("channel", ""));
-                        editor.apply();
+                    if (path != null) {
+                        if (path.startsWith("/index.html")) {
+                            if (activity != null) {
+                                SharedPreferences.Editor editor = activity.sharedPreferences.edit();
+                                editor.putInt(activity.getString(R.string.preferences_drawerSelection_key), R.id.nav_chat);
+                                editor.putString(activity.getString(R.string.preferences_chat_channel_key), queries.getOrDefault("channel", ""));
+                                editor.apply();
+
+                                activity.shouldReloadFragment = true;
+                            }
+
+                            return true;
+                        }
                     }
                 // QED-Gallery
                 } else if (host.equals("qedgallery.qed-verein.de")) {
-                    if (path != null) if (path.startsWith("/album_list.php")) {
-                        SharedPreferences.Editor editor = sharedPreferences.edit();
-                        editor.putInt(getString(R.string.preferences_drawerSelection_key), R.id.nav_gallery).apply();
-                    } else if (path.startsWith("/image_view.php")) {
-                        SharedPreferences.Editor editor = sharedPreferences.edit();
-                        editor.putInt(getString(R.string.preferences_drawerSelection_key), R.id.nav_gallery).apply();
+                    if (path != null) {
+                        if (path.startsWith("/album_list.php")) {
+                            if (activity != null) {
+                                SharedPreferences.Editor editor = activity.sharedPreferences.edit();
+                                editor.putInt(activity.getString(R.string.preferences_drawerSelection_key), R.id.nav_gallery).apply();
+                                activity.shouldReloadFragment = true;
+                            }
+
+                            return true;
+                        }
                     }
                 }
             }
-            return true;
         }
         return false;
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
+        if (handleIntent(intent,this)) {
+            if (shouldReloadFragment) {
+                shouldReloadFragment = false;
+                reloadFragment(false);
+            }
+        } else {
+            super.finish();
+            Toast.makeText(this, R.string.error, Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-        if (handleIntent(intent))
-            reloadFragment(false);
+        super.onNewIntent(intent);
     }
 }

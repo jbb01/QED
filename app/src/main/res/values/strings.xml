@@ -33,11 +33,25 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="offline_mode">Offline-Mode</string>
+    <string name="offline_mode_not_available">Not available in offline mode.</string>
     <string name="thumbnail">thumbnail</string>
+    <string name="unknown_error">An unknown error occurred.</string>
+    <string name="delete">Delete</string>
+    <string name="double_back_to_exit_toast">Press again to exit</string>
+    <string name="login_failed_switching_to_offline">Login failed.</string>
+    <string name="cant_connect">No Internet Connection.</string>
+    <string name="coming_soon">Coming soon</string>
+    <string name="no_file_explorer">No file explorer was found.</string>
+    <string name="content_description_divider">Divider</string>
 
     <!-- Chat Fragment -->
     <string name="title_fragment_chat">Chat</string>
     <string name="chat_button_send">Send</string>
+    <string name="chat_empty_message">You are about to send an empty message. Do you wish to continue?</string>
+    <string name="chat_login_failed">Chat login failed</string>
+    <string name="chat_message_hint">Write a message</string>
+    <string name="chat_refresh">Refresh</string>
+    <string name="chat_scroll_down_button_content_description">Scroll Down</string>
 
     <!-- Login Activity -->
     <string name="title_activity_login">Sign In</string>
@@ -49,6 +63,10 @@
 
     <!-- Database -->
     <string name="database_offline">No internet connection.\nThe Database if not available when offline</string>
+    <string name="database_hits">Hits</string>
+    <string name="database_login_failed">Database login failed</string>
+    <string name="database_save_done">Saved</string>
+    <string name="database_search_button">Search</string>
     <!-- Chat Database Fragment -->
     <string name="title_fragment_chat_database">Database</string>
     <string name="chat_database_channel_checkbox">Channel</string>
@@ -62,6 +80,7 @@
     <string name="chat_database_dateTo_checkbox">until</string>
     <string name="chat_database_dateTo_hint">yyyy-mm-dd hh:mm:ss</string>
     <string name="chat_database_id_checkbox">ID</string>
+    <string name="chat_database_id_hint">from</string>
     <!-- Persons Database Fragment -->
     <string name="title_fragment_persons_database">Persons</string>
     <string name="persons_database_firstName_checkbox">First Name</string>
@@ -104,6 +123,7 @@
     <string name="preferences_chat_showLinks_key" translatable="false">showLinks</string>
     <string name="preferences_chat_katex_key" translatable="false">katex</string>
     <string name="preferences_chat_delete_db_key" translatable="false">delete_chat_db</string>
+    <string name="preferences_chat_colorful_messages_key" translatable="false">colorful_messages</string>
 
     <string name="preferences_ping_notification_key" translatable="false">pushPings</string>
 
@@ -114,7 +134,7 @@
     <string name="preferences_gallery_delete_images_key" translatable="false">delete_images</string>
     <string name="preferences_gallery_offline_mode_key" translatable="false">gallery_offline_mode</string>
     <string name="preferences_gallery_show_dir_key" translatable="false">show_gallery_dir</string>
-    <string name="preferences_chat_colorful_messages_key" translatable="false">colorful_messages</string>
+    <string name="preferences_gallery_delete_db_key" translatable="false">delete_gallery_db</string>
 
     <!-- Preference Activity -->
     <string name="title_activity_settings">Settings</string>
@@ -132,7 +152,7 @@
     <string name="preferences_chat_katex_title">KaTex Rendering</string>
     <string name="preferences_chat_colorful_messages_title">Colorful Messages</string>
     <string name="preferences_chat_delete_db_title">Delete Chat Database</string>
-    <string name="confirm_delete_database">Are you sure you want to delete the offline chat database?</string>
+    <string name="confirm_delete_chat_database">Are you sure you want to delete the offline chat database?</string>
 
     <string name="preferences_gallery_group_fs">File System</string>
     <string name="preferences_gallery_delete_thumbnails">Delete saved thumbnails</string>
@@ -141,11 +161,14 @@
     <string name="preferences_gallery_offline_mode_true_summary">No Pictures will be downloaded. Some features will only be available to a limited extent.</string>
     <string name="preferences_gallery_offline_mode_false_summary">All features are unrestricted available. Pictures will be downloaded as needed.</string>
     <string name="preferences_gallery_show_dir">Open storage directory</string>
+    <string name="preferences_gallery_delete_db_title">Delete Gallery Database</string>
     <string name="confirm_delete_thumbnails">Are you sure you want to delete all the saved thumbnails?</string>
     <string name="confirm_delete_images">Are you sure you want to delete all the saved images?</string>
+    <string name="confirm_delete_gallery_database">Are you sure you want to delete the gallery database?</string>
 
     <!-- Navigation Drawer -->
     <string name="drawer_chat_heading">Chat</string>
+    <string name="drawer_chat">Chat</string>
     <string name="drawer_chat_log">Log</string>
     <string name="drawer_chat_db">Database</string>
 
@@ -181,10 +204,12 @@
     <string name="log_postrecent">postrecent</string>
     <string name="log_daterecent">daterecent</string>
     <string name="log_dateinterval">dateinterval</string>
+    <string name="log_file">file</string>
     <string-array name="modes">
         <item>@string/log_postrecent</item>
         <item>@string/log_daterecent</item>
         <item>@string/log_dateinterval</item>
+        <item>@string/log_file</item>
     </string-array>
 
     <!-- Album Fragment + Activity -->
@@ -199,6 +224,10 @@
     <string name="title_activity_album">Album</string>
     <string name="gallery_folder_images" translatable="false">gallery/images</string>
     <string name="gallery_folder_thumbnails" translatable="false">gallery/thumbnails</string>
+    <string name="album_empty">This album is empty</string>
+    <string name="album_not_downloaded">This album is not downloaded</string>
+    <string name="album_invalid">This album does not exist.</string>
+    <string name="album_overwrite_offline_mode">You are in offline mode. Do you want to download the album nevertheless?</string>
 
     <!-- Image Activity -->
     <string name="title_activity_image">Picture</string>
@@ -211,28 +240,10 @@
     <string name="image_info_format">Format:</string>
     <string name="image_info_path">Path:</string>
     <string name="image_info_creation_date">Created on:</string>
-    <string name="empty_album">This album is empty</string>
-    <string name="login_failed_switching_to_offline">Login failed.</string>
     <string name="image_not_downloaded">This picture is not downloaded</string>
-    <string name="no_file_explorer">No file explorer was found.</string>
-    <string name="cant_connect">No</string>
-    <string name="chat_database_id_hint">from</string>
-    <string name="chat_empty_message">You are about to send an empty message. Do you wish to continue?</string>
-    <string name="chat_login_failed">Chat login failed</string>
-    <string name="chat_message_hint">Write a message</string>
-    <string name="chat_refresh">Refresh</string>
-    <string name="chat_scroll_down_button_content_description">Scroll Down</string>
-    <string name="coming_soon">Coming soon</string>
-    <string name="content_description_divider">Divider</string>
-    <string name="database_hits">Hits</string>
-    <string name="database_login_failed">Database login failed</string>
-    <string name="database_save_done">Saved</string>
-    <string name="database_search_button">Search</string>
-    <string name="delete">Delete</string>
-    <string name="double_back_to_exit_toast">Press again to exit</string>
-    <string name="drawer_chat">Chat</string>
-    <string name="album_not_downloaded">This album is not downloaded</string>
     <string name="image_download_non_picture">You are about to download an audio or video file. A WLAN connection is recommanded. Do you wish to continue?</string>
+    <string name="image_overwrite_offline_mode">You are in offline mode. Do you want to download the image nevertheless?</string>
+
     <!-- Sonstiges -->
 
 </resources>
