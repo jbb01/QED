@@ -37,6 +37,7 @@
             <TableLayout
                 android:id="@+id/expand"
                 android:visibility="gone"
+                tools:visibility="visible"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentTop="true"
@@ -64,7 +65,8 @@
                         android:layout_marginEnd="6dp"
                         android:textSize="16sp"
                         android:hint="@string/chat_database_channel_hint"
-                        android:inputType="text" />
+                        android:inputType="text"
+                        android:importantForAutofill="no" />
                 </TableRow>
 
                 <TableRow
@@ -88,7 +90,8 @@
                         android:layout_marginEnd="6dp"
                         android:textSize="16sp"
                         android:hint="@string/chat_database_message_hint"
-                        android:inputType="text" />
+                        android:inputType="text"
+                        android:importantForAutofill="no" />
                 </TableRow>
 
                 <TableRow
@@ -112,7 +115,8 @@
                         android:layout_marginEnd="6dp"
                         android:textSize="16sp"
                         android:hint="@string/chat_database_name_hint"
-                        android:inputType="text" />
+                        android:inputType="text"
+                        android:importantForAutofill="no" />
                 </TableRow>
 
                 <TableRow
@@ -136,7 +140,8 @@
                         android:layout_marginEnd="6dp"
                         android:textSize="16sp"
                         android:hint="@string/chat_database_dateFrom_hint"
-                        android:inputType="datetime" />
+                        android:inputType="datetime"
+                        android:importantForAutofill="no" />
                 </TableRow>
 
                 <TableRow
@@ -160,7 +165,8 @@
                         android:layout_marginEnd="6dp"
                         android:textSize="16sp"
                         android:hint="@string/chat_database_dateTo_hint"
-                        android:inputType="datetime" />
+                        android:inputType="datetime"
+                        android:importantForAutofill="no" />
                 </TableRow>
 
                 <TableRow
@@ -184,7 +190,8 @@
                         android:layout_marginEnd="6dp"
                         android:textSize="16sp"
                         android:hint="@string/chat_database_id_hint"
-                        android:inputType="text" />
+                        android:inputType="text"
+                        android:importantForAutofill="no" />
                 </TableRow>
             </TableLayout>
 

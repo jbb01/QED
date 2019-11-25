@@ -1,6 +1,6 @@
 package com.jonahbauer.qed;
 
-public interface Internet {
+public interface NetworkListener {
     void onConnectionFail();
     void onConnectionRegain();
 }

@@ -1,5 +1,6 @@
 package com.jonahbauer.qed.activities;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Animatable;
@@ -51,10 +52,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import static com.jonahbauer.qed.Application.getContext;
+import static com.jonahbauer.qed.DeepLinkingActivity.QEDIntent;
 
 public class GalleryAlbumActivity extends AppCompatActivity implements QEDPageReceiver<Album>, CompoundButton.OnCheckedChangeListener, View.OnClickListener, GalleryDatabaseReceiver, AdapterView.OnItemClickListener {
     public static final String GALLERY_ALBUM_KEY = "galleryAlbum";
+
+    private Application application;
 
     private Album album;
 
@@ -96,8 +99,10 @@ public class GalleryAlbumActivity extends AppCompatActivity implements QEDPageRe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        application = (Application) getApplication();
+
         Intent intent = getIntent();
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         if (!handleIntent(intent, this)) {
             super.finish();
             Toast.makeText(this, R.string.error, Toast.LENGTH_SHORT).show();
@@ -212,6 +217,7 @@ public class GalleryAlbumActivity extends AppCompatActivity implements QEDPageRe
         } else if (id == R.id.album_info) {
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
             alertDialogBuilder.setTitle(album.name);
+            @SuppressLint("InflateParams")
             View view = LayoutInflater.from(this).inflate(R.layout.alert_dialog_album_info, null);
             ((TextView)view.findViewById(R.id.album_creator)).setText(album.owner);
             ((TextView)view.findViewById(R.id.album_creation_date)).setText(album.creationDate);
@@ -302,8 +308,11 @@ public class GalleryAlbumActivity extends AppCompatActivity implements QEDPageRe
     }
 
     @Override
-    public void onNetworkError(String tag) {
-        switchToOfflineMode();
+    public void onError(String tag, String reason, Throwable cause) {
+        QEDPageReceiver.super.onError(tag, reason, cause);
+
+        if (REASON_NETWORK.equals(reason))
+            switchToOfflineMode();
     }
 
     @Override
@@ -405,7 +414,7 @@ public class GalleryAlbumActivity extends AppCompatActivity implements QEDPageRe
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Image image = imageAdapter.getItem(position);
         if (image == null || (!online && !image.available)) {
-            Toast.makeText(getContext(), getString(R.string.image_not_downloaded), Toast.LENGTH_SHORT).show();
+            Toast.makeText(application, getString(R.string.image_not_downloaded), Toast.LENGTH_SHORT).show();
             return;
         }
         Intent intent = new Intent(this, ImageActivity.class);
@@ -420,7 +429,7 @@ public class GalleryAlbumActivity extends AppCompatActivity implements QEDPageRe
             offlineLabel.setVisibility(View.VISIBLE);
 
             if (!sharedPreferences.getBoolean(getString(R.string.preferences_gallery_offline_mode_key), false))
-                Toast.makeText(getContext(), offlineLabel.getContext().getString(R.string.login_failed_switching_to_offline), Toast.LENGTH_SHORT).show();
+                Toast.makeText(application, offlineLabel.getContext().getString(R.string.login_failed_switching_to_offline), Toast.LENGTH_SHORT).show();
         });
 
         searchFilters.post(() -> searchFilters.setVisibility(View.GONE));
@@ -485,7 +494,7 @@ public class GalleryAlbumActivity extends AppCompatActivity implements QEDPageRe
             return true;
         }
 
-        if (Intent.ACTION_VIEW.equals(intent.getAction()) || "com.jonahbauer.qed.action.SHOW_ALBUM".equals(intent.getAction())) {
+        if (Intent.ACTION_VIEW.equals(intent.getAction()) || QEDIntent.ACTION_SHOW_ALBUM.equals(intent.getAction())) {
             Uri data = intent.getData();
             if (data != null) {
                 String host = data.getHost();

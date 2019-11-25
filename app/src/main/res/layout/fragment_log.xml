@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/fragment"
     android:layout_width="match_parent"
@@ -8,107 +8,141 @@
     android:background="@color/log_background"
     tools:context=".activities.LogFragment">
 
-    <!--<RelativeLayout
+    <TableLayout
+        android:id="@+id/log_fragment_progress_table"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <ImageView
-            android:id="@+id/background"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentBottom="true"
-            android:contentDescription="@string/background"/>-->
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:gravity="center_vertical"
+        android:padding="16dp" >
 
-        <!--<LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" >-->
+        <TableRow>
+            <RelativeLayout>
+                <ImageView
+                    android:id="@+id/log_fragment_icon_download"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:src="@drawable/ic_log_download"
+                    android:tint="@color/state_dependend_icon_color"
+                    android:contentDescription="@string/content_description_icon"
+                    android:padding="5dp"/>
+                <ProgressBar
+                    android:layout_alignStart="@id/log_fragment_icon_download"
+                    android:layout_alignEnd="@id/log_fragment_icon_download"
+                    android:layout_alignTop="@id/log_fragment_icon_download"
+                    android:layout_alignBottom="@id/log_fragment_icon_download"
+                    android:id="@+id/log_fragment_progress_download"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:padding="5dp"
+                    style="?android:attr/progressBarStyleSmall"
+                    android:layout_gravity="center"
+                    tools:visibility="gone"/>
+            </RelativeLayout>
+            <TextView
+                android:id="@+id/log_fragment_text_download"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:gravity="center_vertical"
+                android:textSize="14sp"
+                android:padding="5dp"
+                android:text="@string/log_download_pending"/>
+        </TableRow>
+        <TableRow>
+            <RelativeLayout>
+                <ImageView
+                    android:id="@+id/log_fragment_icon_json_parse"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:src="@drawable/ic_log_converting"
+                    android:tint="@color/state_dependend_icon_color"
+                    android:contentDescription="@string/content_description_icon"
+                    android:padding="5dp"/>
+                <ProgressBar
+                    android:layout_alignStart="@id/log_fragment_icon_json_parse"
+                    android:layout_alignEnd="@id/log_fragment_icon_json_parse"
+                    android:layout_alignTop="@id/log_fragment_icon_json_parse"
+                    android:layout_alignBottom="@id/log_fragment_icon_json_parse"
+                    android:id="@+id/log_fragment_progress_json_parse"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:padding="5dp"
+                    style="?android:attr/progressBarStyleSmall"
+                    android:layout_gravity="center"
+                    tools:visibility="gone"/>
+            </RelativeLayout>
+            <TextView
+                android:id="@+id/log_fragment_text_json_parse"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:gravity="center_vertical"
+                android:textSize="14sp"
+                android:padding="5dp"
+                android:text="@string/log_parse_pending"/>
+        </TableRow>
+
+        <View
+            android:layout_height="100dp"
+            android:layout_width="match_parent"/>
+    </TableLayout>
+
     <ProgressBar
         android:id="@+id/save_progress"
         style="@android:style/Widget.ProgressBar.Horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
         android:progressDrawable="@drawable/progressbar"
-        android:visibility="gone" />
+        android:visibility="gone"
+        tools:progress="66"
+        tools:visibility="visible"/>
 
     <TextView
-        android:id="@+id/log_subtitle"
+        android:id="@+id/log_fragment_subtitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/save_progress"
         android:textSize="16sp"
         android:gravity="center"
         android:textStyle="bold"
         android:background="@color/log_subtitle_background"
         android:textColor="@color/log_subtitle_font"
         android:paddingTop="10dp"
-        android:paddingBottom="10dp"/>
+        android:paddingBottom="10dp"
+        tools:text="Lorem ipsum dolor sit."
+        tools:visibility="visible"/>
 
-    <ProgressBar
-        android:id="@+id/search_progress"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:layout_marginBottom="30dp"
-        android:visibility="visible"
-        tools:visibility="visible"
-        android:background="#00ffffff"
-        android:layout_gravity="center"/>
-
-    <TableLayout
-        android:id="@+id/progress_table"
-        android:visibility="visible"
-        tools:visibility="visible"
+    <TextView
+        android:id="@+id/label_offline"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp">
-        <TableRow>
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_column="1"
-                android:src="@drawable/ic_log_download"
-                android:padding="4dp"
-                tools:ignore="ContentDescription" />
-            <TextView
-                android:id="@+id/progress_download_text"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_column="2"
-                android:text="@string/log_downloading"
-                android:gravity="center_vertical"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:textSize="16sp" />
-        </TableRow>
-        <TableRow>
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_column="1"
-                android:padding="4dp"
-                android:src="@drawable/ic_log_converting"
-                tools:ignore="ContentDescription" />
-            <TextView
-                android:id="@+id/progress_parse_text"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_column="2"
-                android:text="@string/log_parsing"
-                android:gravity="center_vertical"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:textSize="16sp" />
-        </TableRow>
-
-    </TableLayout>
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:textAlignment="center"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:text="@string/no_internet"
+        android:visibility="gone"
+        tools:visibility="visible"/>
 
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/log_fragment_subtitle"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
         android:id="@+id/log_message_container"
         android:background="#00ffffff"
         android:divider="#00ffffff"
@@ -120,16 +154,4 @@
         android:fastScrollEnabled="true"
         tools:visibility="gone"
         tools:ignore="RtlSymmetry" />
-
-    <TextView
-        android:id="@+id/label_offline"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:textAlignment="center"
-        android:textSize="16sp"
-        android:gravity="center"
-        android:text="@string/no_internet"
-        android:visibility="gone"/>
-    <!--</LinearLayout>
-</RelativeLayout>-->
-</LinearLayout>
+</RelativeLayout>

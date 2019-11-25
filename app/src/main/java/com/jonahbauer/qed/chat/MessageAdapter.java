@@ -21,6 +21,7 @@ import androidx.preference.PreferenceManager;
 import com.jonahbauer.qed.R;
 
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
@@ -145,8 +146,9 @@ public class MessageAdapter extends ArrayAdapter<Message> {
         return view;
     }
 
+
     public List<Message> getData() {
-        return messageList;
+        return new LinkedList<>(messageList);
     }
 
     @SuppressWarnings("unused")

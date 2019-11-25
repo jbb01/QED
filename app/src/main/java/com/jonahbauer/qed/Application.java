@@ -1,9 +1,12 @@
 package com.jonahbauer.qed;
 
 import android.app.Activity;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.security.keystore.KeyGenParameterSpec;
 import android.util.Log;
 import android.widget.Toast;
@@ -13,7 +16,10 @@ import androidx.preference.PreferenceManager;
 import androidx.security.crypto.EncryptedSharedPreferences;
 import androidx.security.crypto.MasterKeys;
 
+import org.jetbrains.annotations.Contract;
+
 import java.io.IOException;
+import java.lang.ref.SoftReference;
 import java.security.GeneralSecurityException;
 import java.util.HashSet;
 import java.util.Set;
@@ -36,37 +42,46 @@ public class Application extends android.app.Application implements android.app.
     public static final String KEY_DATABASE_SESSIONID = "db_sessionid";
     public static final String KEY_DATABASE_SESSIONID2 = "db_sessionid2";
 
+    @SuppressWarnings("unused")
     public static final String KEY_FCM_DEVICE_TOKEN = "fcmDeviceToken";
+    @SuppressWarnings("unused")
     public static final String KEY_FCM_RSA_KEY = "fcmRsaKeyPair";
+
+    public static final String NOTIFICATION_CHANNEL_ID = "qednotification";
 
 
     private static final String ENCRYPTED_SHARED_PREFERENCE_FILE = "com.jonahbauer.qed_encrypted";
 
 
     public static boolean online;
+    private static boolean foreground;
 
-    private static Application context;
+    private static SoftReference<Application> context;
     private SharedPreferences sharedPreferences;
     private Activity activity;
-    private final Set<Activity> activeActivities;
     private final Set<Activity> existingActivities;
-    private boolean active;
     private ConnectionStateMonitor connectionStateMonitor;
 
     private String masterKeyAlias;
 
     {
-        activeActivities = new HashSet<>();
         existingActivities = new HashSet<>();
     }
 
+    /**
+     * Loads data from the default shared preferences.
+     *
+     * @param key a key mapping to the data entry
+     * @param encrypted should be the same value as used when saving the data entry
+     * @return the stored value, null if none is stored
+     */
     public String loadData(String key, boolean encrypted) {
         if (encrypted) {
             try {
                 KeyGenParameterSpec keyGenParameterSpec = MasterKeys.AES256_GCM_SPEC;
                 masterKeyAlias = MasterKeys.getOrCreate(keyGenParameterSpec);
             } catch (GeneralSecurityException | IOException e) {
-                Toast.makeText(this, "Passwort konnte nicht gespeichert werden.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.master_key_error, Toast.LENGTH_SHORT).show();
             }
 
             if (masterKeyAlias == null) {
@@ -79,7 +94,7 @@ public class Application extends android.app.Application implements android.app.
                         .create(
                                 ENCRYPTED_SHARED_PREFERENCE_FILE,
                                 masterKeyAlias,
-                                context,
+                                this,
                                 EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
                                 EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
                         );
@@ -93,6 +108,16 @@ public class Application extends android.app.Application implements android.app.
         }
     }
 
+    /**
+     * Stores data to the default shared preferences.
+     *
+     * When {@param encrypted} is true the data will be encrypted using a key from the Android Keystore.
+     * That way it is almost impossible to extract the value from the shared preferences even with root permission.
+     *
+     * @param data the data value
+     * @param key a key mapping to the data entry
+     * @param encrypted should be the same value as used when saving the data entry
+     */
     public void saveData(String data, String key, boolean encrypted) {
         if (encrypted) {
             try {
@@ -110,7 +135,7 @@ public class Application extends android.app.Application implements android.app.
                         .create(
                                 ENCRYPTED_SHARED_PREFERENCE_FILE,
                                 masterKeyAlias,
-                                context,
+                                this,
                                 EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
                                 EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
                         );
@@ -129,7 +154,7 @@ public class Application extends android.app.Application implements android.app.
         super.onCreate();
         registerActivityLifecycleCallbacks(this);
 
-        context = this;
+        context = new SoftReference<>(this);
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         connectionStateMonitor = new ConnectionStateMonitor(this);
@@ -157,30 +182,17 @@ public class Application extends android.app.Application implements android.app.
 
     @Override
     public void onActivityResumed(@NonNull Activity activity) {
-        if (activeActivities.size() == 0) {
-            active = true;
-            new Handler().postDelayed(() -> {
-                if (active) onApplicationResumed();
-            },500);
-        }
-        activeActivities.add(activity);
         this.activity = activity;
+        foreground = true;
     }
 
     @Override
     public void onActivityPaused(@NonNull Activity activity) {
-        activeActivities.remove(activity);
-        if (activeActivities.size() == 0) {
-            active = false;
-            new Handler().postDelayed(() -> {
-                if (!active) onApplicationPaused();
-            },500);
-        }
+        foreground = false;
     }
 
     @Override
-    public void onActivityStopped(@NonNull Activity activity) {
-    }
+    public void onActivityStopped(@NonNull Activity activity) {}
 
     @Override
     public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState) {}
@@ -190,28 +202,58 @@ public class Application extends android.app.Application implements android.app.
         existingActivities.remove(activity);
     }
 
-    private void onApplicationResumed() {
-    }
-
-    private void onApplicationPaused() {
-    }
-
-    public static Application getContext() {
+    @Contract(pure = true)
+    @NonNull
+    public static SoftReference<Application> getApplicationReference() {
         return context;
     }
 
+    /**
+     * Sets the online status of the app and calls all {@code NetworkListener}.
+     * @param online the new online status
+     */
     public void setOnline(boolean online) {
         if (!Application.online && online) {
-            if (activity!=null&&(activity instanceof Internet)) ((Internet)activity).onConnectionRegain();
+            if (activity!=null&&(activity instanceof NetworkListener)) ((NetworkListener)activity).onConnectionRegain();
         } else if (Application.online && !online) {
-            if (activity!=null&&(activity instanceof Internet)) ((Internet)activity).onConnectionFail();
+            if (activity!=null&&(activity instanceof NetworkListener)) ((NetworkListener)activity).onConnectionFail();
         } else if (!Application.online) {
-            if (activity!=null&&(activity instanceof Internet)) ((Internet)activity).onConnectionFail();
+            if (activity!=null&&(activity instanceof NetworkListener)) ((NetworkListener)activity).onConnectionFail();
         }
         Application.online = online;
     }
 
     public void finish() {
         for (Activity activity : existingActivities) activity.finish();
+    }
+
+    /**
+     * Returns {@code true} if the app is in foreground.
+     * When switching activities for a short time it can happen that this method returns {@code false} even though the app is in foreground.
+     *
+     * @return true if the app is in foreground.
+     */
+    @Contract(pure = true)
+    public static boolean isForeground() {
+        return foreground;
+    }
+
+
+    /**
+     * Creates a notification channel for android versions greater than Oreo
+     */
+    public static void createNotificationChannel(@NonNull Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = context.getString(R.string.notification_channel_name);
+            String description = context.getString(R.string.notification_channel_description);
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+
+            NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+
+            NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
+            if (notificationManager != null)
+                notificationManager.createNotificationChannel(channel);
+        }
     }
 }

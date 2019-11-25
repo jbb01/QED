@@ -1,7 +1,6 @@
 package com.jonahbauer.qed.activities;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,9 +10,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 
-import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.networking.QEDDBPages;
 import com.jonahbauer.qed.networking.QEDPageReceiver;
@@ -23,12 +20,12 @@ import com.jonahbauer.qed.qeddb.event.EventAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EventDatabaseFragment extends Fragment implements QEDPageReceiver<List<Event>> {
+public class EventDatabaseFragment extends QEDFragment implements QEDPageReceiver<List<Event>> {
     private EventAdapter eventAdapter;
 
     private ListView eventListView;
     private ProgressBar searchProgress;
-    private TextView offlineLabel;
+    private TextView errorLabel;
 
     static String showEvent;
     static int showEventId;
@@ -44,7 +41,7 @@ public class EventDatabaseFragment extends Fragment implements QEDPageReceiver<L
         super.onResume();
 
         searchProgress.setVisibility(View.VISIBLE);
-        offlineLabel.setVisibility(View.GONE);
+        errorLabel.setVisibility(View.GONE);
         eventListView.setVisibility(View.GONE);
         QEDDBPages.getEventList(getClass().toString(), this);
     }
@@ -56,7 +53,7 @@ public class EventDatabaseFragment extends Fragment implements QEDPageReceiver<L
 
         eventListView = view.findViewById(R.id.event_list_view);
         searchProgress = view.findViewById(R.id.search_progress);
-        offlineLabel = view.findViewById(R.id.label_offline);
+        errorLabel = view.findViewById(R.id.label_error);
 
         eventAdapter = new EventAdapter(getContext(), new ArrayList<>());
         eventListView.setAdapter(eventAdapter);
@@ -103,19 +100,21 @@ public class EventDatabaseFragment extends Fragment implements QEDPageReceiver<L
     }
 
     @Override
-    public void onNetworkError(String tag) {
-        Log.e(Application.LOG_TAG_ERROR, "networkError at " + tag);
+    public void onError(String tag, String reason, Throwable cause) {
+        QEDPageReceiver.super.onError(tag, reason, cause);
 
-        offlineLabel.post(() -> {
-            offlineLabel.setVisibility(View.VISIBLE);
+        final String errorString;
+
+        if (REASON_NETWORK.equals(reason))
+            errorString = getString(R.string.database_offline);
+        else
+            errorString = getString(R.string.unknown_error);
+
+        handler.post(() -> {
+            errorLabel.setText(errorString);
+            errorLabel.setVisibility(View.VISIBLE);
             searchProgress.setVisibility(View.GONE);
             eventListView.setVisibility(View.GONE);
         });
-
-//        Intent intent = new Intent(getActivity(), LoginActivity.class);
-//        intent.putExtra(LoginActivity.ERROR_MESSAGE, getString(R.string.database_login_failed));
-//        startActivity(intent);
-//        if (getActivity() != null) getActivity().finish();
-
     }
 }

@@ -7,6 +7,8 @@ import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 
+import androidx.annotation.NonNull;
+
 import com.jonahbauer.qed.chat.Message;
 
 import java.util.ArrayList;
@@ -46,7 +48,7 @@ public class ChatDatabase {
     }
 
     @SuppressWarnings("UnusedReturnValue")
-    public long insert(Message message) {
+    public long insert(@NonNull Message message) {
         ContentValues value = new ContentValues();
         value.put(COLUMN_NAME_ID,message.id);
         value.put(COLUMN_NAME_USERID,message.userId);

@@ -13,12 +13,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.jonahbauer.qed.Application;
-import com.jonahbauer.qed.Internet;
+import com.jonahbauer.qed.NetworkListener;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.networking.AsyncLoadQEDPage;
 import com.jonahbauer.qed.networking.AsyncLoadQEDPageToStream;
@@ -31,7 +32,7 @@ import java.net.URLEncoder;
 
 import javax.net.ssl.HttpsURLConnection;
 
-public class LoginActivity extends AppCompatActivity implements Internet {
+public class LoginActivity extends AppCompatActivity implements NetworkListener {
     public static final String ERROR_MESSAGE = "errorMessage";
     public static final String DONT_START_MAIN = "dontStartMain";
 
@@ -237,7 +238,7 @@ public class LoginActivity extends AppCompatActivity implements Internet {
         }
 
         @Override
-        protected void onPostExecute(final Boolean success) {
+        protected void onPostExecute(@NonNull final Boolean success) {
             authTask = null;
             showProgress(false);
 

@@ -1,182 +1,213 @@
-package com.jonahbauer.qed.networking;
+package com.jonahbauer.qed.networking.downloadManager;
 
+import android.app.DownloadManager;
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.util.LongSparseArray;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.activities.LoginActivity;
+import com.jonahbauer.qed.networking.NoNetworkException;
 import com.jonahbauer.qed.networking.login.InvalidCredentialsException;
 import com.jonahbauer.qed.networking.login.QEDLogin;
 
-import java.io.IOException;
+import org.jetbrains.annotations.Contract;
+
+import java.io.File;
 import java.lang.ref.SoftReference;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
-import java.util.function.Function;
 
-import javax.net.ssl.HttpsURLConnection;
+public class Download extends AsyncTask<Void, Void, Void> {
+    private static final Map<String, String> credentials;
+    private static final DownloadManager downloadManager;
 
-/**
- * Asynchronously loads a web page from the qed servers.
- *
- * @param <T> callback return value type
- */
-public class AsyncLoadQEDPage<T> extends AsyncTask<Void, Void, String> {
-    private Feature feature;
-    private Application application;
-    private String url;
-    private String tag;
-    private QEDPageReceiver<T> receiver;
-    private Map<String,String> cookies;
-    private Function<String, T> postExecute;
+    private static final LongSparseArray<Download> downloads;
 
-    private static Map<String, String> credentials;
+    private final Application application;
 
-    public static boolean forcedLogin;
+    private final Feature feature;
+    private final Uri uri;
+    private final File file;
+    private final Map<String,String> cookies;
+    private final String notificationTitle;
+    private final String notificationDescription;
+
+    private DownloadListener listener;
+
+    private boolean forcedLogin = false;
+
+    private long id = -1;
+
 
     static {
         credentials = new HashMap<>();
+        downloads = new LongSparseArray<>();
+
+        SoftReference<Application> applicationReference = Application.getApplicationReference();
+        Application application = applicationReference.get();
+
+        if (application != null)
+            downloadManager = (DownloadManager) application.getSystemService(Context.DOWNLOAD_SERVICE);
+        else
+            downloadManager = null;
     }
 
-    /**
-     * Loads the webpage from url. url might contain the wildcards "{@userid}", "{@pwhash}", "{@sessionid}", "{@sessionid2}"
-     *
-     * @param feature the type of the qed website to be loaded
-     * @param url the url of the qed website
-     * @param receiver a receiver that will be informed on success or failure of the download
-     * @param tag a string tag used when calling receiver methods
-     * @param postExecute a function to collect relevant data from the html string, called on ui thread
-     * @param cookies a map of cookies, the cookies required for authenticating to the server are automatically added depending on {@param feature}
-     */
-    @SuppressWarnings("JavaDoc")
-    AsyncLoadQEDPage(@NonNull Feature feature, @NonNull String url, @NonNull QEDPageReceiver<T> receiver, String tag, @NonNull Function<String, T> postExecute, @NonNull Map<String, String> cookies) {
-        this.feature = feature;
-        this.url = url;
-        this.tag = tag;
-        this.receiver = receiver;
-        this.postExecute = postExecute;
+    public static void startDownload(@NonNull Download download) {
+        download.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (Void) null);
+    }
 
-        this.cookies = cookies;
+    public static void stopDownload(@NonNull Download download) {
+        download.cancel(true);
+        downloadManager.remove(download.id);
+    }
 
+    @Nullable
+    static Download getDownload(long id) {
+        return downloads.get(id);
+    }
+
+    @Nullable
+    public static Uri getCompletedDownload(long id) {
+        return downloadManager.getUriForDownloadedFile(id);
+    }
+
+
+    public Download(long downloadId) {
+        this.id = downloadId;
+        this.listener = null;
+        this.feature = null;
+        this.uri = null;
+        this.file = null;
+        this.cookies = null;
+        this.application = null;
+        this.notificationTitle = null;
+        this.notificationDescription = null;
+    }
+
+    public Download(@NonNull Feature feature, @NonNull Uri uri, @NonNull File target, @Nullable Map<String, String> cookies, @NonNull DownloadListener listener, @Nullable String notificationTitle, @Nullable String notificationDescription) {
         SoftReference<Application> applicationReference = Application.getApplicationReference();
         application = applicationReference.get();
 
+        this.feature = feature;
+        this.uri = uri;
+
+        if (cookies == null)
+            this.cookies = new HashMap<>();
+        else
+            this.cookies = cookies;
+
+        this.file = target;
+        this.listener = listener;
+        this.notificationTitle = notificationTitle;
+        this.notificationDescription = notificationDescription;
+
+        if (application == null) {
+            listener.onError(id, null, new AssertionError("Application reference points to a null object."));
+            return;
+        }
+
+        // add required cookies
         switch (feature) {
             case CHAT:
-                cookies.put("userid", "{@userid}");
-                cookies.put("pwhash", "{@pwhash}");
+                this.cookies.put("userid", "{@userid}");
+                this.cookies.put("pwhash", "{@pwhash}");
                 break;
             case GALLERY:
-                cookies.put("userid", "{@userid}");
-                cookies.put("PHPSESSID", "{@phpsessid}");
-                cookies.put("pwhash", "{@pwhash}");
+                this.cookies.put("userid", "{@userid}");
+                this.cookies.put("PHPSESSID", "{@phpsessid}");
+                this.cookies.put("pwhash", "{@pwhash}");
                 break;
             case DATABASE:
-                cookies.put("{@sessioncookie}", "{@sessionid}");
+                this.cookies.put("{@sessioncookie}", "{@sessionid}");
                 break;
         }
     }
 
     @Override
-    protected String doInBackground(Void... voids) {
-        if (application == null) {
-            Log.e(Application.LOG_TAG_ERROR, "", new Exception("Application is null!"));
-            return null;
-        }
+    protected Void doInBackground(Void... voids) {
+        if (feature == null) return null;
 
-        if (!dataAvailable(feature)) {
-            if (!login()) return null;
-        }
-
+        // ensure logged in
+        if (!dataAvailable(feature) && !login()) return null;
         if (!dataAvailable(feature)) throw new AssertionError();
 
-        try {
-            String out = null;
-
-            HttpsURLConnection httpsURLConnection = createConnection();
-            httpsURLConnection.connect();
-
-            String location = httpsURLConnection.getHeaderField("Location");
-            boolean loginError = false;
-            if (feature == Feature.CHAT || feature == Feature.GALLERY) loginError = location != null && location.startsWith("account");
-            else if (feature == Feature.DATABASE) {
-                out = readPage(httpsURLConnection);
-                loginError = out.contains("nicht eingeloggt");
-            }
-            if (loginError) {
-                httpsURLConnection.disconnect();
-
-                if (login()) {
-                    httpsURLConnection = createConnection();
-                    httpsURLConnection.connect();
-
-                    location = httpsURLConnection.getHeaderField("Location");
-                    loginError = false;
-                    if (feature == Feature.CHAT || feature == Feature.GALLERY) loginError = location != null && location.startsWith("account");
-                    else if (feature == Feature.DATABASE) {
-                        out = readPage(httpsURLConnection);
-                        loginError = out.contains("nicht eingeloggt");
-                    }
-                    if (loginError)
-                        throw new InvalidCredentialsException(null);
-
-                    if (feature != Feature.DATABASE) out = readPage(httpsURLConnection);
-                    httpsURLConnection.disconnect();
-
-                    return out;
-                } else {
-                    return null;
-                }
-            }
-
-            if (feature != Feature.DATABASE) out = readPage(httpsURLConnection);
-            httpsURLConnection.disconnect();
-
-            return out;
-        } catch (IOException e) {
-            Log.e(Application.LOG_TAG_ERROR, e.getMessage(), e);
-            receiver.onError(tag, QEDPageReceiver.REASON_NETWORK, e);
-            return null;
-        } catch (InvalidCredentialsException e) {
-            Log.e(Application.LOG_TAG_ERROR, e.getMessage(), e);
-            forceLogin();
-            return null;
-        }
-    }
-
-    @Override
-    protected void onPostExecute(String s) {
-        if (s != null)
-            receiver.onPageReceived(tag, postExecute.apply(s));
-    }
-
-    private HttpsURLConnection createConnection() throws IOException {
-        HttpsURLConnection httpsURLConnection = (HttpsURLConnection) (new URL(formatString(url, feature)).openConnection());
-        httpsURLConnection.setRequestMethod("POST");
-        httpsURLConnection.setInstanceFollowRedirects(false);
-        httpsURLConnection.setUseCaches(false);
+        // create download request
+        DownloadManager.Request request = new DownloadManager.Request(uri);
 
         StringBuilder cookieStringBuilder = new StringBuilder();
         for (String header : cookies.keySet()) {
-            cookieStringBuilder.append(formatString(header, feature)).append("=").append(formatString(cookies.getOrDefault(header, "null"),feature)).append(";");
+            cookieStringBuilder.append(formatString(header, feature)).append("=").append(formatString(cookies.get(header),feature)).append(";");
         }
 
-        httpsURLConnection.setRequestProperty("Cookie", cookieStringBuilder.toString());
+        if (notificationTitle != null) request.setTitle(notificationTitle);
+        if (notificationDescription != null) request.setDescription(notificationDescription);
+        request.addRequestHeader("Cookie", cookieStringBuilder.toString());
 
-        return httpsURLConnection;
+        Uri uri = Uri.fromFile(file);
+        request.setDestinationUri(uri);
+
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE);
+
+        id = downloadManager.enqueue(request);
+
+        synchronized (downloads) {
+            downloads.put(id, this);
+        }
+
+        if (listener != null) listener.attach(id, downloadManager);
+
+        return null;
     }
 
-    /**
-     * replaces wildcards matching the {@param feature} within {@param string}
-     * @return the string with replaced wildcards
-     */
+
+    public void attachListener(@NonNull DownloadListener listener) {
+        if (this.listener == null || !this.listener.equals(listener))  {
+            if (this.listener != null) this.listener.detach();
+
+            this.listener = listener;
+            listener.attach(id, downloadManager);
+        }
+    }
+
+    public void detachListener(@NonNull DownloadListener listener) {
+        listener.detach();
+    }
+
+
+    public int getDownloadStatus() {
+        DownloadManager.Query query = new DownloadManager.Query();
+        query.setFilterById(id);
+
+        Cursor cursor = downloadManager.query(query);
+        if (cursor.moveToFirst()) { // should always be true
+            int statusIndex = cursor.getColumnIndex(DownloadManager.COLUMN_STATUS);
+            return cursor.getInt(statusIndex);
+        }
+
+        return -1;
+    }
+
+    public long getDownloadId() {
+        return id;
+    }
+
+    public DownloadListener getListener() {
+        return listener;
+    }
+
+    @Contract("null, _ -> !null")
     @SuppressWarnings("RegExpRedundantEscape")
-    private String formatString(String string, @NonNull Feature feature) {
+    private String formatString(@Nullable String string, @NonNull Feature feature) {
+        if (string == null) return "";
+
         String userId, pwHash, sessionCookie, sessionId, sessionId2, phpSessionId;
         String out = string;
         switch (feature) {
@@ -248,9 +279,6 @@ public class AsyncLoadQEDPage<T> extends AsyncTask<Void, Void, String> {
         return out;
     }
 
-    /**
-     * @return true if and only if all credentials required for authenticating to the qed website corresponding to {@param feature}.
-     */
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private boolean dataAvailable(@NonNull Feature feature) {
         String userId, pwHash, sessionCookie, sessionId, sessionId2, phpSessionId;
@@ -280,12 +308,8 @@ public class AsyncLoadQEDPage<T> extends AsyncTask<Void, Void, String> {
         return true;
     }
 
-    /**
-     * Tries to use username and password the fetch credential cookies.
-     * @return true if login was successful, false otherwise
-     */
     private boolean login() {
-        credentials = new HashMap<>();
+        credentials.clear();
         try {
             switch (feature) {
                 case CHAT:
@@ -300,37 +324,17 @@ public class AsyncLoadQEDPage<T> extends AsyncTask<Void, Void, String> {
             }
         } catch (NoNetworkException e) {
             Log.e(Application.LOG_TAG_ERROR, e.getMessage(), e);
-            receiver.onError(tag, QEDPageReceiver.REASON_NETWORK, e);
+            if (listener != null) listener.onError(id, "ERROR_NETWORK_ERROR", e);
             return false;
         } catch (InvalidCredentialsException e) {
             Log.e(Application.LOG_TAG_ERROR, e.getMessage(), e);
-            forceLogin();
+            forceLogin(e);
             return false;
         }
         return true;
     }
 
-    /**
-     * reads the html code from a given {@param httpsURLConnection} to a single one-line string
-     */
-    @NonNull
-    private String readPage(@NonNull HttpsURLConnection httpsURLConnection) throws IOException {
-        StringBuilder out = new StringBuilder();
-        Scanner scanner = new Scanner(httpsURLConnection.getInputStream());
-
-        while (scanner.hasNextLine()) {
-            out.append(scanner.nextLine());
-        }
-
-        scanner.close();
-
-        return out.toString();
-    }
-
-    /**
-     * Starts the login activity
-     */
-    private void forceLogin() {
+    private void forceLogin(InvalidCredentialsException e) {
         if (!forcedLogin) {
             forcedLogin = true;
             Intent intent = new Intent(application, LoginActivity.class);
@@ -338,8 +342,8 @@ public class AsyncLoadQEDPage<T> extends AsyncTask<Void, Void, String> {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             application.startActivity(intent);
         }
-        cancel(true);
-        receiver.onError(tag, QEDPageReceiver.REASON_UNABLE_TO_LOG_IN, null);
+
+        if (listener != null) listener.onError(id, "ERROR_INVALID_CREDENTIALS", e);
     }
 
     public enum Feature {

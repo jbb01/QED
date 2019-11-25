@@ -24,10 +24,10 @@ import static com.jonahbauer.qed.database.ChatDatabaseContract.ChatEntry.COLUMN_
 import static com.jonahbauer.qed.database.ChatDatabaseContract.ChatEntry.TABLE_NAME;
 
 public class ChatDatabaseAsync extends AsyncTask<Object, Integer, Boolean> {
-    private Mode mode;
-    private ChatDatabaseReceiver receiver;
+    private final Mode mode;
+    private final ChatDatabaseReceiver receiver;
 
-    private SQLiteDatabase sqLiteDatabase;
+    private final SQLiteDatabase sqLiteDatabase;
 
     private String query;
     private String[] queryArgs;

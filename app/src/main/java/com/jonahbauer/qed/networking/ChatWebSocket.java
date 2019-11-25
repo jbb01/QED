@@ -18,6 +18,7 @@ import com.jonahbauer.qed.networking.login.QEDLogin;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.ref.SoftReference;
 import java.net.UnknownHostException;
 import java.util.concurrent.TimeUnit;
 
@@ -41,9 +42,21 @@ public class ChatWebSocket extends WebSocketListener {
     private boolean forcedLogin = false;
     private boolean sending;
 
-    public ChatWebSocket(ChatWebSocketListener listener) {
+    public ChatWebSocket(@NonNull ChatWebSocketListener listener) {
         this.listener = listener;
-        application = Application.getContext();
+
+        SoftReference<Application> applicationReference = Application.getApplicationReference();
+        application = applicationReference.get();
+
+        if (application == null) {
+            AssertionError error = new AssertionError("Application is null.");
+
+            listener.onError(null, error);
+            sharedPreferences = null;
+
+            throw error;
+        }
+
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(application);
 
         sending = true;
@@ -174,10 +187,10 @@ public class ChatWebSocket extends WebSocketListener {
             throw (Exception) t;
         } catch (UnknownHostException | SSLException e) {
             Log.e(Application.LOG_TAG_DEBUG, "Chat WebSocket " + webSocket.toString() + " no network!", e);
-            if (listener != null) listener.onNetworkError();
+            if (listener != null) listener.onError(ChatWebSocketListener.REASON_NETWORK, t);
         } catch (Exception e) {
             Log.e(Application.LOG_TAG_DEBUG, "Chat WebSocket failed! " + e.getClass().toString(), e);
-            if (listener != null) listener.onUnknownError();
+            if (listener != null) listener.onError(null, t);
         }
     }
 
@@ -186,7 +199,7 @@ public class ChatWebSocket extends WebSocketListener {
             QEDLogin.loginChat();
         } catch (NoNetworkException e) {
             Log.e(Application.LOG_TAG_ERROR, e.getMessage(), e);
-            if (listener != null) listener.onNetworkError();
+            if (listener != null) listener.onError(ChatWebSocketListener.REASON_NETWORK, e);
             return false;
         } catch (InvalidCredentialsException e) {
             Log.e(Application.LOG_TAG_ERROR, e.getMessage(), e);
@@ -204,6 +217,6 @@ public class ChatWebSocket extends WebSocketListener {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             application.startActivity(intent);
         }
-        if (listener != null) listener.onUnknownError();
+        if (listener != null) listener.onError(null, null);
     }
 }

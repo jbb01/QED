@@ -43,6 +43,13 @@
     <string name="coming_soon">Coming soon</string>
     <string name="no_file_explorer">No file explorer was found.</string>
     <string name="content_description_divider">Divider</string>
+    <string name="master_key_error">Password could not be saved.</string>
+    <string name="download_notification_title">QED</string>
+    <string name="download_notification_log_description">Chatlog</string>
+
+    <!-- Sonstiges -->
+    <string name="notification_channel_description">Stub!</string>
+    <string name="notification_channel_name">QED</string>
 
     <!-- Chat Fragment -->
     <string name="title_fragment_chat">Chat</string>
@@ -187,10 +194,26 @@
     <string name="log_subtitle_date_interval">Posts from {0,date,dd.MM.yyyy} until {1,date,dd.MM.yyyy}</string>
     <string name="log_subtitle_date_recent">Posts of the last {0,choice,1#|2#{0} }hour{0,choice,1#|2#s}</string>
     <string name="log_subtitle_post_recent">Last{0,choice,1#|2# {0}} Post{0,choice,1#|2#s}</string>
+    <string name="log_subtitle_post_interval">Posts from #{0} to #{1}</string>
+    <string name="log_subtitle_file">File</string>
     <string name="log_action_save">Save to database</string>
-    <string name="log_wait_for_save">Bitte warte bis das Speichern abgeschlossen ist.</string>
-    <string name="log_downloading">Downloading chatlog… (%s MiB)</string>
-    <string name="log_parsing">Parsing JSON… (%s)</string>
+    <string name="log_wait_for_save">Please wait until saving is done.</string>
+
+    <string name="log_download_pending">Download pending…</string>
+    <string name="log_downloading">Downloading… %s</string>
+    <string name="log_download_paused">Download paused… %s</string>
+    <string name="log_download_successful">Download successful. %s</string>
+    <string name="log_download_failed">Download failed. %s</string>
+    <string name="log_parse_pending">JSON Parsing pending…</string>
+    <string name="log_parsing">Parsing JSON… %s</string>
+    <string name="log_parse_failed">JSON Parsing failed. %s</string>
+
+    <string name="log_download_running">A log download is running. Do you really want to leave?</string>
+    <string name="log_download_continue_in_background_toast">Download will be continued in background.</string>
+    <string name="log_download_continue_in_background">Continue in Background</string>
+    <string name="log_download_running_force_cancel">The running download will be canceled.</string>
+    <string name="log_download_stay">Wait</string>
+    <string name="log_download_cancel">Cancel</string>
 
     <!-- Log Dialog Activity -->
     <string name="title_activity_log_dialog">Logs</string>
@@ -201,12 +224,15 @@
     <string name="log_dialog_daterecent_after">Hours</string>
     <string name="log_dialog_dateinterval_from">From</string>
     <string name="log_dialog_dateinterval_to">Until</string>
+    <string name="log_dialog_file_title">File</string>
     <string name="log_postrecent">postrecent</string>
     <string name="log_daterecent">daterecent</string>
     <string name="log_dateinterval">dateinterval</string>
+    <string name="log_postinterval">postinterval</string>
     <string name="log_file">file</string>
     <string-array name="modes">
         <item>@string/log_postrecent</item>
+        <item>@string/log_postinterval</item>
         <item>@string/log_daterecent</item>
         <item>@string/log_dateinterval</item>
         <item>@string/log_file</item>

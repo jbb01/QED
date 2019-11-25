@@ -3,7 +3,6 @@ package com.jonahbauer.qed.activities;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,10 +16,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
 
-import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.database.GalleryDatabase;
 import com.jonahbauer.qed.database.GalleryDatabaseReceiver;
@@ -32,7 +29,7 @@ import com.jonahbauer.qed.qedgallery.album.AlbumAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GalleryFragment extends Fragment implements QEDPageReceiver<List<Album>>, GalleryDatabaseReceiver {
+public class GalleryFragment extends QEDFragment implements QEDPageReceiver<List<Album>>, GalleryDatabaseReceiver {
     private ListView galleryListView;
     private ProgressBar searchProgress;
     private TextView offlineLabel;
@@ -100,7 +97,7 @@ public class GalleryFragment extends Fragment implements QEDPageReceiver<List<Al
     }
 
     @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.menu_log, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
@@ -129,10 +126,11 @@ public class GalleryFragment extends Fragment implements QEDPageReceiver<List<Al
     }
 
     @Override
-    public void onNetworkError(String tag) {
-        Log.e(Application.LOG_TAG_ERROR, "networkError at: " + tag);
-        switchToOfflineMode();
+    public void onError(String tag, String reason, Throwable cause) {
+        QEDPageReceiver.super.onError(tag, reason, cause);
 
+        if (REASON_NETWORK.equals(reason))
+            switchToOfflineMode();
     }
 
     @Override
@@ -157,16 +155,14 @@ public class GalleryFragment extends Fragment implements QEDPageReceiver<List<Al
             galleryAdapter.clear();
             galleryAdapter.addAll(galleryDatabase.getAlbums());
             galleryAdapter.notifyDataSetChanged();
-        });
-
-        searchProgress.post(() -> {
-            searchProgress.setVisibility(View.GONE);
             galleryListView.setVisibility(View.VISIBLE);
         });
+
+        searchProgress.post(() -> searchProgress.setVisibility(View.GONE));
     }
 
     private void switchToOnlineMode() {
-        searchProgress.post(() -> {
+        handler.post(() -> {
             searchProgress.setVisibility(View.VISIBLE);
             galleryListView.setVisibility(View.GONE);
             offlineLabel.setVisibility(View.GONE);

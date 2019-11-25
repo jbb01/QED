@@ -1,8 +1,11 @@
 package com.jonahbauer.qed.networking;
 
+import android.annotation.SuppressLint;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.util.Pair;
 
 import com.jonahbauer.qed.Application;
@@ -10,6 +13,7 @@ import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.qeddb.event.Event;
 import com.jonahbauer.qed.qeddb.person.Person;
 
+import java.lang.ref.SoftReference;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -26,8 +30,16 @@ public abstract class QEDDBPages {
     private static final SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.GERMANY);
     private static final SimpleDateFormat simpleDateFormat3 = new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY);
 
+    @Nullable
     public static AsyncTask[] getEvent(String tag, String eventId, QEDPageReceiver<Event> eventReceiver) {
-        Application application = Application.getContext();
+        SoftReference<Application> applicationReference = Application.getApplicationReference();
+        Application application = applicationReference.get();
+
+        if (application == null) {
+            Log.e(Application.LOG_TAG_ERROR, "", new Exception("Application is null!"));
+            return null;
+        }
+
         QEDPageReceiver<Event> receiver = new QEDPageReceiver<Event>() {
             private final Event event = new Event();
             private final AtomicInteger done = new AtomicInteger();
@@ -55,9 +67,10 @@ public abstract class QEDDBPages {
                 }
             }
 
+            @SuppressLint("MissingSuperCall")
             @Override
-            public void onNetworkError(String tag2) {
-                eventReceiver.onNetworkError(tag);
+            public void onError(String tag2, String reason, Throwable cause) {
+                eventReceiver.onError(tag, reason, cause);
             }
         };
 
@@ -215,8 +228,15 @@ public abstract class QEDDBPages {
         return getEvent(tag, event.id, eventReceiver);
     }
 
+    @Nullable
     public static AsyncTask[] getEventList(String tag, QEDPageReceiver<List<Event>> eventListReceiver) {
-        Application application = Application.getContext();
+        SoftReference<Application> applicationReference = Application.getApplicationReference();
+        Application application = applicationReference.get();
+
+        if (application == null) {
+            Log.e(Application.LOG_TAG_ERROR, "", new Exception("Application is null!"));
+            return null;
+        }
 
         AsyncLoadQEDPage<List<Event>> list = new AsyncLoadQEDPage<>(
                 AsyncLoadQEDPage.Feature.DATABASE,
@@ -283,8 +303,16 @@ public abstract class QEDDBPages {
         return new AsyncTask[] {list};
     }
 
+    @Nullable
     public static AsyncTask[] getPerson(String tag, String personId, QEDPageReceiver<Person> personReceiver) {
-        Application application = Application.getContext();
+        SoftReference<Application> applicationReference = Application.getApplicationReference();
+        Application application = applicationReference.get();
+
+        if (application == null) {
+            Log.e(Application.LOG_TAG_ERROR, "", new Exception("Application is null!"));
+            return null;
+        }
+
         QEDPageReceiver<Person> receiver = new QEDPageReceiver<Person>() {
             private final Person person = new Person();
             private final AtomicInteger done = new AtomicInteger();
@@ -320,9 +348,10 @@ public abstract class QEDDBPages {
                 }
             }
 
+            @SuppressLint("MissingSuperCall")
             @Override
-            public void onNetworkError(String tag2) {
-                personReceiver.onNetworkError(tag);
+            public void onError(String tag2, String reason, Throwable cause) {
+                personReceiver.onError(tag, reason, cause);
             }
         };
 
@@ -536,8 +565,15 @@ public abstract class QEDDBPages {
         return new AsyncTask[] {page1, page2, page3};
     }
 
+    @Nullable
     public static AsyncTask[] getPersonList(String tag, QEDPageReceiver<List<Person>> personListReceiver) {
-        Application application = Application.getContext();
+        SoftReference<Application> applicationReference = Application.getApplicationReference();
+        Application application = applicationReference.get();
+
+        if (application == null) {
+            Log.e(Application.LOG_TAG_ERROR, "", new Exception("Application is null!"));
+            return null;
+        }
 
         AsyncLoadQEDPage<List<Person>> list = new AsyncLoadQEDPage<>(
                 AsyncLoadQEDPage.Feature.DATABASE,
@@ -553,12 +589,17 @@ public abstract class QEDDBPages {
                             Person person = new Person();
                             String data = m.group();
                             Matcher m2 = Pattern.compile("<td id=\'personen_(\\d*)\'").matcher(data);
-                            if (m2.find()) person.id = Integer.valueOf(m2.group(1));
+
+                            if (m2.find()) {
+                                String idStr = m2.group(1);
+                                if (idStr != null) person.id = Integer.valueOf(idStr);
+                            }
+
                             for (String data2 : data.split("</div>")) {
                                 Matcher m3 = Pattern.compile("<div class=\".*\" title=\"(.*)\">(.*)&nbsp;").matcher(data2);
                                 while (m3.find()) {
                                     String title = m3.group(1);
-                                    String value = m2.group(2);
+                                    String value = m3.group(2);
                                     if (title != null) switch (title) {
                                         case "Vorname":
                                             person.firstName = value;

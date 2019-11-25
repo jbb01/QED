@@ -24,7 +24,7 @@ public class DeepLinkingActivity extends Activity {
             return;
         }
 
-        if (Intent.ACTION_VIEW.equals(intent.getAction())) {
+        if (Intent.ACTION_VIEW.equals(intent.getAction()) || QEDIntent.ACTION_SHOW.equals(intent.getAction())) {
             Uri data = intent.getData();
 
             if (data == null) {
@@ -44,7 +44,7 @@ public class DeepLinkingActivity extends Activity {
                         boolean wantsIntent = ImageActivity.handleIntent(intent, null);
 
                         if (wantsIntent) {
-                            Intent intent1 = new Intent("com.jonahbauer.qed.action.SHOW_IMAGE", data, this, ImageActivity.class);
+                            Intent intent1 = new Intent(QEDIntent.ACTION_SHOW_IMAGE, data, this, ImageActivity.class);
                             startActivity(intent1);
                             usedIntent = true;
                         }
@@ -53,7 +53,7 @@ public class DeepLinkingActivity extends Activity {
                         boolean wantsIntent = GalleryAlbumActivity.handleIntent(intent, null);
 
                         if (wantsIntent) {
-                            Intent intent1 = new Intent("com.jonahbauer.qed.action.SHOW_ALBUM", data, this, GalleryAlbumActivity.class);
+                            Intent intent1 = new Intent(QEDIntent.ACTION_SHOW_ALBUM, data, this, GalleryAlbumActivity.class);
                             startActivity(intent1);
                             usedIntent = true;
                         }
@@ -63,7 +63,7 @@ public class DeepLinkingActivity extends Activity {
             }
 
             if (MainActivity.handleIntent(intent, null)) {
-                Intent intent1 = new Intent("com.jonahbauer.qed.action.SHOW", data, this, MainActivity.class);
+                Intent intent1 = new Intent(QEDIntent.ACTION_SHOW, data, this, MainActivity.class);
                 startActivity(intent1);
                 usedIntent = true;
             }
@@ -76,5 +76,11 @@ public class DeepLinkingActivity extends Activity {
         if (!usedIntent)
             Toast.makeText(this, R.string.error, Toast.LENGTH_SHORT).show();
         finish();
+    }
+
+    public static class QEDIntent {
+        public static final String ACTION_SHOW = "com.jonahbauer.qed.intent.action.SHOW";
+        public static final String ACTION_SHOW_ALBUM = "com.jonahbauer.qed.intent.action.SHOW_ALBUM";
+        public static final String ACTION_SHOW_IMAGE = "com.jonahbauer.qed.intent.action.SHOW_IMAGE";
     }
 }

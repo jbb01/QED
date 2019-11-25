@@ -70,14 +70,30 @@
         tools:visibility="visible"
         layout="@layout/fragment_log_dialog_file"/>
 
-    <LinearLayout
-        android:id="@+id/log_dialog_fragment_holder"
-        android:layout_width="match_parent"
+    <include
+        android:id="@+id/log_fragment_postinterval"
         android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_below="@id/log_fragment_file"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
-        android:layout_below="@id/log_fragment_dateinterval"
-        android:orientation="vertical">
-    </LinearLayout>
+        android:visibility="gone"
+        tools:visibility="visible"
+        layout="@layout/fragment_log_dialog_postinterval"/>
+
+    <TextView
+        android:id="@+id/log_dialog_running_download"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/log_fragment_postinterval"
+        android:paddingStart="@dimen/activity_horizontal_margin"
+        android:paddingEnd="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:text="@string/log_download_running_force_cancel"
+        android:textColor="#F00"
+        android:visibility="gone"
+        tools:visibility="visible" />
 
 </RelativeLayout>

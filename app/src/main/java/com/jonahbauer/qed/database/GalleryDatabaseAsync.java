@@ -4,6 +4,8 @@ import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 
+import androidx.annotation.NonNull;
+
 import com.jonahbauer.qed.qedgallery.album.Album;
 import com.jonahbauer.qed.qedgallery.image.Image;
 
@@ -150,7 +152,8 @@ public class GalleryDatabaseAsync extends AsyncTask<Object, Integer, Boolean> {
         if (insertsRunning == 0) galleryWritable.close();
     }
 
-    private void insertAllAlbums(List<Album> albums, boolean insertOrUpdate) {
+    @SuppressWarnings("ConstantConditions")
+    private void insertAllAlbums(@NonNull List<Album> albums, boolean insertOrUpdate) {
         insertsRunning ++;
         SQLiteDatabase galleryWritable = databaseHelper.getWritableDatabase();
 

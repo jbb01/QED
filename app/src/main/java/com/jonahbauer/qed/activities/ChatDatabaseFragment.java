@@ -14,7 +14,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
 
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.chat.Message;
@@ -35,7 +34,7 @@ import static com.jonahbauer.qed.database.ChatDatabaseContract.ChatEntry.COLUMN_
 import static com.jonahbauer.qed.database.ChatDatabaseContract.ChatEntry.TABLE_NAME;
 
 
-public class ChatDatabaseFragment extends Fragment implements CompoundButton.OnCheckedChangeListener, ChatDatabaseReceiver {
+public class ChatDatabaseFragment extends QEDFragment implements CompoundButton.OnCheckedChangeListener, ChatDatabaseReceiver {
     private ChatDatabase database;
     private MessageAdapter messageAdapter;
 
@@ -151,11 +150,11 @@ public class ChatDatabaseFragment extends Fragment implements CompoundButton.OnC
         }
     }
 
-    private static void expand(final View v) {
+    private static void expand(@NonNull final View v) {
         v.setVisibility(View.VISIBLE);
     }
 
-    private static void collapse(final View v) {
+    private static void collapse(@NonNull final View v) {
         v.setVisibility(View.GONE);
     }
 
@@ -386,12 +385,14 @@ public class ChatDatabaseFragment extends Fragment implements CompoundButton.OnC
 
     @Override
     public void onReceiveResult(List<Message> messages) {
-        searchProgress.post(() -> searchProgress.setVisibility(View.GONE));
-        messageListView.post(() -> messageListView.setVisibility(View.VISIBLE));
-        searchButton.post(() -> searchButton.setEnabled(true));
-
         String hits = messages.size() + " " + getString(R.string.database_hits);
-        hitsView.post(() -> hitsView.setText(hits));
+
+        handler.post(() -> {
+            searchProgress.setVisibility(View.GONE);
+            messageListView.setVisibility(View.VISIBLE);
+            searchButton.setEnabled(true);
+            hitsView.setText(hits);
+        });
 
         messageListView.post(() -> {
             messages.forEach(messageAdapter::add);
@@ -401,9 +402,11 @@ public class ChatDatabaseFragment extends Fragment implements CompoundButton.OnC
 
     @Override
     public void onDatabaseError() {
-        searchProgress.post(() -> searchProgress.setVisibility(View.GONE));
-        messageListView.post(() -> messageListView.setVisibility(View.VISIBLE));
-        searchButton.post(() -> searchButton.setEnabled(true));
+        handler.post(() -> {
+            searchProgress.setVisibility(View.GONE);
+            messageListView.setVisibility(View.VISIBLE);
+            searchButton.setEnabled(true);
+        });
     }
 
     @Override

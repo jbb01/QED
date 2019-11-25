@@ -24,12 +24,6 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="AppTheme.Dialog.MinWidth" parent="Theme.AppCompat.Light.Dialog.MinWidth">
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-    </style>
-
     <style name="AppTheme.NoListDivider" parent="AppTheme">
         <item name="android:listDivider">@null</item>
     </style>

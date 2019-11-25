@@ -100,8 +100,6 @@
     <string name="log_dialog_mode_label">Modus</string>
     <string name="log_dialog_postrecent_after">Posts</string>
     <string name="log_dialog_postrecent_before">Letzte</string>
-    <string name="log_downloading">Chatlog wird heruntergeladen… (%s MiB)</string>
-    <string name="log_parsing">JSON wird geparst… (%s)</string>
     <string name="log_postrecent">postrecent</string>
     <string name="log_file">file</string>
     <string name="log_wait_for_save">Bitte warte bis das Speichern abgeschlossen ist.</string>
@@ -163,4 +161,28 @@
     <string name="album_invalid">Dieses Album existiert nicht.</string>
     <string name="image_overwrite_offline_mode">Du befindest dich im Offline-Modus. Möchtest du das Bild trotzdem herunterladen?</string>
     <string name="album_overwrite_offline_mode">Du befindest dich im Offline-Modus. Möchtest du das Album trotzdem herunterladen?</string>
+    <string name="notification_channel_description">Stub!</string>
+    <string name="notification_channel_name">QED</string>
+    <string name="log_download_pending">Download ausstehend…</string>
+    <string name="log_download_paused">Download pausiert… %s</string>
+    <string name="log_download_successful">Download erfolgreich. %s</string>
+    <string name="log_download_failed">Download fehlgeschlagen. %s</string>
+    <string name="log_downloading">Download im Gange… %s</string>
+    <string name="log_parsing">JSON wird interpretiert… %s</string>
+    <string name="log_parse_pending">JSON Interpretation ausstehend…</string>
+    <string name="log_parse_failed">JSON Interpretation fefhlgeschlagen. %s</string>
+
+    <string name="log_download_running">Ein Chatlog-Download ist noch im Gange. </string>
+    <string name="log_download_continue_in_background">Im Hintergrund fortsetzen</string>
+    <string name="log_download_continue_in_background_toast">Chatlog-Download wird im Hintergrund fortgesetzt.</string>
+    <string name="log_download_running_force_cancel">Der laufende Download wird abgebrochen.</string>
+    <string name="log_download_stay">Warten</string>
+    <string name="log_download_cancel">Abbrechen</string>
+    <string name="master_key_error">Passwort konnte nicht gespeichert werden.</string>
+    <string name="download_notification_title">QED</string>
+    <string name="download_notification_log_description">Chatlog</string>
+    <string name="log_dialog_file_title">Datei</string>
+    <string name="log_subtitle_post_interval">Posts von #{0} bis #{1}</string>
+    <string name="log_subtitle_file">Datei</string>
+    <string name="log_postinterval">postinterval</string>
 </resources>

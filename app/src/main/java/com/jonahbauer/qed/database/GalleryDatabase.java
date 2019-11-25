@@ -37,7 +37,7 @@ public class GalleryDatabase {
         });
     }
 
-    @SuppressWarnings("UnusedReturnValue")
+    @SuppressWarnings({"UnusedReturnValue", "ConstantConditions"})
     public long insert(@NonNull Album album, boolean insertOrUpdate) {
         insertsRunning ++;
         ContentValues value = new ContentValues();

@@ -1,5 +1,6 @@
 package com.jonahbauer.qed.activities;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -38,6 +39,7 @@ import com.jonahbauer.qed.networking.QEDPageStreamReceiver;
 import com.jonahbauer.qed.qedgallery.image.Image;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -46,6 +48,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.jonahbauer.qed.DeepLinkingActivity.QEDIntent;
 import static com.jonahbauer.qed.networking.QEDGalleryPages.Mode.NORMAL;
 import static com.jonahbauer.qed.networking.QEDGalleryPages.Mode.ORIGINAL;
 
@@ -169,6 +172,7 @@ public class ImageActivity extends AppCompatActivity implements GalleryDatabaseR
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
             alertDialogBuilder.setTitle(image.name);
 
+            @SuppressLint("InflateParams")
             View view = LayoutInflater.from(this).inflate(R.layout.alert_dialog_image_info, null);
 
             if (image.album != null && image.album.name != null) ((TextView)view.findViewById(R.id.image_album)).setText(image.album.name);
@@ -220,8 +224,8 @@ public class ImageActivity extends AppCompatActivity implements GalleryDatabaseR
     /**
      * show/hide overlay with buttons
      */
-    public void changeExtended() {changeExtended(!extended);}
-    public void changeExtended(boolean extended) {
+    private void changeExtended() {changeExtended(!extended);}
+    private void changeExtended(boolean extended) {
         this.extended = extended;
         if (extended) {
             windowDecor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
@@ -314,7 +318,7 @@ public class ImageActivity extends AppCompatActivity implements GalleryDatabaseR
     /**
      * starts an async download for the specified image
      */
-    public void downloadImage(Image image) {
+    private void downloadImage(Image image) {
         downloadImage(image, 0);
     }
 
@@ -322,7 +326,7 @@ public class ImageActivity extends AppCompatActivity implements GalleryDatabaseR
      * @param overwriteOfflineMode overwrite offline (-1), don't overwrite (0), overwrite online (1)
      */
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public void downloadImage(Image image, int overwriteOfflineMode) {
+    private void downloadImage(Image image, int overwriteOfflineMode) {
         changeExtended(true);
 
         if (overwriteOfflineMode == -1 || (overwriteOfflineMode == 0 && sharedPreferences.getBoolean(getString(R.string.preferences_gallery_offline_mode_key), false))) {
@@ -334,7 +338,7 @@ public class ImageActivity extends AppCompatActivity implements GalleryDatabaseR
                 dialog.dismiss();
             });
             builder.setNegativeButton(R.string.no, (dialog, which) -> {
-                onNetworkError(null);
+                onError(ImageActivity.class.toString(), "User denied large download.", null);
                 dialog.dismiss();
             });
             builder.setCancelable(false);
@@ -395,12 +399,12 @@ public class ImageActivity extends AppCompatActivity implements GalleryDatabaseR
      * shows the image or a icon if a non image resource was downloaded
      */
     @Override
-    public void onPageReceived(String tag) {
+    public void onPageReceived(String tag, File file) {
         if (downloadTmp != null && target != null && downloadTmp.exists()) {
             if (target.exists()) target.delete();
 
             if (!downloadTmp.renameTo(target)) {
-                onStreamError(tag);
+                onError(tag, null, new Exception("Unable to rename file."));
                 return;
             }
             if (downloadTmp != null) {
@@ -409,7 +413,7 @@ public class ImageActivity extends AppCompatActivity implements GalleryDatabaseR
 
             image.available = true;
         } else {
-            onStreamError(tag);
+            onError(tag, null, new FileNotFoundException());
             return;
         }
 
@@ -417,7 +421,6 @@ public class ImageActivity extends AppCompatActivity implements GalleryDatabaseR
 
         switch (getType(image)) {
             case "image":
-                //Log.d("test", "showed file");
                 imageView.setImageBitmap(BitmapFactory.decodeFile(image.path));
                 break;
             case "video":
@@ -463,11 +466,11 @@ public class ImageActivity extends AppCompatActivity implements GalleryDatabaseR
         }
     }
 
-    /**
-     * if a network error occurred while downloading image file or data the thumbnail or a icon will be shown
-     */
-    public void onNetworkError(String tag) {
-        Log.e(Application.LOG_TAG_ERROR, "networkError at: " + tag, new Exception());
+
+    @Override
+    public void onError(String tag, String reason, Throwable cause) {
+        QEDPageStreamReceiver.super.onError(tag, reason, cause);
+        QEDPageReceiver.super.onError(tag, reason, cause);
 
         if (downloadTmp != null) downloadTmp.delete();
 
@@ -524,12 +527,6 @@ public class ImageActivity extends AppCompatActivity implements GalleryDatabaseR
     }
 
     @Override
-    public void onStreamError(String tag) {
-        Log.e(Application.LOG_TAG_ERROR, "streamError at: " + tag);
-        onNetworkError(tag);
-    }
-
-    @Override
     public void onProgressUpdate(String tag, long done, long total) {
         if (done == total) {
             progressBar.setVisibility(View.GONE);
@@ -572,7 +569,7 @@ public class ImageActivity extends AppCompatActivity implements GalleryDatabaseR
             return true;
         }
 
-        if (Intent.ACTION_VIEW.equals(intent.getAction()) || "com.jonahbauer.qed.action.SHOW_IMAGE".equals(intent.getAction())) {
+        if (Intent.ACTION_VIEW.equals(intent.getAction()) || QEDIntent.ACTION_SHOW_IMAGE.equals(intent.getAction())) {
             Uri data = intent.getData();
             if (data != null) {
                 String host = data.getHost();
@@ -612,7 +609,7 @@ public class ImageActivity extends AppCompatActivity implements GalleryDatabaseR
     /**
      * @return the type of the resource ("image", "video", "audio"). if no type is specified "image" will be used as a standard
      */
-    private String getType(Image image) {
+    private String getType(@NonNull Image image) {
         String type = "image";
         if (image.format != null)
             type = image.format.split("/")[0];

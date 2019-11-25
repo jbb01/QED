@@ -5,7 +5,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.CalendarContract;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,7 +24,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.layoutStuff.AnimatedTabHostListener;
 import com.jonahbauer.qed.layoutStuff.FixedHeaderAdapter;
@@ -193,14 +191,21 @@ public class EventBottomSheet extends BottomSheetDialogFragment implements QEDPa
     }
 
     @Override
-    public void onNetworkError(String tag) {
-        Log.e(Application.LOG_TAG_ERROR, "networkError at: " + tag);
-
+    public void onError(String tag, String reason, Throwable cause) {
+        QEDPageReceiver.super.onError(tag, reason, cause);
         if (dismissed) return;
+
+        final String errorString;
+        if (REASON_NETWORK.equals(reason) && getContext() != null)
+            errorString = getContext().getString(R.string.cant_connect);
+        else if (getContext() != null)
+            errorString = getContext().getString(R.string.unknown_error);
+        else
+            errorString = "Severe Error!";
 
         if (!receivedError) {
             receivedError = true;
-            progressBar.post(() -> Toast.makeText(getContext(), R.string.cant_connect, Toast.LENGTH_SHORT).show());
+            progressBar.post(() -> Toast.makeText(getContext(), errorString, Toast.LENGTH_SHORT).show());
             progressBar.postDelayed(() -> receivedError = false, 5000);
             dismiss();
         }

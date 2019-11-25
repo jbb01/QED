@@ -45,6 +45,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/login_prompt_username"
+                    android:importantForAutofill="no"
                     android:inputType="text"
                     android:maxLines="1"
                     android:singleLine="true" />
@@ -66,7 +67,8 @@
                     android:imeOptions="actionUnspecified"
                     android:inputType="textPassword"
                     android:maxLines="1"
-                    android:singleLine="true" />
+                    android:singleLine="true"
+                    android:importantForAutofill="no" />
 
             </com.google.android.material.textfield.TextInputLayout>
 

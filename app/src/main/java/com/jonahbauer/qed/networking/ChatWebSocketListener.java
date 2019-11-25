@@ -1,12 +1,18 @@
 package com.jonahbauer.qed.networking;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
+import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.chat.Message;
 
 public interface ChatWebSocketListener {
+    String REASON_NETWORK = "network error";
+
     void onMessage(@NonNull Message message);
 
-    void onNetworkError();
-    void onUnknownError();
+    default void onError(String reason, Throwable cause) {
+        Log.e(Application.LOG_TAG_ERROR, reason != null ? reason : "", cause);
+    }
 }

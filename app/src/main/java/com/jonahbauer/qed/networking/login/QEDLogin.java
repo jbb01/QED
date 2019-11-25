@@ -1,11 +1,14 @@
 package com.jonahbauer.qed.networking.login;
 
+import android.util.Log;
+
 import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.networking.NoNetworkException;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.lang.ref.SoftReference;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -15,7 +18,14 @@ import javax.net.ssl.HttpsURLConnection;
 public abstract class QEDLogin {
     public static void loginChat() throws InvalidCredentialsException, NoNetworkException {
         try {
-            Application application = Application.getContext();
+            SoftReference<Application> applicationReference = Application.getApplicationReference();
+            Application application = applicationReference.get();
+
+            if (application == null) {
+                Log.e(Application.LOG_TAG_ERROR, "", new Exception("Application is null!"));
+                throw new NoNetworkException(new Exception("No Application!"));
+            }
+
             String username = application.loadData(Application.KEY_USERNAME, false);
             String password = application.loadData(Application.KEY_PASSWORD, true);
             String version = application.getString(R.string.chat_version);
@@ -66,7 +76,14 @@ public abstract class QEDLogin {
 
     public static void loginDatabase() throws InvalidCredentialsException, NoNetworkException {
         try {
-            Application application = Application.getContext();
+            SoftReference<Application> applicationReference = Application.getApplicationReference();
+            Application application = applicationReference.get();
+
+            if (application == null) {
+                Log.e(Application.LOG_TAG_ERROR, "", new Exception("Application is null!"));
+                throw new NoNetworkException(new Exception("No Application!"));
+            }
+
             String username = application.loadData(Application.KEY_USERNAME, false);
             String password = application.loadData(Application.KEY_PASSWORD, true);
 
@@ -123,7 +140,14 @@ public abstract class QEDLogin {
 
     public static void loginGallery() throws InvalidCredentialsException, NoNetworkException {
         try {
-            Application application = Application.getContext();
+            SoftReference<Application> applicationReference = Application.getApplicationReference();
+            Application application = applicationReference.get();
+
+            if (application == null) {
+                Log.e(Application.LOG_TAG_ERROR, "", new Exception("Application is null!"));
+                throw new NoNetworkException(new Exception("No Application!"));
+            }
+
             String username = application.loadData(Application.KEY_USERNAME, false);
             String password = application.loadData(Application.KEY_PASSWORD, true);
 

@@ -38,7 +38,7 @@
         tools:listitem="@layout/list_item_event" />
 
     <TextView
-        android:id="@+id/label_offline"
+        android:id="@+id/label_error"
         android:layout_alignParentBottom="true"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
@@ -48,6 +48,6 @@
         android:textAlignment="center"
         android:textSize="16sp"
         android:gravity="center"
-        android:text="@string/database_offline"
+        android:text="@string/unknown_error"
         android:visibility="gone"/>
 </RelativeLayout>

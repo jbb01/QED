@@ -14,6 +14,8 @@ import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import org.jetbrains.annotations.Contract;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,6 +33,7 @@ public class AdvancedImageView extends androidx.appcompat.widget.AppCompatImageV
     private float oldDistance = 0.0f;
 
     private float fitScale;
+    private float overfitScaleFactor;
 
     private final Matrix matrix = new Matrix();
     private final Matrix savedMatrix = new Matrix();
@@ -114,6 +117,9 @@ public class AdvancedImageView extends androidx.appcompat.widget.AppCompatImageV
         float scaleX = ((float) viewWidth) / ((float)srcWidth);
         float scaleY = ((float) viewHeight) / ((float)srcHeight);
         fitScale = Math.min(scaleX, scaleY);
+
+        float overfitScale = Math.max(scaleX, scaleY);
+        overfitScaleFactor = overfitScale / fitScale;
 
         if (animator != null) animator.cancel();
 
@@ -240,7 +246,7 @@ public class AdvancedImageView extends androidx.appcompat.widget.AppCompatImageV
                 lastClick = -500;
             } else {
                 savedMatrix.set(matrix);
-                matrix.postScale(2f, 2f, start.x, start.y);
+                matrix.postScale(overfitScaleFactor, overfitScaleFactor, start.x, start.y);
                 fixPositionAndScale(matrix);
                 animate(savedMatrix, matrix);
                 fit = false;
@@ -261,6 +267,7 @@ public class AdvancedImageView extends androidx.appcompat.widget.AppCompatImageV
     /**
      * @return the square of the euclidian distance between the two points (x1,y1) and (x2,y2)
      */
+    @Contract(pure = true)
     private float squaredDistance(float x1, float y1, float x2, float y2) {
         float dx = x1 - x2;
         float dy = y1 - y2;
@@ -377,6 +384,7 @@ public class AdvancedImageView extends androidx.appcompat.widget.AppCompatImageV
         animator = new Animator(initState, finalState);
         post(animator);
     }
+
     private class Animator implements Runnable {
         private final Interpolator interpolator;
         private final long startTime;
@@ -394,7 +402,7 @@ public class AdvancedImageView extends androidx.appcompat.widget.AppCompatImageV
         
         final Matrix target;
 
-        private Animator(Matrix initState, Matrix finalState) {
+        private Animator(@NonNull Matrix initState, @NonNull Matrix finalState) {
             interpolator = new AccelerateDecelerateInterpolator();
             startTime = System.currentTimeMillis();
             duration = 500;

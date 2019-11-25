@@ -78,7 +78,7 @@ public class CheckBoxTriStates extends androidx.appcompat.widget.AppCompatCheckB
         return state;
     }
 
-    public void setState(int state) {
+    private void setState(int state) {
         if(!this.restoring && this.state != state) {
             this.state = state;
 

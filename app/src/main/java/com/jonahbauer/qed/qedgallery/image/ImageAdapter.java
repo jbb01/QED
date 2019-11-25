@@ -41,18 +41,18 @@ public class ImageAdapter extends ArrayAdapter<Image> implements GalleryDatabase
     private final GalleryAlbumActivity context;
     private final List<Image> imageList;
 
-    private HashMap<String, AsyncTask> asyncTasks;
-    private HashMap<String, Triple<Image, ImageView, ProgressBar>> byTag;
-    private HashMap<View, String> tagByView;
+    private final HashMap<String, AsyncTask> asyncTasks;
+    private final HashMap<String, Triple<Image, ImageView, ProgressBar>> byTag;
+    private final HashMap<View, String> tagByView;
 
-    private Set<String> invalidatedTags;
+    private final Set<String> invalidatedTags;
 
-    private GalleryDatabase galleryDatabase;
+    private final GalleryDatabase galleryDatabase;
 
     private boolean offlineMode;
     public static boolean receivedError = false;
 
-    private Random random;
+    private final Random random;
 
     public ImageAdapter(GalleryAlbumActivity context, List<Image> imageList, boolean offlineMode) {
         super(context, R.layout.list_item_image, imageList);
@@ -179,6 +179,7 @@ public class ImageAdapter extends ArrayAdapter<Image> implements GalleryDatabase
         downloadImage(tag, image);
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     private void downloadImage(String tag, Image image) {
         File dir = new File(getContext().getExternalCacheDir(), context.getString(R.string.gallery_folder_thumbnails));
 
@@ -199,9 +200,9 @@ public class ImageAdapter extends ArrayAdapter<Image> implements GalleryDatabase
     }
 
     @Override
-    public void onPageReceived(String tag) {
+    public void onPageReceived(String tag, File file) {
         if (invalidatedTags.contains(tag)) return;
-        Triple<Image,ImageView, ProgressBar> triple = byTag.get(tag);
+        Triple<Image, ImageView, ProgressBar> triple = byTag.get(tag);
         assert triple != null;
 
         Image image = triple.first;
@@ -211,7 +212,13 @@ public class ImageAdapter extends ArrayAdapter<Image> implements GalleryDatabase
         galleryDatabase.insert(image, true);
 
         if (thumbnail != null && progressBar != null) {
-            thumbnail.setImageBitmap(BitmapFactory.decodeFile(image.thumbnailPath));
+            Bitmap bitmap = BitmapFactory.decodeFile(image.thumbnailPath);
+
+            if (bitmap == null) {
+                thumbnail.setImageResource(R.drawable.ic_gallery_empty_image);
+            } else {
+                thumbnail.setImageBitmap(bitmap);
+            }
 
             thumbnail.setVisibility(View.VISIBLE);
             progressBar.setVisibility(View.GONE);
@@ -235,18 +242,9 @@ public class ImageAdapter extends ArrayAdapter<Image> implements GalleryDatabase
     }
 
     @Override
-    public void onNetworkError(String tag) {
-        Log.e(Application.LOG_TAG_ERROR, "networkError at " + tag);
+    public void onError(String tag, String reason, Throwable cause) {
+        QEDPageStreamReceiver.super.onError(tag, reason, cause);
 
-        if (!receivedError) {
-            receivedError = true;
-            context.switchToOfflineMode();
-        }
-    }
-
-    @Override
-    public void onStreamError(String tag) {
-        Log.e(Application.LOG_TAG_ERROR, "streamError at " + tag);
         if (!receivedError) {
             receivedError = true;
             context.switchToOfflineMode();

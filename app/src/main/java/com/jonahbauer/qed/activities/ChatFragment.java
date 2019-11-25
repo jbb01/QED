@@ -1,6 +1,7 @@
 package com.jonahbauer.qed.activities;
 
 import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -8,9 +9,6 @@ import android.content.res.Resources;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,12 +22,11 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
+import androidx.annotation.Nullable;
 import androidx.preference.PreferenceManager;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.jonahbauer.qed.Application;
-import com.jonahbauer.qed.Internet;
+import com.jonahbauer.qed.NetworkListener;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.chat.Message;
 import com.jonahbauer.qed.chat.MessageAdapter;
@@ -47,7 +44,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class ChatFragment extends Fragment implements Internet, AbsListView.OnScrollListener, ChatWebSocketListener {
+public class ChatFragment extends QEDFragment implements NetworkListener, AbsListView.OnScrollListener, ChatWebSocketListener {
     private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.GERMANY);
 
     private ChatWebSocket webSocket = null;
@@ -112,6 +109,7 @@ public class ChatFragment extends Fragment implements Internet, AbsListView.OnSc
 
             inputDialog.setTitle(res.getString(R.string.preferences_chat_name_title));
 
+            @SuppressLint("InflateParams")
             View editTextView = LayoutInflater.from(inputDialog.getContext()).inflate(R.layout.alert_dialog_edit_text, null);
 
             EditText inputEditText = editTextView.findViewById(R.id.input);
@@ -134,6 +132,7 @@ public class ChatFragment extends Fragment implements Internet, AbsListView.OnSc
 
             inputDialog.setTitle(res.getString(R.string.preferences_chat_channel_title));
 
+            @SuppressLint("InflateParams")
             View editTextView = LayoutInflater.from(inputDialog.getContext()).inflate(R.layout.alert_dialog_edit_text, null);
 
             EditText inputEditText = editTextView.findViewById(R.id.input);
@@ -154,7 +153,7 @@ public class ChatFragment extends Fragment implements Internet, AbsListView.OnSc
 
         quickSettings.setOnClickListener(a -> {
             if (showQuickSettings) {
-                quickSettings.postDelayed(fabFade, 5000);
+                quickSettingsName.postDelayed(fabFade, 5000);
                 quickSettingsName.hide();
                 quickSettingsChannel.hide();
                 showQuickSettings = !showQuickSettings;
@@ -254,7 +253,8 @@ public class ChatFragment extends Fragment implements Internet, AbsListView.OnSc
 
         if (Message.PONG.equals(message)) {
             initDone = true;
-            new Handler(Looper.getMainLooper()).post(() -> {
+            handler.post(() -> {
+                messageAdapter.clear();
                 messageAdapter.addAll(initMessages);
                 database.insertAll(initMessages);
                 messageAdapter.notifyDataSetChanged();
@@ -277,7 +277,7 @@ public class ChatFragment extends Fragment implements Internet, AbsListView.OnSc
         if (message.bottag == 1 && sharedPreferences.getBoolean(res.getString(R.string.preferences_chat_showSense_key),false)) return;
 
         if (messageAdapter != null) {
-            messageListView.post(() -> {
+            handler.post(() -> {
                 if (checkDate) {
                     Message lastMessage = (Message) messageListView.getItemAtPosition((position == -1) ? messageListView.getCount() - 1 : position - 1);
                     String lastDate;
@@ -308,22 +308,22 @@ public class ChatFragment extends Fragment implements Internet, AbsListView.OnSc
         }
     }
 
-    private void addPost(Message message, boolean notifiy) {
-        this.addPost(message, -1, notifiy, true);
+    private void addPost(Message message, boolean notify) {
+        this.addPost(message, -1, notify, true);
     }
 
     private void editTextClicked() {
         if (messageListView.getLastVisiblePosition() >= messageAdapter.getCount()-1)
-            messageListView.postDelayed(() -> messageListView.setSelection(messageAdapter.getCount() -1),100);
+            handler.postDelayed(() -> messageListView.setSelection(messageAdapter.getCount() -1),100);
     }
 
     public void onConnectionFail() {
-        onNetworkError();
+        onError(REASON_NETWORK, null);
     }
 
     @Override
     public void onConnectionRegain() {
-        messageListView.post(this::reload);
+        handler.post(this::reload);
     }
 
     private void initSocket() {
@@ -354,11 +354,11 @@ public class ChatFragment extends Fragment implements Internet, AbsListView.OnSc
         }
 
         if (webSocket.send(message)) {
-            messageEditText.post(() -> messageEditText.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0));
+            handler.post(() -> messageEditText.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0));
             messageEditText.setText("");
             messageEditText.requestFocus();
         } else {
-            messageEditText.post(() -> messageEditText.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.ic_error_red,0));
+            handler.post(() -> messageEditText.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.ic_error_red,0));
         }
     }
 
@@ -372,7 +372,7 @@ public class ChatFragment extends Fragment implements Internet, AbsListView.OnSc
     }
 
     private void scrollDown() {
-        messageListView.post(() -> messageListView.smoothScrollToPositionFromTop(messageAdapter.getCount(),0,250));
+        handler.post(() -> messageListView.smoothScrollToPositionFromTop(messageAdapter.getCount(),0,250));
     }
 
     @Override
@@ -383,43 +383,20 @@ public class ChatFragment extends Fragment implements Internet, AbsListView.OnSc
     }
 
     @Override
-    public void onNetworkError() {
+    public void onError(@Nullable String reason, @Nullable Throwable cause) {
+        ChatWebSocketListener.super.onError(reason, cause);
+
         if (networkError.getAndSet(true)) return;
 
-        if (webSocket != null) webSocket.closeSocket();
+        if (REASON_NETWORK.equals(reason))
+            error(res.getString(R.string.cant_connect));
+        else
+            error(res.getString(R.string.unknown_error));
 
-        Log.e(Application.LOG_TAG_DEBUG, "debug", new Exception());
-
-        initDone = true;
-        Calendar cal = Calendar.getInstance();
-
-        String year = "0000" + cal.get(Calendar.YEAR);
-        year = year.substring(year.length()-4);
-        String month = "00" + cal.get(Calendar.MONTH);
-        month = month.substring(month.length()-2);
-        String day = "00" + cal.get(Calendar.DAY_OF_MONTH);
-        day = day.substring(day.length()-2);
-        String hour = "00" + cal.get(Calendar.HOUR_OF_DAY);
-        hour = hour.substring(hour.length()-2);
-        String minute = "00" + cal.get(Calendar.MINUTE);
-        minute = minute.substring(minute.length()-2);
-        String second = "00" + cal.get(Calendar.SECOND);
-        second = second.substring(second.length()-2);
-        String date = year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second;
-        addPost(new Message("Error", res.getString(R.string.cant_connect), date,503,"Error","220000", Integer.MAX_VALUE, 0, null), -1, true, false);
-        Handler handler = new Handler(Looper.getMainLooper());
-        handler.post(() -> {
-           messageEditText.setEnabled(false);
-           sendButton.setEnabled(false);
-
-           progressBar.setVisibility(View.GONE);
-           messageListView.setVisibility(View.VISIBLE);
-        });
         handler.postDelayed(() -> networkError.set(false), 1000);
     }
 
-    @Override
-    public void onUnknownError() {
+    private void error(String message) {
         if (webSocket != null) webSocket.closeSocket();
         initDone = true;
         Calendar cal = Calendar.getInstance();
@@ -437,8 +414,8 @@ public class ChatFragment extends Fragment implements Internet, AbsListView.OnSc
         String second = "00" + cal.get(Calendar.SECOND);
         second = second.substring(second.length()-2);
         String date = year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second;
-        addPost(new Message("Error", res.getString(R.string.unknown_error), date,503,"Error","220000", Integer.MAX_VALUE, 0, null), -1, true, false);
-        new Handler(Looper.getMainLooper()).post(() -> {
+        addPost(new Message("Error", message, date,503,"Error","220000", Integer.MAX_VALUE, 0, null), -1, true, false);
+        handler.post(() -> {
             messageEditText.setEnabled(false);
             sendButton.setEnabled(false);
 

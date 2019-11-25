@@ -6,7 +6,6 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -19,7 +18,6 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.SwitchPreference;
 
-import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.BuildConfig;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.database.ChatDatabase;
@@ -91,7 +89,6 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.pref_general, rootKey);
 
-            Log.d(Application.LOG_TAG_DEBUG, "usesFcm: " + BuildConfig.usesFCM);
             if (BuildConfig.usesFCM) {
                 pingNotifications = findPreference(getString(R.string.preferences_ping_notification_key));
                 if (pingNotifications != null)

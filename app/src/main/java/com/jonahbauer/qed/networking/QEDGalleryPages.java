@@ -13,6 +13,7 @@ import com.jonahbauer.qed.qedgallery.album.Album;
 import com.jonahbauer.qed.qedgallery.image.Image;
 
 import java.io.OutputStream;
+import java.lang.ref.SoftReference;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -31,9 +32,15 @@ public abstract class QEDGalleryPages {
     private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.GERMANY);
     private static final ThreadPoolExecutor imageTpe = (ThreadPoolExecutor) Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
-
+    @Nullable
     public static AsyncTask getAlbumList(String tag, QEDPageReceiver<List<Album>> albumListReceiver) {
-        Application application = Application.getContext();
+        SoftReference<Application> applicationReference = Application.getApplicationReference();
+        Application application = applicationReference.get();
+
+        if (application == null) {
+            albumListReceiver.onError(tag, "", new Exception("Application is null!"));
+            return null;
+        }
 
         AsyncLoadQEDPage<List<Album>> list = new AsyncLoadQEDPage<>(
                 AsyncLoadQEDPage.Feature.GALLERY,
@@ -63,8 +70,15 @@ public abstract class QEDGalleryPages {
         return list;
     }
 
+    @Nullable
     public static AsyncTask getAlbum(String tag, @NonNull Album album, @Nullable Map<Filter, String> filters, QEDPageReceiver<Album> albumReceiver) {
-        Application application = Application.getContext();
+        SoftReference<Application> applicationReference = Application.getApplicationReference();
+        Application application = applicationReference.get();
+
+        if (application == null) {
+            albumReceiver.onError(tag, "", new Exception("Application is null!"));
+            return null;
+        }
 
         final boolean filtersUsed;
 
@@ -166,8 +180,15 @@ public abstract class QEDGalleryPages {
         return getImageInfo(tag, image, imageQEDPageReceiver);
     }
 
+    @Nullable
     public static AsyncTask getImageInfo(String tag, @NonNull Image image, QEDPageReceiver<Image> imageInfoReceiver) {
-        Application application = Application.getContext();
+        SoftReference<Application> applicationReference = Application.getApplicationReference();
+        Application application = applicationReference.get();
+
+        if (application == null) {
+            imageInfoReceiver.onError(tag, "", new Exception("Application is null!"));
+            return null;
+        }
 
         AsyncLoadQEDPage<Image> info = new AsyncLoadQEDPage<>(
                 AsyncLoadQEDPage.Feature.GALLERY,
@@ -216,10 +237,19 @@ public abstract class QEDGalleryPages {
         return info;
     }
 
+    @Nullable
     public static AsyncTask getImage(String tag, @NonNull Image image, @NonNull Mode mode, @NonNull OutputStream outputStream, QEDPageStreamReceiver imageReceiver) {
+        SoftReference<Application> applicationReference = Application.getApplicationReference();
+        Application application = applicationReference.get();
+
+        if (application == null) {
+            imageReceiver.onError(tag, "", new Exception("Application is null!"));
+            return null;
+        }
+
         AsyncLoadQEDPageToStream async = new AsyncLoadQEDPageToStream(
                 AsyncLoadQEDPageToStream.Feature.GALLERY,
-                String.format(Application.getContext().getString(R.string.gallery_server_image), mode.query, String.valueOf(image.id)),
+                String.format(application.getString(R.string.gallery_server_image), mode.query, String.valueOf(image.id)),
                 imageReceiver,
                 tag,
                 outputStream
@@ -228,7 +258,7 @@ public abstract class QEDGalleryPages {
         try {
             async.executeOnExecutor(imageTpe, (Void) null);
         } catch (RejectedExecutionException e) {
-            imageReceiver.onStreamError(tag);
+            imageReceiver.onError(tag, null, e);
             return null;
         }
         return async;

@@ -2,7 +2,6 @@ package com.jonahbauer.qed.activities;
 
 import android.graphics.drawable.Animatable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,9 +16,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 
-import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.layoutStuff.CheckBoxTriStates;
 import com.jonahbauer.qed.networking.QEDDBPages;
@@ -31,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class PersonDatabaseFragment extends Fragment implements CompoundButton.OnCheckedChangeListener, QEDPageReceiver<List<Person>> {
+public class PersonDatabaseFragment extends QEDFragment implements CompoundButton.OnCheckedChangeListener, QEDPageReceiver<List<Person>> {
     private PersonAdapter personAdapter;
 
     private ListView personListView;
@@ -45,7 +42,7 @@ public class PersonDatabaseFragment extends Fragment implements CompoundButton.O
     private EditText firstNameEditText;
     private EditText lastNameEditText;
     private TextView hitsView;
-    private TextView offlineLabel;
+    private TextView errorLabel;
     private Button searchButton;
 
     private boolean sortLastName = false;
@@ -62,7 +59,7 @@ public class PersonDatabaseFragment extends Fragment implements CompoundButton.O
         super.onResume();
 
         searchProgress.setVisibility(View.VISIBLE);
-        offlineLabel.setVisibility(View.GONE);
+        errorLabel.setVisibility(View.GONE);
         personListView.setVisibility(View.GONE);
         searchButton.setEnabled(false);
         QEDDBPages.getPersonList(getClass().toString(), this);
@@ -85,7 +82,7 @@ public class PersonDatabaseFragment extends Fragment implements CompoundButton.O
         firstNameEditText = view.findViewById(R.id.database_firstName_editText);
         lastNameEditText = view.findViewById(R.id.database_lastName_editText);
         hitsView = view.findViewById(R.id.database_hits);
-        offlineLabel = view.findViewById(R.id.label_offline);
+        errorLabel = view.findViewById(R.id.label_error);
         RadioButton sortByFirstNameRadioButton = view.findViewById(R.id.database_sort_first_name_radio_button);
         RadioButton sortByLastNameRadioButton = view.findViewById(R.id.database_sort_last_name_radio_button);
 
@@ -190,7 +187,7 @@ public class PersonDatabaseFragment extends Fragment implements CompoundButton.O
         this.persons.addAll(persons);
         personAdapter.addAll(persons);
 
-        searchProgress.post(() -> {
+        handler.post(() -> {
             searchProgress.setVisibility(View.GONE);
             personListView.setVisibility(View.VISIBLE);
             searchButton.setEnabled(true);
@@ -198,11 +195,19 @@ public class PersonDatabaseFragment extends Fragment implements CompoundButton.O
     }
 
     @Override
-    public void onNetworkError(String tag) {
-        Log.e(Application.LOG_TAG_ERROR, "networkError at " + tag);
+    public void onError(String tag, String reason, Throwable cause) {
+        QEDPageReceiver.super.onError(tag, reason, cause);
 
-        offlineLabel.post(() -> {
-            offlineLabel.setVisibility(View.VISIBLE);
+        final String errorString;
+
+        if (REASON_NETWORK.equals(reason))
+            errorString = getString(R.string.database_offline);
+        else
+            errorString = getString(R.string.unknown_error);
+
+        handler.post(() -> {
+            errorLabel.setText(errorString);
+            errorLabel.setVisibility(View.VISIBLE);
             searchProgress.setVisibility(View.GONE);
             personListView.setVisibility(View.GONE);
         });

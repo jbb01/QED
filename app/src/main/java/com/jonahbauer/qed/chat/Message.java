@@ -77,7 +77,8 @@ public class Message {
             if ("null".equals(username)) username = null;
             return new Message(name, message, date, userid, username, color, id, bottag, channel);
         } catch (JSONException e) {
-            Log.e(Application.LOG_TAG_ERROR, jsonMessage + ": " + e.getMessage(), e);
+            if (!jsonMessage.contains("\"type\":\"ok\""))
+                Log.e(Application.LOG_TAG_ERROR, jsonMessage + ": " + e.getMessage(), e);
         }
         return null;
     }

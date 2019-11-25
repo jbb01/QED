@@ -14,13 +14,14 @@ import com.jonahbauer.qed.networking.login.QEDLogin;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.ref.SoftReference;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 
-public class AsyncLoadQEDPageToStream extends AsyncTask<Void, Long, String> {
+public class AsyncLoadQEDPageToStream extends AsyncTask<Void, Long, Boolean> {
     private OutputStream outputStream;
     private InputStream in;
     private Feature feature;
@@ -44,20 +45,21 @@ public class AsyncLoadQEDPageToStream extends AsyncTask<Void, Long, String> {
         this.tag = tag;
         this.outputStream = outputStream;
 
-        application = Application.getContext();
+        SoftReference<Application> applicationReference = Application.getApplicationReference();
+        application = applicationReference.get();
     }
 
 
     @Override
-    protected String doInBackground(Void... voids) {
+    protected Boolean doInBackground(Void... voids) {
 //        if (!dataAvailable(feature)) {
-//    if (!login()) return null;
+//    if (!login()) return false;
 //    else if (!dataAvailable(feature)) throw new AssertionError();
 //}
 
         try {
             HttpsURLConnection httpsURLConnection = createConnection();
-            if (isCancelled()) return null;
+            if (isCancelled()) return false;
             httpsURLConnection.connect();
 
             String location = httpsURLConnection.getHeaderField("Location");
@@ -67,7 +69,7 @@ public class AsyncLoadQEDPageToStream extends AsyncTask<Void, Long, String> {
 
                 if (login()) {
                     httpsURLConnection = createConnection();
-                    if (isCancelled()) return null;
+                    if (isCancelled()) return false;
                     httpsURLConnection.connect();
 
                     location = httpsURLConnection.getHeaderField("Location");
@@ -79,17 +81,17 @@ public class AsyncLoadQEDPageToStream extends AsyncTask<Void, Long, String> {
                     try {
                         copyStream(in, outputStream, httpsURLConnection.getContentLength());
                     } catch (IOException e) {
-                        receiver.onStreamError(tag);
-                        return null;
+                        receiver.onError(tag, null, e);
+                        return false;
                     }
                     in.close();
                     outputStream.close();
 
                     httpsURLConnection.disconnect();
 
-                    return "";
+                    return true;
                 } else {
-                    return null;
+                    return false;
                 }
             }
 
@@ -97,30 +99,30 @@ public class AsyncLoadQEDPageToStream extends AsyncTask<Void, Long, String> {
             try {
                 copyStream(in, outputStream, httpsURLConnection.getContentLength());
             } catch (IOException e) {
-                receiver.onStreamError(tag);
-                return null;
+                receiver.onError(tag, null, e);
+                return false;
             }
             in.close();
             outputStream.close();
 
             httpsURLConnection.disconnect();
 
-            return "";
+            return true;
         } catch (IOException e) {
             Log.e(Application.LOG_TAG_ERROR, e.getMessage(), e);
-            receiver.onNetworkError(tag);
-            return null;
+            receiver.onError(tag, null, e);
+            return false;
         } catch (InvalidCredentialsException e) {
             Log.e(Application.LOG_TAG_ERROR, e.getMessage(), e);
             forceLogin();
-            return null;
+            return false;
         }
     }
 
     @Override
-    protected void onPostExecute(String s) {
-        if ("".equals(s))
-            receiver.onPageReceived(tag);
+    protected void onPostExecute(Boolean b) {
+        if (b != null && b)
+            receiver.onPageReceived(tag, null);
     }
 
     @Override
@@ -255,7 +257,7 @@ public class AsyncLoadQEDPageToStream extends AsyncTask<Void, Long, String> {
             }
         } catch (NoNetworkException e) {
             Log.e(Application.LOG_TAG_ERROR, e.getMessage(), e);
-            receiver.onNetworkError(tag);
+            receiver.onError(tag, QEDPageReceiver.REASON_NETWORK, e);
             return false;
         } catch (InvalidCredentialsException e) {
             Log.e(Application.LOG_TAG_ERROR, e.getMessage(), e);
@@ -274,7 +276,7 @@ public class AsyncLoadQEDPageToStream extends AsyncTask<Void, Long, String> {
             application.startActivity(intent);
         }
         cancel(true);
-        receiver.onNetworkError(tag);
+        receiver.onError(tag, QEDPageReceiver.REASON_UNABLE_TO_LOG_IN, null);
     }
 
     private void copyStream(InputStream in, OutputStream out, long contentLength) throws IOException {

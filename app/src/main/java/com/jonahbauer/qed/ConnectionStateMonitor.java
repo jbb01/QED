@@ -8,6 +8,11 @@ import android.net.NetworkRequest;
 
 import androidx.annotation.NonNull;
 
+/**
+ * Listens to network connection and reports to application
+ *
+ * Only network connection, not internet connection is checked
+ */
 public class ConnectionStateMonitor extends ConnectivityManager.NetworkCallback {
     private final Application application;
     private final NetworkRequest networkRequest;
