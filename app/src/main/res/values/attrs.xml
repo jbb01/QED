@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="MathView">
-        <attr name="text" format="string"/>
-        <attr name="engine" format="enum">
-            <enum name="KaTeX" value="0"/>
-            <enum name="MathJax" value="1"/>
-        </attr>
+        <attr name="android:textSize"/>
+        <attr name="android:textStyle"/>
+        <attr name="android:textAppearance"/>
+        <attr name="android:textColor"/>
     </declare-styleable>
 </resources>

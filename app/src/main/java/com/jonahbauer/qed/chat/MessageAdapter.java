@@ -18,7 +18,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.preference.PreferenceManager;
 
+import com.jonahbauer.qed.BuildConfig;
 import com.jonahbauer.qed.R;
+import com.jonahbauer.qed.layoutStuff.MathView;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -29,18 +31,33 @@ public class MessageAdapter extends ArrayAdapter<Message> {
     private final Context context;
     private final List<Message> messageList;
     private final boolean extended;
+    private final boolean mathMode;
     private final SharedPreferences sharedPreferences;
 
+    private LinearLayout mathPreload;
+
     public MessageAdapter(Context context, @NonNull List<Message> messageList, boolean extended) {
+        this(context, messageList, extended, false, null);
+    }
+    private MessageAdapter(Context context, @NonNull List<Message> messageList, boolean extended, boolean mathMode, LinearLayout mathPreload) {
         super(context, R.layout.list_item_message, messageList);
         this.context = context;
         this.messageList = messageList;
         this.extended = extended;
+        this.mathMode = mathMode;
+        this.mathPreload = mathPreload;
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+
+        if (mathMode) for (Message message : messageList)
+            MathView.extractAndPreload(context, message, context.getResources().getDimensionPixelSize(R.dimen.message_text_size), mathPreload);
     }
 
-    public MessageAdapter(Context context, List<Message> messageList) {
-        this(context, messageList, false);
+    public MessageAdapter(Context context, @NonNull List<Message> messageList) {
+        this(context, messageList, false, false, null);
+    }
+
+    public MessageAdapter(Context context, @NonNull List<Message> messageList, boolean mathMode, LinearLayout mathPreload) {
+        this(context, messageList, false, mathMode, mathPreload);
     }
 
     @NonNull
@@ -59,7 +76,7 @@ public class MessageAdapter extends ArrayAdapter<Message> {
         } else {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             if (extended) view = Objects.requireNonNull(inflater).inflate(R.layout.extended_message, parent, false);
-            else view = Objects.requireNonNull(inflater).inflate(isDate ? R.layout.date_inline : R.layout.list_item_message, parent, false);
+            else view = Objects.requireNonNull(inflater).inflate(isDate ? R.layout.date_inline : (mathMode ? R.layout.list_item_message_math : R.layout.list_item_message), parent, false);
         }
 
         if (isDate) {
@@ -69,7 +86,17 @@ public class MessageAdapter extends ArrayAdapter<Message> {
         }
 
         TextView nameView = view.findViewById(R.id.message_name);
-        TextView messageView = view.findViewById(R.id.message_message);
+
+        MathView messageViewMath = null;
+        TextView messageView = null;
+
+        if (mathMode) messageViewMath = view.findViewById(R.id.message_message);
+        else messageView = view.findViewById(R.id.message_message);
+
+        if (BuildConfig.DEBUG && !((mathMode && messageViewMath != null) || (!mathMode && messageView != null))) {
+            throw new AssertionError();
+        }
+
         TextView dateView = view.findViewById(R.id.message_date);
 
 
@@ -88,17 +115,26 @@ public class MessageAdapter extends ArrayAdapter<Message> {
             date = dates[1] + ":" + dates[2];
         }
 
+
         StringBuilder messageText = new StringBuilder(message.message);
         if (!extended) {
             float dateWidth = dateView.getPaint().measureText(date);
-            float spaceWidth = messageView.getPaint().measureText(" ");
-            for (int i = 0; i < Math.ceil((dateWidth + TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, context.getResources().getDisplayMetrics())) / spaceWidth); i++)
-                messageText.append(" ");
+            if (!mathMode) {
+                float spaceWidth = messageView.getPaint().measureText(" ");
+                for (int i = 0; i < Math.ceil((dateWidth + TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, context.getResources().getDisplayMetrics())) / spaceWidth); i++)
+                    messageText.append(" ");
+            } else {
+                float spaceWidth = messageViewMath.getSpaceWidth();
+                for (int i = 0; i < Math.ceil((dateWidth + TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, context.getResources().getDisplayMetrics())) / spaceWidth); i++)
+                    messageText.append(" ");
+            }
         }
 
         nameView.setText(name);
         dateView.setText(date);
-        messageView.setText(messageText.toString());
+
+        if (mathMode) messageViewMath.setMessage(message);
+        else messageView.setText(messageText.toString());
 
         if (!extended) {
             LinearLayout.LayoutParams dateParams = (LinearLayout.LayoutParams) dateView.getLayoutParams();
@@ -116,7 +152,7 @@ public class MessageAdapter extends ArrayAdapter<Message> {
         }
 
 
-        if (sharedPreferences.getBoolean(view.getContext().getString(R.string.preferences_chat_showLinks_key),true)) {
+        if (!mathMode && sharedPreferences.getBoolean(view.getContext().getString(R.string.preferences_chat_showLinks_key),true)) {
             messageView.setLinksClickable(true);
             Linkify.addLinks(messageView, Linkify.WEB_URLS);
         }
@@ -140,23 +176,26 @@ public class MessageAdapter extends ArrayAdapter<Message> {
 
         nameView.setTextColor(color);
         if (!extended && sharedPreferences.getBoolean(view.getContext().getString(R.string.preferences_chat_colorful_messages_key), false)) {
-            messageView.setTextColor(color);
+            if (mathMode) messageViewMath.setTextColor(color);
+            else messageView.setTextColor(color);
         }
 
         return view;
     }
 
-
     public List<Message> getData() {
         return new LinkedList<>(messageList);
     }
 
-    @SuppressWarnings("unused")
-    public void addAll(int index, Collection<? extends Message> collection) {
-        messageList.addAll(index, collection);
+    @Override
+    public void addAll(@NonNull Collection<? extends Message> collection) {
+        if (mathMode) for (Message message : collection) {
+            MathView.extractAndPreload(context, message, context.getResources().getDimensionPixelSize(R.dimen.message_text_size), mathPreload);
+        }
+        super.addAll(collection);
     }
 
-    public void add(int index, Message message) {
-        messageList.add(index, message);
+    public void add(Message message) {
+        super.add(message);
     }
 }

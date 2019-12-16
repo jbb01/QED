@@ -33,8 +33,14 @@ public class PersonAdapter extends FixedHeaderAdapter<Person, Character> {
                 if (person.comparableLastName == null) person.comparableLastName = (person.lastName + " " + person.firstName).replaceAll("Ö", "O").replaceAll("Ü", "U").replaceAll("Ä","A");
                 return person.comparableLastName;
             });
-    private static final Function<Person, Character> headerMapFirstName = person -> person.firstName.toUpperCase().toUpperCase().replaceAll("Ö", "O").replaceAll("Ü", "U").replaceAll("Ä","A").charAt(0);
-    private static final Function<Person, Character> headerMapLastName = person -> person.lastName.toUpperCase().toUpperCase().replaceAll("Ö", "O").replaceAll("Ü", "U").replaceAll("Ä","A").charAt(0);
+    private static final Function<Person, Character> headerMapFirstName = person -> {
+        if (person.firstName == null) return '?';
+        else return person.firstName.toUpperCase().replaceFirst("Ö", "O").replaceFirst("Ü", "U").replaceFirst("Ä","A").charAt(0);
+    };
+    private static final Function<Person, Character> headerMapLastName = person -> {
+        if (person.lastName == null) return '?';
+        else return person.lastName.toUpperCase().replaceFirst("Ö", "O").replaceFirst("Ü", "U").replaceFirst("Ä","A").charAt(0);
+    };
 
     private String sort;
 

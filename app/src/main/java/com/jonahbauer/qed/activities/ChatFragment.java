@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
@@ -50,6 +51,7 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
     private ChatWebSocket webSocket = null;
     private MessageAdapter messageAdapter;
 
+    private LinearLayout mathPreload;
     private FloatingActionButton scrollDownButton;
     private ListView messageListView;
     private ProgressBar progressBar;
@@ -83,6 +85,7 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
         super.onCreate(savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_chat, container, false);
 
+        mathPreload = view.findViewById(R.id.math_preload);
         scrollDownButton = view.findViewById(R.id.scroll_down_Button);
         messageListView = view.findViewById(R.id.messageBox);
         progressBar = view.findViewById(R.id.progress_bar);
@@ -166,7 +169,7 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
             }
         });
 
-        messageAdapter = new MessageAdapter(view.getContext(), new ArrayList<>());
+        messageAdapter = new MessageAdapter(view.getContext(), new ArrayList<>(), sharedPreferences.getBoolean(getString(R.string.preferences_chat_katex_key), false), mathPreload);
         messageListView.setAdapter(messageAdapter);
         messageListView.setOnScrollListener(this);
         messageListView.setItemsCanFocus(false);
@@ -230,25 +233,26 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
 
         assert getActivity() != null;
 
+        initMessages.clear();
         messageAdapter.clear();
         initDone = false;
         progressBar.setVisibility(View.VISIBLE);
         messageListView.setVisibility(View.GONE);
 
         initSocket();
-        if (messageEditText!=null) {
+        if (messageEditText != null) {
             messageEditText.setEnabled(true);
             messageEditText.post(() -> messageEditText.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0));
         }
-        if (sendButton!=null) sendButton.setEnabled(true);
+        if (sendButton != null) sendButton.setEnabled(true);
 
-        messageAdapter = new MessageAdapter(getContext(), messageAdapter.getData());
+        messageAdapter = new MessageAdapter(getContext(), messageAdapter.getData(), sharedPreferences.getBoolean(getString(R.string.preferences_chat_katex_key), false), mathPreload);
         messageListView.setAdapter(messageAdapter);
 
         if (refreshButton != null) refreshButton.setEnabled(true);
     }
 
-    private void addPost(@NonNull Message message, @SuppressWarnings("SameParameterValue") int position, boolean notify, boolean checkDate) {
+    private void addPost(@NonNull Message message, boolean notify, boolean checkDate) {
         assert getContext() != null;
 
         if (Message.PONG.equals(message)) {
@@ -279,7 +283,7 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
         if (messageAdapter != null) {
             handler.post(() -> {
                 if (checkDate) {
-                    Message lastMessage = (Message) messageListView.getItemAtPosition((position == -1) ? messageListView.getCount() - 1 : position - 1);
+                    Message lastMessage = (Message) messageListView.getItemAtPosition(messageListView.getCount() - 1);
                     String lastDate;
                     if (lastMessage != null)
                         lastDate = lastMessage.date.split(" ")[0];
@@ -292,15 +296,12 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
                             if (d != null)
                                 date = android.text.format.DateFormat.getLongDateFormat(getContext()).format(d).toUpperCase();
                         } catch (ParseException ignored) {}
-                        if (position == -1)
-                            messageAdapter.add(new Message("date", "date", date, -6473, "date", "date", -6473, -6473, "date"));
-                        else
-                            messageAdapter.add(position, new Message("date", "date", date, -6473, "date", "date", -6473, -6473, "date"));
+                        messageAdapter.add(new Message("date", "date", date, -6473, "date", "date", -6473, -6473, "date"));
                     }
                 }
 
-                if (position==-1) messageAdapter.add(message);
-                else messageAdapter.add(position,message);
+                messageAdapter.add(message);
+
                 if (notify) {
                     messageAdapter.notifyDataSetChanged();
                 }
@@ -309,7 +310,7 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
     }
 
     private void addPost(Message message, boolean notify) {
-        this.addPost(message, -1, notify, true);
+        this.addPost(message, notify, true);
     }
 
     private void editTextClicked() {
@@ -414,7 +415,7 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
         String second = "00" + cal.get(Calendar.SECOND);
         second = second.substring(second.length()-2);
         String date = year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second;
-        addPost(new Message("Error", message, date,503,"Error","220000", Integer.MAX_VALUE, 0, null), -1, true, false);
+        addPost(new Message("Error", message, date,503,"Error","220000", Integer.MAX_VALUE, 0, null), true, false);
         handler.post(() -> {
             messageEditText.setEnabled(false);
             sendButton.setEnabled(false);

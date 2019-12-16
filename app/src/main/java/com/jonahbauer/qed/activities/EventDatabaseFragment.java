@@ -9,7 +9,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.networking.QEDDBPages;
@@ -27,18 +26,12 @@ public class EventDatabaseFragment extends QEDFragment implements QEDPageReceive
     private ProgressBar searchProgress;
     private TextView errorLabel;
 
-    static String showEvent;
     static int showEventId;
     static boolean shownEvent = true;
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
+    public void onStart() {
+        super.onStart();
 
         searchProgress.setVisibility(View.VISIBLE);
         errorLabel.setVisibility(View.GONE);
@@ -85,16 +78,8 @@ public class EventDatabaseFragment extends QEDFragment implements QEDPageReceive
         searchProgress.setVisibility(View.GONE);
         eventListView.setVisibility(View.VISIBLE);
 
-        if ((showEvent != null || showEventId != 0) && !shownEvent) {
-            if (showEventId != 0) showBottomSheetDialogFragment(String.valueOf(showEventId));
-            else {
-                for (Event event : events) {
-                    if (event.name.equals(showEvent)) {
-                        showBottomSheetDialogFragment(event);
-                        break;
-                    }
-                }
-            }
+        if (showEventId != 0 && !shownEvent) {
+            showBottomSheetDialogFragment(String.valueOf(showEventId));
             shownEvent = true;
         }
     }

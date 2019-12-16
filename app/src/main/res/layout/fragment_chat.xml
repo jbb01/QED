@@ -5,10 +5,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".activities.ChatFragment"
-    android:background="@color/chat_background"
     android:id="@+id/fragment"
+    android:background="@color/chat_background"
     android:clipToPadding="false"
     android:clipChildren="false">
+
+    <LinearLayout
+        android:id="@+id/math_preload"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        android:orientation="vertical"
+        android:clickable="false"
+        android:focusable="false"/>
 
     <TextView
         android:id="@+id/date_banner"

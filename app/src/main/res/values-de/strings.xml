@@ -135,7 +135,7 @@
     <string name="persons_database_sort_last_name">Nachnamen</string>
     <string name="preferences_Gallery_offline_mode">Offline-Modus</string>
     <string name="preferences_chat_channel_title">Channel</string>
-    <string name="preferences_chat_katex_title">KaTex Rendering</string>
+    <string name="preferences_chat_katex_title">KaTeX Rendering (Beta)</string>
     <string name="preferences_chat_name_title">Name</string>
     <string name="preferences_chat_publicId_title">Öffentliche ID</string>
     <string name="preferences_chat_showLinks_title">Links anzeigen</string>
@@ -185,4 +185,13 @@
     <string name="log_subtitle_post_interval">Posts von #{0} bis #{1}</string>
     <string name="log_subtitle_file">Datei</string>
     <string name="log_postinterval">postinterval</string>
+    <string name="preferences_general_bug_report_title">Fehler melden</string>
+    <string name="preferences_general_bug_report_summary">Bitte benutze den GitHub Issue Tracker für Fehlerberichte. Füge so viele Informationen wie möglich bei (Android und App-Version, Schritte zum reproduzieren, Fehlerbericht (System > Entwickleroptionen > Fehlerbericht abrufen), …).</string>
+    <string name="preferences_general_github_title">GitHub-Projekt</string>
+    <string name="event_sign_up">Anmelden</string>
+    <string name="event_sign_up_success">Erfolgreich angemeldet!</string>
+    <string name="event_sign_up_deadline_exceeded">Anmeldeschluss vorüber!</string>
+    <string name="event_sign_up_already_signed_up">Du bist bereits angemeldet!</string>
+    <string name="event_sign_up_unknown_event">Unbekannte Veranstaltung!</string>
+    <string name="event_sign_up_confirm">Möchtest du dich wirklich zu %s anmelden?</string>
 </resources>

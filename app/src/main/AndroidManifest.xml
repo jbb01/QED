@@ -15,6 +15,7 @@
         android:supportsRtl="true"
         android:largeHeap="true"
         android:theme="@style/AppTheme">
+
         <provider
             android:name=".GenericFileProvider"
             android:authorities="com.jonahbauer.qed.fileprovider"
@@ -22,16 +23,16 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/provider_paths"/>
+                android:resource="@xml/provider_paths" />
         </provider>
 
         <activity
             android:name=".DeepLinkingActivity"
-            android:label="QED"
-            android:exported="true"
-            android:noHistory="true"
             android:excludeFromRecents="true"
+            android:exported="true"
+            android:label="QED"
             android:launchMode="singleInstance"
+            android:noHistory="true"
             android:theme="@android:style/Theme.Translucent.NoTitleBar">
 
             <!-- Image Activity -->
@@ -45,7 +46,6 @@
                     android:host="qedgallery.qed-verein.de"
                     android:pathPrefix="/image_view.php"
                     android:scheme="https" />
-
             </intent-filter>
 
             <!-- Album Activity -->
@@ -60,7 +60,6 @@
                     android:pathPrefix="/album_view.php"
                     android:scheme="https" />
             </intent-filter>
-
 
             <!-- Main Activity -->
             <intent-filter>
@@ -95,18 +94,17 @@
                     android:scheme="https" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".activities.LoginActivity"
             android:label="@string/title_activity_login"
             android:screenOrientation="portrait" />
         <activity
             android:name=".activities.MainActivity"
+            android:hardwareAccelerated="true"
             android:label="@string/app_name"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
-            android:hardwareAccelerated="true"
             android:windowSoftInputMode="stateVisible|adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -128,22 +126,20 @@
             android:name=".activities.GalleryAlbumActivity"
             android:label="@string/title_activity_album"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".activities.ImageActivity"
+            android:exported="false"
             android:label="@string/title_activity_image"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:exported="false">
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar"/>
 
         <receiver
-            android:name="com.jonahbauer.qed.networking.downloadManager.DownloadBroadcastReceiver"
+            android:name=".networking.downloadManager.DownloadBroadcastReceiver"
             android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.DOWNLOAD_COMPLETE"/>
-                <action android:name="android.intent.action.DOWNLOAD_NOTIFICATION_CLICKED"/>
+                <action android:name="android.intent.action.DOWNLOAD_COMPLETE" />
+                <action android:name="android.intent.action.DOWNLOAD_NOTIFICATION_CLICKED" />
             </intent-filter>
         </receiver>
     </application>

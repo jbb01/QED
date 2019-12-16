@@ -2,6 +2,7 @@ package com.jonahbauer.qed.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
@@ -9,6 +10,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,6 +18,7 @@ import androidx.fragment.app.Fragment;
 import androidx.preference.EditTextPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceManager;
 import androidx.preference.SwitchPreference;
 
 import com.jonahbauer.qed.BuildConfig;
@@ -49,7 +52,7 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
 
     }
 
-    public boolean onPreferenceStartFragment(PreferenceFragmentCompat caller, Preference pref) {
+    public boolean onPreferenceStartFragment(PreferenceFragmentCompat caller, @NonNull Preference pref) {
         // Instantiate the new Fragment
         final Bundle args = pref.getExtras();
         final Fragment fragment = getSupportFragmentManager().getFragmentFactory().instantiate(
@@ -67,7 +70,7 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             onBackPressed();
             return true;
@@ -84,38 +87,64 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
 
     public static class GeneralPreferenceFragment extends PreferenceFragmentCompat implements Preference.OnPreferenceClickListener {
         private SwitchPreference pingNotifications;
+        private Preference bugReport;
+        private Preference github;
 
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.pref_general, rootKey);
+
+            bugReport = findPreference(getString(R.string.preferences_general_bug_report_key));
+            if (bugReport != null)
+                bugReport.setOnPreferenceClickListener(this);
+
+            github = findPreference(getString(R.string.preferences_general_github_key));
+            if (github != null)
+                github.setOnPreferenceClickListener(this);
 
             if (BuildConfig.usesFCM) {
                 pingNotifications = findPreference(getString(R.string.preferences_ping_notification_key));
                 if (pingNotifications != null)
                     pingNotifications.setOnPreferenceClickListener(this);
 
-                EditTextPreference pushPingServer = findPreference("pushPingServer");
+                EditTextPreference pushPingServer = findPreference(getString(R.string.preferences_ping_notification_server_key));
                 if (pushPingServer != null) {
-                    pushPingServer.setOnPreferenceClickListener(this);
-                    pushPingServer.setSummaryProvider(EditTextPreference.SimpleSummaryProvider.getInstance());
+                    if (BuildConfig.DEBUG) {
+                        pushPingServer.setOnPreferenceClickListener(this);
+                        pushPingServer.setSummaryProvider(EditTextPreference.SimpleSummaryProvider.getInstance());
+                    } else {
+                        pushPingServer.setEnabled(false);
+                        pushPingServer.setVisible(false);
+                    }
                 }
             }
         }
 
         @Override
-        public boolean onPreferenceClick(Preference preference) {
+        public boolean onPreferenceClick(@NonNull Preference preference) {
             if (preference.equals(pingNotifications)) {
                 if (pingNotifications.isChecked()) {
                     PingNotifications.getInstance(getContext()).registrationStage0();
                 }
+                return true;
+            } else if (preference.equals(bugReport)) {
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.github_project_issue_tracker)));
+                startActivity(intent);
+                return true;
+            } else if (preference.equals(github)) {
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.github_project)));
+                startActivity(intent);
+                return true;
             }
 
             return false;
         }
     }
 
-    public static class ChatPreferenceFragment extends PreferenceFragmentCompat implements Preference.OnPreferenceClickListener {
+    public static class ChatPreferenceFragment extends PreferenceFragmentCompat implements Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
         private Preference deleteDatabase;
+        private SwitchPreference katex;
+        private SwitchPreference links;
 
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -125,6 +154,14 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
             EditTextPreference name = findPreference(getString(R.string.preferences_chat_name_key));
             EditTextPreference channel = findPreference(getString(R.string.preferences_chat_channel_key));
             deleteDatabase = findPreference(getString(R.string.preferences_chat_delete_db_key));
+
+            katex = findPreference(getString(R.string.preferences_chat_katex_key));
+            if (katex != null)
+                katex.setOnPreferenceChangeListener(this);
+
+            links = findPreference(getString(R.string.preferences_chat_showLinks_key));
+            if (links != null)
+                links.setOnPreferenceChangeListener(this);
             
             if (deleteDatabase != null)
                 deleteDatabase.setOnPreferenceClickListener(this);
@@ -135,7 +172,7 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
         }
 
         @Override
-        public boolean onOptionsItemSelected(MenuItem item) {
+        public boolean onOptionsItemSelected(@NonNull MenuItem item) {
             int id = item.getItemId();
             if (id == android.R.id.home) {
                 startActivity(new Intent(getActivity(), SettingsActivity.class));
@@ -163,6 +200,46 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
                 return true;
             }
             return false;
+        }
+
+        @Override
+        public boolean onPreferenceChange(Preference preference, Object newValue) {
+            if (preference.equals(katex)) {
+                if (!(newValue instanceof Boolean)) return true;
+                boolean value = (Boolean) newValue;
+
+                if (links != null) {
+                    if (value) {
+                        if (getContext() != null)
+                            PreferenceManager.getDefaultSharedPreferences(getContext()).edit().putBoolean("oldLinkValue", links.isChecked()).apply();
+                        links.setChecked(false);
+                    } else {
+                        if (getContext() != null) {
+                            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+                            sharedPreferences.edit().putBoolean("oldKatexValue", false).apply();
+                            links.setChecked(sharedPreferences.getBoolean("oldLinkValue", true));
+                        }
+                    }
+                }
+            } else if (preference.equals(links)) {
+                if (!(newValue instanceof Boolean)) return true;
+                boolean value = (Boolean) newValue;
+
+                if (katex != null) {
+                    if (value) {
+                        if (getContext() != null)
+                            PreferenceManager.getDefaultSharedPreferences(getContext()).edit().putBoolean("oldKatexValue", katex.isChecked()).apply();
+                        katex.setChecked(false);
+                    } else {
+                        if (getContext() != null) {
+                            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+                            sharedPreferences.edit().putBoolean("oldLinkValue", false).apply();
+                            katex.setChecked(sharedPreferences.getBoolean("oldKatexValue", true));
+                        }
+                    }
+                }
+            }
+            return true;
         }
     }
 

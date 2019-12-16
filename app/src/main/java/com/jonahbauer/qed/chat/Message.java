@@ -3,9 +3,11 @@ package com.jonahbauer.qed.chat;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.jonahbauer.qed.Application;
 
+import org.jetbrains.annotations.Contract;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -61,7 +63,9 @@ public class Message {
      * @param jsonMessage a json formatted message string
      * @return a message object representing the given message, null if an error occurred
      */
-    public static Message interpretJSONMessage(String jsonMessage) {
+    @Contract("null -> null")
+    public static Message interpretJSONMessage(@Nullable String jsonMessage) {
+        if (jsonMessage == null) return null;
         try {
             JSONObject json = new JSONObject(jsonMessage);
             String name = json.getString("name");

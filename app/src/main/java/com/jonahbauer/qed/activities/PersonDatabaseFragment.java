@@ -55,8 +55,8 @@ public class PersonDatabaseFragment extends QEDFragment implements CompoundButto
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onStart() {
+        super.onStart();
 
         searchProgress.setVisibility(View.VISIBLE);
         errorLabel.setVisibility(View.GONE);
@@ -111,7 +111,7 @@ public class PersonDatabaseFragment extends QEDFragment implements CompoundButto
     }
 
     @Override
-    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+    public void onCheckedChanged(@NonNull CompoundButton buttonView, boolean isChecked) {
         switch (buttonView.getId()) {
             case R.id.expand_checkBox:
                 if (isChecked) {
@@ -135,7 +135,7 @@ public class PersonDatabaseFragment extends QEDFragment implements CompoundButto
         }
     }
 
-    private void onRadioButtonClicked(View view) {
+    private void onRadioButtonClicked(@NonNull View view) {
         boolean checked = ((RadioButton) view).isChecked();
 
         switch (view.getId()) {
@@ -148,11 +148,11 @@ public class PersonDatabaseFragment extends QEDFragment implements CompoundButto
         }
     }
 
-    private static void expand(final View v) {
+    private static void expand(@NonNull final View v) {
         v.setVisibility(View.VISIBLE);
     }
 
-    private static void collapse(final View v) {
+    private static void collapse(@NonNull final View v) {
         v.setVisibility(View.GONE);
     }
 

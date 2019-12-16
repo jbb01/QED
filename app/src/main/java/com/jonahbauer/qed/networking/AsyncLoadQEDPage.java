@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.activities.LoginActivity;
@@ -46,15 +47,15 @@ public class AsyncLoadQEDPage<T> extends AsyncTask<Void, Void, String> {
     /**
      * Loads the webpage from url. url might contain the wildcards "{@userid}", "{@pwhash}", "{@sessionid}", "{@sessionid2}"
      *
-     * @param feature the type of the qed website to be loaded
+     * @param feature the type of the qed website to be loaded, used to choose correct form of authentication
      * @param url the url of the qed website
-     * @param receiver a receiver that will be informed on success or failure of the download
+     * @param receiver a receiver that will receive the relevant data collected by {@param postExecute} or an error message
      * @param tag a string tag used when calling receiver methods
      * @param postExecute a function to collect relevant data from the html string, called on ui thread
      * @param cookies a map of cookies, the cookies required for authenticating to the server are automatically added depending on {@param feature}
      */
     @SuppressWarnings("JavaDoc")
-    AsyncLoadQEDPage(@NonNull Feature feature, @NonNull String url, @NonNull QEDPageReceiver<T> receiver, String tag, @NonNull Function<String, T> postExecute, @NonNull Map<String, String> cookies) {
+    AsyncLoadQEDPage(@NonNull Feature feature, @NonNull String url, @NonNull QEDPageReceiver<T> receiver, String tag, @NonNull Function<String, T> postExecute, @Nullable Map<String, String> cookies) {
         this.feature = feature;
         this.url = url;
         this.tag = tag;
@@ -62,22 +63,23 @@ public class AsyncLoadQEDPage<T> extends AsyncTask<Void, Void, String> {
         this.postExecute = postExecute;
 
         this.cookies = cookies;
+        if (cookies == null) this.cookies = new HashMap<>();
 
         SoftReference<Application> applicationReference = Application.getApplicationReference();
         application = applicationReference.get();
 
         switch (feature) {
             case CHAT:
-                cookies.put("userid", "{@userid}");
-                cookies.put("pwhash", "{@pwhash}");
+                this.cookies.put("userid", "{@userid}");
+                this.cookies.put("pwhash", "{@pwhash}");
                 break;
             case GALLERY:
-                cookies.put("userid", "{@userid}");
-                cookies.put("PHPSESSID", "{@phpsessid}");
-                cookies.put("pwhash", "{@pwhash}");
+                this.cookies.put("userid", "{@userid}");
+                this.cookies.put("PHPSESSID", "{@phpsessid}");
+                this.cookies.put("pwhash", "{@pwhash}");
                 break;
             case DATABASE:
-                cookies.put("{@sessioncookie}", "{@sessionid}");
+                this.cookies.put("{@sessioncookie}", "{@sessionid}");
                 break;
         }
     }

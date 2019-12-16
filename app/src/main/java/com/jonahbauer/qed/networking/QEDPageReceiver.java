@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 import com.jonahbauer.qed.Application;
 
 public interface QEDPageReceiver<T> {
+    String REASON_UNKNOWN = "unknown error";
     String REASON_NETWORK = "network error";
     String REASON_UNABLE_TO_LOG_IN = "unable to log in";
 
