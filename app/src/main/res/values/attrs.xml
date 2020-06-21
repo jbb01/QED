@@ -1,9 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="MathView">
-        <attr name="android:textSize"/>
-        <attr name="android:textStyle"/>
-        <attr name="android:textAppearance"/>
-        <attr name="android:textColor"/>
+        <attr name="android:text" format="string"/>
+        <attr name="android:textSize" format="dimension"/>
+        <attr name="android:textStyle" format="integer"/>
+        <attr name="android:textAppearance" format="reference"/>
+        <attr name="android:textColor" format="color"/>
     </declare-styleable>
+    <declare-styleable name="Histogram">
+        <attr name="android:src"/>
+        <attr name="mode" format="flags">
+            <flag name="red" value="1"/>
+            <flag name="green" value="2"/>
+            <flag name="blue" value="4"/>
+            <flag name="luminosity" value="8"/>
+        </attr>
+    </declare-styleable>
+    <declare-styleable name="com.jonahbauer.qed.layoutStuff.SeekBarPreference">
+        <attr name="min" format="integer"/>
+        <attr name="android:max" format="integer"/>
+        <attr name="seekBarIncrement" format="integer"/>
+        <attr name="adjustable" format="boolean"/>
+        <attr name="showSeekBarValue" format="boolean"/>
+        <attr name="updatesContinuously" format="boolean"/>
+        <attr name="externalValues" format="reference"/>
+        <attr name="externalValueStrings" format="reference"/>
+    </declare-styleable>
+
+    <declare-styleable name="MessageView">
+        <attr name="name" format="string"/>
+        <attr name="message" format="string"/>
+        <attr name="date" format="string"/>
+        <attr name="dateBanner" format="string"/>
+        <attr name="channel" format="string"/>
+        <attr name="id" format="string"/>
+
+        <attr name="extended" format="boolean"/>
+        <attr name="linkify" format="boolean"/>
+        <attr name="katex" format="boolean"/>
+        <attr name="colorful" format="boolean"/>
+
+        <!-- Name Attributes -->
+        <attr name="nameTextColor" format="color"/>
+        <attr name="nameTextSize" format="dimension"/>
+        <attr name="nameTextAppearance" format="reference"/>
+
+        <!-- Message Attributes -->
+        <attr name="messageTextColor" format="color"/>
+        <attr name="messageTextSize" format="dimension"/>
+        <attr name="messageTextAppearance" format="reference"/>
+
+        <!-- Date Attributes -->
+        <attr name="dateTextColor" format="color"/>
+        <attr name="dateTextSize" format="dimension"/>
+        <attr name="dateTextAppearance" format="reference"/>
+
+        <!-- Date Banner Attributes -->
+        <attr name="dateBannerTextColor" format="color"/>
+        <attr name="dateBannerTextSize" format="dimension"/>
+        <attr name="dateBannerTextAppearance" format="reference"/>
+        <attr name="dateBannerBackgroundTint" format="color"/>
+
+        <!-- Data Attributes (message id, channel, date; only when expanded) -->
+        <attr name="dataTextColor" format="color"/>
+        <attr name="dataTextSize" format="dimension"/>
+        <attr name="dataTextAppearance" format="reference"/>
+
+        <attr name="android:colorBackground" format="color"/>
+        <attr name="android:colorPressedHighlight" format="color"/>
+    </declare-styleable>
+
+    <attr name="sideSheetDialogTheme" format="reference"/>
+    <attr name="messageStyle" format="reference"/>
+    <attr name="colorPrimaryLight" format="color"/>
+    <attr name="dividerColor" format="color"/>
+    <attr name="preferenceIconColor" format="color"/>
+    <attr name="listIconColor" format="color"/>
 </resources>

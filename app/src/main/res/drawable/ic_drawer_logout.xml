@@ -4,6 +4,6 @@
         android:viewportWidth="24.0"
         android:viewportHeight="24.0">
     <path
-        android:fillColor="@color/navigation_drawer_icons"
+        android:fillColor="@android:color/white"
         android:pathData = "m 7.424,3 h 8.888866 c 1.11,0 2,0.9 2,2 v 1.9952941 h -2 V 5 H 7.424 v 14 h 8.888866 v -1.995294 h 2 V 19 c 0,1.1 -0.89,2 -2,2 H 7.424 c -1.1,0 -2,-0.9 -2,-2 V 5 c 0,-1.1 0.9,-2 2,-2 z m 5.775749,12.59 1.41,1.41 5,-5 -5,-5 -1.41,1.41 2.58,2.59 H 9.424 v 2 h 6.355749 z" />
 </vector>

@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:clipChildren="false">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <View
+            android:id="@+id/background"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            tools:background="@drawable/background_4"
+            tools:backgroundTint="@android:color/holo_green_light"
+            tools:layout_height="230dp"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignBottom="@id/background"
+            android:rotation="180"
+            android:background="@drawable/bottom_shadow"/>
+    </RelativeLayout>
+
+    <!-- TODO try to flatten view hierarchy -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:transitionName="content"
+        android:scrollbars="vertical">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?android:colorBackground"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/icon_id"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentStart="true"
+                android:padding="8dp"
+                android:tint="?listIconColor"
+                android:src="@drawable/ic_message_info_id"
+                tools:ignore="ContentDescription" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/icon_id"
+                android:layout_alignTop="@id/icon_id"
+                android:layout_alignBottom="@id/icon_id"
+                android:layout_alignParentEnd="true"
+                android:gravity="center_vertical"
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/value_id"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    tools:text="#2185476"
+                    style="?attr/textAppearanceListItem"/>
+                <TextView
+                    android:id="@+id/title_id"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/message_info_title_id"
+                    style="?attr/textAppearanceListItemSmall"/>
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/icon_name"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_below="@id/icon_id"
+                android:layout_alignParentStart="true"
+                android:padding="8dp"
+                android:tint="?listIconColor"
+                android:src="@drawable/ic_message_info_name"
+                tools:ignore="ContentDescription" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/icon_name"
+                android:layout_alignTop="@id/icon_name"
+                android:layout_alignBottom="@id/icon_name"
+                android:layout_alignParentEnd="true"
+                android:gravity="center_vertical"
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/value_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    tools:text="Vincent"
+                    style="?attr/textAppearanceListItem"/>
+                <TextView
+                    android:id="@+id/title_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/message_info_title_name"
+                    style="?attr/textAppearanceListItemSmall"/>
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/icon_username"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_below="@id/icon_name"
+                android:layout_alignParentStart="true"
+                android:padding="8dp"
+                android:tint="?listIconColor"
+                android:src="@drawable/ic_message_info_username"
+                android:visibility="gone"
+                tools:visibility="visible"
+                tools:ignore="ContentDescription" />
+
+            <LinearLayout
+                android:id="@+id/layout_username"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/icon_username"
+                android:layout_alignTop="@id/icon_username"
+                android:layout_alignBottom="@id/icon_username"
+                android:layout_alignParentEnd="true"
+                android:gravity="center_vertical"
+                android:orientation="vertical"
+                android:visibility="gone"
+                tools:visibility="visible">
+                <TextView
+                    android:id="@+id/value_username"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    tools:text="Vincent Gau"
+                    style="?attr/textAppearanceListItem"/>
+                <TextView
+                    android:id="@+id/title_username"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/message_info_title_username"
+                    style="?attr/textAppearanceListItemSmall"/>
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/icon_channel"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_below="@id/icon_username"
+                android:layout_alignParentStart="true"
+                android:padding="8dp"
+                android:tint="?listIconColor"
+                android:src="@drawable/ic_message_info_channel"
+                tools:ignore="ContentDescription" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/icon_channel"
+                android:layout_alignTop="@id/icon_channel"
+                android:layout_alignBottom="@id/icon_channel"
+                android:layout_alignParentEnd="true"
+                android:gravity="center_vertical"
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/value_channel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    tools:text="(main)"
+                    style="?attr/textAppearanceListItem"/>
+                <TextView
+                    android:id="@+id/title_channel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/message_info_title_channel"
+                    style="?attr/textAppearanceListItemSmall"/>
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/icon_timestamp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_below="@id/icon_channel"
+                android:layout_alignParentStart="true"
+                android:padding="8dp"
+                android:tint="?listIconColor"
+                android:src="@drawable/ic_message_info_time"
+                tools:ignore="ContentDescription" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/icon_timestamp"
+                android:layout_alignTop="@id/icon_timestamp"
+                android:layout_alignBottom="@id/icon_timestamp"
+                android:layout_alignParentEnd="true"
+                android:gravity="center_vertical"
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/value_timestamp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    tools:text="02.11.2004 20:15"
+                    style="?attr/textAppearanceListItem"/>
+                <TextView
+                    android:id="@+id/title_timestamp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/message_info_title_timestamp"
+                    style="?attr/textAppearanceListItemSmall"/>
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/icon_bottag"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_below="@id/icon_timestamp"
+                android:layout_alignParentStart="true"
+                android:padding="8dp"
+                android:tint="?listIconColor"
+                android:src="@drawable/ic_message_info_bottag"
+                tools:ignore="ContentDescription" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/icon_bottag"
+                android:layout_alignTop="@id/icon_bottag"
+                android:layout_alignBottom="@id/icon_bottag"
+                android:layout_alignParentEnd="true"
+                android:gravity="center_vertical"
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/value_bottag"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    tools:text="0"
+                    style="?attr/textAppearanceListItem"/>
+                <TextView
+                    android:id="@+id/title_bottag"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/message_info_title_bottag"
+                    style="?attr/textAppearanceListItemSmall"/>
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/icon_message"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_below="@id/icon_bottag"
+                android:layout_alignParentStart="true"
+                android:padding="8dp"
+                android:tint="?listIconColor"
+                android:src="@drawable/ic_message_info_message"
+                tools:ignore="ContentDescription" />
+
+            <LinearLayout
+                android:paddingTop="3dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/icon_message"
+                android:layout_alignTop="@id/icon_message"
+                android:layout_alignParentEnd="true"
+                android:gravity="center_vertical"
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/title_message"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/message_info_title_message"
+                    style="?attr/textAppearanceListItemSmall"/>
+                <TextView
+                    android:id="@+id/value_message"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:text="Musternachricht"
+                    style="?attr/textAppearanceListItem"/>
+            </LinearLayout>
+        </RelativeLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

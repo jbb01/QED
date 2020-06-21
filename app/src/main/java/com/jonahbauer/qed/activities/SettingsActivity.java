@@ -5,16 +5,19 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.preference.EditTextPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
@@ -22,9 +25,11 @@ import androidx.preference.PreferenceManager;
 import androidx.preference.SwitchPreference;
 
 import com.jonahbauer.qed.BuildConfig;
+import com.jonahbauer.qed.Pref;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.database.ChatDatabase;
 import com.jonahbauer.qed.database.GalleryDatabase;
+import com.jonahbauer.qed.layoutStuff.SeekBarPreference;
 import com.jonahbauer.qed.pingNotifications.PingNotifications;
 
 import org.apache.commons.io.FileUtils;
@@ -34,9 +39,19 @@ import java.io.IOException;
 import java.util.List;
 
 public class SettingsActivity extends AppCompatActivity implements PreferenceFragmentCompat.OnPreferenceStartFragmentCallback  {
+    private static final String SAVED_INSTANCE_CONTENT_KEY = "content";
+    private static final String SAVED_INSTANCE_CONTENT_KEY_KEY = "contentKey";
+
+    private int mHeaderId;
+    private int mContentId;
+
+    private int mOrientation;
+
+    private String mContent;
+    private String mContentKey;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
@@ -45,10 +60,46 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
+        mOrientation = getResources().getConfiguration().orientation;
+
+        if (mOrientation == Configuration.ORIENTATION_PORTRAIT) {
+            mHeaderId = R.id.settings;
+            mContentId = R.id.settings;
+        } else if (mOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+            mHeaderId = R.id.settings_header;
+            mContentId = R.id.settings_content;
+        }
+
+        PreferenceFragmentCompat header = new SettingsFragment();
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.settings, new SettingsFragment())
+                .replace(mHeaderId, header)
                 .commit();
+
+        if (savedInstanceState != null) {
+            mContent = savedInstanceState.getString(SAVED_INSTANCE_CONTENT_KEY);
+            mContentKey = savedInstanceState.getString(SAVED_INSTANCE_CONTENT_KEY_KEY);
+        }
+
+        if (mContent == null && mOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+            mContent = GeneralPreferenceFragment.class.getName();
+            mContentKey = getString(R.string.preferences_header_general);
+        }
+
+        if (mContent != null) {
+            final Fragment fragment = getSupportFragmentManager().getFragmentFactory().instantiate(
+                    getClassLoader(),
+                    mContent);
+
+            // Replace the existing Fragment with the new Fragment
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction()
+                    .replace(mContentId, fragment);
+
+            if (mOrientation != Configuration.ORIENTATION_LANDSCAPE)
+                transaction.addToBackStack(mContentKey);
+
+            transaction.commit();
+        }
 
     }
 
@@ -61,12 +112,27 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
         fragment.setArguments(args);
         fragment.setTargetFragment(caller, 0);
 
+        mContent = pref.getFragment();
+        mContentKey = pref.getKey();
+
+
         // Replace the existing Fragment with the new Fragment
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.settings, fragment)
-                .addToBackStack(pref.getKey())
-                .commit();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction()
+                .replace(mContentId, fragment);
+
+        if (mOrientation != Configuration.ORIENTATION_LANDSCAPE)
+            transaction.addToBackStack(pref.getKey());
+
+        transaction.commit();
+
         return true;
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        outState.putString(SAVED_INSTANCE_CONTENT_KEY, mContent);
+        outState.putString(SAVED_INSTANCE_CONTENT_KEY_KEY, mContentKey);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -94,24 +160,23 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.pref_general, rootKey);
 
-            bugReport = findPreference(getString(R.string.preferences_general_bug_report_key));
+            bugReport = findPreference(Pref.General.BUG_REPORT);
             if (bugReport != null)
                 bugReport.setOnPreferenceClickListener(this);
 
-            github = findPreference(getString(R.string.preferences_general_github_key));
+            github = findPreference(Pref.General.GITHUB);
             if (github != null)
                 github.setOnPreferenceClickListener(this);
 
-            if (BuildConfig.usesFCM) {
-                pingNotifications = findPreference(getString(R.string.preferences_ping_notification_key));
+            if (BuildConfig.USES_FCM) {
+                pingNotifications = findPreference(Pref.FCM.PING_NOTIFICATION);
                 if (pingNotifications != null)
                     pingNotifications.setOnPreferenceClickListener(this);
 
-                EditTextPreference pushPingServer = findPreference(getString(R.string.preferences_ping_notification_server_key));
+                EditTextPreference pushPingServer = findPreference(Pref.FCM.PING_NOTIFICATION_SERVER);
                 if (pushPingServer != null) {
                     if (BuildConfig.DEBUG) {
                         pushPingServer.setOnPreferenceClickListener(this);
-                        pushPingServer.setSummaryProvider(EditTextPreference.SimpleSummaryProvider.getInstance());
                     } else {
                         pushPingServer.setEnabled(false);
                         pushPingServer.setVisible(false);
@@ -146,29 +211,33 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
         private SwitchPreference katex;
         private SwitchPreference links;
 
+//        private SeekBarPreference maxShownRows;
+        public static final int[] maxShownRowsValues = {10_000, 20_000, 50_000, 100_000, 200_000, 500_000, Integer.MAX_VALUE};
+        private static final String[] maxShownRowsStringValues = {"10.000", "20.000", "50.000", "100.000", "200.000", "500.000", "\u221E"};
+
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.pref_chat, rootKey);
             setHasOptionsMenu(true);
 
-            EditTextPreference name = findPreference(getString(R.string.preferences_chat_name_key));
-            EditTextPreference channel = findPreference(getString(R.string.preferences_chat_channel_key));
-            deleteDatabase = findPreference(getString(R.string.preferences_chat_delete_db_key));
+            deleteDatabase = findPreference(Pref.Chat.DELETE_CHAT_DB);
 
-            katex = findPreference(getString(R.string.preferences_chat_katex_key));
+            katex = findPreference(Pref.Chat.KATEX);
             if (katex != null)
                 katex.setOnPreferenceChangeListener(this);
 
-            links = findPreference(getString(R.string.preferences_chat_showLinks_key));
+            links = findPreference(Pref.Chat.SHOW_LINKS);
             if (links != null)
                 links.setOnPreferenceChangeListener(this);
             
             if (deleteDatabase != null)
                 deleteDatabase.setOnPreferenceClickListener(this);
-            if (name != null)
-                name.setSummaryProvider(EditTextPreference.SimpleSummaryProvider.getInstance());
-            if (channel != null)
-                channel.setSummaryProvider(EditTextPreference.SimpleSummaryProvider.getInstance());
+
+            SeekBarPreference maxShownRows = findPreference("maxEntries");
+            if (maxShownRows != null) {
+                maxShownRows.setOnPreferenceChangeListener(this);
+                maxShownRows.setExternalValues(maxShownRowsValues, maxShownRowsStringValues);
+            }
         }
 
         @Override
@@ -238,7 +307,9 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
                         }
                     }
                 }
-            }
+            }/* else if (preference.equals(maxShownRows)) {
+
+            }*/
             return true;
         }
     }
@@ -254,10 +325,10 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.pref_gallery, rootKey);
 
-            deleteThumbnails = findPreference(getString(R.string.preferences_gallery_delete_thumbnails_key));
-            deleteImages = findPreference(getString(R.string.preferences_gallery_delete_images_key));
-            showDir = findPreference(getString(R.string.preferences_gallery_show_dir_key));
-            deleteDatabase = findPreference(getString(R.string.preferences_gallery_delete_db_key));
+            deleteThumbnails = findPreference(Pref.Gallery.DELETE_THUMBNAILS);
+            deleteImages = findPreference(Pref.Gallery.DELETE_IMAGES);
+            showDir = findPreference(Pref.Gallery.SHOW_GALLERY_DIR);
+            deleteDatabase = findPreference(Pref.Gallery.DELETE_GALLERY_DB);
             deleteThumbnails.setOnPreferenceClickListener(this);
             deleteImages.setOnPreferenceClickListener(this);
             showDir.setOnPreferenceClickListener(this);

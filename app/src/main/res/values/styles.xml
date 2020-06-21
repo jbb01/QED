@@ -3,14 +3,126 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Base.Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
+        <item name="colorPrimaryLight">@color/colorPrimaryLight</item>
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+
         <item name="colorAccent">@color/colorAccent</item>
+
         <item name="android:colorBackground">@color/colorBackground</item>
+
+        <item name="colorError">@android:color/holo_red_light</item>
+
+        <item name="preferenceIconColor">?colorAccent</item>
+        <item name="listIconColor">#444</item>
+
         <item name="bottomSheetDialogTheme">@style/AppTheme.BottomSheetDialog</item>
+        <item name="sideSheetDialogTheme">@style/AppTheme.SideSheetDialog</item>
+
+        <item name="buttonStyle">@style/AppTheme.Button</item>
+        <item name="textAppearanceButton">@style/AppTheme.TextAppearance.Button</item>
+
+        <item name="textAppearanceListItem">@style/AppTheme.TextAppearance.ListItem</item>
+        <item name="textAppearanceListItemSecondary">@style/AppTheme.TextAppearance.ListItemSecondary</item>
+        <item name="textAppearanceListItemSmall">@style/AppTheme.TextAppearance.ListItemSmall</item>
+
+        <item name="dividerColor">#F0F0F0</item>
+        <item name="divider">@drawable/divider</item>
+        <item name="dividerHorizontal">?divider</item>
+        <item name="android:divider">?divider</item>
+        <item name="android:listDivider">?divider</item>
+        <item name="android:dividerHeight">1dp</item>
+
+        <item name="actionBarStyle">@style/AppTheme.ActionBarTheme</item>
+        <item name="actionBarTheme">@style/AppTheme.ActionBarTheme</item>
+        <item name="windowNoTitle">false</item>
+        <item name="windowActionBar">true</item>
+
+        <item name="messageStyle">@style/AppTheme.Message</item>
+    </style>
+
+    <style name="AppTheme.SplashScreen" parent="AppTheme">
+        <item name="android:windowBackground">@drawable/splash_screen</item>
+    </style>
+
+    <style name="AppTheme.Translucent">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
+
+    <style name="AppTheme.ActionBarTheme" parent="Base.Theme.AppCompat.Light.DarkActionBar">
+        <item name="titleTextColor">@android:color/white</item>
+
+        <item name="colorControlNormal">@color/color_control_normal</item>
+        <item name="background">@color/colorPrimary</item>
+        <item name="colorPrimary">?attr/background</item>
+        <!--<item name="colorControlHighlight">@android:color/darker_gray</item>-->
+    </style>
+
+    <style name="AppTheme.Button" parent="Widget.AppCompat.Button">
+        <item name="android:background">@drawable/button</item>
+        <item name="android:backgroundTint">@android:color/white</item>
+        <item name="android:textAppearance">?attr/textAppearanceButton</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+    </style>
+    <style name="AppTheme.FloatingActionButton" parent="Widget.Design.FloatingActionButton">
+        <item name="android:tint">?attr/colorAccent</item>
+        <item name="backgroundTint">@android:color/white</item>
+        <item name="rippleColor">#e6e6e6</item>
+        <item name="fabSize">mini</item>
+    </style>
+
+    <style name="AppTheme.TextAppearance" parent="android:TextAppearance.Material.Body1"/>
+    <style name="AppTheme.TextAppearance.Button" parent="android:TextAppearance.Material.Button">
+        <item name="android:textColor">?attr/colorAccent</item>
+    </style>
+    <style name="AppTheme.TextAppearance.ListItem" parent="android:TextAppearance.Material.Subhead"/>
+    <style name="AppTheme.TextAppearance.ListItemSecondary" parent="AppTheme.TextAppearance.ListItem">
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="AppTheme.TextAppearance.ListItemSmall" parent="android:TextAppearance.Material.Body1">
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
     </style>
 
     <style name="AppTheme.BottomSheetDialog" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+
+        <item name="textAppearanceListItem">@style/AppTheme.TextAppearance.ListItem</item>
+        <item name="textAppearanceListItemSecondary">@style/AppTheme.TextAppearance.ListItemSecondary</item>
+        <item name="textAppearanceListItemSmall">@style/AppTheme.TextAppearance.ListItemSmall</item>
+
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+
+        <item name="android:colorBackground">@color/colorBackground</item>
+
+        <item name="android:windowAnimationStyle">@style/AppTheme.Animation.BottomSheetDialog</item>
+    </style>
+    <style name="AppTheme.SideSheetDialog" parent="AppTheme.BottomSheetDialog">
+        <item name="android:windowAnimationStyle">@style/AppTheme.Animation.SideSheetDialog</item>
+    </style>
+
+    <style name="AppTheme.Animation"/>
+    <style name="AppTheme.Animation.BottomSheetDialog">
+        <item name="android:windowEnterAnimation">@anim/slide_in_bottom</item>
+        <item name="android:windowExitAnimation">@anim/slide_out_bottom</item>
+    </style>
+    <style name="AppTheme.Animation.SideSheetDialog">
+        <item name="android:windowEnterAnimation">@anim/slide_in_right</item>
+        <item name="android:windowExitAnimation">@anim/slide_out_right</item>
+    </style>
+
+
+
+
+
+    <style name="AppTheme.Variant" parent="AppTheme">
         <item name="colorPrimary">@color/colorPrimary2</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark2</item>
         <item name="colorAccent">@color/colorAccent2</item>
@@ -24,14 +136,47 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="AppTheme.NoListDivider" parent="AppTheme">
-        <item name="android:listDivider">@null</item>
-    </style>
-
-    <style name="AppTheme.NoActionBar">
+    <style name="AppTheme.NoActionBar" parent="AppTheme">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="AppTheme.AppBarOverlay" parent="Base.ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.Message">
+        <item name="android:colorBackground">@color/message_background</item>
+        <item name="android:colorPressedHighlight">@color/message_highlight</item>
+
+        <item name="nameTextAppearance">@style/AppTheme.TextAppearance.Message.Name</item>
+        <item name="messageTextAppearance">@style/AppTheme.TextAppearance.Message.Message</item>
+        <item name="dateTextAppearance">@style/AppTheme.TextAppearance.Message.Date</item>
+        <item name="dataTextAppearance">@style/AppTheme.TextAppearance.Message.Data</item>
+
+        <item name="dateBannerTextAppearance">@style/AppTheme.TextAppearance.Message.DateBanner</item>
+        <item name="dateBannerBackgroundTint">#E0E0FF</item>
+
+        <item name="android:elevation">3dp</item>
+    </style>
+
+    <style name="AppTheme.TextAppearance.Message" parent="android:TextAppearance.Material.Body1"/>
+    <style name="AppTheme.TextAppearance.Message.Name">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">?android:textColorPrimary</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="AppTheme.TextAppearance.Message.Message">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">?android:textColorPrimary</item>
+    </style>
+    <style name="AppTheme.TextAppearance.Message.Date">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">?android:textColorSecondary</item>
+    </style>
+    <style name="AppTheme.TextAppearance.Message.Data">
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">?android:textColorPrimary</item>
+    </style>
+    <style name="AppTheme.TextAppearance.Message.DateBanner">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">?android:textColorSecondary</item>
+    </style>
 </resources>

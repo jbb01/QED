@@ -24,105 +24,109 @@ import static com.jonahbauer.qed.database.ChatDatabaseContract.ChatEntry.COLUMN_
 import static com.jonahbauer.qed.database.ChatDatabaseContract.ChatEntry.TABLE_NAME;
 
 public class ChatDatabaseAsync extends AsyncTask<Object, Integer, Boolean> {
-    private final Mode mode;
-    private final ChatDatabaseReceiver receiver;
+    private final Mode mMode;
+    private final ChatDatabaseReceiver mReceiver;
+    private final ChatDatabaseHelper mDatabaseHelper;
 
-    private final SQLiteDatabase sqLiteDatabase;
+    private String mQuery;
+    private String[] mQueryArgs;
 
-    private String query;
-    private String[] queryArgs;
+    private List<Message> mInsertAll;
 
-    private List<Message> insertAll;
-
-    ChatDatabaseAsync(SQLiteDatabase sqLiteDatabase, ChatDatabaseReceiver receiver, String query, String[] queryArgs) {
-        this.mode = Mode.QUERY;
-        this.sqLiteDatabase = sqLiteDatabase;
-        this.receiver = receiver;
-        this.query = query;
-        this.queryArgs = queryArgs;
+    ChatDatabaseAsync(ChatDatabaseHelper databaseHelper, ChatDatabaseReceiver receiver, String query, String[] queryArgs) {
+        this.mMode = Mode.QUERY;
+        this.mDatabaseHelper = databaseHelper;
+        this.mReceiver = receiver;
+        this.mQuery = query;
+        this.mQueryArgs = queryArgs;
     }
 
-    ChatDatabaseAsync(SQLiteDatabase sqLiteDatabase, ChatDatabaseReceiver receiver, List<Message> messages) {
-        this.mode = Mode.INSERT_ALL;
-        this.sqLiteDatabase = sqLiteDatabase;
-        this.receiver = receiver;
-        this.insertAll = messages;
+    ChatDatabaseAsync(ChatDatabaseHelper databaseHelper, ChatDatabaseReceiver receiver, List<Message> messages) {
+        this.mMode = Mode.INSERT_ALL;
+        this.mDatabaseHelper = databaseHelper;
+        this.mReceiver = receiver;
+        this.mInsertAll = messages;
     }
 
     @Override
     protected Boolean doInBackground(Object... objects) {
-        switch (mode) {
+        switch (mMode) {
             case QUERY:
-                query(receiver, query, queryArgs);
+                query(mReceiver, mQuery, mQueryArgs);
                 break;
             case INSERT_ALL:
-                insertAll(insertAll);
+                insertAll(mInsertAll);
                 break;
         }
         return true;
     }
 
     private void query(ChatDatabaseReceiver receiver, String query, String[] args) {
-        Cursor cursor = sqLiteDatabase.rawQuery(query, args);
+        try (SQLiteDatabase chatReadable = mDatabaseHelper.getReadableDatabase()) {
+            try (Cursor cursor = chatReadable.rawQuery(query, args)) {
+                List<Message> messages = new ArrayList<>();
 
-        List<Message> messages = new ArrayList<>();
+                while (cursor.moveToNext()) {
+                    messages.add(new Message(
+                            cursor.getString(cursor.getColumnIndex(COLUMN_NAME_NAME)),
+                            cursor.getString(cursor.getColumnIndex(COLUMN_NAME_MESSAGE)),
+                            cursor.getString(cursor.getColumnIndex(COLUMN_NAME_DATE)),
+                            cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_USERID)),
+                            cursor.getString(cursor.getColumnIndex(COLUMN_NAME_USERNAME)),
+                            cursor.getString(cursor.getColumnIndex(COLUMN_NAME_COLOR)),
+                            cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_ID)),
+                            cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_BOTTAG)),
+                            cursor.getString(cursor.getColumnIndex(COLUMN_NAME_CHANNEL))
+                    ));
+                }
 
-        while (cursor.moveToNext()) {
-            messages.add(new Message(
-                    cursor.getString(cursor.getColumnIndex(COLUMN_NAME_NAME)),
-                    cursor.getString(cursor.getColumnIndex(COLUMN_NAME_MESSAGE)),
-                    cursor.getString(cursor.getColumnIndex(COLUMN_NAME_DATE)),
-                    cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_USERID)),
-                    cursor.getString(cursor.getColumnIndex(COLUMN_NAME_USERNAME)),
-                    cursor.getString(cursor.getColumnIndex(COLUMN_NAME_COLOR)),
-                    cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_ID)),
-                    cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_BOTTAG)),
-                    cursor.getString(cursor.getColumnIndex(COLUMN_NAME_CHANNEL))
-            ));
+                receiver.onReceiveResult(messages);
+            }
         }
-
-        cursor.close();
-
-        receiver.onReceiveResult(messages);
     }
 
     private void insertAll(List<Message> messages) {
-        sqLiteDatabase.beginTransaction();
-
-        AtomicInteger i = new AtomicInteger();
-        int j = messages.size();
-
-        for (Message message : messages) {
-            ContentValues value = new ContentValues();
-            value.put(COLUMN_NAME_ID, message.id);
-            value.put(COLUMN_NAME_USERID, message.userId);
-            value.put(COLUMN_NAME_USERNAME, message.userName);
-            value.put(COLUMN_NAME_BOTTAG, message.bottag);
-            value.put(COLUMN_NAME_COLOR, message.color);
-            value.put(COLUMN_NAME_MESSAGE, message.message);
-            value.put(COLUMN_NAME_DATE, message.date);
-            value.put(COLUMN_NAME_NAME, message.name);
-            value.put(COLUMN_NAME_CHANNEL, message.channel);
-
+        try (SQLiteDatabase chatWriteable = mDatabaseHelper.getWritableDatabase()) {
+            chatWriteable.beginTransaction();
             try {
-                sqLiteDatabase.insertOrThrow(TABLE_NAME, null, value);
-            } catch (SQLiteConstraintException ignored) {}
 
-            publishProgress(i.incrementAndGet(), j);
+                AtomicInteger i = new AtomicInteger();
+                int j = messages.size();
+
+                for (Message message : messages) {
+                    ContentValues value = new ContentValues();
+                    value.put(COLUMN_NAME_ID, message.id);
+                    value.put(COLUMN_NAME_USERID, message.userId);
+                    value.put(COLUMN_NAME_USERNAME, message.userName);
+                    value.put(COLUMN_NAME_BOTTAG, message.bottag);
+                    value.put(COLUMN_NAME_COLOR, message.color);
+                    value.put(COLUMN_NAME_MESSAGE, message.message);
+                    value.put(COLUMN_NAME_DATE, message.date);
+                    value.put(COLUMN_NAME_NAME, message.name);
+                    value.put(COLUMN_NAME_CHANNEL, message.channel);
+
+                    try {
+                        chatWriteable.insertOrThrow(TABLE_NAME, null, value);
+                    } catch (SQLiteConstraintException ignored) {}
+
+                    publishProgress(i.incrementAndGet(), j);
+                }
+
+                chatWriteable.setTransactionSuccessful();
+            } finally {
+                chatWriteable.endTransaction();
+            }
         }
-
-        sqLiteDatabase.setTransactionSuccessful();
-        sqLiteDatabase.endTransaction();
     }
 
     @Override
     protected void onPostExecute(Boolean success) {
-        if (!success && (mode == Mode.QUERY) && (receiver != null)) receiver.onDatabaseError();
+        if (!success && (mMode == Mode.QUERY) && (mReceiver != null)) mReceiver.onDatabaseError();
     }
 
     @Override
     protected void onProgressUpdate(Integer... values) {
-        if (mode == Mode.INSERT_ALL && (receiver != null)) receiver.onInsertAllUpdate(values[0], values[1]);
+        if (mMode == Mode.INSERT_ALL && (mReceiver != null)) mReceiver.onInsertAllUpdate(values[0], values[1]);
     }
 
     enum Mode {

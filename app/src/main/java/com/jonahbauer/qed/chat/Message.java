@@ -1,5 +1,8 @@
 package com.jonahbauer.qed.chat;
 
+import android.graphics.Color;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -11,23 +14,78 @@ import org.jetbrains.annotations.Contract;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 /**
  * An object representing a message in the qed chat
  */
-public class Message {
-    public static final Message PONG = new Message("PONG", "PONG", "PONG", 0, "PONG", "PONG", 0, 0, "PONG");
+public class Message implements Parcelable, Comparable<Message>, Serializable {
+    public static final Parcelable.Creator<Message> CREATOR = new Parcelable.Creator<Message>() {
 
-    public final String name;
-    public final String message;
-    public final String date;
-    public final int userId;
-    public final String userName;
-    public final String color;
-    public final String channel;
+        @Override
+        public Message createFromParcel(Parcel source) {
+            String name = source.readString();
+            String message = source.readString();
+            String date = source.readString();
+            long userId = source.readLong();
+            String userName = source.readString();
+            String color = source.readString();
+            String channel = source.readString();
+            int bottag = source.readInt();
+            long id = source.readLong();
+
+            assert name != null & message != null & date != null & color != null & channel != null;
+
+            return new Message(name, message, date, userId, userName, color, id, bottag, channel);
+        }
+
+        @Override
+        public Message[] newArray(int size) {
+            return new Message[size];
+        }
+    };
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(name);
+        dest.writeString(message);
+        dest.writeString(date);
+        dest.writeLong(userId);
+        dest.writeString(userName);
+        dest.writeString(color);
+        dest.writeString(channel);
+        dest.writeInt(bottag);
+        dest.writeLong(id);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    private static final SimpleDateFormat sdfIn = new SimpleDateFormat("yyyy-MM-dd", Locale.GERMANY);
+    private static final SimpleDateFormat sdfOut = new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY);
+
+    public static final Message PONG = new Message("PONG", "PONG", "PONG", 0, "PONG", "000000", 0, 0, "PONG");
+
+    @NonNull public final String name;
+    @NonNull public final String message;
+    @NonNull public final String date;
+    public final long userId;
+    @Nullable public final String userName;
+    @NonNull public final String color;
+    @NonNull public final String channel;
     public final int bottag;
-    public final int id;
+    public final long id;
 
-    public Message(String name, String message, String date, int userId, String userName, String color, int id, int bottag, String channel) {
+    public final String dateNoTime;
+    public final int transformedColor;
+
+    public Message(@NonNull String name, @NonNull String message, @NonNull String date, long userId, @Nullable String userName, @NonNull String color, long id, int bottag, @NonNull String channel) {
         this.name = name;
         this.message = message;
         this.date = date;
@@ -37,6 +95,19 @@ public class Message {
         this.id = id;
         this.bottag = bottag;
         this.channel = channel;
+
+        Date dateNoTimeObj = null;
+        try {
+            dateNoTimeObj = sdfIn.parse(date.split(" ")[0]);
+        } catch (ParseException ignored) {}
+
+        if (dateNoTimeObj != null) {
+            this.dateNoTime = sdfOut.format(dateNoTimeObj).intern();
+        } else {
+            this.dateNoTime = date.split(" ")[0].intern();
+        }
+
+        transformedColor = transformColor(color);
     }
 
     @NonNull
@@ -55,7 +126,7 @@ public class Message {
 
 
     public int compareTo(Message other) {
-        return Integer.compare(id,other.id);
+        return Long.compare(id,other.id);
     }
 
     /**
@@ -87,8 +158,22 @@ public class Message {
         return null;
     }
 
+    private int transformColor(String color) {
+        return transformColor(Color.parseColor("#" + color));
+    }
+
+    private int transformColor(int color) {
+        float[] hsv = new float[3];
+        Color.colorToHSV(color, hsv);
+
+        hsv[1] = 1/*-(1-hsv[1])*0.2f*/;
+        hsv[2] = 0.85f;
+
+        return Color.HSVToColor(hsv);
+    }
+
     @Override
     public int hashCode() {
-        return id;
+        return (int) id;
     }
 }

@@ -28,6 +28,7 @@
     <string name="database_hits">Treffer</string>
     <string name="database_login_failed">Datenbank Login fehlgeschlagen</string>
     <string name="database_offline">Keine Verbindung zum Internet möglich.\nDie Datenbank ist offline nicht verfügbar.</string>
+    <string name="database_empty">Die Datenbank scheint leer zu sein.\nHast du den Mitgliedsbeitrag bezahlt?</string>
     <string name="database_save_done">Gespeichert</string>
     <string name="database_search_button">Suchen</string>
     <string name="delete">Löschen</string>
@@ -81,15 +82,9 @@
     <string name="gallery_login_failed">Galerie Login fehlgeschlagen</string>
     <string name="image_already_original">Das ist bereits die Originaldatei, möchtest du sie erneut herunterladen?</string>
     <string name="image_async_still_running">Es laufen noch Downloads. Wenn du jetzt zurückgehst werden sie abgebrochen. Möchtest du fortfahren?</string>
-    <string name="image_info_album">Album:</string>
-    <string name="image_info_creation_date">Erstellt am:</string>
-    <string name="image_info_format">Format:</string>
-    <string name="image_info_owner">Besitzer:</string>
-    <string name="image_info_path">Pfad:</string>
-    <string name="image_info_upload_date">Hochgeladen am:</string>
     <string name="image_not_downloaded">Dieses Bild ist nicht heruntergeladen</string>
     <string name="image_suffix_original">" (original)"</string>
-    <string name="info">Info</string>
+    <string name="info">Details</string>
     <string name="log_action_save">In Datenbank speichern</string>
     <string name="log_dateinterval">dateinterval</string>
     <string name="log_daterecent">daterecent</string>
@@ -186,7 +181,7 @@
     <string name="log_subtitle_file">Datei</string>
     <string name="log_postinterval">postinterval</string>
     <string name="preferences_general_bug_report_title">Fehler melden</string>
-    <string name="preferences_general_bug_report_summary">Bitte benutze den GitHub Issue Tracker für Fehlerberichte. Füge so viele Informationen wie möglich bei (Android und App-Version, Schritte zum reproduzieren, Fehlerbericht (System > Entwickleroptionen > Fehlerbericht abrufen), …).</string>
+    <string name="preferences_general_bug_report_summary">Bitte benutze den GitHub Issue Tracker für Fehlerberichte. Füge so viele Informationen wie möglich bei (Android und App-Version, Schritte zum reproduzieren, …).</string>
     <string name="preferences_general_github_title">GitHub-Projekt</string>
     <string name="event_sign_up">Anmelden</string>
     <string name="event_sign_up_success">Erfolgreich angemeldet!</string>
@@ -194,4 +189,61 @@
     <string name="event_sign_up_already_signed_up">Du bist bereits angemeldet!</string>
     <string name="event_sign_up_unknown_event">Unbekannte Veranstaltung!</string>
     <string name="event_sign_up_confirm">Möchtest du dich wirklich zu %s anmelden?</string>
+    <string name="image_info">@string/info</string>
+    <string name="image_open_with">Öffnen mit…</string>
+    <string name="image_download_original">Original herunterladen</string>
+    <string name="event_subtitle_orga">Orga</string>
+
+    <!-- Image Info Activity -->
+    <string name="title_activity_image_info">Informationen</string>
+    <string name="image_info_details">Fotoinformationen</string>
+    <string name="image_info_camera_manufacturer">Hersteller</string>
+    <string name="image_info_camera_model">Model</string>
+    <string name="image_info_iso">ISO</string>
+    <string name="image_info_focal_ratio">Blendenzahl</string>
+    <string name="image_info_focal_length">Brennweite</string>
+    <string name="image_info_exposure_time">Belichtungszeit</string>
+    <string name="image_info_flash">Blitz</string>
+    <string name="image_info_flash_no_flash">Kein Blitz</string>
+    <string name="image_info_flash_triggered">Blitz ausgelöst</string>
+    <string name="image_info_orientation">Orientierung</string>
+    <string name="image_info_resolution">Auflösung</string>
+    <string name="image_info_position">Position</string>
+    <string name="image_info_creation_date">Zeit</string>
+    <string name="image_info_format">Format</string>
+
+    <string name="image_info_histogram">Bild-Histogramm</string>
+
+    <string name="image_info_qed_details">QED</string>
+    <string name="image_info_number_of_calls">Anzahl der Aufrufe</string>
+    <string name="image_info_album">Album</string>
+    <string name="image_info_owner">Besitzer</string>
+    <string name="image_info_upload_date">Hochgeladen</string>
+
+    <string name="image_info_other_details">Andere</string>
+    <string name="image_info_thumbnail_path">Thumbnail-Pfad</string>
+    <string name="image_info_path">Pfad</string>
+
+    <string name="message_info">@string/info</string>
+    <string name="album_info">@string/info</string>
+    <string name="message_reply">Antworten</string>
+    <string name="preferences_chat_db_max_search_result_title">Maximale Anzahl an Suchergebnissen</string>
+
+    <string-array name="chat_database_max_entries_value_strings">
+        <item>10.000</item>
+        <item>20.000</item>
+        <item>50.000</item>
+        <item>100.000</item>
+        <item>200.000</item>
+        <item>500.000</item>
+        <item>\u221E</item>
+    </string-array>
+
+    <string name="message_info_title_id">ID</string>
+    <string name="message_info_title_name">Name</string>
+    <string name="message_info_title_username">Nutzername</string>
+    <string name="message_info_title_channel">Channel</string>
+    <string name="message_info_title_timestamp">Zeitstempel</string>
+    <string name="message_info_title_bottag">Bottag</string>
+    <string name="message_info_title_message">Nachricht</string>
 </resources>

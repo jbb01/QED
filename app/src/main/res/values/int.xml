@@ -6,4 +6,14 @@
     <integer name="checkbox_change_2">200</integer>
 
     <integer name="reload_spin_time">500</integer>
+
+    <integer-array name="chat_database_max_entries_values">
+        <item>10000</item>
+        <item>20000</item>
+        <item>50000</item>
+        <item>100000</item>
+        <item>200000</item>
+        <item>500000</item>
+        <item>2147483647</item>
+    </integer-array>
 </resources>

@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:height="24dp"
     android:width="24dp"
@@ -10,7 +11,7 @@
         android:scaleX="0.8"
         android:scaleY="0.8">
         <path
-            android:fillColor="@color/event_icons"
+            android:fillColor="@android:color/white"
             android:pathData="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" />
     </group>
     <group
@@ -21,7 +22,7 @@
         android:scaleX="0.5"
         android:scaleY="0.5">
         <path
-            android:fillColor="@color/event_icons"
+            android:fillColor="@android:color/white"
             android:pathData="M12,3C17.5,3 22,6.58 22,11C22,15.42 17.5,19 12,19C10.76,19 9.57,18.82 8.47,18.5C5.55,21 2,21 2,21C4.33,18.67 4.7,17.1 4.75,16.5C3.05,15.07 2,13.13 2,11C2,6.58 6.5,3 12,3Z" />
     </group>
 </vector>

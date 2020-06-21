@@ -6,14 +6,14 @@
     <group
         android:translateY="-1.5">
         <path
-            android:fillColor="@color/floating_action_button_foreground"
+            android:fillColor="#fff"
             android:pathData="M7.41,7.84L12,12.42l4.59,-4.58L18,9.25l-6,6 -6,-6z"/>
     </group>
 
     <group
         android:translateY="3.5">
         <path
-            android:fillColor="@color/floating_action_button_foreground"
+            android:fillColor="#fff"
             android:pathData="M7.41,7.84L12,12.42l4.59,-4.58L18,9.25l-6,6 -6,-6z"/>
     </group>
 </vector>

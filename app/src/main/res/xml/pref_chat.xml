@@ -19,6 +19,7 @@
             android:selectAllOnFocus="true"
             android:singleLine="true"
             android:title="@string/preferences_chat_name_title"
+            app:useSimpleSummaryProvider="true"
             android:icon="@drawable/ic_settings_name" />
 
         <EditTextPreference
@@ -29,6 +30,7 @@
             android:selectAllOnFocus="true"
             android:singleLine="true"
             android:title="@string/preferences_chat_channel_title"
+            app:useSimpleSummaryProvider="true"
             android:icon="@drawable/ic_settings_channel" />
 
     </PreferenceCategory>
@@ -52,7 +54,7 @@
             android:icon="@drawable/ic_settings_link" />
 
         <SwitchPreference
-            android:defaultValue="true"
+            android:defaultValue="false"
             android:key="@string/preferences_chat_katex_key"
             android:selectAllOnFocus="true"
             android:singleLine="true"
@@ -70,6 +72,18 @@
 
     <PreferenceCategory
         app:title="@string/preferences_chat_group_database">
+
+        <com.jonahbauer.qed.layoutStuff.SeekBarPreference
+            android:defaultValue="50000"
+            android:key="@string/preferences_chat_db_max_search_result_key"
+            android:singleLine="true"
+            android:title="@string/preferences_chat_db_max_search_result_title"
+            android:max="6"
+            android:icon="@drawable/ic_settings_database_search"
+            app:showSeekBarValue="true"
+            app:externalValues="@array/chat_database_max_entries_values"
+            app:externalValueStrings="@array/chat_database_max_entries_value_strings"
+            app:updatesContinuously="true"/>
         <Preference
             android:defaultValue="false"
             android:key="@string/preferences_chat_delete_db_key"

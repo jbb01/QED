@@ -2,12 +2,18 @@ package com.jonahbauer.qed.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
+import android.util.SparseArray;
+import android.util.TypedValue;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -26,35 +32,55 @@ import com.google.android.material.navigation.NavigationView;
 import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.BuildConfig;
 import com.jonahbauer.qed.NetworkListener;
+import com.jonahbauer.qed.Pref;
 import com.jonahbauer.qed.R;
+import com.jonahbauer.qed.activities.eventSheet.EventBottomSheet;
+import com.jonahbauer.qed.activities.mainFragments.ChatDatabaseFragment;
+import com.jonahbauer.qed.activities.mainFragments.ChatFragment;
+import com.jonahbauer.qed.activities.mainFragments.EventDatabaseFragment;
+import com.jonahbauer.qed.activities.mainFragments.GalleryFragment;
+import com.jonahbauer.qed.activities.mainFragments.LogFragment;
+import com.jonahbauer.qed.activities.mainFragments.PersonDatabaseFragment;
+import com.jonahbauer.qed.activities.mainFragments.QEDFragment;
+import com.jonahbauer.qed.activities.personSheet.PersonBottomSheet;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static com.jonahbauer.qed.DeepLinkingActivity.QEDIntent;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, NetworkListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, NetworkListener, DrawerLayout.DrawerListener {
     private static final String FRAGMENT_TAG = "com.jonahbauer.qed.activities.QEDFragment";
 
-    private DrawerLayout drawerLayout;
-    private NavigationView navView;
-    private Toolbar toolbar;
-    private SharedPreferences sharedPreferences;
+    private SparseArray<QEDFragment> mCachedFragments = new SparseArray<>();
 
-    private boolean doubleBackToExitPressedOnce;
+    private DrawerLayout mDrawerLayout;
+    private NavigationView mNavView;
+    private Toolbar mToolbar;
+    private SharedPreferences mSharedPreferences;
 
-    private FragmentTransaction fragmentTransaction;
-    private boolean waitForDropResult;
+    private boolean mDoubleBackToExitPressedOnce;
 
-    private boolean shouldReloadFragment;
+    private FragmentTransaction mFragmentTransaction;
+    private int mNewSelection;
 
-    private QEDFragment fragment = null;
+    private boolean mWaitForDropResult;
+
+    private boolean mShouldReloadFragment;
+
+    private QEDFragment mFragment = null;
+
+    private Toolbar mAltToolbar;
+    private boolean mAltToolbarBorrowed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(R.style.AppTheme_NoActionBar);
         super.onCreate(savedInstanceState);
 
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        mNewSelection = mSharedPreferences.getInt(Pref.General.DRAWER_SELECTION, R.id.nav_chat);
 
         Intent intent = getIntent();
         if (!handleIntent(intent, this)) {
@@ -64,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
 
-        if (!sharedPreferences.getBoolean(getString(R.string.preferences_loggedIn_key),false)) {
+        if (!mSharedPreferences.getBoolean(Pref.General.LOGGED_IN,false)) {
             Intent intent2 = new Intent(this, LoginActivity.class);
             startActivity(intent2);
             finish();
@@ -72,38 +98,35 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         setContentView(R.layout.activity_main);
-        drawerLayout = findViewById(R.id.drawer_layout);
-        navView = findViewById(R.id.nav_view);
-        toolbar = findViewById(R.id.toolbar);
+        mDrawerLayout = findViewById(R.id.drawer_layout);
+        mNavView = findViewById(R.id.nav_view);
+        mToolbar = findViewById(R.id.toolbar);
+        mAltToolbar = findViewById(R.id.alt_toolbar);
 
-        navView.setNavigationItemSelectedListener(this);
-        drawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
-            @Override
-            public void onDrawerSlide(@NonNull View view, float v) {}
+        mNavView.setNavigationItemSelectedListener(this);
+        mDrawerLayout.addDrawerListener(this);
 
+        final RelativeLayout navHeader = (RelativeLayout) mNavView.getHeaderView(0);
+        ViewTreeObserver vto = mNavView.getViewTreeObserver();
+        vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
-            public void onDrawerOpened(@NonNull View view) {}
+            public void onGlobalLayout() {
+                mNavView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                int width = mNavView.getMeasuredWidth();
 
-            @Override
-            public void onDrawerClosed(@NonNull View view) {
-                if (shouldReloadFragment) {
-                    reloadFragment(false);
-                    shouldReloadFragment = false;
-                }
+                navHeader.getLayoutParams().height = width * 9 / 16;
+                navHeader.requestLayout();
             }
-
-            @Override
-            public void onDrawerStateChanged(int i) {}
         });
 
 
-        setSupportActionBar(toolbar);
+        setSupportActionBar(mToolbar);
         ActionBar actionbar = getSupportActionBar();
         assert actionbar != null;
         actionbar.setDisplayHomeAsUpEnabled(true);
         actionbar.setHomeAsUpIndicator(R.drawable.ic_menu);
 
-        navView.setCheckedItem(sharedPreferences.getInt(getString(R.string.preferences_drawerSelection_key), R.id.nav_chat));
+        mNavView.setCheckedItem(mSharedPreferences.getInt(Pref.General.DRAWER_SELECTION, R.id.nav_chat));
         reloadFragment(false);
     }
 
@@ -115,7 +138,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     protected void onPause() {
-        if (!doubleBackToExitPressedOnce) {
+        if (!mDoubleBackToExitPressedOnce) {
             FragmentManager manager = getSupportFragmentManager();
 
             Fragment oldFrag2 = manager.findFragmentByTag(FRAGMENT_TAG);
@@ -130,53 +153,75 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+    }
+
+    @Override
     public void onBackPressed() {
-        if (waitForDropResult) {
+        if (mWaitForDropResult) {
             if (BuildConfig.DEBUG) Log.d(Application.LOG_TAG_DEBUG, "onBackPressed() invoked while waiting for onDrop result");
             return;
         }
 
         // Close drawer if open
-        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            drawerLayout.closeDrawers();
+        if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+            mDrawerLayout.closeDrawers();
+            return;
+        }
+
+        // Hide visible alternative toolbar
+        if (mAltToolbarBorrowed) {
+            returnAltToolbar();
             return;
         }
 
         // Require double back to exit
-        if (doubleBackToExitPressedOnce) {
-            Boolean mayDrop = fragment.onDrop(false);
+        if (mDoubleBackToExitPressedOnce) {
+            Boolean mayDrop = mFragment.onDrop(false);
 
             if (mayDrop == null) {
-                fragmentTransaction = null;
-                waitForDropResult = true;
+                mFragmentTransaction = null;
+                mWaitForDropResult = true;
             } else if (mayDrop) {
                 super.onBackPressed();
             }
         } else {
-            this.doubleBackToExitPressedOnce = true;
+            this.mDoubleBackToExitPressedOnce = true;
             Toast.makeText(this, R.string.double_back_to_exit_toast, Toast.LENGTH_SHORT).show();
         }
 
-        new Handler().postDelayed(() -> doubleBackToExitPressedOnce = false, 2000);
+        new Handler().postDelayed(() -> mDoubleBackToExitPressedOnce = false, 2000);
     }
 
+    /**
+     * Called by fragments that returned {@code null} in {@link QEDFragment#onDrop(boolean)}
+     *
+     * @param result if the fragment may be dropped
+     * @see QEDFragment#onDrop(boolean)
+     */
     public void onDropResult(boolean result) {
-        if (waitForDropResult) {
-            waitForDropResult = false;
+        if (mWaitForDropResult) {
+            mWaitForDropResult = false;
 
             if (result) {
-                if (fragmentTransaction != null) fragmentTransaction.commit();
-                else super.onBackPressed();
+                if (mFragmentTransaction != null) {
+                    commitFragmentTransaction();
+                } else {
+                    super.onBackPressed();
+                }
             }
         } else {
             if (BuildConfig.DEBUG) Log.d(Application.LOG_TAG_DEBUG, "dropResult() invoked while not waiting for onDrop result.");
         }
+
+        disposeFragmentTransaction();
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            drawerLayout.openDrawer(GravityCompat.START);
+            mDrawerLayout.openDrawer(GravityCompat.START);
             return true;
         }
 
@@ -208,26 +253,42 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 startActivity(intent);
                 finish();
                 return true; }
+            default: {
+                if (mSharedPreferences.getInt(Pref.General.DRAWER_SELECTION, R.id.nav_chat) != menuItem.getItemId() && mNewSelection != menuItem.getItemId()) {
+                    mNewSelection = menuItem.getItemId();
+                    mShouldReloadFragment = true;
+                }
+                mDrawerLayout.closeDrawers();
+
+                return false;
+            }
+        }
+    }
+
+
+    private void commitFragmentTransaction() {
+        if (mFragmentTransaction != null) {
+            mFragmentTransaction.commit();
+            mFragmentTransaction = null;
         }
 
-        if (sharedPreferences.getInt(getString(R.string.preferences_drawerSelection_key),R.id.nav_chat) != menuItem.getItemId()) {
-            sharedPreferences.edit()
-                    .putInt(getString(R.string.preferences_drawerSelection_key), menuItem.getItemId()).apply();
-            shouldReloadFragment = true;
-//            navView.postDelayed(() -> reloadFragment(false), 250);
-        }
-        drawerLayout.closeDrawers();
+        mSharedPreferences.edit().putInt(Pref.General.DRAWER_SELECTION, mNewSelection).apply();
+        mNavView.setCheckedItem(mNewSelection);
+        mNewSelection = 0;
+    }
 
-        return true;
+    private void disposeFragmentTransaction() {
+        mFragmentTransaction = null;
+        mNewSelection = mSharedPreferences.getInt(Pref.General.DRAWER_SELECTION, R.id.nav_chat);
     }
 
     /**
-     * Reloads the content fragment if and only if the content type changed.
+     * Reloads the content mFragment if and only if the content type changed.
      *
-     * @param onlyTitle if true only the title will be changed an no fragment transaction is initiated
+     * @param onlyTitle if true only the title will be changed an no mFragment transaction is initiated
      */
     private void reloadFragment(boolean onlyTitle) {
-        if (waitForDropResult) {
+        if (mWaitForDropResult) {
             if (BuildConfig.DEBUG) Log.d(Application.LOG_TAG_DEBUG, "reloadFragment() invoked while waiting for onDrop result");
             return;
         }
@@ -238,125 +299,133 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (!(oldFrag2 instanceof QEDFragment)) oldFrag2 = null;
         QEDFragment oldFrag = (QEDFragment) oldFrag2;
 
-        fragmentTransaction = null;
-        int selected = sharedPreferences.getInt(getString(R.string.preferences_drawerSelection_key), R.id.nav_chat);
+        mFragmentTransaction = null;
+        int selected = onlyTitle ? mSharedPreferences.getInt(Pref.General.DRAWER_SELECTION, R.id.nav_chat) : mNewSelection;
+        boolean changed = false;
         switch (selected) {
             case R.id.nav_chat:
-                toolbar.setTitle(getString(R.string.title_fragment_chat));
-                if (oldFrag instanceof ChatFragment) {
-                    fragment = oldFrag;
-                    return;
-                }
-
+                mToolbar.setTitle(getString(R.string.title_fragment_chat));
                 if (!onlyTitle) {
-                    fragment = new ChatFragment();
-                    fragmentTransaction = manager.beginTransaction();
-                    fragmentTransaction.replace(R.id.fragment, fragment, FRAGMENT_TAG);
+                    mFragment = mCachedFragments.get(R.id.nav_chat);
+
+                    if (mFragment == null) {
+                        mFragment = ChatFragment.newInstance(R.style.AppTheme);
+                        mCachedFragments.put(R.id.nav_chat, mFragment);
+                    }
+
+                    changed = true;
                 }
                 break;
             case R.id.nav_chat_db:
-                toolbar.setTitle(getString(R.string.title_fragment_chat_database));
-                if (oldFrag instanceof ChatDatabaseFragment) {
-                    fragment = oldFrag;
-                    return;
-                }
-
+                mToolbar.setTitle(getString(R.string.title_fragment_chat_database));
                 if (!onlyTitle) {
-                    fragment = new ChatDatabaseFragment();
-                    fragmentTransaction = manager.beginTransaction();
-                    fragmentTransaction.replace(R.id.fragment, fragment, FRAGMENT_TAG);
+                    mFragment = mCachedFragments.get(R.id.nav_chat_db);
+
+                    if (mFragment == null) {
+                        mFragment = ChatDatabaseFragment.newInstance(R.style.AppTheme);
+                        mCachedFragments.put(R.id.nav_chat_db, mFragment);
+                    }
+
+                    changed = true;
                 }
                 break;
             case R.id.nav_database_persons:
-                toolbar.setTitle(getString(R.string.title_fragment_persons_database));
-                if (oldFrag instanceof PersonDatabaseFragment) {
-                    fragment = oldFrag;
-                    return;
-                }
-
+                mToolbar.setTitle(getString(R.string.title_fragment_persons_database));
                 if (!onlyTitle) {
-                    fragment = new PersonDatabaseFragment();
-                    fragmentTransaction = manager.beginTransaction();
-                    fragmentTransaction.replace(R.id.fragment, fragment, FRAGMENT_TAG);
+                    mFragment = mCachedFragments.get(R.id.nav_database_persons);
+
+                    if (mFragment == null) {
+                        mFragment = PersonDatabaseFragment.newInstance(R.style.AppTheme);
+                        mCachedFragments.put(R.id.nav_database_persons, mFragment);
+                    }
+
+                    changed = true;
                 }
                 break;
             case R.id.nav_chat_log:
-                toolbar.setTitle(getString(R.string.title_fragment_log));
-                if (oldFrag instanceof LogFragment) {
-                    fragment = oldFrag;
-                    return;
-                }
-
+                mToolbar.setTitle(getString(R.string.title_fragment_log));
                 if (!onlyTitle) {
-                    fragment = new LogFragment(LogFragment.Mode.DATE_RECENT, "", 86400L);
-                    fragmentTransaction = manager.beginTransaction();
-                    fragmentTransaction.replace(R.id.fragment, fragment, FRAGMENT_TAG);
+                    mFragment = mCachedFragments.get(R.id.nav_chat_log);
+
+                    if (mFragment == null) {
+                        mFragment = LogFragment.newInstance(R.style.AppTheme);
+                        mCachedFragments.put(R.id.nav_chat_log, mFragment);
+                    }
+
+                    changed = true;
                 }
                 break;
             case R.id.nav_database_events:
-                toolbar.setTitle(getString(R.string.title_fragment_events_database));
-                if (oldFrag instanceof EventDatabaseFragment) {
-                    fragment = oldFrag;
-                    return;
-                }
-
+                mToolbar.setTitle(getString(R.string.title_fragment_events_database));
                 if (!onlyTitle) {
-                    fragment = new EventDatabaseFragment();
-                    fragmentTransaction = manager.beginTransaction();
-                    fragmentTransaction.replace(R.id.fragment, fragment, FRAGMENT_TAG);
+                    mFragment = mCachedFragments.get(R.id.nav_database_events);
+
+                    if (mFragment == null) {
+                        mFragment = EventDatabaseFragment.newInstance(R.style.AppTheme);
+                        mCachedFragments.put(R.id.nav_database_events, mFragment);
+                    }
+
+                    changed = true;
                 }
                 break;
             case R.id.nav_gallery:
-                toolbar.setTitle(getString(R.string.title_fragment_gallery));
-                if (oldFrag instanceof GalleryFragment) {
-                    fragment = oldFrag;
-                    return;
-                }
-
+                mToolbar.setTitle(getString(R.string.title_fragment_gallery));
                 if (!onlyTitle) {
-                    fragment = new GalleryFragment();
-                    fragmentTransaction = manager.beginTransaction();
-                    fragmentTransaction.replace(R.id.fragment, fragment, FRAGMENT_TAG);
+                    mFragment = mCachedFragments.get(R.id.nav_gallery);
+
+                    if (mFragment == null) {
+                        mFragment = GalleryFragment.newInstance(R.style.AppTheme);
+                        mCachedFragments.put(R.id.nav_gallery, mFragment);
+                    }
+
+                    changed = true;
                 }
                 break;
         }
 
-        navView.setCheckedItem(selected);
+        if (!onlyTitle && changed) {
+            mFragmentTransaction = manager.beginTransaction();
+            mFragmentTransaction.replace(R.id.fragment, mFragment, FRAGMENT_TAG);
 
-        Boolean mayDrop = oldFrag == null;
-        if (!mayDrop)
-            mayDrop = oldFrag.onDrop(false);
+            Boolean mayDrop = oldFrag == null;
+            if (!mayDrop)
+                mayDrop = oldFrag.onDrop(false);
 
-        if (mayDrop == null) {
-            waitForDropResult = true;
-        } else {
-            if (!onlyTitle && fragmentTransaction != null && mayDrop) fragmentTransaction.commit();
+            if (mayDrop == null) {
+                mWaitForDropResult = true;
+            } else if (mayDrop && mFragment != null) {
+                commitFragmentTransaction();
+            }
         }
     }
 
     /**
-     * Relays a network connection failure event to the content fragment
+     * Relays a network connection failure event to the content mFragment
      */
     @Override
     public void onConnectionFail() {
-        if (fragment != null && fragment instanceof NetworkListener) ((NetworkListener) fragment).onConnectionFail();
+        if (mFragment != null && mFragment instanceof NetworkListener) ((NetworkListener) mFragment).onConnectionFail();
     }
 
     /**
-     * Relays a network connection regain event to the content fragment
+     * Relays a network connection regain event to the content mFragment
      */
     @Override
     public void onConnectionRegain() {
-        if (fragment != null && fragment instanceof NetworkListener) ((NetworkListener) fragment).onConnectionRegain();
+        if (mFragment != null && mFragment instanceof NetworkListener) ((NetworkListener) mFragment).onConnectionRegain();
     }
 
     /**
-     * If {@param activity} is null this method determines if the {@param intent} is of interest and {@return} true or false accordingly.
+     * If {@code activity} is {@code null} this method determines if the {@code intent} is of interest and returns {@code true} or {@code false} accordingly.
      *
-     * If {@param activity} is non-null the appropriate actions (changing the content fragment, showing a bottom sheet, ...) will be performed.
+     * If {@code activity} is non-null the appropriate actions (changing the content mFragment, showing a bottom sheet, ...) will be performed.
+     *
+     * @param intent an intent
+     * @param activity the current main activity, may be null
+     * @return true iff the intent is of interest to the {@code MainActivity}
      */
     public static boolean handleIntent(Intent intent, @Nullable MainActivity activity) {
-        if (activity != null) activity.shouldReloadFragment = false;
+        if (activity != null) activity.mShouldReloadFragment = false;
 
         if (Intent.ACTION_MAIN.equals(intent.getAction()) && intent.getCategories().contains(Intent.CATEGORY_LAUNCHER)) return true;
 
@@ -377,30 +446,34 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 // QED-DB
                 if (host != null) if (host.equals("qeddb.qed-verein.de")) {
                     if (path != null) {
-                        if (path.startsWith("/personen.php")) {
+                        if (path.startsWith("/personen.php") || path.startsWith("/person.php")) {
                             String person = queries.getOrDefault("person", null);
                             if (activity != null) {
-                                if (person != null && person.matches("\\d+")) {
-                                    PersonBottomSheet personBottomSheet = PersonBottomSheet.newInstance(person);
+                                if (person != null && person.matches("\\d{1,5}")) {
+                                    PersonBottomSheet personBottomSheet = PersonBottomSheet.newInstance(Long.parseLong(person));
                                     personBottomSheet.show(activity.getSupportFragmentManager(), personBottomSheet.getTag());
-                                    activity.shouldReloadFragment = false;
+                                    activity.mShouldReloadFragment = false;
                                 } else {
-                                    activity.sharedPreferences.edit().putInt(activity.getString(R.string.preferences_drawerSelection_key), R.id.nav_database_persons).apply();
-                                    activity.shouldReloadFragment = true;
+                                    activity.mNewSelection = R.id.nav_database_persons;
+                                    activity.mShouldReloadFragment = true;
                                 }
                             }
 
                             return true;
-                        } else if (path.startsWith("/veranstaltungen.php")) {
-                            if (activity != null) {
-                                activity.sharedPreferences.edit().putInt(activity.getString(R.string.preferences_drawerSelection_key), R.id.nav_database_events).apply();
-                                activity.shouldReloadFragment = true;
-                            }
-
+                        } else if (path.startsWith("/veranstaltungen.php") || path.startsWith("/veranstaltung.php")) {
                             String event = queries.getOrDefault("veranstaltung", null);
-                            if (event != null && event.matches("\\d+")) {
-                                EventDatabaseFragment.showEventId = Integer.valueOf(event);
-                                EventDatabaseFragment.shownEvent = false;
+                            if (activity != null) {
+                                if (event != null && event.matches("\\d{1,5}")) {
+                                    try {
+                                        long eventId = Long.parseLong(event);
+                                        EventBottomSheet eventBottomSheet = EventBottomSheet.newInstance(eventId);
+                                        eventBottomSheet.show(activity.getSupportFragmentManager(), eventBottomSheet.getTag());
+                                        activity.mShouldReloadFragment = false;
+                                    } catch (NumberFormatException ignored) {}
+                                } else {
+                                    activity.mNewSelection = R.id.nav_database_events;
+                                    activity.mShouldReloadFragment = true;
+                                }
                             }
 
                             return true;
@@ -411,23 +484,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     if (path != null) {
                         if (path.startsWith("/index.html")) {
                             if (activity != null) {
-                                SharedPreferences.Editor editor = activity.sharedPreferences.edit();
-                                editor.putInt(activity.getString(R.string.preferences_drawerSelection_key), R.id.nav_chat);
-                                editor.putString(activity.getString(R.string.preferences_chat_channel_key), queries.getOrDefault("channel", ""));
+                                SharedPreferences.Editor editor = activity.mSharedPreferences.edit();
+                                editor.putString(Pref.Chat.CHANNEL, queries.getOrDefault("channel", ""));
                                 editor.apply();
 
-                                activity.shouldReloadFragment = true;
+                                activity.mNewSelection = R.id.nav_chat;
+
+                                activity.mShouldReloadFragment = true;
                             }
 
                             return true;
                         } else if (path.startsWith("/rubychat/history")) {
                             if (activity != null) {
-                                SharedPreferences.Editor editor = activity.sharedPreferences.edit();
-                                editor.putInt(activity.getString(R.string.preferences_drawerSelection_key), R.id.nav_chat_log);
-                                editor.putString(activity.getString(R.string.preferences_chat_channel_key), queries.getOrDefault("channel", ""));
+                                SharedPreferences.Editor editor = activity.mSharedPreferences.edit();
+                                editor.putString(Pref.Chat.CHANNEL, queries.getOrDefault("channel", ""));
                                 editor.apply();
 
-                                activity.shouldReloadFragment = true;
+                                activity.mNewSelection = R.id.nav_chat_log;
+
+                                activity.mShouldReloadFragment = true;
                             }
 
                             return true;
@@ -438,9 +513,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     if (path != null) {
                         if (path.startsWith("/album_list.php")) {
                             if (activity != null) {
-                                SharedPreferences.Editor editor = activity.sharedPreferences.edit();
-                                editor.putInt(activity.getString(R.string.preferences_drawerSelection_key), R.id.nav_gallery).apply();
-                                activity.shouldReloadFragment = true;
+                                activity.mNewSelection = R.id.nav_gallery;
+                                activity.mShouldReloadFragment = true;
                             }
 
                             return true;
@@ -455,9 +529,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onNewIntent(Intent intent) {
         if (handleIntent(intent,this)) {
-            if (shouldReloadFragment) {
-                shouldReloadFragment = false;
-                reloadFragment(false);
+            if (mShouldReloadFragment) {
+                mShouldReloadFragment = false;
+                new Handler(Looper.getMainLooper()).post(() -> reloadFragment(false));
             }
         } else {
             super.finish();
@@ -467,4 +541,71 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         super.onNewIntent(intent);
     }
+
+    /**
+     * Borrows the alternative toolbar {@link #mAltToolbar} which will be shown atop the standard one.
+     *
+     * The toolbar will be cleaned (menu and listeners removed) every time this method is called.
+     *
+     * After the alternative toolbar is no longer needed {@link #returnAltToolbar()} must be called in
+     * order to hide the toolbar and make it accessible for other fragments.
+     *
+     * @return the alternative toolbar
+     * @throws IllegalStateException when the alternative toolbar is has already been borrowed and is not yet returned
+     *
+     * @see #returnAltToolbar()
+     */
+    public Toolbar borrowAltToolbar() {
+        if (mAltToolbarBorrowed) throw new IllegalStateException("borrowAltToolbar may only be called once before calling returnAltToolbar!");
+
+        mAltToolbarBorrowed = true;
+
+        mAltToolbar.setNavigationIcon(R.drawable.ic_arrow_back);
+        mAltToolbar.setOnMenuItemClickListener(null);
+        mAltToolbar.setNavigationOnClickListener(null);
+        mAltToolbar.setVisibility(View.VISIBLE);
+        mAltToolbar.getMenu().clear();
+
+        TypedValue colorPrimary = new TypedValue();
+        getTheme().resolveAttribute(R.attr.colorPrimary, colorPrimary, true);
+
+        getWindow().setStatusBarColor(colorPrimary.data);
+
+        return mAltToolbar;
+    }
+
+    /**
+     * @see #borrowAltToolbar()
+     */
+    public void returnAltToolbar() {
+        if (mAltToolbarBorrowed) {
+            if (mFragment != null) mFragment.revokeAltToolbar();
+
+            mAltToolbar.setVisibility(View.GONE);
+
+            TypedValue colorPrimaryDark = new TypedValue();
+            getTheme().resolveAttribute(R.attr.colorPrimaryDark, colorPrimaryDark, true);
+
+            getWindow().setStatusBarColor(colorPrimaryDark.data);
+
+            mAltToolbarBorrowed = false;
+        }
+    }
+
+    @Override
+    public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {}
+
+    @Override
+    public void onDrawerOpened(@NonNull View drawerView) {}
+
+    @Override
+    public void onDrawerClosed(@NonNull View drawerView) {
+        if (mShouldReloadFragment) {
+            reloadFragment(false);
+            mShouldReloadFragment = false;
+        }
+    }
+
+    @Override
+    public void onDrawerStateChanged(int newState) {}
 }

@@ -5,12 +5,13 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.security.keystore.KeyGenParameterSpec;
-import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.preference.PreferenceManager;
 import androidx.security.crypto.EncryptedSharedPreferences;
@@ -26,6 +27,7 @@ import java.util.Set;
 
 public class Application extends android.app.Application implements android.app.Application.ActivityLifecycleCallbacks {
     public static final String LOG_TAG_ERROR = "com.jonahbauer.qed::error";
+
     @SuppressWarnings("unused")
     public static final String LOG_TAG_DEBUG = "com.jonahbauer.qed::debug";
 
@@ -53,19 +55,19 @@ public class Application extends android.app.Application implements android.app.
     private static final String ENCRYPTED_SHARED_PREFERENCE_FILE = "com.jonahbauer.qed_encrypted";
 
 
-    public static boolean online;
-    private static boolean foreground;
+    public static boolean sOnline;
+    private static boolean sForeground;
 
-    private static SoftReference<Application> context;
-    private SharedPreferences sharedPreferences;
-    private Activity activity;
-    private final Set<Activity> existingActivities;
-    private ConnectionStateMonitor connectionStateMonitor;
+    private static SoftReference<Application> sContext;
+    private SharedPreferences mSharedPreferences;
+    private SharedPreferences mEncryptedSharedPreferences;
 
-    private String masterKeyAlias;
+    private Activity mActivity;
+    private final Set<Activity> mExistingActivities;
+    private ConnectionStateMonitor mConnectionStateMonitor;
 
     {
-        existingActivities = new HashSet<>();
+        mExistingActivities = new HashSet<>();
     }
 
     /**
@@ -78,33 +80,14 @@ public class Application extends android.app.Application implements android.app.
     public String loadData(String key, boolean encrypted) {
         if (encrypted) {
             try {
-                KeyGenParameterSpec keyGenParameterSpec = MasterKeys.AES256_GCM_SPEC;
-                masterKeyAlias = MasterKeys.getOrCreate(keyGenParameterSpec);
-            } catch (GeneralSecurityException | IOException e) {
-                Toast.makeText(this, R.string.master_key_error, Toast.LENGTH_SHORT).show();
-            }
+                loadEncryptedSharedPreferences();
 
-            if (masterKeyAlias == null) {
-                Log.e(LOG_TAG_ERROR, "masterKeyAlias is null");
-                return null;
-            }
-
-            try {
-                SharedPreferences sharedPreferences = EncryptedSharedPreferences
-                        .create(
-                                ENCRYPTED_SHARED_PREFERENCE_FILE,
-                                masterKeyAlias,
-                                this,
-                                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-                        );
-                return sharedPreferences.getString(key, null);
-            } catch (GeneralSecurityException | IOException e) {
-                Log.e(LOG_TAG_ERROR, e.getMessage(), e);
+                return mEncryptedSharedPreferences.getString(key, null);
+            } catch (NullPointerException e) {
                 return null;
             }
         } else {
-            return sharedPreferences.getString(key, null);
+            return mSharedPreferences.getString(key, null);
         }
     }
 
@@ -121,31 +104,33 @@ public class Application extends android.app.Application implements android.app.
     public void saveData(String data, String key, boolean encrypted) {
         if (encrypted) {
             try {
-                KeyGenParameterSpec keyGenParameterSpec = MasterKeys.AES256_GCM_SPEC;
-                masterKeyAlias = MasterKeys.getOrCreate(keyGenParameterSpec);
-            } catch (GeneralSecurityException | IOException e) {
-                Toast.makeText(this, "Passwort konnte nicht gespeichert werden.", Toast.LENGTH_SHORT).show();
-            }
-            if (masterKeyAlias == null) {
-                Log.e(LOG_TAG_ERROR, "masterKeyAlias is null");
-                return;
-            }
-            try {
-                SharedPreferences sharedPreferences = EncryptedSharedPreferences
-                        .create(
-                                ENCRYPTED_SHARED_PREFERENCE_FILE,
-                                masterKeyAlias,
-                                this,
-                                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-                        );
+                loadEncryptedSharedPreferences();
 
-                sharedPreferences.edit().putString(key, data).apply();
-            } catch (GeneralSecurityException | IOException e) {
-                Log.e(LOG_TAG_ERROR, e.getMessage(), e);
-            }
+                mEncryptedSharedPreferences.edit().putString(key, data).apply();
+            } catch (NullPointerException ignored) {}
         } else {
-            sharedPreferences.edit().putString(key, data).apply();
+            mSharedPreferences.edit().putString(key, data).apply();
+        }
+    }
+
+    private void loadEncryptedSharedPreferences() {
+        if (this.mEncryptedSharedPreferences != null) return;
+
+        try {
+            KeyGenParameterSpec keyGenParameterSpec = MasterKeys.AES256_GCM_SPEC;
+            String masterKeyAlias = MasterKeys.getOrCreate(keyGenParameterSpec);
+
+            this.mEncryptedSharedPreferences = EncryptedSharedPreferences
+                    .create(
+                            ENCRYPTED_SHARED_PREFERENCE_FILE,
+                            masterKeyAlias,
+                            this,
+                            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+                    );
+        } catch (GeneralSecurityException | IOException e) {
+            Toast.makeText(this, R.string.master_key_error, Toast.LENGTH_SHORT).show();
+            throw new NullPointerException();
         }
     }
 
@@ -154,41 +139,43 @@ public class Application extends android.app.Application implements android.app.
         super.onCreate();
         registerActivityLifecycleCallbacks(this);
 
-        context = new SoftReference<>(this);
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        Pref.init(getResources());
 
-        connectionStateMonitor = new ConnectionStateMonitor(this);
-        online = false;
-        connectionStateMonitor.enable();
+        sContext = new SoftReference<>(this);
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        mConnectionStateMonitor = new ConnectionStateMonitor(this);
+        sOnline = false;
+        mConnectionStateMonitor.enable();
     }
 
     @Override
     public void onTerminate() {
         super.onTerminate();
-        if (connectionStateMonitor != null) connectionStateMonitor.disable();
+        if (mConnectionStateMonitor != null) mConnectionStateMonitor.disable();
         unregisterActivityLifecycleCallbacks(this);
     }
 
     @Override
     public void onActivityCreated(@NonNull Activity activity, Bundle savedInstanceState) {
-        this.activity = activity;
-        existingActivities.add(activity);
+        this.mActivity = activity;
+        mExistingActivities.add(activity);
     }
 
     @Override
     public void onActivityStarted(@NonNull Activity activity) {
-        this.activity = activity;
+        this.mActivity = activity;
     }
 
     @Override
     public void onActivityResumed(@NonNull Activity activity) {
-        this.activity = activity;
-        foreground = true;
+        this.mActivity = activity;
+        setForeground(true);
     }
 
     @Override
     public void onActivityPaused(@NonNull Activity activity) {
-        foreground = false;
+        setForeground(false);
     }
 
     @Override
@@ -199,13 +186,13 @@ public class Application extends android.app.Application implements android.app.
 
     @Override
     public void onActivityDestroyed(@NonNull Activity activity) {
-        existingActivities.remove(activity);
+        mExistingActivities.remove(activity);
     }
 
     @Contract(pure = true)
     @NonNull
     public static SoftReference<Application> getApplicationReference() {
-        return context;
+        return sContext;
     }
 
     /**
@@ -213,18 +200,26 @@ public class Application extends android.app.Application implements android.app.
      * @param online the new online status
      */
     public void setOnline(boolean online) {
-        if (!Application.online && online) {
-            if (activity!=null&&(activity instanceof NetworkListener)) ((NetworkListener)activity).onConnectionRegain();
-        } else if (Application.online && !online) {
-            if (activity!=null&&(activity instanceof NetworkListener)) ((NetworkListener)activity).onConnectionFail();
-        } else if (!Application.online) {
-            if (activity!=null&&(activity instanceof NetworkListener)) ((NetworkListener)activity).onConnectionFail();
+        if (!Application.sOnline && online) {
+            if (mActivity !=null&&(mActivity instanceof NetworkListener)) ((NetworkListener) mActivity).onConnectionRegain();
+        } else if (Application.sOnline && !online) {
+            if (mActivity !=null&&(mActivity instanceof NetworkListener)) ((NetworkListener) mActivity).onConnectionFail();
+        } else if (!Application.sOnline) {
+            if (mActivity !=null&&(mActivity instanceof NetworkListener)) ((NetworkListener) mActivity).onConnectionFail();
         }
-        Application.online = online;
+        Application.sOnline = online;
+    }
+
+    /**
+     * Returns the currently active Activity.
+     * @return the currently active Activity
+     */
+    public Activity getActivity() {
+        return mActivity;
     }
 
     public void finish() {
-        for (Activity activity : existingActivities) activity.finish();
+        for (Activity activity : mExistingActivities) activity.finish();
     }
 
     /**
@@ -235,7 +230,13 @@ public class Application extends android.app.Application implements android.app.
      */
     @Contract(pure = true)
     public static boolean isForeground() {
-        return foreground;
+        return sForeground;
+    }
+
+    public static void setForeground(boolean foreground) {
+        if (Application.sForeground == foreground) return;
+
+        Application.sForeground = foreground;
     }
 
 
@@ -254,6 +255,34 @@ public class Application extends android.app.Application implements android.app.
             NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
             if (notificationManager != null)
                 notificationManager.createNotificationChannel(channel);
+        }
+    }
+    
+    @ColorInt
+    public static int colorful(int value) {
+        switch ((value % 10 + 10) % 10) {
+            case 0:
+                return Color.argb(255, 0x33, 0xb5, 0xe5);
+            case 1:
+                return Color.argb(255, 0x99, 0xcc, 0x00);
+            case 2:
+                return Color.argb(255, 0xff, 0x44, 0x44);
+            case 3:
+                return Color.argb(255, 0x00, 0x99, 0xcc);
+            case 4:
+                return Color.argb(255, 0x66, 0x99, 0x00);
+            case 5:
+                return Color.argb(255, 0xcc, 0x00, 0x00);
+            case 6:
+                return Color.argb(255, 0xaa, 0x66, 0xcc);
+            case 7:
+                return Color.argb(255, 0xff, 0xbb, 0x33);
+            case 8:
+                return Color.argb(255, 0xff, 0x88, 0x00);
+            case 9:
+                return Color.argb(255, 0x00, 0xdd, 0xff);
+            default:
+                throw new AssertionError("(value % 10 + 10) % 10 is not in range 0 to 9!");
         }
     }
 }

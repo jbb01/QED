@@ -1,7 +1,6 @@
 package com.jonahbauer.qed.networking;
 
 import android.app.DownloadManager;
-import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Handler;
@@ -9,6 +8,7 @@ import android.os.Looper;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
 
+import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.lang.ref.SoftReference;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -38,6 +40,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 public abstract class QEDChatPages {
     private static final Map<String, ParseThread> threads = new HashMap<>();
     private static final Map<String, Download> asyncTasks = new HashMap<>();
+
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef(value = {STATUS_DOWNLOAD_PENDING, STATUS_DOWNLOAD_RUNNING, STATUS_DOWNLOAD_FINISHED, STATUS_PARSE_THREAD_ALIVE, STATUS_PARSE_THREAD_TERMINATED}, flag = true)
+    public @interface Status {}
+    public static final int STATUS_DOWNLOAD_PENDING = 1;
+    public static final int STATUS_DOWNLOAD_RUNNING = 1 << 1;
+    public static final int STATUS_DOWNLOAD_FINISHED = 1 << 2;
+    public static final int STATUS_PARSE_THREAD_ALIVE = 1 << 4;
+    public static final int STATUS_PARSE_THREAD_TERMINATED = 1 << 5;
 
     /**
      * This method asynchronously get the qed chat log and parses it to {@code Message} objects
@@ -74,7 +85,7 @@ public abstract class QEDChatPages {
         }
 
         Uri uri = Uri.parse(application.getString(R.string.chat_server_history) + "?" + options);
-        Download download = new Download(Download.Feature.CHAT, uri, file, null, listener, application.getString(R.string.download_notification_title), application.getString(R.string.download_notification_log_description));
+        Download download = new Download(Feature.CHAT, uri, file, null, listener, application.getString(R.string.download_notification_title), application.getString(R.string.download_notification_log_description));
 
         asyncTasks.put(tag, download);
 
@@ -84,14 +95,7 @@ public abstract class QEDChatPages {
     }
 
 
-    /**
-     * @return  1 -> none of the below
-     *          2 -> download pending
-     *          4 -> download running
-     *          8 -> download finished
-     *          16 -> parsing thread alive
-     *          32 -> parsing thread terminated
-     */
+    @Status
     public static int getStatus(String tag) {
         Download download = asyncTasks.get(tag);
         ParseThread parse = threads.get(tag);
@@ -102,29 +106,29 @@ public abstract class QEDChatPages {
             int downloadStatus = download.getDownloadStatus();
             switch (downloadStatus) {
                 case DownloadManager.STATUS_PENDING:
-                    out |= 1 << 1;
+                    out |= STATUS_DOWNLOAD_PENDING;
                     break;
                 case DownloadManager.STATUS_RUNNING:
                 case DownloadManager.STATUS_PAUSED:
-                    out |= 1 << 2;
+                    out |= STATUS_DOWNLOAD_RUNNING;
                     break;
                 case DownloadManager.STATUS_SUCCESSFUL:
                 case DownloadManager.STATUS_FAILED:
                 case -1:
-                    out |= 1 << 3;
+                    out |= STATUS_DOWNLOAD_FINISHED;
                     break;
             }
         }
 
         if (parse != null) {
             if (parse.getState() == Thread.State.TERMINATED) {
-                out |= 1 << 5;
+                out |= STATUS_PARSE_THREAD_TERMINATED;
             } else {
-                out |= 1 << 4;
+                out |= STATUS_PARSE_THREAD_ALIVE;
             }
         }
 
-        return out == 0 ? 1 : out;
+        return out;
     }
 
     /**
@@ -147,25 +151,25 @@ public abstract class QEDChatPages {
     private static class ParseThread extends Thread {
         private static final Handler handler = new Handler(Looper.getMainLooper());
 
-        private final String tag;
-        private final long id;
-        private final MessageAdapter out;
-        private final Uri sourceFileUri;
-        private final Context context;
-        private final QEDPageStreamReceiver chatLogReceiver;
-        private final DownloadListener downloadListener;
+        private final String mTag;
+        private final long mId;
+        private final MessageAdapter mOut;
+        private final Uri mSourceFileUri;
+        private final Application mContext;
+        private final QEDPageStreamReceiver mChatLogReceiver;
+        private final DownloadListener mDownloadListener;
 
-        private boolean canceled;
+        private boolean mCanceled;
 
 
-        private ParseThread(String tag, long id, @NonNull MessageAdapter out, Uri sourceFileUri, Context context, QEDPageStreamReceiver chatLogReceiver, DownloadListener downloadListener) {
-            this.tag = tag;
-            this.id = id;
-            this.out = out;
-            this.sourceFileUri = sourceFileUri;
-            this.context = context;
-            this.chatLogReceiver = chatLogReceiver;
-            this.downloadListener = downloadListener;
+        private ParseThread(String tag, long id, @NonNull MessageAdapter out, Uri sourceFileUri, Application context, QEDPageStreamReceiver chatLogReceiver, DownloadListener downloadListener) {
+            this.mTag = tag;
+            this.mId = id;
+            this.mOut = out;
+            this.mSourceFileUri = sourceFileUri;
+            this.mContext = context;
+            this.mChatLogReceiver = chatLogReceiver;
+            this.mDownloadListener = downloadListener;
         }
 
         @Override
@@ -177,12 +181,13 @@ public abstract class QEDChatPages {
             Reader inReader2;
             long size = -1;
             try {
-                InputStream inputStream = context.getContentResolver().openInputStream(sourceFileUri);
-                InputStream inputStream2 = context.getContentResolver().openInputStream(sourceFileUri);
+                // Two streams required: one for getting line count, one for reading data
+                InputStream inputStream = mContext.getContentResolver().openInputStream(mSourceFileUri);
+                InputStream inputStream2 = mContext.getContentResolver().openInputStream(mSourceFileUri);
                 closeables.add(inputStream);
                 closeables.add(inputStream2);
 
-                ParcelFileDescriptor parcelFileDescriptor = context.getContentResolver().openFileDescriptor(sourceFileUri, "r");
+                ParcelFileDescriptor parcelFileDescriptor = mContext.getContentResolver().openFileDescriptor(mSourceFileUri, "r");
                 if (parcelFileDescriptor != null) {
                     size = parcelFileDescriptor.getStatSize();
                     parcelFileDescriptor.close();
@@ -197,19 +202,19 @@ public abstract class QEDChatPages {
                 closeables.add(inReader2);
             } catch (IOException e) {
                 Log.e(Application.LOG_TAG_ERROR, e.getMessage(), e);
-                downloadListener.onError(id, null, e);
+                mDownloadListener.onError(mId, null, e);
                 return;
             }
 
             if (size != -1)
-                downloadListener.onProgressUpdate(id, DownloadManager.STATUS_SUCCESSFUL, (int) size);
+                mDownloadListener.onProgressUpdate(mId, DownloadManager.STATUS_SUCCESSFUL, (int) size);
 
 
             LinkedList<Message> tmpMessageList = new LinkedList<>();
             try (BufferedReader reader = new BufferedReader(inReader); BufferedReader reader2 = new BufferedReader(inReader2)) {
                 // get BufferedReader and lineCount
                 final long lineCount = reader.lines().count() - 2;
-                downloadListener.onProgressUpdate(id, 0, (int) lineCount);
+                mDownloadListener.onProgressUpdate(mId, 0, (int) lineCount);
                 reader.close();
 
 
@@ -217,7 +222,7 @@ public abstract class QEDChatPages {
                 Iterator<String> lines = reader2.lines().sequential().iterator();
 
                 while (lines.hasNext()) {
-                    if (canceled) return;
+                    if (mCanceled) return;
 
                     String string = lines.next();
                     Message msg = Message.interpretJSONMessage(string);
@@ -232,18 +237,18 @@ public abstract class QEDChatPages {
                             return;
                         }
 
-                        downloadListener.onProgressUpdate(id, -j, (int) lineCount);
+                        mDownloadListener.onProgressUpdate(mId, -j, (int) lineCount);
                     }
                 }
 
-                handler.post(() -> out.addAll(tmpMessageList));
+                handler.post(() -> mOut.addAll(tmpMessageList));
 
 
-                if (chatLogReceiver != null)
-                    handler.post(() -> chatLogReceiver.onPageReceived(tag, null));
+                if (mChatLogReceiver != null)
+                    handler.post(() -> mChatLogReceiver.onPageReceived(mTag));
             } catch (IOException e) {
                 Log.e(Application.LOG_TAG_ERROR, e.getMessage(), e);
-                downloadListener.onError(id, null, e);
+                mDownloadListener.onError(mId, null, e);
             } finally {
                 // close all closeables
                 for (Closeable closeable : closeables) {
@@ -253,54 +258,52 @@ public abstract class QEDChatPages {
         }
 
         public void cancel() {
-            canceled = true;
+            mCanceled = true;
         }
     }
 
-
-    // TODO context leak
     public static class LogDownloadListener extends DownloadListener {
         private final Handler handler = new Handler(Looper.getMainLooper());
 
-        private final String tag;
-        private final MessageAdapter out;
-        private final Context context;
-        private final QEDPageStreamReceiver chatLogReceiver;
+        private final String mTag;
+        private final MessageAdapter mOut;
+        private final Application mContext;
+        private final QEDPageStreamReceiver mChatLogReceiver;
 
-        public LogDownloadListener(String tag, MessageAdapter out, Context context, QEDPageStreamReceiver chatLogReceiver) {
-            this.tag = tag;
-            this.out = out;
-            this.context = context;
-            this.chatLogReceiver = chatLogReceiver;
+        public LogDownloadListener(String tag, MessageAdapter out, Application context, QEDPageStreamReceiver chatLogReceiver) {
+            this.mTag = tag;
+            this.mOut = out;
+            this.mContext = context;
+            this.mChatLogReceiver = chatLogReceiver;
         }
 
         private void onDownloadCompleted(Uri file) {
-            ParseThread thread = new ParseThread(tag, -1, out, file, context, chatLogReceiver, this);
+            ParseThread thread = new ParseThread(mTag, -1, mOut, file, mContext, mChatLogReceiver, this);
             thread.start();
 
-            threads.put(tag, thread);
+            threads.put(mTag, thread);
         }
 
         @Override
         public void onDownloadCompleted(long id, Cursor download) {
             // asynchronously parse json messages
-            ParseThread thread = new ParseThread(tag, id, out, downloadManager.getUriForDownloadedFile(id), context, chatLogReceiver, this);
+            ParseThread thread = new ParseThread(mTag, id, mOut, mDownloadManager.getUriForDownloadedFile(id), mContext, mChatLogReceiver, this);
             thread.start();
 
-            threads.put(tag, thread);
+            threads.put(mTag, thread);
         }
 
         @Override
         public void onError(long id, @Nullable String reason, @Nullable Throwable cause) {
             super.onError(id, reason, cause);
-            if (chatLogReceiver != null)
-                handler.post(() -> chatLogReceiver.onError(tag, QEDPageReceiver.REASON_NETWORK, null));
+            if (mChatLogReceiver != null)
+                handler.post(() -> mChatLogReceiver.onError(mTag, QEDPageReceiver.REASON_NETWORK, null));
         }
 
         @Override
         public void onProgressUpdate(long id, int status, int byteSoFar) {
-            if (chatLogReceiver != null) {
-                handler.post(() -> chatLogReceiver.onProgressUpdate(tag, -status, byteSoFar));
+            if (mChatLogReceiver != null) {
+                handler.post(() -> mChatLogReceiver.onProgressUpdate(mTag, -status, byteSoFar));
             }
         }
 

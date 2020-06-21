@@ -64,10 +64,7 @@
             android:layout_height="wrap_content"
             android:layout_toEndOf="@id/person_initials_circle"
             android:layout_alignParentTop="true"
-            android:gravity="start"
-            android:textColor="@color/person_database_text"
-            android:textSize="@dimen/person_name_size"
-            android:textStyle="bold"
+            style="?attr/textAppearanceListItemSecondary"
             tools:text="Max Mustermann"/>
 
         <TextView
@@ -80,9 +77,7 @@
             android:layout_toEndOf="@id/person_name"
             android:paddingStart="5dp"
             android:paddingEnd="0dp"
-            android:gravity="start|center_vertical"
-            android:textColor="@color/person_database_active"
-            android:textSize="@dimen/person_active_size"
+            style="?attr/textAppearanceListItemSmall"
             tools:text="(inaktiv)"/>
 
         <TextView
@@ -92,9 +87,7 @@
             android:layout_toEndOf="@id/person_initials_circle"
             android:layout_alignParentEnd="true"
             android:layout_below="@id/person_name"
-            android:gravity="start"
-            android:textColor="@color/person_database_email"
-            android:textSize="@dimen/person_email_size"
+            style="?attr/textAppearanceListItemSmall"
             tools:text="max.mustermann@email.com"/>
     </RelativeLayout>
 </RelativeLayout>

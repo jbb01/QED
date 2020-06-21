@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:paddingStart="8dp"
+    android:paddingEnd="8dp"
+    android:paddingTop="5dp"
+    android:paddingBottom="5dp"
+    android:color="?android:colorBackground">
+
+    <item android:id="@android:id/mask" android:drawable="@drawable/message_simple_background"/>
+
+    <item android:drawable="@drawable/message_simple_background" />
+</ripple>

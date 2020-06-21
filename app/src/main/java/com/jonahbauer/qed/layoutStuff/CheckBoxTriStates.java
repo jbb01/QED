@@ -17,47 +17,44 @@ import com.jonahbauer.qed.R;
  */
 public class CheckBoxTriStates extends androidx.appcompat.widget.AppCompatCheckBox {
 
-    static public final int UNKNOW = -1;
+    static public final int UNKNOWN = -1;
 
     static public final int UNCHECKED = 0;
 
     static public final int CHECKED = 1;
 
-    private int state;
+    private int mState;
 
     /**
      * This is the listener set to the super class which is going to be evoke each
      * time the check state has changed.
      */
-    private final OnCheckedChangeListener privateListener = new CompoundButton.OnCheckedChangeListener() {
-
+    private final OnCheckedChangeListener mPrivateListener = (CompoundButton buttonView, boolean isChecked) -> {
         // checkbox status is changed from uncheck to checked.
-        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            switch (state) {
-                case UNKNOW:
-                    setState(UNCHECKED);
-                    break;
-                case UNCHECKED:
-                    setState(CHECKED);
-                    break;
-                case CHECKED:
-                    setState(UNKNOW);
-                    break;
-            }
+        switch (mState) {
+            case UNKNOWN:
+                setState(UNCHECKED);
+                break;
+            case UNCHECKED:
+                setState(CHECKED);
+                break;
+            case CHECKED:
+                setState(UNKNOWN);
+                break;
         }
     };
 
     /**
      * Holds a reference to the listener set by a client, if any.
      */
-    private OnCheckedChangeListener clientListener;
+    private OnCheckedChangeListener mClientListener;
 
     /**
-     * This flag is needed to avoid accidentally changing the current {@link #state} when
+     * This flag is needed to avoid accidentally changing the current {@link #mState} when
      * {@link #onRestoreInstanceState(Parcelable)} calls {@link #setChecked(boolean)}
-     * evoking our {@link #privateListener} and therefore changing the real state.
+     * evoking our {@link #mPrivateListener} and therefore changing the real state.
      */
-    private boolean restoring;
+    private boolean mRestoring;
 
     public CheckBoxTriStates(Context context) {
         super(context);
@@ -75,15 +72,15 @@ public class CheckBoxTriStates extends androidx.appcompat.widget.AppCompatCheckB
     }
 
     public int getState() {
-        return state;
+        return mState;
     }
 
     private void setState(int state) {
-        if(!this.restoring && this.state != state) {
-            this.state = state;
+        if(!this.mRestoring && this.mState != state) {
+            this.mState = state;
 
-            if(this.clientListener != null) {
-                this.clientListener.onCheckedChanged(this, this.isChecked());
+            if(this.mClientListener != null) {
+                this.mClientListener.onCheckedChanged(this, this.isChecked());
             }
 
             updateBtn(false);
@@ -95,12 +92,12 @@ public class CheckBoxTriStates extends androidx.appcompat.widget.AppCompatCheckB
 
         // we never truly set the listener to the client implementation, instead we only hold
         // a reference to it and evoke it when needed.
-        if(this.privateListener != listener) {
-            this.clientListener = listener;
+        if(this.mPrivateListener != listener) {
+            this.mClientListener = listener;
         }
 
         // always use our implementation
-        super.setOnCheckedChangeListener(privateListener);
+        super.setOnCheckedChangeListener(mPrivateListener);
     }
 
     @Override
@@ -109,31 +106,31 @@ public class CheckBoxTriStates extends androidx.appcompat.widget.AppCompatCheckB
 
         SavedState ss = new SavedState(superState);
 
-        ss.state = state;
+        ss.mState = mState;
 
         return ss;
     }
 
     @Override
     public void onRestoreInstanceState(Parcelable state) {
-        this.restoring = true; // indicates that the ui is restoring its state
+        this.mRestoring = true; // indicates that the ui is restoring its state
         SavedState ss = (SavedState) state;
         super.onRestoreInstanceState(ss.getSuperState());
-        setState(ss.state);
+        setState(ss.mState);
         requestLayout();
-        this.restoring = false;
+        this.mRestoring = false;
     }
 
     private void init() {
-        state = UNKNOW;
+        mState = UNKNOWN;
         updateBtn(true);
-        setOnCheckedChangeListener(this.privateListener);
+        setOnCheckedChangeListener(this.mPrivateListener);
     }
 
     private void updateBtn(boolean isInit) {
         int btnDrawable = R.drawable.ic_checkbox_checked_to_unknown;
-        switch (state) {
-            case UNKNOW:
+        switch (mState) {
+            case UNKNOWN:
                 if (isInit) btnDrawable = R.drawable.ic_checkbox_unknown;
                 else btnDrawable = R.drawable.ic_checkbox_checked_to_unknown_animated;
                 break;
@@ -151,7 +148,7 @@ public class CheckBoxTriStates extends androidx.appcompat.widget.AppCompatCheckB
     }
 
     static class SavedState extends BaseSavedState {
-        int state;
+        int mState;
 
         SavedState(Parcelable superState) {
             super(superState);
@@ -159,13 +156,13 @@ public class CheckBoxTriStates extends androidx.appcompat.widget.AppCompatCheckB
 
         private SavedState(Parcel in) {
             super(in);
-            state = in.readInt();
+            mState = in.readInt();
         }
 
         @Override
         public void writeToParcel(Parcel out, int flags) {
             super.writeToParcel(out, flags);
-            out.writeValue(state);
+            out.writeValue(mState);
         }
 
         @NonNull
@@ -173,7 +170,7 @@ public class CheckBoxTriStates extends androidx.appcompat.widget.AppCompatCheckB
         public String toString() {
             return "CheckboxTriState.SavedState{"
                     + Integer.toHexString(System.identityHashCode(this))
-                    + " state=" + state + "}";
+                    + " state=" + mState + "}";
         }
 
         @SuppressWarnings("hiding")

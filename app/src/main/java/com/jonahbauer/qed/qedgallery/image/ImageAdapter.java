@@ -4,7 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
-import android.util.Log;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +15,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
-import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.GalleryAlbumActivity;
 import com.jonahbauer.qed.database.GalleryDatabase;
@@ -23,10 +22,11 @@ import com.jonahbauer.qed.database.GalleryDatabaseReceiver;
 import com.jonahbauer.qed.networking.QEDGalleryPages;
 import com.jonahbauer.qed.networking.QEDGalleryPages.Mode;
 import com.jonahbauer.qed.networking.QEDPageStreamReceiver;
+import com.jonahbauer.qed.util.Triple;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.lang.ref.SoftReference;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -38,54 +38,59 @@ import static com.jonahbauer.qed.qedgallery.image.Image.audioFileExtensions;
 import static com.jonahbauer.qed.qedgallery.image.Image.videoFileExtensions;
 
 public class ImageAdapter extends ArrayAdapter<Image> implements GalleryDatabaseReceiver, QEDPageStreamReceiver {
-    private final GalleryAlbumActivity context;
-    private final List<Image> imageList;
+    private final GalleryAlbumActivity mContext;
+    private final List<Image> mImageList;
 
-    private final HashMap<String, AsyncTask> asyncTasks;
-    private final HashMap<String, Triple<Image, ImageView, ProgressBar>> byTag;
-    private final HashMap<View, String> tagByView;
+    private final HashMap<String, AsyncTask<?,?,?>> mAsyncTasks;
+    private final HashMap<String, Triple<Image, ImageView, ProgressBar>> mByTag;
+    private final HashMap<View, String> mTagByView;
+    private final HashMap<Integer, ByteArrayOutputStream> mBaosById;
 
-    private final Set<String> invalidatedTags;
+    private final SparseArray<SoftReference<Bitmap>> mCache;
 
-    private final GalleryDatabase galleryDatabase;
+    private final Set<String> mInvalidatedTags;
 
-    private boolean offlineMode;
-    public static boolean receivedError = false;
+    private final GalleryDatabase mGalleryDatabase;
 
-    private final Random random;
+    private boolean mOfflineMode;
+    public static boolean sReceivedError = false;
+
+    private final Random mRandom;
 
     public ImageAdapter(GalleryAlbumActivity context, List<Image> imageList, boolean offlineMode) {
         super(context, R.layout.list_item_image, imageList);
-        this.context = context;
-        this.imageList = imageList;
-        this.offlineMode = offlineMode;
+        this.mContext = context;
+        this.mImageList = imageList;
+        this.mOfflineMode = offlineMode;
 
-        random = new Random();
+        mRandom = new Random();
 
-        galleryDatabase = new GalleryDatabase();
-        galleryDatabase.init(context, this);
+        mGalleryDatabase = new GalleryDatabase();
+        mGalleryDatabase.init(context, this);
 
-        asyncTasks = new HashMap<>();
-        byTag = new HashMap<>();
-        tagByView = new HashMap<>();
-        invalidatedTags = new HashSet<>();
+        mAsyncTasks = new HashMap<>();
+        mByTag = new HashMap<>();
+        mTagByView = new HashMap<>();
+        mInvalidatedTags = new HashSet<>();
+        mCache = new SparseArray<>();
+        mBaosById = new HashMap<>();
     }
 
     @NonNull
     @Override
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
-        final Image image = imageList.get(position);
+        final Image image = mImageList.get(position);
 
         View view;
         if (convertView != null) {
             view = convertView;
-            String tag = tagByView.getOrDefault(convertView, "");
-            invalidatedTags.add(tag);
+            String tag = mTagByView.getOrDefault(convertView, "");
+            mInvalidatedTags.add(tag);
 
-            AsyncTask async = asyncTasks.get(tag);
+            AsyncTask<?,?,?> async = mAsyncTasks.get(tag);
             if (async != null) async.cancel(false);
         } else {
-            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             view = Objects.requireNonNull(inflater).inflate(R.layout.list_item_image, parent, false);
         }
 
@@ -96,32 +101,42 @@ public class ImageAdapter extends ArrayAdapter<Image> implements GalleryDatabase
         thumbnail.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
 
-        String tag = getClass().toString() + random.nextLong();
-        byTag.put(tag, new Triple<>(image, thumbnail, progressBar));
+        String tag = getClass().toString() + mRandom.nextLong();
+        mByTag.put(tag, new Triple<>(image, thumbnail, progressBar));
 
         setThumbnail(tag, image, thumbnail, progressBar);
 
-        tagByView.put(view, tag);
+        mTagByView.put(view, tag);
 
         return view;
     }
 
     public void add(int index, Image image) {
-        imageList.add(index, image);
+        mImageList.add(index, image);
     }
 
-    private void setThumbnail(String tag, Image image, ImageView thumbnail, ProgressBar progressBar) {
-        String path = image.thumbnailPath;
-        if (path == null) path = galleryDatabase.getImageThumbnailPath(image);
-        if (path != null) {
-            Bitmap bmp = BitmapFactory.decodeFile(path);
-            if (bmp != null) {
-                thumbnail.setImageBitmap(bmp);
+    private void setThumbnail(String tag, @NonNull Image image, ImageView thumbnail, ProgressBar progressBar) {
+        // Cache
+        SoftReference<Bitmap> cachedBitmap = mCache.get(image.id);
+        if (cachedBitmap != null) {
+            Bitmap bitmap = cachedBitmap.get();
+            if (bitmap != null) {
+                thumbnail.setImageBitmap(bitmap);
                 thumbnail.setVisibility(View.VISIBLE);
                 progressBar.setVisibility(View.GONE);
-                image.available = true;
                 return;
             }
+        }
+
+        // Database
+        Bitmap bitmap = mGalleryDatabase.getThumbnail(image);
+        if (bitmap != null) {
+            mCache.put(image.id, new SoftReference<>(bitmap));
+            thumbnail.setImageBitmap(bitmap);
+            thumbnail.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(View.GONE);
+            image.available = true;
+            return;
         }
 
         String fileExtension = null;
@@ -130,8 +145,8 @@ public class ImageAdapter extends ArrayAdapter<Image> implements GalleryDatabase
             fileExtension = tmp[tmp.length - 1];
         }
 
-        if (offlineMode) {
-            if (image.path == null) image.path = galleryDatabase.getImagePath(image);
+        if (mOfflineMode) {
+            if (image.path == null) image.path = mGalleryDatabase.getImagePath(image);
             image.available = image.path != null && new File(image.path).exists();
 
             int drawableId;
@@ -176,44 +191,44 @@ public class ImageAdapter extends ArrayAdapter<Image> implements GalleryDatabase
         thumbnail.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
 
+        // Download
         downloadImage(tag, image);
     }
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    private void downloadImage(String tag, Image image) {
-        File dir = new File(getContext().getExternalCacheDir(), context.getString(R.string.gallery_folder_thumbnails));
+    private void downloadImage(String tag, @NonNull Image image) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        mBaosById.put(image.id, baos);
 
-        if (!dir.exists()) dir.mkdirs();
-        File file = new File(dir, image.id + ".jpeg");
+        AsyncTask<?,?,?> async = QEDGalleryPages.getImage(tag, image, Mode.THUMBNAIL, baos, this);
 
-        try {
-            FileOutputStream fos = new FileOutputStream(file);
-
-            image.thumbnailPath = file.getAbsolutePath();
-
-            AsyncTask async = QEDGalleryPages.getImage(tag, image, Mode.THUMBNAIL, fos, this);
-
-            asyncTasks.put(tag, async);
-        } catch (IOException e) {
-            Log.e(Application.LOG_TAG_ERROR, e.getMessage(), e);
-        }
+        mAsyncTasks.put(tag, async);
     }
 
     @Override
-    public void onPageReceived(String tag, File file) {
-        if (invalidatedTags.contains(tag)) return;
-        Triple<Image, ImageView, ProgressBar> triple = byTag.get(tag);
+    public void onPageReceived(String tag) {
+        Triple<Image, ImageView, ProgressBar> triple = mByTag.get(tag);
         assert triple != null;
 
         Image image = triple.first;
         ImageView thumbnail = triple.second;
         ProgressBar progressBar = triple.third;
 
-        galleryDatabase.insert(image, true);
+        ByteArrayOutputStream baos = mBaosById.get(image.id);
+        if (baos == null) return;
+
+        byte[] encodedBitmap = baos.toByteArray();
+        Bitmap bitmap = BitmapFactory.decodeByteArray(encodedBitmap, 0, encodedBitmap.length);
+        if (bitmap != null) {
+            mGalleryDatabase.insertThumbnail(image, bitmap);
+            mCache.put(image.id, new SoftReference<>(bitmap));
+        }
+
+        mBaosById.remove(image.id);
+        mByTag.remove(tag);
+
+        if (mInvalidatedTags.contains(tag)) return;
 
         if (thumbnail != null && progressBar != null) {
-            Bitmap bitmap = BitmapFactory.decodeFile(image.thumbnailPath);
-
             if (bitmap == null) {
                 thumbnail.setImageResource(R.drawable.ic_gallery_empty_image);
             } else {
@@ -229,37 +244,23 @@ public class ImageAdapter extends ArrayAdapter<Image> implements GalleryDatabase
     public void onProgressUpdate(String tag, long done, long total) {}
 
     @Override
-    public void onReceiveResult(List items) {}
-
-    @Override
-    public void onDatabaseError() {}
-
-    @Override
     public void onInsertAllUpdate(int done, int total) {}
 
     public void setOfflineMode(boolean offlineMode) {
-        this.offlineMode = offlineMode;
+        this.mOfflineMode = offlineMode;
+    }
+
+    public void clearCache() {
+        this.mCache.clear();
     }
 
     @Override
     public void onError(String tag, String reason, Throwable cause) {
         QEDPageStreamReceiver.super.onError(tag, reason, cause);
 
-        if (!receivedError) {
-            receivedError = true;
-            context.switchToOfflineMode();
-        }
-    }
-
-    private class Triple<A,B,C> {
-        final A first;
-        final B second;
-        final C third;
-
-        Triple(A a, B b, C c) {
-            first = a;
-            second = b;
-            third = c;
+        if (!sReceivedError) {
+            sReceivedError = true;
+            mContext.switchToOfflineMode();
         }
     }
 }

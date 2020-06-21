@@ -14,23 +14,23 @@ import androidx.annotation.NonNull;
  * Only network connection, not internet connection is checked
  */
 public class ConnectionStateMonitor extends ConnectivityManager.NetworkCallback {
-    private final Application application;
-    private final NetworkRequest networkRequest;
+    private final Application mApplication;
+    private final NetworkRequest mNetworkRequest;
 
     ConnectionStateMonitor(Application application) {
-        networkRequest = new NetworkRequest.Builder().addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR).addTransportType(NetworkCapabilities.TRANSPORT_WIFI).build();
-        this.application = application;
+        mNetworkRequest = new NetworkRequest.Builder().addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR).addTransportType(NetworkCapabilities.TRANSPORT_WIFI).build();
+        this.mApplication = application;
     }
 
     void enable() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) application.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivityManager = (ConnectivityManager) mApplication.getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connectivityManager != null) {
-            connectivityManager.registerNetworkCallback(networkRequest , this);
+            connectivityManager.registerNetworkCallback(mNetworkRequest, this);
         }
     }
 
     public void disable() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) application.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivityManager = (ConnectivityManager) mApplication.getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connectivityManager != null) {
             connectivityManager.unregisterNetworkCallback(this);
         }
@@ -38,16 +38,16 @@ public class ConnectionStateMonitor extends ConnectivityManager.NetworkCallback 
 
     @Override
     public void onAvailable(@NonNull Network network) {
-        application.setOnline(true);
+        mApplication.setOnline(true);
     }
 
     @Override
     public void onLost(@NonNull Network network) {
-        application.setOnline(false);
+        mApplication.setOnline(false);
     }
 
     @Override
     public void onUnavailable() {
-        application.setOnline(false);
+        mApplication.setOnline(false);
     }
 }

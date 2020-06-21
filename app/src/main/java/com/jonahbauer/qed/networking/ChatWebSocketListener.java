@@ -9,6 +9,7 @@ import com.jonahbauer.qed.chat.Message;
 
 public interface ChatWebSocketListener {
     String REASON_NETWORK = "network error";
+    String REASON_INVALID_CREDENTIALS = "invalid credentials";
 
     void onMessage(@NonNull Message message);
 

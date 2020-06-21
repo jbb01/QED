@@ -24,30 +24,39 @@ import static com.jonahbauer.qed.layoutStuff.AdvancedImageView.Mode.DRAG;
 import static com.jonahbauer.qed.layoutStuff.AdvancedImageView.Mode.NONE;
 import static com.jonahbauer.qed.layoutStuff.AdvancedImageView.Mode.ZOOM;
 
+/**
+ * <p>
+ *     An improved version of the {@code ImageView}.
+ * </p>
+ * <p>
+ *     This version of the {@link androidx.appcompat.widget.AppCompatImageView} enables use of common
+ *     gestures like pinch to zoom, dragging and double tap to fit size.
+ * </p>
+ */
 public class AdvancedImageView extends androidx.appcompat.widget.AppCompatImageView {
-    private Mode mode = NONE;
-    private boolean dragging;
+    private Mode mMode = NONE;
+    private boolean mDragging;
 
-    private final PointF start = new PointF();
-    private final PointF zoomCenter = new PointF();
-    private float oldDistance = 0.0f;
+    private final PointF mStart = new PointF();
+    private final PointF mZoomCenter = new PointF();
+    private float mOldDistance = 0.0f;
 
-    private float fitScale;
-    private float overfitScaleFactor;
+    private float mFitScale;
+    private float mOverfitScaleFactor;
 
-    private final Matrix matrix = new Matrix();
-    private final Matrix savedMatrix = new Matrix();
+    private final Matrix mMatrix = new Matrix();
+    private final Matrix mSavedMatrix = new Matrix();
 
-    private int viewWidth;
-    private int viewHeight;
-    private int srcWidth;
-    private int srcHeight;
+    private int mViewWidth;
+    private int mViewHeight;
+    private int mSrcWidth;
+    private int mSrcHeight;
 
-    private long lastClick;
+    private long mLastClick;
 
-    private boolean fit = false;
+    private boolean mFit = false;
 
-    private Animator animator;
+    private Animator mAnimator;
 
     public AdvancedImageView(Context context) {
         super(context);
@@ -65,8 +74,8 @@ public class AdvancedImageView extends androidx.appcompat.widget.AppCompatImageV
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
 
-        viewHeight = getMeasuredHeight();
-        viewWidth = getMeasuredWidth();
+        mViewHeight = getMeasuredHeight();
+        mViewWidth = getMeasuredWidth();
 
         if (changed) init();
     }
@@ -79,8 +88,8 @@ public class AdvancedImageView extends androidx.appcompat.widget.AppCompatImageV
 
         if (source == null) return;
 
-        srcHeight = source.getIntrinsicHeight();
-        srcWidth = source.getIntrinsicWidth();
+        mSrcHeight = source.getIntrinsicHeight();
+        mSrcWidth = source.getIntrinsicWidth();
 
         init();
     }
@@ -93,8 +102,8 @@ public class AdvancedImageView extends androidx.appcompat.widget.AppCompatImageV
 
         if (source == null) return;
 
-        srcHeight = source.getIntrinsicHeight();
-        srcWidth = source.getIntrinsicWidth();
+        mSrcHeight = source.getIntrinsicHeight();
+        mSrcWidth = source.getIntrinsicWidth();
 
         init();
     }
@@ -107,62 +116,62 @@ public class AdvancedImageView extends androidx.appcompat.widget.AppCompatImageV
 
         if (source == null) return;
 
-        srcHeight = source.getIntrinsicHeight();
-        srcWidth = source.getIntrinsicWidth();
+        mSrcHeight = source.getIntrinsicHeight();
+        mSrcWidth = source.getIntrinsicWidth();
 
         init();
     }
 
     private void init() {
-        float scaleX = ((float) viewWidth) / ((float)srcWidth);
-        float scaleY = ((float) viewHeight) / ((float)srcHeight);
-        fitScale = Math.min(scaleX, scaleY);
+        float scaleX = ((float) mViewWidth) / ((float) mSrcWidth);
+        float scaleY = ((float) mViewHeight) / ((float) mSrcHeight);
+        mFitScale = Math.min(scaleX, scaleY);
 
         float overfitScale = Math.max(scaleX, scaleY);
-        overfitScaleFactor = overfitScale / fitScale;
+        mOverfitScaleFactor = overfitScale / mFitScale;
 
-        if (animator != null) animator.cancel();
+        if (mAnimator != null) mAnimator.cancel();
 
-        centerAndScale(matrix, fitScale);
-        setImageMatrix(matrix);
+        centerAndScale(mMatrix, mFitScale);
+        setImageMatrix(mMatrix);
 
-        fit = true;
+        mFit = true;
     }
 
     @Override
     public boolean onTouchEvent(@NonNull MotionEvent event) {
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN: // on first down start dragging
-                mode = DRAG;
-                start.set(event.getX(), event.getY());
-                savedMatrix.set(matrix);
+                mMode = DRAG;
+                mStart.set(event.getX(), event.getY());
+                mSavedMatrix.set(mMatrix);
 
-                if (animator != null) animator.cancel();
+                if (mAnimator != null) mAnimator.cancel();
                 break;
             case MotionEvent.ACTION_POINTER_DOWN: // on second down start zooming
-                oldDistance = spacing(event, 0 ,1);
-                if (oldDistance > 10f && event.getPointerCount() == 2) {
-                    mode = ZOOM;
-                    savedMatrix.set(matrix);
-                    midPoint(zoomCenter, event, 0 , 1);
+                mOldDistance = spacing(event, 0 ,1);
+                if (mOldDistance > 10f && event.getPointerCount() == 2) {
+                    mMode = ZOOM;
+                    mSavedMatrix.set(mMatrix);
+                    midPoint(mZoomCenter, event, 0 , 1);
                 }
 
                 // more than 2 fingers -> do nothing
-                if (event.getPointerCount() > 2) mode = NONE;
+                if (event.getPointerCount() > 2) mMode = NONE;
                 break;
             case MotionEvent.ACTION_POINTER_UP: // if only two fingers remain start zooming, one finger -> dragging
                 if (event.getPointerCount() == 3) { // lifted pointer is still counted
                     List<Integer> indices = new ArrayList<>(Arrays.asList(0,1,2));
                     indices.remove((Integer) event.getActionIndex());
 
-                    oldDistance = spacing(event, indices.get(0), indices.get(1));
-                    if (oldDistance > 10f && event.getPointerCount() == 3) {
-                        mode = ZOOM;
-                        savedMatrix.set(matrix);
-                        midPoint(zoomCenter, event, indices.get(0), indices.get(1));
+                    mOldDistance = spacing(event, indices.get(0), indices.get(1));
+                    if (mOldDistance > 10f && event.getPointerCount() == 3) {
+                        mMode = ZOOM;
+                        mSavedMatrix.set(mMatrix);
+                        midPoint(mZoomCenter, event, indices.get(0), indices.get(1));
                     }
 
-                    if (animator != null) animator.cancel();
+                    if (mAnimator != null) mAnimator.cancel();
                 } else if (event.getPointerCount() == 2) {
                     int indexStillDown;
                     if (event.getActionIndex() == 0)
@@ -170,61 +179,61 @@ public class AdvancedImageView extends androidx.appcompat.widget.AppCompatImageV
                     else
                         indexStillDown = 0;
 
-                    mode = DRAG;
-                    start.set(event.getX(indexStillDown), event.getY(indexStillDown));
-                    savedMatrix.set(matrix);
-                    dragging = true;
+                    mMode = DRAG;
+                    mStart.set(event.getX(indexStillDown), event.getY(indexStillDown));
+                    mSavedMatrix.set(mMatrix);
+                    mDragging = true;
 
-                    if (animator != null) animator.cancel();
+                    if (mAnimator != null) mAnimator.cancel();
                 } else {
-                    mode = NONE;
+                    mMode = NONE;
                 }
                 break;
             case MotionEvent.ACTION_UP:
                 // if no bigger motion has been detected interpret as click
-                if (mode == DRAG && !dragging) {
+                if (mMode == DRAG && !mDragging) {
                     performClick();
                     break;
                 }
 
-                if (animator != null && !animator.canceled) break;
+                if (mAnimator != null && !mAnimator.mCanceled) break;
 
-                savedMatrix.set(matrix);
-                if (fixPositionAndScale(matrix)) {
-                    animate(savedMatrix, matrix);
-                    fit = false;
+                mSavedMatrix.set(mMatrix);
+                if (fixPositionAndScale(mMatrix)) {
+                    animate(mSavedMatrix, mMatrix);
+                    mFit = false;
                 }
 
                 // reset
-                dragging = false;
-                mode = NONE;
+                mDragging = false;
+                mMode = NONE;
                 break;
             case MotionEvent.ACTION_MOVE:
-                if (animator != null && !animator.canceled) break;
+                if (mAnimator != null && !mAnimator.mCanceled) break;
 
-                if (mode == DRAG && dragging) {
+                if (mMode == DRAG && mDragging) {
                     // translate image
-                    matrix.set(savedMatrix);
-                    float tmpTranslateX = event.getX() - start.x;
-                    float tmpTranslateY = event.getY() - start.y;
-                    matrix.postTranslate(tmpTranslateX, tmpTranslateY);
-                } else if (mode == DRAG) {
+                    mMatrix.set(mSavedMatrix);
+                    float tmpTranslateX = event.getX() - mStart.x;
+                    float tmpTranslateY = event.getY() - mStart.y;
+                    mMatrix.postTranslate(tmpTranslateX, tmpTranslateY);
+                } else if (mMode == DRAG) {
                     // start dragging only when the motion is big enough
-                    if (squaredDistance(start.x, start.y, event.getX(), event.getY()) > 100) {
-                        dragging = true;
+                    if (squaredDistance(mStart.x, mStart.y, event.getX(), event.getY()) > 100) {
+                        mDragging = true;
                     }
                     break;
-                } else if (mode == ZOOM) {
+                } else if (mMode == ZOOM) {
                     // scale image
                     float newDistance = spacing(event, 0 , 1);
                     if (newDistance > 10f) {
-                        matrix.set(savedMatrix);
-                        float tmpScale = newDistance / oldDistance;
-                        matrix.postScale(tmpScale, tmpScale, zoomCenter.x, zoomCenter.y);
+                        mMatrix.set(mSavedMatrix);
+                        float tmpScale = newDistance / mOldDistance;
+                        mMatrix.postScale(tmpScale, tmpScale, mZoomCenter.x, mZoomCenter.y);
                     }
                 }
-                fit = false;
-                setImageMatrix(matrix);
+                mFit = false;
+                setImageMatrix(mMatrix);
                 break;
         }
 
@@ -235,30 +244,30 @@ public class AdvancedImageView extends androidx.appcompat.widget.AppCompatImageV
     public boolean performClick() {
         long time = System.currentTimeMillis();
 
-        if (time - lastClick < 500) { // double tap
-            if (animator != null) animator.cancel();
+        if (time - mLastClick < 500) { // double tap
+            if (mAnimator != null) mAnimator.cancel();
 
-            if (!fit) {
-                savedMatrix.set(matrix);
-                centerAndScale(matrix, fitScale);
-                animate(savedMatrix, matrix);
-                fit = true;
-                lastClick = -500;
+            if (!mFit) {
+                mSavedMatrix.set(mMatrix);
+                centerAndScale(mMatrix, mFitScale);
+                animate(mSavedMatrix, mMatrix);
+                mFit = true;
+                mLastClick = -500;
             } else {
-                savedMatrix.set(matrix);
-                matrix.postScale(overfitScaleFactor, overfitScaleFactor, start.x, start.y);
-                fixPositionAndScale(matrix);
-                animate(savedMatrix, matrix);
-                fit = false;
-                lastClick = -500;
+                mSavedMatrix.set(mMatrix);
+                mMatrix.postScale(mOverfitScaleFactor, mOverfitScaleFactor, mStart.x, mStart.y);
+                fixPositionAndScale(mMatrix);
+                animate(mSavedMatrix, mMatrix);
+                mFit = false;
+                mLastClick = -500;
             }
             return true;
         } else {
-            lastClick = time;
-            savedMatrix.set(matrix);
-            if (fixPositionAndScale(matrix)) {
-                animate(savedMatrix, matrix);
-                fit = false;
+            mLastClick = time;
+            mSavedMatrix.set(mMatrix);
+            if (fixPositionAndScale(mMatrix)) {
+                animate(mSavedMatrix, mMatrix);
+                mFit = false;
             }
             return super.performClick();
         }
@@ -268,7 +277,7 @@ public class AdvancedImageView extends androidx.appcompat.widget.AppCompatImageV
      * @return the square of the euclidian distance between the two points (x1,y1) and (x2,y2)
      */
     @Contract(pure = true)
-    private float squaredDistance(float x1, float y1, float x2, float y2) {
+    private static float squaredDistance(float x1, float y1, float x2, float y2) {
         float dx = x1 - x2;
         float dy = y1 - y2;
         return dx * dx + dy * dy;
@@ -277,7 +286,7 @@ public class AdvancedImageView extends androidx.appcompat.widget.AppCompatImageV
     /**
      * @return the distance between the pointers with indices {@param index1} and {@param index2}
      */
-    private float spacing(@NonNull MotionEvent event, int index1, int index2) {
+    private static float spacing(@NonNull MotionEvent event, int index1, int index2) {
         float dx = event.getX(index1) - event.getX(index2);
         float dy = event.getY(index1) - event.getY(index2);
         return (float) Math.sqrt(dx * dx + dy * dy);
@@ -286,7 +295,7 @@ public class AdvancedImageView extends androidx.appcompat.widget.AppCompatImageV
     /**
      * calculates the mid point between the two given pointers of the motion event and stores it to {@param point}
      */
-    private void midPoint(@NonNull PointF point, @NonNull MotionEvent event, int index1, int index2) {
+    private static void midPoint(@NonNull final PointF point, @NonNull MotionEvent event, int index1, int index2) {
         float x = event.getX(index1) + event.getX(index2);
         float y = event.getY(index1) + event.getY(index2);
         point.set(x / 2, y / 2);
@@ -296,10 +305,10 @@ public class AdvancedImageView extends androidx.appcompat.widget.AppCompatImageV
      * changes the given matrix such that it will center the image on the screen with the given scale
      */
     private void centerAndScale(@NonNull Matrix matrix, float scale) {
-        float translateX = (viewWidth - srcWidth) / 2f;
-        float translateY = (viewHeight - srcHeight) / 2f;
+        float translateX = (mViewWidth - mSrcWidth) / 2f;
+        float translateY = (mViewHeight - mSrcHeight) / 2f;
         matrix.setTranslate(translateX, translateY);
-        matrix.postScale(scale, scale, viewWidth / 2f, viewHeight / 2f);
+        matrix.postScale(scale, scale, mViewWidth / 2f, mViewHeight / 2f);
     }
 
     /**
@@ -321,21 +330,21 @@ public class AdvancedImageView extends androidx.appcompat.widget.AppCompatImageV
         boolean changed = false;
 
         // scale stuff
-        if (scale < Math.min(1, fitScale)) { // scale too low
-            centerAndScale(matrix, Math.min(1, fitScale));
+        if (scale < Math.min(1, mFitScale)) { // scale too low
+            centerAndScale(matrix, Math.min(1, mFitScale));
             changed = true;
-        } else if (scale < fitScale) { // pictures smaller than screen should be centered
+        } else if (scale < mFitScale) { // pictures smaller than screen should be centered
             centerAndScale(matrix, scale);
             changed = true;
-        } else if (scale == fitScale) { // pictures exactly the fitting size should only be changed if they are not correctly aligned
-            if (!fit) {
+        } else if (scale == mFitScale) { // pictures exactly the fitting size should only be changed if they are not correctly aligned
+            if (!mFit) {
                 centerAndScale(matrix, scale);
                 changed = true;
             }
-        } else if (scale > 10 * fitScale) { // scale too high
-            translateX = viewWidth / 2f - (viewWidth / 2f - translateX) * 10 * fitScale / scale;
-            translateY = viewHeight / 2f - (viewHeight / 2f - translateY) * 10 * fitScale / scale;
-            scale = 10 * fitScale;
+        } else if (scale > 10 * mFitScale) { // scale too high
+            translateX = mViewWidth / 2f - (mViewWidth / 2f - translateX) * 10 * mFitScale / scale;
+            translateY = mViewHeight / 2f - (mViewHeight / 2f - translateY) * 10 * mFitScale / scale;
+            scale = 10 * mFitScale;
 
             matrix.setScale(scale, scale);
             matrix.postTranslate(translateX, translateY);
@@ -343,10 +352,10 @@ public class AdvancedImageView extends androidx.appcompat.widget.AppCompatImageV
         }
 
         // translation stuff
-        if (scale > fitScale) { // don't allow black strips when image is bigger than screen
-            if (scale * srcWidth > viewWidth) {
+        if (scale > mFitScale) { // don't allow black strips when image is bigger than screen
+            if (scale * mSrcWidth > mViewWidth) {
                 float maxXTranslation = 0;
-                float minXTranslation = viewWidth - scale * srcWidth;
+                float minXTranslation = mViewWidth - scale * mSrcWidth;
                 if (translateX > maxXTranslation) {
                     matrix.postTranslate(maxXTranslation - translateX, 0);
                     changed = true;
@@ -355,13 +364,13 @@ public class AdvancedImageView extends androidx.appcompat.widget.AppCompatImageV
                     changed = true;
                 }
             } else {
-                matrix.postTranslate((viewWidth - scale * srcWidth) / 2f - translateX, 0);
+                matrix.postTranslate((mViewWidth - scale * mSrcWidth) / 2f - translateX, 0);
                 changed = true;
             }
 
-            if (scale * srcHeight > viewHeight) {
+            if (scale * mSrcHeight > mViewHeight) {
                 float maxYTranslation = 0;
-                float minYTranslation = viewHeight - scale * srcHeight;
+                float minYTranslation = mViewHeight - scale * mSrcHeight;
                 if (translateY > maxYTranslation) {
                     matrix.postTranslate(0, maxYTranslation - translateY);
                     changed = true;
@@ -370,7 +379,7 @@ public class AdvancedImageView extends androidx.appcompat.widget.AppCompatImageV
                     changed = true;
                 }
             } else {
-                matrix.postTranslate(0, (viewHeight - scale * srcHeight) / 2f - translateY);
+                matrix.postTranslate(0, (mViewHeight - scale * mSrcHeight) / 2f - translateY);
                 changed = true;
             }
         }
@@ -378,68 +387,77 @@ public class AdvancedImageView extends androidx.appcompat.widget.AppCompatImageV
         return changed;
     }
 
+    /**
+     * Animates the transition between {@code initState} and {@code finalState}.
+     *
+     * @param initState the initial image matrix
+     * @param finalState the target image matrix
+     */
     private void animate(@NonNull Matrix initState, @NonNull Matrix finalState) {
-        if (animator != null) animator.cancel();
+        if (mAnimator != null) mAnimator.cancel();
 
-        animator = new Animator(initState, finalState);
-        post(animator);
+        mAnimator = new Animator(initState, finalState);
+        post(mAnimator);
     }
 
+    /**
+     * Transitions the image matrix between to given values.
+     */
     private class Animator implements Runnable {
-        private final Interpolator interpolator;
-        private final long startTime;
-        private final long duration;
+        private final Interpolator mInterpolator;
+        private final long mStartTime;
+        private final long mDuration;
 
-        private final float finalScale;
-        private final float finalX;
-        private final float finalY;
+        private final float mFinalScale;
+        private final float mFinalX;
+        private final float mFinalY;
         
-        private final float initScale;
-        private final float initX;
-        private final float initY;
+        private final float mInitScale;
+        private final float mInitX;
+        private final float mInitY;
 
-        private boolean canceled;
+        private boolean mCanceled;
         
-        final Matrix target;
+        final Matrix mTarget;
 
         private Animator(@NonNull Matrix initState, @NonNull Matrix finalState) {
-            interpolator = new AccelerateDecelerateInterpolator();
-            startTime = System.currentTimeMillis();
-            duration = 500;
+            mInterpolator = new AccelerateDecelerateInterpolator();
+            mStartTime = System.currentTimeMillis();
+            mDuration = 500;
 
             float[] finalValues = new float[9];
             finalState.getValues(finalValues);
-            finalScale = finalValues[Matrix.MSCALE_X];
-            finalX = finalValues[Matrix.MTRANS_X];
-            finalY = finalValues[Matrix.MTRANS_Y];
+            mFinalScale = finalValues[Matrix.MSCALE_X];
+            mFinalX = finalValues[Matrix.MTRANS_X];
+            mFinalY = finalValues[Matrix.MTRANS_Y];
             
             float[] initValues = new float[9];
             initState.getValues(initValues);
-            initScale = initValues[Matrix.MSCALE_X];
-            initX = initValues[Matrix.MTRANS_X];
-            initY = initValues[Matrix.MTRANS_Y];
+            mInitScale = initValues[Matrix.MSCALE_X];
+            mInitX = initValues[Matrix.MTRANS_X];
+            mInitY = initValues[Matrix.MTRANS_Y];
             
-            this.target = initState;
+            this.mTarget = initState;
         }
 
         @Override
         public void run() {
-            float t = (float) (System.currentTimeMillis() - startTime) / duration;
-            t = t > 1.0f ? 1.0f : t;
-            float interpolatedRatio = interpolator.getInterpolation(t);
-            float tempScale = initScale + interpolatedRatio * (finalScale - initScale);
-            float tempX = initX + interpolatedRatio * (finalX - initX);
-            float tempY = initY + interpolatedRatio * (finalY - initY);
+            float t = (float) (System.currentTimeMillis() - mStartTime) / mDuration;
+            t = Math.min(t, 1.0f);
+            float interpolatedRatio = mInterpolator.getInterpolation(t);
+            float tempScale = mInitScale + interpolatedRatio * (mFinalScale - mInitScale);
+            float tempX = mInitX + interpolatedRatio * (mFinalX - mInitX);
+            float tempY = mInitY + interpolatedRatio * (mFinalY - mInitY);
 
-            target.reset();
-            target.postScale(tempScale, tempScale);
-            target.postTranslate(tempX, tempY);
+            mTarget.reset();
+            mTarget.postScale(tempScale, tempScale);
+            mTarget.postTranslate(tempX, tempY);
 
-            setImageMatrix(target);
+            setImageMatrix(mTarget);
 
-            if (canceled) {
-                savedMatrix.set(target);
-                matrix.set(target);
+            if (mCanceled) {
+                mSavedMatrix.set(mTarget);
+                mMatrix.set(mTarget);
                 return;
             }
 
@@ -449,7 +467,7 @@ public class AdvancedImageView extends androidx.appcompat.widget.AppCompatImageV
         }
 
         private void cancel() {
-            canceled = true;
+            mCanceled = true;
         }
     }
 

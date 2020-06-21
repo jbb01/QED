@@ -1,6 +1,5 @@
 package com.jonahbauer.qed.networking;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
 
@@ -9,8 +8,8 @@ import androidx.preference.PreferenceManager;
 
 import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.BuildConfig;
+import com.jonahbauer.qed.Pref;
 import com.jonahbauer.qed.R;
-import com.jonahbauer.qed.activities.LoginActivity;
 import com.jonahbauer.qed.chat.Message;
 import com.jonahbauer.qed.networking.login.InvalidCredentialsException;
 import com.jonahbauer.qed.networking.login.QEDLogin;
@@ -20,6 +19,7 @@ import org.json.JSONObject;
 
 import java.lang.ref.SoftReference;
 import java.net.UnknownHostException;
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.SSLException;
@@ -31,93 +31,88 @@ import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
 
 public class ChatWebSocket extends WebSocketListener {
+    private final Application mApplication;
+    private final SharedPreferences mSharedPreferences;
+    private final ChatWebSocketListener mListener;
 
-    private final Application application;
-    private final SharedPreferences sharedPreferences;
-    private final ChatWebSocketListener listener;
+    private WebSocket mWebSocket;
 
-    private WebSocket webSocket;
-
-    private int position = -100;
-    private boolean forcedLogin = false;
-    private boolean sending;
+    private int mPosition = -100;
+    private boolean mSending;
 
     public ChatWebSocket(@NonNull ChatWebSocketListener listener) {
-        this.listener = listener;
+        this.mListener = listener;
 
         SoftReference<Application> applicationReference = Application.getApplicationReference();
-        application = applicationReference.get();
+        mApplication = applicationReference.get();
 
-        if (application == null) {
+        if (mApplication == null) {
             AssertionError error = new AssertionError("Application is null.");
 
             listener.onError(null, error);
-            sharedPreferences = null;
+            mSharedPreferences = null;
 
             throw error;
         }
 
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(application);
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(mApplication);
 
-        sending = true;
+        mSending = true;
     }
 
     public void openSocket() {
-        position = -100;
+        mPosition = -100;
 
-        if (webSocket != null)
-            webSocket.close(1001,null);
+        if (mWebSocket != null)
+            mWebSocket.close(1001,null);
 
         OkHttpClient client = new OkHttpClient.Builder()
                 .pingInterval(30, TimeUnit.SECONDS)
                 .connectTimeout(5, TimeUnit.SECONDS).build();
 
         Request.Builder builder = new Request.Builder().url(
-                application.getString(R.string.chat_websocket)
-                        + "?channel=" + sharedPreferences.getString(application.getString(R.string.preferences_chat_channel_key),"")
+                mApplication.getString(R.string.chat_websocket)
+                        + "?channel=" + mSharedPreferences.getString(Pref.Chat.CHANNEL,"")
                         + "&version=" + "2"
-                        + "&position=" + position);
+                        + "&position=" + mPosition);
         builder.addHeader("Origin", "https://chat.qed-verein.de");
 
-        String userId = application.loadData(Application.KEY_USERID, false);
-        String pwHash = application.loadData(Application.KEY_CHAT_PWHASH, true);
+        try {
+            QEDLogin.ensureDataAvailable(Feature.CHAT);
 
-        if (userId == null || userId.equals("") || pwHash == null || pwHash.equals("")) {
-            if (!login()) {
-                return;
-            } else {
-                userId = application.loadData(Application.KEY_USERID, false);
-                pwHash = application.loadData(Application.KEY_CHAT_PWHASH, true);
-            }
+            HashMap<String,String> cookies = new HashMap<>();
+            QEDLogin.addCookies(Feature.CHAT, cookies);
+
+            builder.addHeader("Cookie", QEDLogin.loadCookies(Feature.CHAT, cookies));
+            Request request = builder.build();
+            mWebSocket = client.newWebSocket(request, this);
+            mWebSocket.send("{\"type\":\"ping\"}");
+        } catch (InvalidCredentialsException e) {
+            Log.e(Application.LOG_TAG_ERROR, e.getMessage(), e);
+            if (mListener != null) mListener.onError(ChatWebSocketListener.REASON_INVALID_CREDENTIALS, e);
+        } catch (NoNetworkException e) {
+            Log.e(Application.LOG_TAG_ERROR, e.getMessage(), e);
+            if (mListener != null) mListener.onError(ChatWebSocketListener.REASON_NETWORK, e);
         }
-
-        if (userId == null || userId.equals("") || pwHash == null || pwHash.equals("")) {
-            throw new AssertionError();
-        }
-
-        builder.addHeader("Cookie", "userid=" + userId + ", pwhash=" + pwHash);
-        Request request = builder.build();
-        webSocket = client.newWebSocket(request, this);
-        webSocket.send("{\"type\":\"ping\"}");
     }
 
     public void closeSocket() {
-        if (webSocket != null) webSocket.close(1001, "");
+        if (mWebSocket != null) mWebSocket.close(1001, "");
     }
 
     public boolean send(@NonNull String message) {
-        if (!sending) try {
-            sending = true;
+        if (!mSending) try {
+            mSending = true;
 
             JSONObject json = new JSONObject();
-            json.put("channel", sharedPreferences.getString(application.getString(R.string.preferences_chat_channel_key), ""));
-            json.put("name", sharedPreferences.getString(application.getString(R.string.preferences_chat_name_key), ""));
+            json.put("channel", mSharedPreferences.getString(Pref.Chat.CHANNEL, ""));
+            json.put("name", mSharedPreferences.getString(Pref.Chat.NAME, ""));
             json.put("message", message);
-            json.put("delay", Long.toString(position));
-            json.put("publicid", sharedPreferences.getBoolean(application.getString(R.string.preferences_chat_publicId_key), false) ? 1 : 0);
-            return webSocket.send(json.toString());
+            json.put("delay", Long.toString(mPosition));
+            json.put("publicid", mSharedPreferences.getBoolean(Pref.Chat.PUBLIC_ID, false) ? 1 : 0);
+            return mWebSocket.send(json.toString());
         } catch (JSONException e) {
-            sending = false;
+            mSending = false;
             Log.e(Application.LOG_TAG_ERROR, "Chat WebSocket: Unable to create JSON message!", e);
             return false;
         }
@@ -137,14 +132,14 @@ public class ChatWebSocket extends WebSocketListener {
                     webSocket.send("{\"type\":\"pong\"}");
                     break;
                 case "pong":
-                    if (listener != null) listener.onMessage(Message.PONG);
+                    if (mListener != null) mListener.onMessage(Message.PONG);
                 case "ack":
-                    sending = false;
+                    mSending = false;
                     break;
                 case "post":
                     int id = json.getInt("id");
-                    if (id < position) break;
-                    position = id + 1;
+                    if (id < mPosition) break;
+                    mPosition = id + 1;
                     String name = json.getString("name");
                     String messageStr = json.getString("message");
                     String username = json.getString("username");
@@ -158,7 +153,7 @@ public class ChatWebSocket extends WebSocketListener {
 
                     Message message = new Message(name, messageStr, date, userid, username, color, id, bot, channel);
 
-                    if (listener != null) listener.onMessage(message);
+                    if (mListener != null) mListener.onMessage(message);
                     break;
             }
         } catch (JSONException e) {
@@ -174,8 +169,15 @@ public class ChatWebSocket extends WebSocketListener {
     @Override
     public void onClosed(@NonNull WebSocket webSocket, int code, @NonNull String reason) {
         if (code == 4000 && reason.contains("Ungültige Anmeldedaten")) {
-            if (login()) {
+            try {
+                QEDLogin.login(Feature.CHAT);
                 openSocket();
+            } catch (InvalidCredentialsException e) {
+                Log.e(Application.LOG_TAG_ERROR, e.getMessage(), e);
+                if (mListener != null) mListener.onError(ChatWebSocketListener.REASON_INVALID_CREDENTIALS, e);
+            } catch (NoNetworkException e) {
+                Log.e(Application.LOG_TAG_ERROR, e.getMessage(), e);
+                if (mListener != null) mListener.onError(ChatWebSocketListener.REASON_NETWORK, e);
             }
         }
     }
@@ -183,40 +185,14 @@ public class ChatWebSocket extends WebSocketListener {
     @Override
     public void onFailure(@NonNull WebSocket webSocket, @NonNull Throwable t, Response response) {
         try {
-            sending = false;
+            mSending = false;
             throw (Exception) t;
         } catch (UnknownHostException | SSLException e) {
             Log.e(Application.LOG_TAG_DEBUG, "Chat WebSocket " + webSocket.toString() + " no network!", e);
-            if (listener != null) listener.onError(ChatWebSocketListener.REASON_NETWORK, t);
+            if (mListener != null) mListener.onError(ChatWebSocketListener.REASON_NETWORK, t);
         } catch (Exception e) {
             Log.e(Application.LOG_TAG_DEBUG, "Chat WebSocket failed! " + e.getClass().toString(), e);
-            if (listener != null) listener.onError(null, t);
+            if (mListener != null) mListener.onError(null, t);
         }
-    }
-
-    private boolean login() {
-        try {
-            QEDLogin.loginChat();
-        } catch (NoNetworkException e) {
-            Log.e(Application.LOG_TAG_ERROR, e.getMessage(), e);
-            if (listener != null) listener.onError(ChatWebSocketListener.REASON_NETWORK, e);
-            return false;
-        } catch (InvalidCredentialsException e) {
-            Log.e(Application.LOG_TAG_ERROR, e.getMessage(), e);
-            forceLogin();
-            return false;
-        }
-        return true;
-    }
-
-    private void forceLogin() {
-        if (!forcedLogin) {
-            forcedLogin = true;
-            Intent intent = new Intent(application, LoginActivity.class);
-            intent.putExtra(LoginActivity.DONT_START_MAIN, true);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            application.startActivity(intent);
-        }
-        if (listener != null) listener.onError(null, null);
     }
 }

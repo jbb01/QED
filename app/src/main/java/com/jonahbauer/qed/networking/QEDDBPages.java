@@ -12,26 +12,21 @@ import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.qeddb.event.Event;
 import com.jonahbauer.qed.qeddb.person.Person;
+import com.jonahbauer.qed.util.Triple;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.lang.ref.SoftReference;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @SuppressWarnings({"unused", "UnusedReturnValue"})
 public abstract class QEDDBPages {
-    private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.GERMANY);
-    private static final SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.GERMANY);
-    private static final SimpleDateFormat simpleDateFormat3 = new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY);
-
     @Nullable
-    public static AsyncTask[] getEvent(String tag, String eventId, QEDPageReceiver<Event> eventReceiver) {
+    public static AsyncTask<?,?,?>[] getEvent(String tag, long eventId, QEDPageReceiver<Event> eventReceiver) {
         SoftReference<Application> applicationReference = Application.getApplicationReference();
         Application application = applicationReference.get();
 
@@ -41,29 +36,30 @@ public abstract class QEDDBPages {
         }
 
         QEDPageReceiver<Event> receiver = new QEDPageReceiver<Event>() {
-            private final Event event = new Event();
-            private final AtomicInteger done = new AtomicInteger();
+            private final Event mEvent = new Event();
+            private final AtomicInteger mDone = new AtomicInteger();
 
             @Override
             public void onPageReceived(String tag2, Event out) {
                 if (tag2.equals("page1")) {
-                    event.name = out.name;
-                    event.start = out.start;
-                    event.startString = out.startString;
-                    event.end = out.end;
-                    event.endString = out.endString;
-                    event.cost = out.cost;
-                    event.deadline = out.deadline;
-                    event.deadlineString = out.deadlineString;
-                    event.maxMember = out.maxMember;
-                    event.organizer = out.organizer;
+                    mEvent.title = out.title;
+                    mEvent.start = out.start;
+                    mEvent.startString = out.startString;
+                    mEvent.end = out.end;
+                    mEvent.endString = out.endString;
+                    mEvent.cost = out.cost;
+                    mEvent.deadline = out.deadline;
+                    mEvent.deadlineString = out.deadlineString;
+                    mEvent.maxParticipants = out.maxParticipants;
+                    mEvent.organizers = out.organizers;
                 } else if (tag2.equals("page2")) {
-                    event.members = out.members;
+                    mEvent.participants = out.participants;
                 }
 
-                if (done.incrementAndGet() == 2) {
-                    done.set(0);
-                    eventReceiver.onPageReceived(tag, event);
+                if (mDone.incrementAndGet() == 2) {
+                    mEvent.id = eventId;
+                    mDone.set(0);
+                    eventReceiver.onPageReceived(tag, mEvent);
                 }
             }
 
@@ -74,145 +70,90 @@ public abstract class QEDDBPages {
             }
         };
 
+        @SuppressLint("StringFormatMatches")
         AsyncLoadQEDPage<Event> page1 = new AsyncLoadQEDPage<>(
-                AsyncLoadQEDPage.Feature.DATABASE,
+                Feature.DATABASE,
                 String.format(application.getString(R.string.database_server_event), eventId, "1"),
                 receiver,
                 "page1",
                 (String overview) -> {
-                    Event event = new Event();
-                    String[] tableRows = overview.split("(?:</tr><tr>)|(?:<tr>)|(?:</tr>)");
-                    for (String row : tableRows) {
-                        String[] params = row.split("(?:<div class=\' veranstaltung_)|(?: cell\' title=\'\'>)|(?:&nbsp;</div>)");
-                        if (params.length > 2 && params[2] != null && !params[2].trim().equals("")) switch (params[1]) {
-                            case "titel":
-                                event.name = params[2];
-                                break;
-                            case "start":
-                                try {
-                                    event.start = simpleDateFormat.parse(params[2]);
-                                } catch (ParseException ignored) {}
-                                event.startString = params[2];
-                                break;
-                            case "ende":
-                                try {
-                                    event.end = simpleDateFormat.parse(params[2]);
-                                } catch (ParseException ignored) {}
-                                event.endString = params[2];
-                                break;
-                            case "kosten":
-                                event.cost = params[2];
-                                break;
-                            case "anmeldeschluss":
-                                try {
-                                    event.deadline = simpleDateFormat2.parse(params[2]);
-                                } catch (ParseException ignored) {}
-                                event.deadlineString = params[2];
-                                break;
-                            case "max_anzahl_teilnehmer":
-                                event.maxMember = params[2];
-                                break;
-                        }
+                    StringReader reader = new StringReader(overview);
+                    StringBuilder builder = new StringBuilder();
+
+                    Event event;
+
+                    try {
+                        String name = readEventPage1Value(reader, builder, "titel");
+                        String start = readEventPage1Value(reader, builder, "start");
+                        String end = readEventPage1Value(reader, builder, "ende");
+                        String cost = readEventPage1Value(reader, builder, "kosten");
+                        String deadline = readEventPage1Value(reader, builder, "anmeldeschluss");
+                        String maxMember = readEventPage1Value(reader, builder, "max_anzahl_teilnehmer");
+                        String hotel = readEventPage1Value(reader, builder, "uebernachtung_id");
+
+                        event = new Event(name, start, end, cost, deadline, maxMember, hotel);
+                    } catch (IOException e) {
+                        event = new Event();
                     }
 
-                    event.organizer.clear();
-                    for (String str : overview.split("</tr>")) {
-                        Matcher matcher = Pattern.compile("<tr class=\"data\">.*").matcher(str);
-                        while (matcher.find()) {
-                            String data = matcher.group();
-                            if (data.contains("rolle")) {
+                    try {
+                        while (NetworkUtils.readUntilAfter(reader, "<tr class=\"data\"><td id='rollen_")) {
+                            try {
                                 Person person = new Person();
-                                Matcher matcher2 = Pattern.compile("<div class=\"[^\"]*\" title=\"([^\"]*)\">([^&]*)&nbsp;</div>").matcher(data);
-                                while (matcher2.find()) {
-                                    String title = matcher2.group(1);
-                                    String value = matcher2.group(2);
-                                    if (title != null) switch (title) {
-                                        case "Vorname":
-                                            person.firstName = value;
-                                            break;
-                                        case "Nachname":
-                                            person.lastName = value;
-                                            break;
-                                    }
-                                }
-                                event.organizer.add(person);
-                            }
+                                person.firstName = readTableColumn(reader, builder, "Vorname");
+                                person.lastName = readTableColumn(reader, builder, "Nachname");
+                                event.organizers.add(person);
+                            } catch (IOException ignored) {}
                         }
-                    }
+                    } catch (IOException ignored) {}
 
                     return event;
                 },
                 new HashMap<>()
         );
 
+        @SuppressLint("StringFormatMatches")
         AsyncLoadQEDPage<Event> page2 = new AsyncLoadQEDPage<>(
-                AsyncLoadQEDPage.Feature.DATABASE,
+                Feature.DATABASE,
                 String.format(application.getString(R.string.database_server_event), eventId, "2"),
                 receiver,
                 "page2",
                 (String participants) -> {
                     Event event = new Event();
-                    for (String str : participants.split("</tr>")) {
-                        Matcher matcher = Pattern.compile("<tr class=\"data\">.*").matcher(str);
-                        while (matcher.find()) {
-                            String data = matcher.group();
-                            if (data.contains("teilnehmer")) {
-                                String type = null;
 
+                    StringReader reader = new StringReader(participants);
+                    StringBuilder builder = new StringBuilder();
+
+                    try {
+                        while (NetworkUtils.readUntilAfter(reader, "<div class=\"teilnehmerlink teilnehmer_")) {
+                            try {
                                 Person person = new Person();
+                                person.id = NetworkUtils.readInt(reader);
+                                person.firstName = readTableColumn(reader, builder, "Vorname");
+                                person.lastName = readTableColumn(reader, builder, "Nachname");
+                                person.email = readTableColumn(reader, builder, "E-Mail");
 
-                                Matcher matcher3 = Pattern.compile("person=(\\d*)").matcher(data);
-                                if (matcher3.find()) {
-                                    String id = matcher3.group(1);
-                                    if (id != null) person.id = Integer.valueOf(id);
-                                }
-
-                                Matcher matcher2 = Pattern.compile("<div class=\"[^\"]*\" title=\"([^\"]*)\">([^&]*)&nbsp;</div>").matcher(data);
-                                while (matcher2.find()) {
-                                    String title = matcher2.group(1);
-                                    String value = matcher2.group(2);
-                                    if (title != null) switch (title) {
-                                        case "Vorname":
-                                            person.firstName = value;
-                                            break;
-                                        case "Nachname":
-                                            person.lastName = value;
-                                            break;
-                                        case "Status":
-                                            type = value;
-                                            break;
-                                        case "E-Mail":
-                                            person.email = value;
-                                            break;
-                                    }
-                                }
-
-                                if (type != null) switch (type) {
+                                String status = readTableColumn(reader, builder, "Status");
+                                switch (status) {
                                     case "offen":
-                                        person.type = Person.MemberType.MEMBER_OPEN;
+                                        person.participationStatus = Person.ParticipationStatus.MEMBER_OPEN;
                                         break;
                                     case "bestaetigt":
-                                        person.type = Person.MemberType.MEMBER_CONFIRMED;
+                                        person.participationStatus = Person.ParticipationStatus.MEMBER_CONFIRMED;
                                         break;
                                     case "abgemeldet":
-                                        person.type = Person.MemberType.MEMBER_OPT_OUT;
+                                        person.participationStatus = Person.ParticipationStatus.MEMBER_OPT_OUT;
                                         break;
                                     case "teilgenommen":
-                                        person.type = Person.MemberType.MEMBER_PARTICIPATED;
+                                        person.participationStatus = Person.ParticipationStatus.MEMBER_PARTICIPATED;
                                         break;
                                 }
 
-                                for (Person organizer : event.organizer) {
-                                    if ((organizer.firstName + organizer.lastName).equals(person.firstName + person.lastName)) {
-                                        person.type = Person.MemberType.ORGA;
-                                        break;
-                                    }
-                                }
-
-                                event.members.add(person);
-                            }
+                                event.participants.add(person);
+                            } catch (IOException ignored) {}
                         }
-                    }
+                    } catch (IOException ignored) {}
+
                     return event;
                 },
                 new HashMap<>()
@@ -224,12 +165,12 @@ public abstract class QEDDBPages {
         return new AsyncTask[] {page1, page2};
     }
 
-    public static AsyncTask[] getEvent(String tag, @NonNull Event event, QEDPageReceiver<Event> eventReceiver) {
+    public static AsyncTask<?,?,?>[] getEvent(String tag, @NonNull Event event, QEDPageReceiver<Event> eventReceiver) {
         return getEvent(tag, event.id, eventReceiver);
     }
 
     @Nullable
-    public static AsyncTask[] getEventList(String tag, QEDPageReceiver<List<Event>> eventListReceiver) {
+    public static AsyncTask<?,?,?>[] getEventList(String tag, QEDPageReceiver<List<Event>> eventListReceiver) {
         SoftReference<Application> applicationReference = Application.getApplicationReference();
         Application application = applicationReference.get();
 
@@ -239,60 +180,37 @@ public abstract class QEDDBPages {
         }
 
         AsyncLoadQEDPage<List<Event>> list = new AsyncLoadQEDPage<>(
-                AsyncLoadQEDPage.Feature.DATABASE,
+                Feature.DATABASE,
                 application.getString(R.string.database_server_events),
                 eventListReceiver,
                 tag,
                 (String string) -> {
-                    List<Event> events = new ArrayList<>();
+                    List<Event> events = new LinkedList<>();
 
-                    for (String str : string.split("</tr>")) {
-                        Matcher matcher = Pattern.compile("<tr class=\"data\">.*").matcher(str);
-                        while (matcher.find()) {
-                            String data = matcher.group();
-                            if (data.contains("veranstaltung")) {
-                                Event event = new Event();
-                                Matcher matcher2 = Pattern.compile("veranstaltungen_(\\d*)").matcher(data);
-                                if (matcher2.find())
-                                    event.id = matcher2.group(1);
-                                Matcher matcher3 = Pattern.compile("<div class=\"[^\"]*\" title=\"([^\"]*)\">([^&]*)&nbsp;</div>").matcher(data);
-                                while (matcher3.find()) {
-                                    String title = matcher3.group(1);
-                                    String value = matcher3.group(2);
-                                    if (title != null) switch (title) {
-                                        case "Titel":
-                                            event.name = value;
-                                            break;
-                                        case "Start":
-                                            try {
-                                                if (value != null) event.start = simpleDateFormat.parse(value);
-                                            } catch (ParseException ignored) {}
-                                            event.startString = value;
-                                            break;
-                                        case "Ende":
-                                            try {
-                                                if (value != null) event.end = simpleDateFormat.parse(value);
-                                            } catch (ParseException ignored) {}
-                                            event.endString = value;
-                                            break;
-                                        case "Kosten":
-                                            event.cost = value;
-                                            break;
-                                        case "Anmeldeschluss":
-                                            event.deadlineString = value;
-                                            break;
-                                        case "Max. Teilnehmerzahl":
-                                            event.maxMember = value;
-                                            break;
-                                        case "&Uuml;bernachtung":
-                                            if (value != null && !value.trim().equals("(keine)")) event.hotel = value;
-                                            break;
-                                    }
-                                }
+                    StringReader reader = new StringReader(string);
+                    StringBuilder builder = new StringBuilder();
+
+                    try {
+                        while (NetworkUtils.readUntilAfter(reader, "<td class='veranstaltungen_")) {
+                            try {
+                                // Id
+                                String id = String.valueOf(NetworkUtils.readInt(reader));
+                                String name = readTableColumn(reader, builder, "Titel");
+                                String start = readTableColumn(reader, builder, "Start");
+                                String end = readTableColumn(reader, builder, "Ende");
+                                String cost = readTableColumn(reader, builder, "Kosten");
+                                String deadline = readTableColumn(reader, builder, "Anmeldeschluss");
+                                String maxMember = readTableColumn(reader, builder, "Max. Teilnehmerzahl");
+                                String hotel = readTableColumn(reader, builder, "&Uuml;bernachtung");
+
+                                Event event = new Event(id, name, start, end, cost, deadline, maxMember, hotel);
                                 events.add(event);
-                            }
+                            } catch (IOException ignored) {}
                         }
+                    } catch (IOException e) {
+                        return Collections.emptyList();
                     }
+
                     return events;
                 },
                 new HashMap<>()
@@ -304,7 +222,7 @@ public abstract class QEDDBPages {
     }
 
     @Nullable
-    public static AsyncTask[] getPerson(String tag, String personId, QEDPageReceiver<Person> personReceiver) {
+    public static AsyncTask<?,?,?>[] getPerson(String tag, long personId, QEDPageReceiver<Person> personReceiver) {
         SoftReference<Application> applicationReference = Application.getApplicationReference();
         Application application = applicationReference.get();
 
@@ -314,37 +232,37 @@ public abstract class QEDDBPages {
         }
 
         QEDPageReceiver<Person> receiver = new QEDPageReceiver<Person>() {
-            private final Person person = new Person();
-            private final AtomicInteger done = new AtomicInteger();
+            private final Person mPerson = new Person();
+            private final AtomicInteger mDone = new AtomicInteger();
 
             @Override
             public void onPageReceived(String tag2, Person out) {
                 switch (tag2) {
                     case "page1":
-                        person.firstName = out.firstName;
-                        person.lastName = out.lastName;
-                        person.email = out.email;
-                        person.birthday = out.birthday;
-                        person.homeStation = out.homeStation;
-                        person.railcard = out.railcard;
-                        person.memberSince = out.memberSince;
-                        person.active = out.active;
-                        person.member = out.member;
-                        person.id = Integer.parseInt(personId);
+                        mPerson.firstName = out.firstName;
+                        mPerson.lastName = out.lastName;
+                        mPerson.email = out.email;
+                        mPerson.birthday = out.birthday;
+                        mPerson.homeStation = out.homeStation;
+                        mPerson.railcard = out.railcard;
+                        mPerson.memberSince = out.memberSince;
+                        mPerson.active = out.active;
+                        mPerson.member = out.member;
+                        mPerson.id = personId;
                         break;
                     case "page2":
-                        person.addresses = out.addresses;
-                        person.phoneNumbers = out.phoneNumbers;
+                        mPerson.addresses = out.addresses;
+                        mPerson.phoneNumbers = out.phoneNumbers;
                         break;
                     case "page3":
-                        person.events = out.events;
-                        person.management = out.management;
+                        mPerson.events = out.events;
+                        mPerson.management = out.management;
                         break;
                 }
 
-                if (done.incrementAndGet() == 3) {
-                    done.set(0);
-                    personReceiver.onPageReceived(tag, person);
+                if (mDone.incrementAndGet() == 3) {
+                    mDone.set(0);
+                    personReceiver.onPageReceived(tag, mPerson);
                 }
             }
 
@@ -355,203 +273,135 @@ public abstract class QEDDBPages {
             }
         };
 
-        final boolean isSelf = application.loadData(Application.KEY_USERID, false).equals(personId);
+        final boolean isSelf = application.loadData(Application.KEY_USERID, false).equals(String.valueOf(personId));
 
-        AsyncLoadQEDPage<Person> page1 = new AsyncLoadQEDPage<>(
-                AsyncLoadQEDPage.Feature.DATABASE,
+        @SuppressLint("StringFormatMatches") AsyncLoadQEDPage<Person> page1 = new AsyncLoadQEDPage<>(
+                Feature.DATABASE,
                 String.format(application.getString(R.string.database_server_person), personId, "1"),
                 receiver,
                 "page1",
                 (String overview) -> {
                     Person person = new Person();
-                    String[] tableRows = overview.split("(?:</tr><tr>)|(?:<tr>)|(?:</tr>)");
-
-                    for (String row : tableRows) {
-                        String[] params = row.split("(?:<div class=\' person_)|(?: cell\' title=\'\'>)|(?:&nbsp;</div>)");
-                        if (params.length > 2 && params[2] != null && !params[2].trim().equals("")) switch (params[1]) {
-                            case "nachname":
-                                person.lastName = params[2];
-                                break;
-                            case "vorname":
-                                person.firstName = params[2];
-                                break;
-                            case "sichtbare_email":
-                                person.email = params[2];
-                                break;
-                            case "sichtbarer_geburtstag":
-                                person.birthday = params[2];
-                                break;
-                            case "heimatbahnhof":
-                                if (!isSelf)
-                                    person.homeStation = params[2];
-                                else {
-                                    Matcher matcher = Pattern.compile(".*value=\"(.*)\"").matcher(params[2]);
-                                    if (matcher.find())
-                                        person.homeStation = matcher.group(1);
-                                }
-                                break;
-                            case "bahncard":
-                                person.railcard = params[2];
-                                break;
-                            case "mitglied_seit":
-                                person.memberSince = params[2];
-                                break;
-                            case "mitglied":
-                                person.member = params[2].equals("Ja");
-                                break;
-                            case "aktiv":
-                                person.active = params[2].equals("1");
-                                break;
+                    StringReader reader = new StringReader(overview);
+                    StringBuilder builder = new StringBuilder();
+                    try {
+                        person.lastName = readPersonPage1Value(reader, builder, "nachname");
+                        person.firstName = readPersonPage1Value(reader, builder, "vorname");
+                        person.email = readPersonPage1Value(reader, builder, "sichtbare_email");
+                        person.birthday = readPersonPage1Value(reader, builder, "sichtbarer_geburtstag");
+                        if (isSelf) {
+                            person.homeStation = readPersonPage1SelfValue(reader,builder,"heimatbahnhof");
+                            person.railcard = readPersonPage1SelfValue(reader,builder,"bahncard");
+                        } else {
+                            person.homeStation = readPersonPage1Value(reader, builder, "heimatbahnhof");
+                            person.railcard = readPersonPage1Value(reader, builder, "bahncard");
                         }
-                    }
+                        person.memberSince = readPersonPage1Value(reader, builder, "mitglied_seit");
+                        person.member = "Ja".equals(readPersonPage1Value(reader, builder, "mitglied"));
+                        person.active = "1".equals(readPersonPage1Value(reader, builder, "aktiv"));
+                    } catch (IOException ignored) {}
                     return person;
                 },
                 new HashMap<>()
         );
 
 
-        AsyncLoadQEDPage<Person> page2 = new AsyncLoadQEDPage<>(
-                AsyncLoadQEDPage.Feature.DATABASE,
+        @SuppressLint("StringFormatMatches") AsyncLoadQEDPage<Person> page2 = new AsyncLoadQEDPage<>(
+                Feature.DATABASE,
                 String.format(application.getString(R.string.database_server_person), personId, "2"),
                 receiver,
                 "page2",
                 (String details) -> {
                     Person person = new Person();
-                    for (String str : details.split("</tr>")) {
-                        if (isSelf) str = str.replaceAll("<div class=\"noedit\">", "");
-                        Matcher matcher = Pattern.compile("<tr class=\"data\">.*").matcher(str);
-                        while (matcher.find()) {
-                            String data = matcher.group();
-                            if (data.contains("adresse")) {
-                                String street = null, number = null, additions = null, zip = null, city = null, country = null;
-                                Matcher matcher2 = Pattern.compile("<div class=\"[^\"]*\" title=\"([^\"]*)\">([^&]*)&nbsp;</div>").matcher(data);
-                                while (matcher2.find()) {
-                                    String title = matcher2.group(1);
-                                    String value = matcher2.group(2);
-                                    if (title != null) switch (title) {
-                                        case "Strasse":
-                                            street = value;
-                                            break;
-                                        case "Nummer":
-                                            number = value;
-                                            break;
-                                        case "Adresszusatz":
-                                            additions = value;
-                                            break;
-                                        case "PLZ":
-                                            zip = value;
-                                            break;
-                                        case "Ort":
-                                            city = value;
-                                            break;
-                                        case "Land":
-                                            country = value;
-                                            break;
-                                    }
-                                }
-                                String address = "";
-                                if (street != null && !street.trim().equals("")) address += street;
-                                if (number != null && !number.trim().equals("")) address += " " + number;
-                                if (additions != null && !additions.trim().equals("")) address += "\n" + additions;
-                                if (zip != null && !zip.trim().equals("")) address += "\n" + zip;
-                                if (city != null && !city.trim().equals("")) address += ((zip != null && !zip.trim().equals("")) ? " " : "\n") + city;
-                                if (country != null && !country.trim().equals("")) address += "\n" + country;
 
-                                person.addresses.add(address);
-                            } else if (data.contains("telefon")) {
-                                String type = null, number = null;
-                                Matcher matcher2 = Pattern.compile("<div class=\"[^\"]*\" title=\"([^\"]*)\">([^&]*)&nbsp;</div>").matcher(data);
-                                while (matcher2.find()) {
-                                    String title = matcher2.group(1);
-                                    String value = matcher2.group(2);
-                                    if (title != null) switch (title) {
-                                        case "Art":
-                                            type = value;
-                                            break;
-                                        case "Nummer":
-                                            number = value;
-                                            break;
-                                    }
+                    StringReader reader = new StringReader(details);
+                    StringBuilder builder = new StringBuilder();
+
+                    try {
+                        while (NetworkUtils.readUntilAfter(reader, "<td class='person_adresse")) {
+                            try {
+                                String street = readTableColumn(reader, builder, "Strasse");
+                                String number = readTableColumn(reader, builder, "Nummer");
+                                String additions = readTableColumn(reader, builder, "Adresszusatz");
+                                String zip = readTableColumn(reader, builder, "PLZ");
+                                String city = readTableColumn(reader, builder, "Ort");
+                                String country = readTableColumn(reader, builder, "Land");
+
+                                if (isSelf) { // remove "<div class="noedit">"
+                                    street = street.substring(20);
+                                    number = number.substring(20);
+                                    additions = additions.substring(20);
+                                    zip = zip.substring(20);
+                                    city = city.substring(20);
+                                    country = country.substring(20);
+                                }
+
+                                person.addresses.add(toAddress(street, number, additions, zip, city, country));
+                            } catch (IOException ignored) {}
+                        }
+                    } catch (IOException ignored) {}
+
+                    reader = new StringReader(details);
+
+                    try {
+                        while (NetworkUtils.readUntilAfter(reader, "<td class='person_telefon")) {
+                            try {
+                                String type = readTableColumn(reader, builder, "Art");
+                                String number = readTableColumn(reader, builder, "Nummer");
+
+                                if (isSelf) { // remove "<div class="noedit">"
+                                    type = type.substring(20);
+                                    number = number.substring(20);
                                 }
 
                                 person.phoneNumbers.add(new Pair<>(type, number));
-                            }
+                            } catch (IOException ignored) {}
                         }
-                    }
+                    } catch (IOException ignored) {}
+
                     return person;
                 },
                 new HashMap<>()
         );
 
 
-        AsyncLoadQEDPage<Person> page3 = new AsyncLoadQEDPage<>(
-                AsyncLoadQEDPage.Feature.DATABASE,
+        @SuppressLint("StringFormatMatches") AsyncLoadQEDPage<Person> page3 = new AsyncLoadQEDPage<>(
+                Feature.DATABASE,
                 String.format(application.getString(R.string.database_server_person), personId, "3"),
                 receiver,
                 "page3",
                 (String events) -> {
                     Person person = new Person();
-                    for (String str : events.split("</tr>")) {
-                        Matcher matcher = Pattern.compile("<tr class=\"data\">.*").matcher(str);
-                        while (matcher.find()) {
-                            String data = matcher.group();
-                            if (data.contains("rollen")) {
-                                String roll = null, eventTitle = null, start = null, end = null;
-                                Matcher matcher2 = Pattern.compile("<div class=\"[^\"]*\" title=\"([^\"]*)\">([^&]*)&nbsp;</div>").matcher(data);
-                                while (matcher2.find()) {
-                                    String title = matcher2.group(1);
-                                    String value = matcher2.group(2);
-                                    if (title != null) switch (title) {
-                                        case "Rolle":
-                                            roll = value;
-                                            break;
-                                        case "Titel":
-                                            eventTitle = value;
-                                            break;
-                                        case "Start":
-                                            start = value;
-                                            break;
-                                        case "Ende":
-                                            end = value;
-                                            break;
-                                    }
-                                }
-                                Event event = new Event();
-                                event.name = eventTitle;
-                                try {
-                                    if (start != null) event.start = simpleDateFormat3.parse(start);
-                                } catch (ParseException ignored) {}
-                                event.startString = start;
-                                try {
-                                    if (end != null) event.end = simpleDateFormat3.parse(end);
-                                } catch (ParseException ignored) {}
-                                event.endString = end;
 
-                                person.events.add(new Pair<>(event, roll));
-                            } else if (data.contains("funktion")) {
-                                String roll = null, start = null, end = null;
-                                Matcher matcher2 = Pattern.compile("<div class=\"[^\"]*\" title=\"([^\"]*)\">([^&]*)&nbsp;</div>").matcher(data);
-                                while (matcher2.find()) {
-                                    String title = matcher2.group(1);
-                                    String value = matcher2.group(2);
-                                    if(title != null) switch (title) {
-                                        case "Rolle":
-                                            roll = value;
-                                            break;
-                                        case "Start":
-                                            start = value;
-                                            break;
-                                        case "Ende":
-                                            end = value;
-                                            break;
-                                    }
-                                }
+                    StringReader reader = new StringReader(events);
+                    StringBuilder builder = new StringBuilder();
 
-                                person.management.add(new Pair<>(roll, new Pair<>(start, end)));
+                    try {
+                        while (NetworkUtils.readUntilAfter(reader, "<tr class=\"data\"><td id='rollen")) {
+                            try {
+                                String role = readTableColumn(reader, builder, "Rolle");
+                                String eventTitle = readTableColumn(reader, builder, "Titel");
+                                String start = readTableColumn(reader, builder, "Start");
+                                String end = readTableColumn(reader, builder, "Ende");
 
-                            }
+                                person.events.add(new Pair<>(new Event(eventTitle, start, end), role));
+                            } catch (IOException ignored) {}
                         }
-                    }
+                    } catch (IOException ignored) {}
+
+                    reader = new StringReader(events);
+
+                    try {
+                        while (NetworkUtils.readUntilAfter(reader, "<tr class=\"data\"><td id='funktionen")) {
+                            try {
+                                String role = readTableColumn(reader, builder, "Rolle");
+                                String start = readTableColumn(reader, builder, "Start");
+                                String end = readTableColumn(reader, builder, "Ende");
+
+                                person.management.add(new Triple<>(role, start, end));
+                            } catch (IOException ignored) {}
+                        }
+                    } catch (IOException ignored) {}
                     return person;
                 },
                 new HashMap<>()
@@ -566,7 +416,7 @@ public abstract class QEDDBPages {
     }
 
     @Nullable
-    public static AsyncTask[] getPersonList(String tag, QEDPageReceiver<List<Person>> personListReceiver) {
+    public static AsyncTask<?,?,?>[] getPersonList(String tag, QEDPageReceiver<List<Person>> personListReceiver) {
         SoftReference<Application> applicationReference = Application.getApplicationReference();
         Application application = applicationReference.get();
 
@@ -576,57 +426,37 @@ public abstract class QEDDBPages {
         }
 
         AsyncLoadQEDPage<List<Person>> list = new AsyncLoadQEDPage<>(
-                AsyncLoadQEDPage.Feature.DATABASE,
+                Feature.DATABASE,
                 application.getString(R.string.database_server_persons),
                 personListReceiver,
                 tag,
                 (String string) -> {
-                    List<Person> persons = new ArrayList<>();
+                    List<Person> persons = new LinkedList<>();
 
-                    for (String str : string.split("</tr>")) {
-                        Matcher m = Pattern.compile("<tr class=\"data\">.*").matcher(str);
-                        while (m.find()) {
-                            Person person = new Person();
-                            String data = m.group();
-                            Matcher m2 = Pattern.compile("<td id=\'personen_(\\d*)\'").matcher(data);
+                    StringReader reader = new StringReader(string);
+                    StringBuilder builder = new StringBuilder();
 
-                            if (m2.find()) {
-                                String idStr = m2.group(1);
-                                if (idStr != null) person.id = Integer.valueOf(idStr);
-                            }
+                    try {
+                        while (NetworkUtils.readUntilAfter(reader, "<td class='personen_")) {
+                            try {
+                                // Id
+                                Person person = new Person();
+                                person.id = NetworkUtils.readInt(reader);
 
-                            for (String data2 : data.split("</div>")) {
-                                Matcher m3 = Pattern.compile("<div class=\".*\" title=\"(.*)\">(.*)&nbsp;").matcher(data2);
-                                while (m3.find()) {
-                                    String title = m3.group(1);
-                                    String value = m3.group(2);
-                                    if (title != null) switch (title) {
-                                        case "Vorname":
-                                            person.firstName = value;
-                                            break;
-                                        case "Nachname":
-                                            person.lastName = value;
-                                            break;
-                                        case "Emailadresse":
-                                            person.email = value;
-                                            break;
-                                        case "Aktiv":
-                                            person.active = "aktiv".equals(value);
-                                            break;
-                                        case "Geburtstag":
-                                            person.birthday = value;
-                                            break;
-                                        case "Mitglied seit":
-                                            person.memberSince = value;
-                                            break;
-                                        case "Aktuell Mitglied":
-                                            person.member = "Ja".equals(value);
-                                            break;
-                                    }
-                                }
-                            }
-                            persons.add(person);
+                                person.lastName = readTableColumn(reader, builder, "Nachname");
+                                person.firstName = readTableColumn(reader, builder, "Vorname");
+                                person.email = readTableColumn(reader, builder, "Emailadresse");
+                                person.birthday = readTableColumn(reader, builder, "Geburtstag");
+                                person.homeStation = readTableColumn(reader, builder, "Heimatbahnhof");
+                                person.railcard = readTableColumn(reader, builder, "Bahncard");
+                                person.memberSince = readTableColumn(reader, builder, "Mitglied seit");
+                                person.member = "Ja".equals(readTableColumn(reader, builder, "Aktuell Mitglied"));
+                                person.active = "aktiv".equals(readTableColumn(reader, builder, "Aktiv"));
+                                persons.add(person);
+                            } catch (IOException ignored) {}
                         }
+                    } catch (IOException e) {
+                        return Collections.emptyList();
                     }
 
                     return persons;
@@ -637,5 +467,42 @@ public abstract class QEDDBPages {
         list.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (Void) null);
 
         return new AsyncTask[] {list};
+    }
+
+    private static String readTableColumn(StringReader reader, StringBuilder builder, String key) throws IOException {
+        builder.setLength(0);
+        NetworkUtils.readUntilAfter(reader,"title=\"" + key + "\">");
+        NetworkUtils.readUntilAfter(reader, builder,"&nbsp;");
+        return builder.toString();
+    }
+
+    private static String readEventPage1Value(StringReader reader, StringBuilder builder, String key) throws IOException {
+        builder.setLength(0);
+        NetworkUtils.readUntilAfter(reader,"veranstaltung_" + key + " cell' title=''>");
+        NetworkUtils.readUntilAfter(reader, builder,"&nbsp;");
+        return builder.toString();
+    }
+
+    private static String readPersonPage1Value(StringReader reader, StringBuilder builder, String key) throws IOException {
+        builder.setLength(0);
+        NetworkUtils.readUntilAfter(reader,"person_" + key + " cell' title=''>");
+        NetworkUtils.readUntilAfter(reader, builder,"&nbsp;");
+        return builder.toString();
+    }
+
+    private static String readPersonPage1SelfValue(StringReader reader, StringBuilder builder, String key) throws IOException {
+        builder.setLength(0);
+        NetworkUtils.readUntilAfter(reader,"person[" + key + "]\" value=\"");
+        NetworkUtils.readUntilAfter(reader, builder,"\"");
+        return builder.toString();
+    }
+
+    private static String toAddress(String street, String number, String additions, String zip, String city, String country) {
+        String address = street + " " + number;
+        if (!additions.isEmpty()) address += '\n' + additions;
+        if (!zip.isEmpty() || !city.isEmpty()) address += '\n' + zip + " " + city;
+        if (!country.isEmpty()) address += '\n' + country;
+
+        return address;
     }
 }

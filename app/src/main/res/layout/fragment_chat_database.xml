@@ -3,9 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/chat_database_background"
     android:id="@+id/fragment"
-    tools:context=".activities.ChatDatabaseFragment">
+    tools:mContext=".activities.mainFragments.ChatDatabaseFragment">
 
     <ImageView
         android:id="@+id/background"
@@ -35,7 +34,7 @@
             android:elevation="5dp"
             tools:ignore="UselessParent">
             <TableLayout
-                android:id="@+id/expand"
+                android:id="@+id/expandable"
                 android:visibility="gone"
                 tools:visibility="visible"
                 android:layout_alignParentStart="true"
@@ -200,12 +199,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
-                android:layout_below="@id/expand"
-                android:background="@drawable/button"
-                android:paddingStart="@dimen/activity_horizontal_margin"
-                android:paddingEnd="@dimen/activity_horizontal_margin"
-                android:text="@string/database_search_button"
-                android:textColor="@color/colorAccent"/>
+                android:layout_below="@id/expandable"
+                android:text="@string/database_search_button"/>
 
             <TextView
                 android:id="@+id/database_hits"
@@ -217,7 +212,7 @@
                 android:layout_alignBottom="@id/search_button"
                 android:layout_toEndOf="@id/search_button"
                 android:layout_toStartOf="@id/expand_checkBox"
-                android:layout_below="@id/expand"
+                android:layout_below="@id/expandable"
                 android:gravity="center_vertical" />
 
             <CheckBox
@@ -227,7 +222,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_alignTop="@id/search_button"
                 android:layout_alignBottom="@id/search_button"
-                android:layout_below="@id/expand"
+                android:layout_below="@id/expandable"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
@@ -257,10 +252,12 @@
         android:layout_height="match_parent"
         android:translationY="-7dp"
         android:translationZ="-1dp"
+        android:choiceMode="singleChoice"
+        android:listSelector="#0000"
         android:layout_marginBottom="-6dp"
         android:background="@android:color/transparent"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="@dimen/message_divider"
+        android:divider="#00ffffff"
+        android:dividerHeight="0dp"
         android:scrollbarStyle="outsideInset"
         android:fastScrollAlwaysVisible="true"
         android:fastScrollEnabled="true"

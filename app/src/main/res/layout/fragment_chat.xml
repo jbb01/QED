@@ -4,9 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.ChatFragment"
+    tools:mContext=".activities.mainFragments.ChatFragment"
     android:id="@+id/fragment"
-    android:background="@color/chat_background"
     android:clipToPadding="false"
     android:clipChildren="false">
 
@@ -38,20 +37,19 @@
         android:id="@+id/messageBox"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:background="#00ffffff"
         android:divider="#00ffffff"
-        android:dividerHeight="@dimen/message_divider"
+        android:dividerHeight="0dp"
         android:clipToPadding="false"
         android:clipChildren="false"
         android:layout_above="@id/strip"
         android:layout_alignParentStart="true"
-        android:choiceMode="none"
+        android:choiceMode="singleChoice"
+        android:listSelector="#0000"
         android:transcriptMode="normal"
         android:scrollbarStyle="outsideOverlay"
         android:paddingEnd="?android:attr/scrollbarSize"
         android:visibility="gone"
         tools:visibility="visible"
-        tools:listitem="@layout/list_item_message"
         tools:ignore="RtlSymmetry" />
 
     <ProgressBar
@@ -105,7 +103,7 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
-        android:background="@color/chat_background" />
+        android:background="?android:colorBackground" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/button_send"
@@ -137,9 +135,8 @@
             android:id="@+id/scroll_down_Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:fabSize="mini"
-            app:backgroundTint="@color/floating_action_button_background"
-            app:rippleColor="@color/floating_action_button_ripple"
+            style="@style/AppTheme.FloatingActionButton"
+            android:tint="#999999"
             android:src="@drawable/ic_double_arrow_down"
             android:contentDescription="@string/chat_scroll_down_button_content_description"
             android:visibility="visible"
@@ -166,9 +163,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="3dp"
             android:src="@drawable/ic_quick_settings_name"
-            app:fabSize="mini"
-            app:backgroundTint="@color/floating_action_button_background"
-            app:rippleColor="@color/floating_action_button_ripple"/>
+            style="@style/AppTheme.FloatingActionButton"/>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/quick_settings_channel"
@@ -176,9 +171,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="3dp"
             android:src="@drawable/ic_quick_settings_channel"
-            app:fabSize="mini"
-            app:backgroundTint="@color/floating_action_button_background"
-            app:rippleColor="@color/floating_action_button_ripple"/>
+            style="@style/AppTheme.FloatingActionButton"/>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/quick_settings"
@@ -186,10 +179,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="3dp"
             android:src="@drawable/ic_drawer_settings"
-            android:tint="@color/colorAccent"
-            app:backgroundTint="@color/floating_action_button_background"
-            app:fabSize="mini"
-            app:rippleColor="@color/floating_action_button_ripple" />
+            style="@style/AppTheme.FloatingActionButton" />
 
     </LinearLayout>
 

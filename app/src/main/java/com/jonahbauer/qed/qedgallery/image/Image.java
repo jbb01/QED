@@ -11,7 +11,9 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class Image implements Serializable {
@@ -35,11 +37,10 @@ public class Image implements Serializable {
         audioFileExtensions.add("opus");
     }
 
-    public Album album;
+    public transient Album album;
     public String albumName;
     public int id;
     public String format;
-    public String thumbnailPath;
     public String path;
     public String name;
     public String owner;
@@ -47,6 +48,8 @@ public class Image implements Serializable {
     public Date creationDate;
     public boolean original;
     public boolean available;
+
+    public Map<String, String> data = new HashMap<>();
 
     public Image() {
         available = true;

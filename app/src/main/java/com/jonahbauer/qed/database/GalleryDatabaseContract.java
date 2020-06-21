@@ -25,12 +25,18 @@ final class GalleryDatabaseContract {
         static final String COLUMN_NAME_OWNER = "imageOwner";
         static final String COLUMN_NAME_ALBUM_ID = "imageAlbumId";
         static final String COLUMN_NAME_ALBUM_NAME = "imageAlbumName";
-        static final String COLUMN_NAME_THUMBNAIL_PATH = "imageThumbnailPath";
         static final String COLUMN_NAME_PATH = "imagePath";
         static final String COLUMN_NAME_FORMAT = "imageFormat";
         static final String COLUMN_NAME_UPLOAD_DATE = "imageUploadDate";
         static final String COLUMN_NAME_CREATION_DATE = "imageCreationDate";
         static final String COLUMN_NAME_IS_ORIGINAL = "imageIsOriginal";
         static final String COLUMN_NAME_ORDER = "imageOrder";
+        static final String COLUMN_NAME_DATA = "imageData";
+    }
+
+    static class ThumbEntry implements BaseColumns {
+        static final String TABLE_NAME = "thumbs";
+        static final String COLUMN_NAME_ID = "imageId";
+        static final String COLUMN_NAME_THUMBNAIL = "thumbnail";
     }
 }

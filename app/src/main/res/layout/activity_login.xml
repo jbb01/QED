@@ -9,8 +9,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:background="@color/login_background"
-    tools:context=".activities.LoginActivity">
+    tools:mContext=".activities.LoginActivity">
 
     <!-- Login progress -->
     <ProgressBar
@@ -76,13 +75,8 @@
                 android:id="@+id/username_sign_in_button"
                 android:layout_gravity="end"
                 android:gravity="center"
-                android:theme="@style/AppTheme"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:background="@drawable/button"
-                android:textColor="@color/colorAccent"
                 android:text="@string/login_action_sign_in" />
 
         </LinearLayout>

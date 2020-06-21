@@ -7,6 +7,7 @@ import androidx.annotation.Nullable;
 
 import com.jonahbauer.qed.Application;
 
+@SuppressWarnings("unused")
 public interface QEDPageReceiver<T> {
     String REASON_UNKNOWN = "unknown error";
     String REASON_NETWORK = "network error";

@@ -2,12 +2,12 @@
 <animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:drawable="@drawable/ic_checkbox_checked_to_unknown">
     <target
-        android:animation="@anim/ic_tri_checkbox_old"
+        android:animation="@animator/ic_tri_checkbox_old"
         android:name="icon_old_group"/>
     <target
-        android:animation="@anim/ic_tri_checkbox_fill"
+        android:animation="@animator/ic_tri_checkbox_fill"
         android:name="icon_fill"/>
     <target
-        android:animation="@anim/ic_tri_checkbox_change"
+        android:animation="@animator/ic_tri_checkbox_change"
         android:name="icon"/>
 </animated-vector>

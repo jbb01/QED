@@ -5,8 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/log_background"
-    tools:context=".activities.LogFragment">
+    tools:mContext=".activities.mainFragments.LogFragment">
 
     <TableLayout
         android:id="@+id/log_fragment_progress_table"
@@ -146,12 +145,14 @@
         android:id="@+id/log_message_container"
         android:background="#00ffffff"
         android:divider="#00ffffff"
+        android:listSelector="#0000"
         android:dividerHeight="@dimen/message_divider"
         android:clipToPadding="false"
         android:visibility="gone"
+        android:choiceMode="singleChoice"
         android:scrollbarStyle="outsideOverlay"
         android:fastScrollAlwaysVisible="true"
         android:fastScrollEnabled="true"
-        tools:visibility="gone"
+        tools:visibility="visible"
         tools:ignore="RtlSymmetry" />
 </RelativeLayout>

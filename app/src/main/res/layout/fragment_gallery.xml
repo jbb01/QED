@@ -5,8 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/album_background"
-    tools:context=".activities.GalleryFragment">
+    tools:mContext=".activities.mainFragments.GalleryFragment">
 
     <ProgressBar
         android:layout_alignParentTop="true"
@@ -30,7 +29,6 @@
         android:textAlignment="center"
         android:gravity="center"
         android:textSize="16sp"
-        android:background="@color/colorBackground"
         android:textColor="@color/offline_label_font"
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
@@ -39,22 +37,28 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"/>
 
-    <ListView
+    <!--
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/label_offline"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:id="@+id/gallery_list_container"
-        android:background="@color/album_background"
-        android:divider="@drawable/person_divider"
-        android:dividerHeight="@dimen/person_divider"
-        android:scrollbarStyle="outsideInset"
-        android:fastScrollAlwaysVisible="true"
-        android:fastScrollEnabled="true"
-        android:visibility="gone"
-        tools:visibility="visible"
-        tools:listitem="@layout/list_item_gallery"
-        tools:ignore="RtlSymmetry" />
+        android:layout_height="match_parent">
+    -->
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/label_offline"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:id="@+id/gallery_list_container"
+            android:scrollbarStyle="outsideInset"
+            android:fastScrollAlwaysVisible="true"
+            android:fastScrollEnabled="true"
+            android:visibility="gone"
+            tools:visibility="visible"
+            tools:listitem="@layout/list_item_gallery"
+            tools:ignore="RtlSymmetry" />
+    <!--
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+    -->
 </RelativeLayout>

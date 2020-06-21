@@ -3,9 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/person_database_background"
     android:id="@+id/fragment"
-    tools:context=".activities.PersonDatabaseFragment">
+    tools:mContext=".activities.mainFragments.PersonDatabaseFragment">
 
     <LinearLayout
         android:id="@+id/database_search_filters"
@@ -24,7 +23,7 @@
             android:elevation="5dp"
             tools:ignore="UselessParent">
             <TableLayout
-                android:id="@+id/expand"
+                android:id="@+id/expandable"
                 android:visibility="gone"
                 tools:visibility="visible"
                 android:layout_alignParentStart="true"
@@ -106,11 +105,11 @@
 
                 <ImageView
                     android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:src="@drawable/person_divider"
+                    android:layout_height="?android:attr/dividerHeight"
+                    android:src="?attr/divider"
                     android:layout_marginTop="3dp"
                     android:layout_marginBottom="3dp"
-                    android:contentDescription="@string/content_description_divider"/>
+                    tools:ignore="ContentDescription" />
 
                 <TableRow
                     android:layout_width="match_parent"
@@ -156,12 +155,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
-                android:layout_below="@id/expand"
-                android:background="@drawable/button"
-                android:paddingStart="@dimen/activity_horizontal_margin"
-                android:paddingEnd="@dimen/activity_horizontal_margin"
-                android:text="@string/database_search_button"
-                android:textColor="@color/colorAccent"/>
+                android:layout_below="@id/expandable"
+                android:text="@string/database_search_button"/>
 
             <TextView
                 android:id="@+id/database_hits"
@@ -173,7 +168,7 @@
                 android:layout_alignBottom="@id/search_button"
                 android:layout_toEndOf="@id/search_button"
                 android:layout_toStartOf="@id/expand_checkBox"
-                android:layout_below="@id/expand"
+                android:layout_below="@id/expandable"
                 android:gravity="center_vertical" />
 
             <CheckBox
@@ -183,7 +178,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_alignTop="@id/search_button"
                 android:layout_alignBottom="@id/search_button"
-                android:layout_below="@id/expand"
+                android:layout_below="@id/expandable"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
@@ -216,8 +211,6 @@
         android:translationZ="-1dp"
         android:layout_marginBottom="-6dp"
         android:background="@android:color/transparent"
-        android:divider="@drawable/person_divider"
-        android:dividerHeight="@dimen/person_divider"
         android:scrollbarStyle="outsideInset"
         android:fastScrollAlwaysVisible="true"
         android:fastScrollEnabled="true"

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.jonahbauer.qed.layoutStuff.MathView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/message_message_math"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:textAppearance="@style/AppTheme.TextAppearance.Message.Message"
+    android:clickable="false"
+    android:focusable="false"
+    android:visibility="gone"
+    tools:text="Musternachricht             "/>

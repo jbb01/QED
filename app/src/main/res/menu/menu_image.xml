@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <group>
+        <item
+            android:id="@+id/image_download_original"
+            android:title="@string/image_download_original"
+            app:showAsAction="never"/>
+        <item
+            android:id="@+id/image_open_with"
+            android:title="@string/image_open_with"
+            app:showAsAction="never"/>
+        <item
+            android:id="@+id/image_info"
+            android:title="@string/image_info"
+            app:showAsAction="never"/>
+    </group>
+</menu>

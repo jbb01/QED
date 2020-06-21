@@ -15,7 +15,6 @@
         android:id="@+id/gallery_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:backgroundTint="@color/album_background"
         android:orientation="vertical"
         android:elevation="1dp"
         tools:ignore="UselessParent">
@@ -42,10 +41,7 @@
             android:layout_height="wrap_content"
             android:layout_toEndOf="@id/gallery_icon"
             android:layout_alignParentTop="true"
-            android:gravity="start"
-            android:textColor="@color/album_list_text"
-            android:textSize="@dimen/gallery_name_size"
-            android:textStyle="bold"
+            style="?attr/textAppearanceListItemSecondary"
             android:paddingTop="14sp"
             android:paddingBottom="14sp"
             tools:text="Akademie 2018"/>

@@ -1,20 +1,17 @@
 package com.jonahbauer.qed.networking;
 
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
 import com.jonahbauer.qed.Application;
-import com.jonahbauer.qed.activities.LoginActivity;
 import com.jonahbauer.qed.networking.login.InvalidCredentialsException;
 import com.jonahbauer.qed.networking.login.QEDLogin;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.ref.SoftReference;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,42 +19,45 @@ import java.util.Map;
 import javax.net.ssl.HttpsURLConnection;
 
 public class AsyncLoadQEDPageToStream extends AsyncTask<Void, Long, Boolean> {
-    private OutputStream outputStream;
-    private InputStream in;
-    private Feature feature;
-    private String url;
-    private QEDPageStreamReceiver receiver;
-    private String tag;
-    private static Map<String, String> credentials;
+    private InputStream mIn;
 
-    private Application application;
+    private final Feature mFeature;
+    private final String mUrl;
+    private final QEDPageStreamReceiver mReceiver;
+    private final String mTag;
+    private final OutputStream mOutputStream;
 
-    public static boolean forcedLogin;
+    private final Map<String,String> mCookies;
 
-    static {
-        credentials = new HashMap<>();
-    }
 
+    /**
+     * Loads the website from url to the provided {@code OutputStream}. The url might contain the wildcards "{\@userid}", "{\@pwhash}", "{\@sessionid}", "{\@sessionid2}"
+     *
+     * @param feature the type of the qed website to be loaded, used to choose correct form of authentication
+     * @param url the url of the qed website
+     * @param receiver a receiver that will receive the relevant data collected by {@code postExecute} or an error message
+     * @param tag a string tag used when calling receiver methods
+     * @param outputStream the target to which the page will be forwarded
+     */
     AsyncLoadQEDPageToStream(@NonNull Feature feature, @NonNull String url, @NonNull QEDPageStreamReceiver receiver, String tag, @NonNull OutputStream outputStream) {
-        this.feature = feature;
-        this.url = url;
-        this.receiver = receiver;
-        this.tag = tag;
-        this.outputStream = outputStream;
+        if (feature == Feature.DATABASE) throw new Feature.FeatureNotSupportedException();
 
-        SoftReference<Application> applicationReference = Application.getApplicationReference();
-        application = applicationReference.get();
+        this.mFeature = feature;
+        this.mUrl = url;
+        this.mReceiver = receiver;
+        this.mTag = tag;
+        this.mOutputStream = outputStream;
+
+        this.mCookies = new HashMap<>();
+        QEDLogin.addCookies(feature, mCookies);
     }
 
 
     @Override
     protected Boolean doInBackground(Void... voids) {
-//        if (!dataAvailable(feature)) {
-//    if (!login()) return false;
-//    else if (!dataAvailable(feature)) throw new AssertionError();
-//}
-
         try {
+            QEDLogin.ensureDataAvailable(mFeature);
+
             HttpsURLConnection httpsURLConnection = createConnection();
             if (isCancelled()) return false;
             httpsURLConnection.connect();
@@ -67,54 +67,37 @@ public class AsyncLoadQEDPageToStream extends AsyncTask<Void, Long, Boolean> {
             if (loginError) {
                 httpsURLConnection.disconnect();
 
-                if (login()) {
-                    httpsURLConnection = createConnection();
-                    if (isCancelled()) return false;
-                    httpsURLConnection.connect();
+                QEDLogin.login(mFeature);
+                httpsURLConnection = createConnection();
+                if (isCancelled()) return false;
+                httpsURLConnection.connect();
 
-                    location = httpsURLConnection.getHeaderField("Location");
-                    loginError = location != null && location.startsWith("account");
-                    if (loginError)
-                        throw new InvalidCredentialsException(null);
-
-                    in = httpsURLConnection.getInputStream();
-                    try {
-                        copyStream(in, outputStream, httpsURLConnection.getContentLength());
-                    } catch (IOException e) {
-                        receiver.onError(tag, null, e);
-                        return false;
-                    }
-                    in.close();
-                    outputStream.close();
-
-                    httpsURLConnection.disconnect();
-
-                    return true;
-                } else {
-                    return false;
-                }
+                location = httpsURLConnection.getHeaderField("Location");
+                loginError = location != null && location.startsWith("account");
+                if (loginError)
+                    throw new InvalidCredentialsException(null);
             }
 
-            in = httpsURLConnection.getInputStream();
+            mIn = httpsURLConnection.getInputStream();
             try {
-                copyStream(in, outputStream, httpsURLConnection.getContentLength());
+                copyStream(mIn, mOutputStream, httpsURLConnection.getContentLength());
             } catch (IOException e) {
-                receiver.onError(tag, null, e);
+                mReceiver.onError(mTag, null, e);
                 return false;
             }
-            in.close();
-            outputStream.close();
+            mIn.close();
+            mOutputStream.close();
 
             httpsURLConnection.disconnect();
 
             return true;
-        } catch (IOException e) {
+        } catch (IOException | NoNetworkException e) {
             Log.e(Application.LOG_TAG_ERROR, e.getMessage(), e);
-            receiver.onError(tag, null, e);
+            mReceiver.onError(mTag, QEDPageReceiver.REASON_NETWORK, e);
             return false;
         } catch (InvalidCredentialsException e) {
             Log.e(Application.LOG_TAG_ERROR, e.getMessage(), e);
-            forceLogin();
+            mReceiver.onError(mTag, QEDPageReceiver.REASON_UNABLE_TO_LOG_IN, e);
             return false;
         }
     }
@@ -122,164 +105,27 @@ public class AsyncLoadQEDPageToStream extends AsyncTask<Void, Long, Boolean> {
     @Override
     protected void onPostExecute(Boolean b) {
         if (b != null && b)
-            receiver.onPageReceived(tag, null);
+            mReceiver.onPageReceived(mTag);
     }
 
     @Override
     protected void onProgressUpdate(Long... values) {
-        receiver.onProgressUpdate(tag, values[0], values[1]);
+        mReceiver.onProgressUpdate(mTag, values[0], values[1]);
     }
 
+    @NonNull
     private HttpsURLConnection createConnection() throws IOException {
-        ensureCredentialAvailability();
-        HttpsURLConnection httpsURLConnection = (HttpsURLConnection) (new URL(formatString(url, feature)).openConnection());
+        HttpsURLConnection httpsURLConnection = (HttpsURLConnection) (new URL(QEDLogin.formatString(mFeature, mUrl)).openConnection());
         httpsURLConnection.setRequestMethod("GET");
         httpsURLConnection.setDoInput(true);
         httpsURLConnection.setInstanceFollowRedirects(false);
         httpsURLConnection.setUseCaches(false);
-
-        StringBuilder cookieStringBuilder = new StringBuilder();
-        switch (feature) {
-            case CHAT:
-                cookieStringBuilder
-                        .append("userid=").append(credentials.get(Application.KEY_USERID))
-                        .append("; pwhash=").append(credentials.get(Application.KEY_CHAT_PWHASH))
-                        .append(";");
-                break;
-            case GALLERY:
-                cookieStringBuilder
-                        .append("userid=").append(credentials.get(Application.KEY_USERID))
-                        .append("; pwhash=").append(credentials.get(Application.KEY_GALLERY_PWHASH))
-                        .append("; phpsessid=").append(credentials.get(Application.KEY_GALLERY_PHPSESSID))
-                        .append(";");
-                break;
-        }
-
-        httpsURLConnection.setRequestProperty("Cookie", cookieStringBuilder.toString());
+        httpsURLConnection.setRequestProperty("Cookie", QEDLogin.loadCookies(mFeature, mCookies));
 
         return httpsURLConnection;
     }
 
-    private void ensureCredentialAvailability() {
-        String userId, pwHash, phpSessionId;
-        switch (feature) {
-            case CHAT:
-                userId = credentials.getOrDefault(Application.KEY_USERID, null);
-                if (userId == null) {
-                    userId = application.loadData(Application.KEY_USERID, false);
-                    credentials.put(Application.KEY_USERID, userId);
-                }
-
-                pwHash = credentials.getOrDefault(Application.KEY_CHAT_PWHASH, null);
-                if (pwHash == null) {
-                    pwHash = application.loadData(Application.KEY_CHAT_PWHASH, true);
-                    credentials.put(Application.KEY_CHAT_PWHASH, pwHash);
-                }
-                break;
-            case GALLERY:
-                userId = credentials.getOrDefault(Application.KEY_USERID, null);
-                if (userId == null) {
-                    userId = application.loadData(Application.KEY_USERID, false);
-                    credentials.put(Application.KEY_USERID, userId);
-                }
-
-                phpSessionId = credentials.getOrDefault(Application.KEY_GALLERY_PHPSESSID, null);
-                if (phpSessionId == null) {
-                    phpSessionId = application.loadData(Application.KEY_GALLERY_PHPSESSID, true);
-                    credentials.put(Application.KEY_GALLERY_PHPSESSID, phpSessionId);
-                }
-
-                pwHash = credentials.getOrDefault(Application.KEY_GALLERY_PWHASH, null);
-                if (pwHash == null) {
-                    pwHash = application.loadData(Application.KEY_GALLERY_PWHASH, true);
-                    credentials.put(Application.KEY_GALLERY_PWHASH, pwHash);
-                }
-                break;
-        }
-    }
-
-    @SuppressWarnings("RegExpRedundantEscape")
-    private String formatString(String string, Feature feature) {
-        String userId, pwHash, phpSessionId;
-        String out = string;
-        switch (feature) {
-            case CHAT:
-                userId = credentials.getOrDefault(Application.KEY_USERID, null);
-                if (userId == null) {
-                    userId = application.loadData(Application.KEY_USERID, false);
-                    credentials.put(Application.KEY_USERID, userId);
-                }
-
-                pwHash = credentials.getOrDefault(Application.KEY_CHAT_PWHASH, null);
-                if (pwHash == null) {
-                    pwHash = application.loadData(Application.KEY_CHAT_PWHASH, true);
-                    credentials.put(Application.KEY_CHAT_PWHASH, pwHash);
-                }
-
-                out = string.replaceAll("\\{\\@userid\\}", userId).replaceAll("\\{\\@pwhash\\}", pwHash);
-                break;
-            case GALLERY:
-                userId = credentials.getOrDefault(Application.KEY_USERID, null);
-                if (userId == null) {
-                    userId = application.loadData(Application.KEY_USERID, false);
-                    credentials.put(Application.KEY_USERID, userId);
-                }
-
-                phpSessionId = credentials.getOrDefault(Application.KEY_GALLERY_PHPSESSID, null);
-                if (phpSessionId == null) {
-                    phpSessionId = application.loadData(Application.KEY_GALLERY_PHPSESSID, true);
-                    credentials.put(Application.KEY_GALLERY_PHPSESSID, phpSessionId);
-                }
-
-                pwHash = credentials.getOrDefault(Application.KEY_GALLERY_PWHASH, null);
-                if (pwHash == null) {
-                    pwHash = application.loadData(Application.KEY_GALLERY_PWHASH, true);
-                    credentials.put(Application.KEY_GALLERY_PWHASH, pwHash);
-                }
-
-                out = string.replaceAll("\\{\\@userid\\}", userId).replaceAll("\\{\\@phpsessid\\}", phpSessionId).replaceAll("\\{\\@pwhash\\}", pwHash);
-                break;
-        }
-
-        return out;
-    }
-
-    private boolean login() {
-        credentials = new HashMap<>();
-        try {
-            switch (feature) {
-                case CHAT:
-                    QEDLogin.loginChat();
-                    break;
-                case GALLERY:
-                    QEDLogin.loginGallery();
-                    break;
-            }
-        } catch (NoNetworkException e) {
-            Log.e(Application.LOG_TAG_ERROR, e.getMessage(), e);
-            receiver.onError(tag, QEDPageReceiver.REASON_NETWORK, e);
-            return false;
-        } catch (InvalidCredentialsException e) {
-            Log.e(Application.LOG_TAG_ERROR, e.getMessage(), e);
-            forceLogin();
-            return false;
-        }
-        return true;
-    }
-
-    private void forceLogin() {
-        if (!forcedLogin) {
-            forcedLogin = true;
-            Intent intent = new Intent(application, LoginActivity.class);
-            intent.putExtra(LoginActivity.DONT_START_MAIN, true);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            application.startActivity(intent);
-        }
-        cancel(true);
-        receiver.onError(tag, QEDPageReceiver.REASON_UNABLE_TO_LOG_IN, null);
-    }
-
-    private void copyStream(InputStream in, OutputStream out, long contentLength) throws IOException {
+    private void copyStream(@NonNull InputStream in, @NonNull OutputStream out, long contentLength) throws IOException {
         byte[] buffer = new byte[4 * 1024]; // 4 kilobyte
         long count = 0;
         int n;
@@ -298,16 +144,12 @@ public class AsyncLoadQEDPageToStream extends AsyncTask<Void, Long, Boolean> {
     @Override
     protected void onCancelled() {
         try {
-            if (outputStream != null)
-                outputStream.close();
-            if (in != null)
-                in.close();
+            if (mOutputStream != null)
+                mOutputStream.close();
+            if (mIn != null)
+                mIn.close();
         } catch (IOException e) {
             Log.e(Application.LOG_TAG_ERROR, e.getMessage(), e);
         }
-    }
-
-    public enum Feature {
-        CHAT, GALLERY
     }
 }

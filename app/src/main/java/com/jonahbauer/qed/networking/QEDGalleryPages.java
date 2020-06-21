@@ -1,5 +1,6 @@
 package com.jonahbauer.qed.networking;
 
+import android.annotation.SuppressLint;
 import android.net.Uri;
 import android.os.AsyncTask;
 
@@ -33,7 +34,7 @@ public abstract class QEDGalleryPages {
     private static final ThreadPoolExecutor imageTpe = (ThreadPoolExecutor) Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     @Nullable
-    public static AsyncTask getAlbumList(String tag, QEDPageReceiver<List<Album>> albumListReceiver) {
+    public static AsyncTask<?, ?, ?> getAlbumList(String tag, QEDPageReceiver<List<Album>> albumListReceiver) {
         SoftReference<Application> applicationReference = Application.getApplicationReference();
         Application application = applicationReference.get();
 
@@ -43,7 +44,7 @@ public abstract class QEDGalleryPages {
         }
 
         AsyncLoadQEDPage<List<Album>> list = new AsyncLoadQEDPage<>(
-                AsyncLoadQEDPage.Feature.GALLERY,
+                Feature.GALLERY,
                 application.getString(R.string.gallery_server_list),
                 albumListReceiver,
                 tag,
@@ -71,7 +72,7 @@ public abstract class QEDGalleryPages {
     }
 
     @Nullable
-    public static AsyncTask getAlbum(String tag, @NonNull Album album, @Nullable Map<Filter, String> filters, QEDPageReceiver<Album> albumReceiver) {
+    public static AsyncTask<?,?,?> getAlbum(String tag, @NonNull Album album, @Nullable Map<Filter, String> filters, QEDPageReceiver<Album> albumReceiver) {
         SoftReference<Application> applicationReference = Application.getApplicationReference();
         Application application = applicationReference.get();
 
@@ -86,14 +87,14 @@ public abstract class QEDGalleryPages {
         if (filters != null) {
             filtersUsed = !filters.keySet().isEmpty();
             for (Filter filter : filters.keySet()) {
-                filterStringBuilder.append(filter.query).append(filters.getOrDefault(filter,""));
+                filterStringBuilder.append(filter.mQuery).append(filters.getOrDefault(filter,""));
             }
         } else {
             filtersUsed = false;
         }
 
         AsyncLoadQEDPage<Album> albumPage = new AsyncLoadQEDPage<>(
-                AsyncLoadQEDPage.Feature.GALLERY,
+                Feature.GALLERY,
                 application.getString(R.string.gallery_server_album) + album.id + filterStringBuilder.toString(),
                 albumReceiver,
                 tag,
@@ -174,24 +175,24 @@ public abstract class QEDGalleryPages {
         return albumPage;
     }
 
-    public static AsyncTask getImageInfo(String tag, int imageId, QEDPageReceiver<Image> imageQEDPageReceiver) {
+    public static AsyncTask<?,?,?> getImageInfo(String tag, int imageId, QEDPageReceiver<Image> imageQEDPageReceiver) {
         Image image = new Image();
         image.id = imageId;
         return getImageInfo(tag, image, imageQEDPageReceiver);
     }
 
     @Nullable
-    public static AsyncTask getImageInfo(String tag, @NonNull Image image, QEDPageReceiver<Image> imageInfoReceiver) {
+    public static AsyncTask<?,?,?> getImageInfo(String tag, @NonNull Image image, QEDPageReceiver<Image> imageInfoReceiver) {
         SoftReference<Application> applicationReference = Application.getApplicationReference();
         Application application = applicationReference.get();
 
         if (application == null) {
-            imageInfoReceiver.onError(tag, "", new Exception("Application is null!"));
+            imageInfoReceiver.onError(tag, "", new NullPointerException("Application is null!"));
             return null;
         }
 
         AsyncLoadQEDPage<Image> info = new AsyncLoadQEDPage<>(
-                AsyncLoadQEDPage.Feature.GALLERY,
+                Feature.GALLERY,
                 application.getString(R.string.gallery_server_image_info) + image.id,
                 imageInfoReceiver,
                 tag,
@@ -201,26 +202,68 @@ public abstract class QEDGalleryPages {
                         String group1 = matcher.group(1);
                         String group2 = matcher.group(2);
 
-                        if (group1 != null) switch (group1) {
-                            case "Album":
-                                image.albumName = group2;
-                                break;
-                            case "Besitzer":
-                                image.owner = group2;
-                                break;
-                            case "Dateiformat":
-                                image.format = group2;
-                                break;
-                            case "Hochgeladen am":
-                                try {
-                                    image.uploadDate = group2 != null ? simpleDateFormat.parse(group2) : null;
-                                } catch (ParseException ignored) {}
-                                break;
-                            case "Aufgenommen am":
-                                try {
-                                    image.creationDate = group2 != null ? simpleDateFormat.parse(group2) : null;
-                                } catch (ParseException ignored) {}
-                                break;
+                        if (group1 != null) {
+                            switch (group1) {
+                                case "Album":
+                                    image.albumName = group2;
+                                    image.data.put(String.valueOf(R.string.image_info_album), group2);
+                                    break;
+                                case "Besitzer":
+                                    image.owner = group2;
+                                    image.data.put(String.valueOf(R.string.image_info_owner), group2);
+                                    break;
+                                case "Dateiformat":
+                                    image.data.put(String.valueOf(R.string.image_info_format), group2);
+                                    image.format = group2;
+                                    break;
+                                case "Hochgeladen am":
+                                    image.data.put(String.valueOf(R.string.image_info_upload_date), group2);
+                                    try {
+                                        image.uploadDate = group2 != null ? simpleDateFormat.parse(group2) : null;
+                                    } catch (ParseException ignored) {}
+                                    break;
+                                case "Aufgenommen am":
+                                    image.data.put(String.valueOf(R.string.image_info_creation_date), group2);
+                                    try {
+                                        image.creationDate = group2 != null ? simpleDateFormat.parse(group2) : null;
+                                    } catch (ParseException ignored) {}
+                                    break;
+                                case "Orientierung":
+                                    image.data.put(String.valueOf(R.string.image_info_orientation), group2);
+                                    break;
+                                case "Kamerahersteller":
+                                    image.data.put(String.valueOf(R.string.image_info_camera_manufacturer), group2);
+                                    break;
+                                case "Kameramodel":
+                                    image.data.put(String.valueOf(R.string.image_info_camera_model), group2);
+                                    break;
+                                case "Brennweite":
+                                    image.data.put(String.valueOf(R.string.image_info_focal_length), group2);
+                                    break;
+                                case "Blendenzahl":
+                                    image.data.put(String.valueOf(R.string.image_info_focal_ratio), group2);
+                                    break;
+                                case "ISO-Wert":
+                                    image.data.put(String.valueOf(R.string.image_info_iso), group2);
+                                    break;
+                                case "Belichtungszeit":
+                                    image.data.put(String.valueOf(R.string.image_info_exposure_time), group2);
+                                    break;
+                                case "Blitz benutzt":
+                                    image.data.put(String.valueOf(R.string.image_info_flash), group2);
+                                    break;
+                                case "Anzahl der Aufrufe":
+                                case "Anzahl der Anrufe": // TODO remove if typo (?) in gallery is removed
+                                    image.data.put(String.valueOf(R.string.image_info_number_of_calls), group2);
+                                    break;
+                                case "Koordiante": // TODO remove if typo in gallery is removed
+                                case "Koordinate":
+                                    image.data.put(String.valueOf(R.string.image_info_position), group2);
+                                    break;
+                                default:
+                                    image.data.put(group1.trim(), group2 != null ? group2.trim() : "null");
+                                    break;
+                            }
                         }
                     }
 
@@ -238,7 +281,7 @@ public abstract class QEDGalleryPages {
     }
 
     @Nullable
-    public static AsyncTask getImage(String tag, @NonNull Image image, @NonNull Mode mode, @NonNull OutputStream outputStream, QEDPageStreamReceiver imageReceiver) {
+    public static AsyncTask<?,?,?> getImage(String tag, @NonNull Image image, @NonNull Mode mode, @NonNull OutputStream outputStream, QEDPageStreamReceiver imageReceiver) {
         SoftReference<Application> applicationReference = Application.getApplicationReference();
         Application application = applicationReference.get();
 
@@ -247,9 +290,9 @@ public abstract class QEDGalleryPages {
             return null;
         }
 
-        AsyncLoadQEDPageToStream async = new AsyncLoadQEDPageToStream(
-                AsyncLoadQEDPageToStream.Feature.GALLERY,
-                String.format(application.getString(R.string.gallery_server_image), mode.query, String.valueOf(image.id)),
+        @SuppressLint("StringFormatMatches") AsyncLoadQEDPageToStream async = new AsyncLoadQEDPageToStream(
+                Feature.GALLERY,
+                String.format(application.getString(R.string.gallery_server_image), mode.mQuery, image.id),
                 imageReceiver,
                 tag,
                 outputStream
@@ -267,20 +310,20 @@ public abstract class QEDGalleryPages {
     public enum Filter {
         BY_DATE("&byday="), BY_PERSON("&byowner="), BY_CATEGORY("&bycategory=");
 
-        private final String query;
+        private final String mQuery;
 
         Filter(String query) {
-            this.query = query;
+            this.mQuery = query;
         }
     }
 
     public enum Mode {
         THUMBNAIL("thumbnail"), NORMAL("normal"), ORIGINAL("original");
 
-        private final String query;
+        private final String mQuery;
 
         Mode(String query) {
-            this.query = query;
+            this.mQuery = query;
         }
     }
 }

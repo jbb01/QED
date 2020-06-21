@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.util.Log;
 import android.util.LongSparseArray;
 
 import androidx.core.app.NotificationCompat;
@@ -22,13 +21,12 @@ import java.util.Random;
 import static com.jonahbauer.qed.Application.NOTIFICATION_CHANNEL_ID;
 
 public class DownloadBroadcastReceiver extends BroadcastReceiver {
-    private static final LongSparseArray<Integer> downloadNotifications = new LongSparseArray<>();
-    private static final Random random = new Random();
+    private static final LongSparseArray<Integer> sDownloadNotifications = new LongSparseArray<>();
+    private static final Random sRandom = new Random();
 
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (intent != null) Log.d(Application.LOG_TAG_DEBUG, "intent: " + intent);
         if (intent != null && DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(intent.getAction())) {
             final long id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
 
@@ -55,7 +53,7 @@ public class DownloadBroadcastReceiver extends BroadcastReceiver {
             } else {
                 // when app is in background or no receiver is present (e.g. when fragment no longer visible) -> show notification
                 Application.createNotificationChannel(context);
-                showNotification(context, id, cursor);
+                showNotification(context, id);
             }
         } else if (intent != null && DownloadManager.ACTION_NOTIFICATION_CLICKED.equals(intent.getAction())) {
             final long[] ids = intent.getLongArrayExtra(DownloadManager.EXTRA_NOTIFICATION_CLICK_DOWNLOAD_IDS);
@@ -94,7 +92,7 @@ public class DownloadBroadcastReceiver extends BroadcastReceiver {
         }
     }
 
-    private static void showNotification(Context context, long downloadId, Cursor download) {
+    private static void showNotification(Context context, long downloadId) {
         Intent intent = new Intent(
                 DeepLinkingActivity.QEDIntent.ACTION_SHOW,
                 // TODO generify
@@ -113,15 +111,15 @@ public class DownloadBroadcastReceiver extends BroadcastReceiver {
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
 
-        int notificationId = random.nextInt();
-        downloadNotifications.put(downloadId, notificationId);
+        int notificationId = sRandom.nextInt();
+        sDownloadNotifications.put(downloadId, notificationId);
 
         notificationManager.notify(notificationId, notificationBuilder.build());
     }
 
     public static void cancelNotification(Context context, long downloadId) {
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
-        Integer notificationId = downloadNotifications.get(downloadId, -1);
+        Integer notificationId = sDownloadNotifications.get(downloadId, -1);
         if (notificationId != null && notificationId != -1)
             notificationManager.cancel(notificationId);
     }

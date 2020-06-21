@@ -15,7 +15,6 @@
         android:id="@+id/person_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:backgroundTint="@color/event_database_background"
         android:orientation="vertical"
         android:elevation="1dp"
         tools:ignore="UselessParent">
@@ -42,10 +41,7 @@
             android:layout_height="wrap_content"
             android:layout_toEndOf="@id/event_icon"
             android:layout_alignParentTop="true"
-            android:gravity="start"
-            android:textColor="@color/event_database_text"
-            android:textSize="@dimen/event_name_size"
-            android:textStyle="bold"
+            style="?attr/textAppearanceListItemSecondary"
             tools:text="Akademie 2018"/>
 
         <TextView
@@ -55,9 +51,7 @@
             android:layout_toEndOf="@id/event_icon"
             android:layout_alignParentEnd="true"
             android:layout_below="@id/event_name"
-            android:gravity="start"
-            android:textColor="@color/event_database_time"
-            android:textSize="@dimen/event_time_size"
+            style="?attr/textAppearanceListItemSmall"
             tools:text="25.08.2018 - 03.09.2018"/>
     </RelativeLayout>
 </RelativeLayout>
