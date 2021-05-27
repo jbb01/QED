@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:labelFor="@id/log_dialog_daterecent_editText"
-        android:text="@string/log_dialog_daterecent_before" />
+        android:text="@string/log_request_daterecent_before" />
 
     <EditText
         android:paddingTop="@dimen/activity_vertical_margin"
@@ -43,6 +43,6 @@
         android:layout_height="wrap_content"
         android:layout_alignBottom="@id/log_dialog_daterecent_before"
         android:layout_alignParentEnd="true"
-        android:text="@string/log_dialog_daterecent_after" />
+        android:text="@string/log_request_daterecent_after" />
 
 </RelativeLayout>

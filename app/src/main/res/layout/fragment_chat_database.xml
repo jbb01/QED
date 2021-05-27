@@ -6,17 +6,6 @@
     android:id="@+id/fragment"
     tools:mContext=".activities.mainFragments.ChatDatabaseFragment">
 
-    <ImageView
-        android:id="@+id/background"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentBottom="true"
-        android:translationZ="-1dp"
-        android:contentDescription="@string/background"/>
-
     <LinearLayout
         android:id="@+id/database_search_filters"
         android:layout_alignParentTop="true"

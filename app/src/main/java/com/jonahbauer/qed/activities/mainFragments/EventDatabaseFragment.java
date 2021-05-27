@@ -15,10 +15,11 @@ import androidx.fragment.app.FragmentManager;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.eventSheet.EventBottomSheet;
 import com.jonahbauer.qed.activities.eventSheet.EventSideSheet;
+import com.jonahbauer.qed.model.Event;
+import com.jonahbauer.qed.model.adapter.EventAdapter;
 import com.jonahbauer.qed.networking.QEDDBPages;
-import com.jonahbauer.qed.networking.QEDPageReceiver;
-import com.jonahbauer.qed.qeddb.event.Event;
-import com.jonahbauer.qed.qeddb.event.EventAdapter;
+import com.jonahbauer.qed.networking.Reason;
+import com.jonahbauer.qed.networking.async.QEDPageReceiver;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +51,7 @@ public class EventDatabaseFragment extends QEDFragment implements QEDPageReceive
         mSearchProgress.setVisibility(View.VISIBLE);
         mErrorLabel.setVisibility(View.GONE);
         mEventListView.setVisibility(View.GONE);
-        QEDDBPages.getEventList(getClass().toString(), this);
+        QEDDBPages.getEventList(this);
     }
 
     @Override
@@ -65,26 +66,22 @@ public class EventDatabaseFragment extends QEDFragment implements QEDPageReceive
                 -> showBottomSheetDialogFragment(Objects.requireNonNull(mEventAdapter.getItem((int) id))));
     }
 
-    private void showBottomSheetDialogFragment(long eventId) {
+    private void showBottomSheetDialogFragment(@NonNull Event event) {
         FragmentManager fragmentManager = getParentFragmentManager();
 
         int orientation = getResources().getConfiguration().orientation;
 
         if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-            EventBottomSheet eventBottomSheet = EventBottomSheet.newInstance(eventId);
+            EventBottomSheet eventBottomSheet = EventBottomSheet.newInstance(event);
             eventBottomSheet.show(fragmentManager, eventBottomSheet.getTag());
         } else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            EventSideSheet eventSideSheet = EventSideSheet.newInstance(eventId);
+            EventSideSheet eventSideSheet = EventSideSheet.newInstance(event);
             eventSideSheet.show(fragmentManager, eventSideSheet.getTag());
         }
     }
 
-    private void showBottomSheetDialogFragment(@NonNull Event event) {
-        this.showBottomSheetDialogFragment(event.id);
-    }
-
     @Override
-    public void onPageReceived(String tag, List<Event> events) {
+    public void onPageReceived(List<Event> events) {
         mEventAdapter.clear();
         mEventAdapter.addAll(events);
         mEventAdapter.notifyDataSetChanged();
@@ -98,15 +95,15 @@ public class EventDatabaseFragment extends QEDFragment implements QEDPageReceive
     }
 
     @Override
-    public void onError(String tag, String reason, Throwable cause) {
-        QEDPageReceiver.super.onError(tag, reason, cause);
+    public void onError(List<Event> events, String reason, Throwable cause) {
+        QEDPageReceiver.super.onError(events, reason, cause);
 
         final String errorString;
 
-        if (REASON_NETWORK.equals(reason)) {
+        if (Reason.NETWORK.equals(reason)) {
             errorString = getString(R.string.database_offline);
         } else {
-            errorString = getString(R.string.unknown_error);
+            errorString = getString(R.string.error_unknown);
         }
 
         setError(errorString);

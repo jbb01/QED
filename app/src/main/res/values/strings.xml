@@ -1,28 +1,7 @@
 <resources>
     <!-- Servers -->
-    <string name="chat_server_ping" translatable="false">chat.qed-verein.de</string>
-    <string name="chat_server_login" translatable="false">https://chat.qed-verein.de/rubychat/account</string>
-    <string name="chat_server_history" translatable="false">https://chat.qed-verein.de/rubychat/history</string>
-    <string name="chat_websocket" translatable="false">wss://chat.qed-verein.de/websocket</string>
-    <string name="chat_version" translatable="false">20171030131648</string>
-
-    <string name="database_server_login" translatable="false">https://www.qeddb.qed-verein.de/</string>
-    <string name="database_server_person" translatable="false">https://www.qeddb.qed-verein.de/person.php?session_id2={@sessionid2}&amp;person=%s&amp;tab=%s</string>
-    <string name="database_server_persons" translatable="false">https://www.qeddb.qed-verein.de/personen.php?session_id2={@sessionid2}&amp;tables_weitere_daten=1</string>
-    <string name="database_server_events" translatable="false">https://www.qeddb.qed-verein.de/veranstaltungen.php?session_id2={@sessionid2}</string>
-    <string name="database_server_event" translatable="false">https://www.qeddb.qed-verein.de/veranstaltung.php?session_id2={@sessionid2}&amp;veranstaltung=%s&amp;tab=%s</string>
-    <string name="database_server_event_sign_up" translatable="false">https://www.qeddb.qed-verein.de/veranstaltung.php?session_id2={@sessionid2}&amp;anmeldung_veranstaltung=%s</string>
-
-    <string name="gallery_server_list" translatable="false">https://qedgallery.qed-verein.de/album_list.php</string>
-    <string name="gallery_server_album" translatable="false">https://qedgallery.qed-verein.de/album_view.php?page=0&amp;albumid=</string>
-    <string name="gallery_server_login" translatable="false">https://qedgallery.qed-verein.de/account.php</string>
-    <string name="gallery_server_main" translatable="false">https://qedgallery.qed-verein.de/</string>
-    <string name="gallery_server_image_info" translatable="false">https://qedgallery.qed-verein.de/image_view.php?imageid=</string>
-    <string name="gallery_server_image" translatable="false">https://qedgallery.qed-verein.de/image.php?type=%s&amp;imageid=%s</string>
-
     <string name="github_project" translatable="false">https://github.com/jbb01/QED</string>
     <string name="github_project_issue_tracker" translatable="false">https://github.com/jbb01/QED/issues/new</string>
-
 
     <string name="view_pager_bottom_sheet_behavior" translatable="false">com.jonahbauer.qed.layoutStuff.viewPagerBottomSheet.ViewPagerBottomSheetBehavior</string>
     <string name="view_pager_side_sheet_behavior" translatable="false">com.jonahbauer.qed.layoutStuff.viewPagerSideSheet.ViewPagerSideSheetBehavior</string>
@@ -31,19 +10,25 @@
     <string name="app_name">QED</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="delete">Delete</string>
+
     <string name="no_internet">Something went wrong. Please check your network connection.</string>
     <string name="notQED">This app is not related to the Quod Erat Demonstrandum e.V. in any official way.</string>
     <string name="content_description_icon">Icon</string>
-    <string name="background">background</string>
+
     <string name="error">Error!</string>
+    <string name="error_unknown">An unknown error occurred.</string>
+    <string name="error_login">Unable to log in.</string>
+    <string name="error_network">A network error occurred.</string>
+    <string name="error_404">Requested resource could not be found.</string>
+    <string name="error_user">Error in Layer 8</string>
+
     <string name="info">Details</string>
-    <string name="yes">Yes</string>
-    <string name="no">No</string>
     <string name="offline_mode">Offline-Mode</string>
     <string name="offline_mode_not_available">Not available in offline mode.</string>
     <string name="thumbnail">thumbnail</string>
-    <string name="unknown_error">An unknown error occurred.</string>
-    <string name="delete">Delete</string>
     <string name="double_back_to_exit_toast">Press again to exit</string>
     <string name="login_failed_switching_to_offline">Login failed.</string>
     <string name="cant_connect">No Internet Connection.</string>
@@ -128,6 +113,8 @@
     <string name="persons_database_sort">Order By</string>
     <string name="persons_database_sort_first_name">First Name</string>
     <string name="persons_database_sort_last_name">Last Name</string>
+    <string name="persons_database_inactive">(inactive)</string>
+    <string name="persons_database_non_member">(no member)</string>
     <!-- Events Database Fragment -->
     <string name="title_fragment_events_database">Events</string>
 
@@ -150,6 +137,9 @@
     <string name="event_subtitle_cost">Costs</string>
     <string name="event_subtitle_max_members">Maximum Number of Participants</string>
     <string name="event_subtitle_hotel">Venue</string>
+    <string name="event_subtitle_hotel_address">Venue Address</string>
+    <string name="event_subtitle_mail_orga">Email Organizers</string>
+    <string name="event_subtitle_mail_all">Email Participants</string>
     <string name="event_subtitle_orga">Orga</string>
     <string name="event_sign_up">Sign Up</string>
     <string name="event_sign_up_success">Signed Up Successfully!</string>
@@ -158,30 +148,37 @@
     <string name="event_sign_up_unknown_event">Unknown Event!</string>
     <string name="event_sign_up_confirm">Do you really want to sign up for %s?</string>
 
+    <!-- Registration -->
+    <string name="registration_status_orga">Organizer</string>
+    <string name="registration_status_participated">participated</string>
+    <string name="registration_status_confirmed">confirmed</string>
+    <string name="registration_status_open">open</string>
+    <string name="registration_status_cancelled">cancelled</string>
+
     <!-- Preference Keys -->
-    <string name="preferences_chat_name_key" translatable="false">name</string>
-    <string name="preferences_chat_channel_key" translatable="false">channel</string>
-    <string name="preferences_chat_showSense_key" translatable="false">show_sense</string>
-    <string name="preferences_chat_publicId_key" translatable="false">public_id</string>
-    <string name="preferences_chat_showLinks_key" translatable="false">show_links</string>
-    <string name="preferences_chat_katex_key" translatable="false">katex</string>
-    <string name="preferences_chat_delete_db_key" translatable="false">delete_chat_db</string>
-    <string name="preferences_chat_colorful_messages_key" translatable="false">colorful_messages</string>
-    <string name="preferences_chat_db_max_search_result_key" translatable="false">chat_db_max_search_results</string>
+    <string name="preferences_chat_name_key" translatable="false">chat.name</string>
+    <string name="preferences_chat_channel_key" translatable="false">chat.channel</string>
+    <string name="preferences_chat_sense_key" translatable="false">chat.show_sense</string>
+    <string name="preferences_chat_public_id_key" translatable="false">chat.public_id</string>
+    <string name="preferences_chat_linkify_key" translatable="false">chat.linkify</string>
+    <string name="preferences_chat_katex_key" translatable="false">chat.katex</string>
+    <string name="preferences_chat_delete_db_key" translatable="false">chat.delete_db</string>
+    <string name="preferences_chat_colorful_key" translatable="false">chat.colorful</string>
+    <string name="preferences_chat_db_max_result_key" translatable="false">chat.db_max_results</string>
 
     <string name="preferences_ping_notification_key" translatable="false">pushPings</string>
     <string name="preferences_ping_notification_server_key" translatable="false">pushPingServer</string>
-    <string name="preferences_general_bug_report_key" translatable="false">bugReport</string>
-    <string name="preferences_general_github_key" translatable="false">github</string>
 
-    <string name="preferences_loggedIn_key" translatable="false">logged_in</string>
-    <string name="preferences_drawerSelection_key" translatable="false">drawer_selection</string>
+    <string name="preferences_general_bug_report_key" translatable="false">general.bug_report</string>
+    <string name="preferences_general_github_key" translatable="false">general.github</string>
+    <string name="preferences_general_drawer_selection_key" translatable="false">general.drawer_selection</string>
+    <string name="preferences_general_remember_me_key" translatable="false">general.remember_me</string>
 
-    <string name="preferences_gallery_delete_thumbnails_key" translatable="false">delete_thumbnails</string>
-    <string name="preferences_gallery_delete_images_key" translatable="false">delete_images</string>
-    <string name="preferences_gallery_offline_mode_key" translatable="false">gallery_offline_mode</string>
-    <string name="preferences_gallery_show_dir_key" translatable="false">show_gallery_dir</string>
-    <string name="preferences_gallery_delete_db_key" translatable="false">delete_gallery_db</string>
+    <string name="preferences_gallery_delete_thumbnails_key" translatable="false">gallery.delete_thumbnails</string>
+    <string name="preferences_gallery_delete_images_key" translatable="false">gallery.delete_images</string>
+    <string name="preferences_gallery_offline_mode_key" translatable="false">gallery.offline_mode</string>
+    <string name="preferences_gallery_show_dir_key" translatable="false">gallery.show_dir</string>
+    <string name="preferences_gallery_delete_db_key" translatable="false">gallery.delete_db</string>
 
     <!-- Preference Activity -->
     <string name="title_activity_settings">Settings</string>
@@ -192,31 +189,32 @@
     <string name="preferences_general_bug_report_title">Bug Report</string>
     <string name="preferences_general_bug_report_summary">Please use the GitHub Issue Tracker for reporting bugs. Include as much information as possible (Android and app version, steps to reproduce, …).</string>
     <string name="preferences_general_github_title">GitHub Project</string>
+    <string name="preferences_general_remember_me_title">Remember Me</string>
 
     <string name="preferences_chat_group_database">Chat Database</string>
     <string name="preferences_chat_group_appearance">Appearance</string>
     <string name="preferences_chat_name_title">Name</string>
     <string name="preferences_chat_channel_title">Channel</string>
-    <string name="preferences_chat_showSense_title">Show Sense</string>
-    <string name="preferences_chat_publicId_title">Public ID</string>
-    <string name="preferences_chat_showLinks_title">Show Links</string>
+    <string name="preferences_chat_sense_title">Show Sense</string>
+    <string name="preferences_chat_public_id_title">Public ID</string>
+    <string name="preferences_chat_linkify_title">Show Links</string>
     <string name="preferences_chat_katex_title">KaTeX Rendering (Beta)</string>
-    <string name="preferences_chat_colorful_messages_title">Colorful Messages</string>
-    <string name="preferences_chat_db_max_search_result_title">Maximum Number of Search Results</string>
+    <string name="preferences_chat_colorful_title">Colorful Messages</string>
+    <string name="preferences_chat_db_max_result_title">Maximum Number of Search Results</string>
     <string name="preferences_chat_delete_db_title">Delete Chat Database</string>
-    <string name="confirm_delete_chat_database">Are you sure you want to delete the offline chat database?</string>
+    <string name="preferences_chat_confirm_delete_db">Are you sure you want to delete the offline chat database?</string>
 
     <string name="preferences_gallery_group_fs">File System</string>
     <string name="preferences_gallery_delete_thumbnails">Delete saved thumbnails</string>
     <string name="preferences_gallery_delete_images">Delete saved pictures</string>
-    <string name="preferences_Gallery_offline_mode">Offline Mode</string>
+    <string name="preferences_gallery_offline_mode">Offline Mode</string>
     <string name="preferences_gallery_offline_mode_true_summary">No Pictures will be downloaded. Some features will only be available to a limited extent.</string>
     <string name="preferences_gallery_offline_mode_false_summary">All features are unrestricted available. Pictures will be downloaded as needed.</string>
     <string name="preferences_gallery_show_dir">Open storage directory</string>
     <string name="preferences_gallery_delete_db_title">Delete Gallery Database</string>
-    <string name="confirm_delete_thumbnails">Are you sure you want to delete all the saved thumbnails?</string>
-    <string name="confirm_delete_images">Are you sure you want to delete all the saved images?</string>
-    <string name="confirm_delete_gallery_database">Are you sure you want to delete the gallery database?</string>
+    <string name="preferences_gallery_confirm_delete_thumbnails">Are you sure you want to delete all the saved thumbnails?</string>
+    <string name="preferences_gallery_confirm_delete_images">Are you sure you want to delete all the saved images?</string>
+    <string name="preferences_gallery_confirm_delete_gallery_database">Are you sure you want to delete the gallery database?</string>
 
     <!-- Navigation Drawer -->
     <string name="drawer_chat_heading">Chat</string>
@@ -240,52 +238,52 @@
     <string name="log_subtitle_date_recent">Posts of the last {0,choice,1#|2#{0} }hour{0,choice,1#|2#s}</string>
     <string name="log_subtitle_post_recent">Last{0,choice,1#|2# {0}} Post{0,choice,1#|2#s}</string>
     <string name="log_subtitle_post_interval">Posts from #{0} to #{1}</string>
+    <string name="log_subtitle_since_own">Since Own Post</string>
     <string name="log_subtitle_file">File</string>
     <string name="log_action_save">Save to database</string>
     <string name="log_wait_for_save">Please wait until saving is done.</string>
 
-    <string name="log_download_pending">Download pending…</string>
-    <string name="log_downloading">Downloading… %s</string>
-    <string name="log_download_paused">Download paused… %s</string>
-    <string name="log_download_successful">Download successful. %s</string>
-    <string name="log_download_failed">Download failed. %s</string>
-    <string name="log_parse_pending">JSON Parsing pending…</string>
-    <string name="log_parsing">Parsing JSON… %s</string>
-    <string name="log_parse_failed">JSON Parsing failed. %s</string>
+    <string name="log_status_download_pending">Download pending…</string>
+    <string name="log_status_downloading">Downloading… %s</string>
+    <string name="log_status_download_paused">Download paused… %s</string>
+    <string name="log_status_download_successful">Download successful. %s</string>
+    <string name="log_status_download_failed">Download failed. %s</string>
+    <string name="log_status_parse_pending">JSON Parsing pending…</string>
+    <string name="log_status_parsing">Parsing JSON… %s</string>
+    <string name="log_status_parse_failed">JSON Parsing failed. %s</string>
 
-    <string name="log_download_running">A log download is running. Do you really want to leave?</string>
+    <string name="log_confirm_exit">A log download is running. Do you really want to leave?</string>
+    <string name="log_confirm_exit_continue_in_background">Continue in Background</string>
+    <string name="log_confirm_exit_stay">Wait</string>
+    <string name="log_confirm_exit_cancel">Cancel</string>
     <string name="log_download_continue_in_background_toast">Download will be continued in background.</string>
-    <string name="log_download_continue_in_background">Continue in Background</string>
     <string name="log_download_running_force_cancel">The running download will be canceled.</string>
-    <string name="log_download_stay">Wait</string>
-    <string name="log_download_cancel">Cancel</string>
 
     <!-- Log Dialog Activity -->
     <string name="title_activity_log_dialog">Logs</string>
     <string name="log_dialog_mode_label">Mode</string>
-    <string name="log_dialog_postrecent_before">Last</string>
-    <string name="log_dialog_postrecent_after">Posts</string>
-    <string name="log_dialog_daterecent_before">Last</string>
-    <string name="log_dialog_daterecent_after">Hours</string>
-    <string name="log_dialog_dateinterval_from">From</string>
-    <string name="log_dialog_dateinterval_to">Until</string>
-    <string name="log_dialog_file_title">File</string>
-    <string name="log_postrecent">postrecent</string>
-    <string name="log_daterecent">daterecent</string>
-    <string name="log_dateinterval">dateinterval</string>
-    <string name="log_postinterval">postinterval</string>
-    <string name="log_file">file</string>
-    <string-array name="modes">
-        <item>@string/log_postrecent</item>
-        <item>@string/log_postinterval</item>
-        <item>@string/log_daterecent</item>
-        <item>@string/log_dateinterval</item>
-        <item>@string/log_file</item>
+    <string name="log_request_postrecent_before">Last</string>
+    <string name="log_request_postrecent_after">Posts</string>
+    <string name="log_request_daterecent_before">Last</string>
+    <string name="log_request_daterecent_after">Hours</string>
+    <string name="log_request_dateinterval_from">From</string>
+    <string name="log_request_dateinterval_to">Until</string>
+    <string name="log_request_file_title">File</string>
+    <string name="log_request_mode_postrecent">postrecent</string>
+    <string name="log_request_mode_daterecent">daterecent</string>
+    <string name="log_request_mode_dateinterval">dateinterval</string>
+    <string name="log_request_mode_postinterval">postinterval</string>
+    <string name="log_request_mode_file">file</string>
+    <string-array name="log_request_modes">
+        <item>@string/log_request_mode_postrecent</item>
+        <item>@string/log_request_mode_postinterval</item>
+        <item>@string/log_request_mode_daterecent</item>
+        <item>@string/log_request_mode_dateinterval</item>
+        <item>@string/log_request_mode_file</item>
     </string-array>
 
     <!-- Album Fragment-->
     <string name="gallery_folder_images" translatable="false">gallery/images</string>
-    <string name="gallery_folder_thumbnails" translatable="false">gallery/thumbnails</string>
 
     <string name="title_fragment_gallery">Gallery</string>
     <string name="gallery_login_failed">Gallery Login failed</string>

@@ -21,8 +21,8 @@
     <string name="chat_refresh">Aktualisieren</string>
     <string name="chat_scroll_down_button_content_description">Nach unten scrollen</string>
     <string name="coming_soon">Coming soon</string>
-    <string name="confirm_delete_images">Möchtest du wirklich alle gespeicherten Bilder löschen?</string>
-    <string name="confirm_delete_thumbnails">Möchtest du wirklich alle gespeicherten Thumbnails löschen?</string>
+    <string name="preferences_gallery_confirm_delete_images">Möchtest du wirklich alle gespeicherten Bilder löschen?</string>
+    <string name="preferences_gallery_confirm_delete_thumbnails">Möchtest du wirklich alle gespeicherten Thumbnails löschen?</string>
     <string name="content_description_divider">Trennlinie</string>
     <string name="content_description_icon">Icon</string>
     <string name="database_hits">Treffer</string>
@@ -35,7 +35,6 @@
     <string name="double_back_to_exit_toast">Erneut drücken zum Verlassen</string>
     <string name="drawer_chat">Chat</string>
     <string name="drawer_chat_db">Datenbank</string>
-    <string name="background">Hintergrund</string>
     <string name="chat_database_id_hint">vonID-bisID</string>
     <string name="thumbnail">thumbnail</string>
     <string name="title_activity_album">Album</string>
@@ -74,7 +73,10 @@
     <string name="error">Fehler!</string>
     <string name="event_subtitle_cost">Kosten</string>
     <string name="event_subtitle_deadline">Anmeldeschluss</string>
-    <string name="event_subtitle_hotel">Übernachtungen</string>
+    <string name="event_subtitle_hotel">Unterkunft</string>
+    <string name="event_subtitle_hotel_address">Adresse der Unterkunft</string>
+    <string name="event_subtitle_mail_orga">Email Orgas</string>
+    <string name="event_subtitle_mail_all">Email Teilnehmer</string>
     <string name="event_subtitle_max_members">Maximale Teilnehmerzahl</string>
     <string name="event_subtitle_time">Zeitraum</string>
     <string name="event_tab_members">Teilnehmer</string>
@@ -86,17 +88,17 @@
     <string name="image_suffix_original">" (original)"</string>
     <string name="info">Details</string>
     <string name="log_action_save">In Datenbank speichern</string>
-    <string name="log_dateinterval">dateinterval</string>
-    <string name="log_daterecent">daterecent</string>
-    <string name="log_dialog_dateinterval_from">Von</string>
-    <string name="log_dialog_dateinterval_to">Bis</string>
-    <string name="log_dialog_daterecent_after">Stunden</string>
-    <string name="log_dialog_daterecent_before">Letzte</string>
+    <string name="log_request_mode_dateinterval">dateinterval</string>
+    <string name="log_request_mode_daterecent">daterecent</string>
+    <string name="log_request_dateinterval_from">Von</string>
+    <string name="log_request_dateinterval_to">Bis</string>
+    <string name="log_request_daterecent_after">Stunden</string>
+    <string name="log_request_daterecent_before">Letzte</string>
     <string name="log_dialog_mode_label">Modus</string>
-    <string name="log_dialog_postrecent_after">Posts</string>
-    <string name="log_dialog_postrecent_before">Letzte</string>
-    <string name="log_postrecent">postrecent</string>
-    <string name="log_file">file</string>
+    <string name="log_request_postrecent_after">Posts</string>
+    <string name="log_request_postrecent_before">Letzte</string>
+    <string name="log_request_mode_postrecent">postrecent</string>
+    <string name="log_request_mode_file">file</string>
     <string name="log_wait_for_save">Bitte warte bis das Speichern abgeschlossen ist.</string>
     <string name="login_action_sign_in">Anmelden</string>
     <string name="login_action_sign_in_short">Anmelden</string>
@@ -128,13 +130,15 @@
     <string name="persons_database_sort">Sortieren nach</string>
     <string name="persons_database_sort_first_name">Vornamen</string>
     <string name="persons_database_sort_last_name">Nachnamen</string>
-    <string name="preferences_Gallery_offline_mode">Offline-Modus</string>
+    <string name="persons_database_inactive">(inaktiv)</string>
+    <string name="persons_database_non_member">(kein Mitglied)</string>
+    <string name="preferences_gallery_offline_mode">Offline-Modus</string>
     <string name="preferences_chat_channel_title">Channel</string>
     <string name="preferences_chat_katex_title">KaTeX Rendering (Beta)</string>
     <string name="preferences_chat_name_title">Name</string>
-    <string name="preferences_chat_publicId_title">Öffentliche ID</string>
-    <string name="preferences_chat_showLinks_title">Links anzeigen</string>
-    <string name="preferences_chat_showSense_title">Sinn anzeigen</string>
+    <string name="preferences_chat_public_id_title">Öffentliche ID</string>
+    <string name="preferences_chat_linkify_title">Links anzeigen</string>
+    <string name="preferences_chat_sense_title">Sinn anzeigen</string>
     <string name="preferences_gallery_delete_images">Gespeicherte Bilder löschen</string>
     <string name="preferences_gallery_delete_thumbnails">Gespeicherte Thumbnails löschen</string>
     <string name="preferences_gallery_offline_mode_false_summary">Alle Features sind uneingeschränkt verwendbar. Bilder werden heruntergeladen, sobald benötigt.</string>
@@ -144,13 +148,17 @@
     <string name="log_subtitle_post_recent">Letzte{0,choice,1#r|2# {0}} Post{0,choice,1#|2#s}</string>
     <string name="image_download_non_picture">Du bist im Begriff eine Audio- oder Video-Datei herunterzuladen. Eine WLAN-Verbindung wird empfohlen. Möchtest du fortfahren?</string>
     <string name="preferences_chat_group_appearance">Darstellung</string>
-    <string name="preferences_chat_colorful_messages_title">Farbige Nachrichten</string>
+    <string name="preferences_chat_colorful_title">Farbige Nachrichten</string>
     <string name="preferences_chat_group_database">Chat-Datenbank</string>
     <string name="preferences_chat_delete_db_title">Chat-Datenbank löschen</string>
-    <string name="confirm_delete_chat_database">Möchtest du wirklich die gesamte Offline-Chat-Datenbank löschen?</string>
-    <string name="confirm_delete_gallery_database">Möchtest du wirklich die Galerie-Datenbank löschen?</string>
+    <string name="preferences_chat_confirm_delete_db">Möchtest du wirklich die gesamte Offline-Chat-Datenbank löschen?</string>
+    <string name="preferences_gallery_confirm_delete_gallery_database">Möchtest du wirklich die Galerie-Datenbank löschen?</string>
     <string name="preferences_gallery_group_fs">Dateisystem</string>
-    <string name="unknown_error">Ein unbekannter Fehler trat auf.</string>
+    <string name="error_unknown">Ein unbekannter Fehler trat auf.</string>
+    <string name="error_login">Login fehlgeschlagen.</string>
+    <string name="error_network">Ein Netzwerk-Fehler trat auf.</string>
+    <string name="error_404">Die angeforderte Ressource wurde nicht gefunden.</string>
+    <string name="error_user">Fehler in Layer 8</string>
     <string name="preferences_gallery_delete_db_title">Galerie-Datenbank löschen</string>
     <string name="offline_mode_not_available">Im Offline-Modus nicht verfügbar.</string>
     <string name="album_invalid">Dieses Album existiert nicht.</string>
@@ -158,41 +166,52 @@
     <string name="album_overwrite_offline_mode">Du befindest dich im Offline-Modus. Möchtest du das Album trotzdem herunterladen?</string>
     <string name="notification_channel_description">Stub!</string>
     <string name="notification_channel_name">QED</string>
-    <string name="log_download_pending">Download ausstehend…</string>
-    <string name="log_download_paused">Download pausiert… %s</string>
-    <string name="log_download_successful">Download erfolgreich. %s</string>
-    <string name="log_download_failed">Download fehlgeschlagen. %s</string>
-    <string name="log_downloading">Download im Gange… %s</string>
-    <string name="log_parsing">JSON wird interpretiert… %s</string>
-    <string name="log_parse_pending">JSON Interpretation ausstehend…</string>
-    <string name="log_parse_failed">JSON Interpretation fefhlgeschlagen. %s</string>
+    <string name="log_status_download_pending">Download ausstehend…</string>
+    <string name="log_status_download_paused">Download pausiert… %s</string>
+    <string name="log_status_download_successful">Download erfolgreich. %s</string>
+    <string name="log_status_download_failed">Download fehlgeschlagen. %s</string>
+    <string name="log_status_downloading">Download im Gange… %s</string>
+    <string name="log_status_parsing">JSON wird interpretiert… %s</string>
+    <string name="log_status_parse_pending">JSON Interpretation ausstehend…</string>
+    <string name="log_status_parse_failed">JSON Interpretation fefhlgeschlagen. %s</string>
 
-    <string name="log_download_running">Ein Chatlog-Download ist noch im Gange. </string>
-    <string name="log_download_continue_in_background">Im Hintergrund fortsetzen</string>
+    <string name="log_confirm_exit">Ein Chatlog-Download ist noch im Gange. </string>
+    <string name="log_confirm_exit_continue_in_background">Im Hintergrund fortsetzen</string>
     <string name="log_download_continue_in_background_toast">Chatlog-Download wird im Hintergrund fortgesetzt.</string>
     <string name="log_download_running_force_cancel">Der laufende Download wird abgebrochen.</string>
-    <string name="log_download_stay">Warten</string>
-    <string name="log_download_cancel">Abbrechen</string>
+    <string name="log_confirm_exit_stay">Warten</string>
+    <string name="log_confirm_exit_cancel">Abbrechen</string>
     <string name="master_key_error">Passwort konnte nicht gespeichert werden.</string>
     <string name="download_notification_title">QED</string>
     <string name="download_notification_log_description">Chatlog</string>
-    <string name="log_dialog_file_title">Datei</string>
+    <string name="log_request_file_title">Datei</string>
     <string name="log_subtitle_post_interval">Posts von #{0} bis #{1}</string>
+    <string name="log_subtitle_since_own">Seit eigenem Post</string>
     <string name="log_subtitle_file">Datei</string>
-    <string name="log_postinterval">postinterval</string>
+    <string name="log_request_mode_postinterval">postinterval</string>
     <string name="preferences_general_bug_report_title">Fehler melden</string>
     <string name="preferences_general_bug_report_summary">Bitte benutze den GitHub Issue Tracker für Fehlerberichte. Füge so viele Informationen wie möglich bei (Android und App-Version, Schritte zum reproduzieren, …).</string>
     <string name="preferences_general_github_title">GitHub-Projekt</string>
+    <string name="preferences_general_remember_me_title">Passwort speichern</string>
     <string name="event_sign_up">Anmelden</string>
     <string name="event_sign_up_success">Erfolgreich angemeldet!</string>
     <string name="event_sign_up_deadline_exceeded">Anmeldeschluss vorüber!</string>
     <string name="event_sign_up_already_signed_up">Du bist bereits angemeldet!</string>
     <string name="event_sign_up_unknown_event">Unbekannte Veranstaltung!</string>
     <string name="event_sign_up_confirm">Möchtest du dich wirklich zu %s anmelden?</string>
+    <string name="event_subtitle_orga">Orga</string>
+
+
+    <!-- Registration -->
+    <string name="registration_status_orga">Orga</string>
+    <string name="registration_status_participated">teilgenommen</string>
+    <string name="registration_status_confirmed">bestätigt</string>
+    <string name="registration_status_open">offen</string>
+    <string name="registration_status_cancelled">abgemeldet</string>
+
     <string name="image_info">@string/info</string>
     <string name="image_open_with">Öffnen mit…</string>
     <string name="image_download_original">Original herunterladen</string>
-    <string name="event_subtitle_orga">Orga</string>
 
     <!-- Image Info Activity -->
     <string name="title_activity_image_info">Informationen</string>
@@ -227,7 +246,7 @@
     <string name="message_info">@string/info</string>
     <string name="album_info">@string/info</string>
     <string name="message_reply">Antworten</string>
-    <string name="preferences_chat_db_max_search_result_title">Maximale Anzahl an Suchergebnissen</string>
+    <string name="preferences_chat_db_max_result_title">Maximale Anzahl an Suchergebnissen</string>
 
     <string-array name="chat_database_max_entries_value_strings">
         <item>10.000</item>

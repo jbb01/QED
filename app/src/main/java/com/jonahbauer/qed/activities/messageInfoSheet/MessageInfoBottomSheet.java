@@ -21,8 +21,8 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.jonahbauer.qed.R;
-import com.jonahbauer.qed.chat.Message;
 import com.jonahbauer.qed.layoutStuff.ColorfulBottomSheetCallback;
+import com.jonahbauer.qed.model.Message;
 
 public class MessageInfoBottomSheet extends BottomSheetDialogFragment {
     private static final String ARGUMENT_MESSAGE = "message";
@@ -109,7 +109,7 @@ public class MessageInfoBottomSheet extends BottomSheetDialogFragment {
                 Window rootWindow = activity.getWindow();
 
                 mBehavior = BottomSheetBehavior.from((View) view.getParent());
-                mBehavior.addBottomSheetCallback(mSheetCallback != null ? mSheetCallback : (mSheetCallback = new ColorfulBottomSheetCallback(MessageInfoBottomSheet.this, rootWindow, touchOutside, mMessage.transformedColor)));
+                mBehavior.addBottomSheetCallback(mSheetCallback != null ? mSheetCallback : (mSheetCallback = new ColorfulBottomSheetCallback(MessageInfoBottomSheet.this, rootWindow, touchOutside, mMessage.getTransformedColor())));
             }
 
             @Override

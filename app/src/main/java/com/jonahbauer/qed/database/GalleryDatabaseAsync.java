@@ -7,8 +7,8 @@ import android.os.AsyncTask;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.jonahbauer.qed.qedgallery.album.Album;
-import com.jonahbauer.qed.qedgallery.image.Image;
+import com.jonahbauer.qed.model.Album;
+import com.jonahbauer.qed.model.Image;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -68,25 +68,25 @@ public class GalleryDatabaseAsync extends AsyncTask<Void, Integer, Boolean> {
 
                 for (Image image : images) {
                     ContentValues value = new ContentValues();
-                    value.put(GalleryDatabaseContract.ImageEntry.COLUMN_NAME_ID, image.id);
-                    if (image.name != null)
-                        value.put(GalleryDatabaseContract.ImageEntry.COLUMN_NAME_NAME, image.name);
-                    if (image.path != null)
-                        value.put(GalleryDatabaseContract.ImageEntry.COLUMN_NAME_PATH, image.path);
-                    if (image.album.id != 0)
-                        value.put(GalleryDatabaseContract.ImageEntry.COLUMN_NAME_ALBUM_ID, image.album.id);
-                    if (image.format != null)
-                        value.put(GalleryDatabaseContract.ImageEntry.COLUMN_NAME_FORMAT, image.format);
-                    if (image.owner != null)
-                        value.put(GalleryDatabaseContract.ImageEntry.COLUMN_NAME_OWNER, image.owner);
-                    if (image.albumName != null)
-                        value.put(GalleryDatabaseContract.ImageEntry.COLUMN_NAME_ALBUM_NAME, image.albumName);
+                    value.put(GalleryDatabaseContract.ImageEntry.COLUMN_NAME_ID, image.getId());
+                    if (image.getName() != null)
+                        value.put(GalleryDatabaseContract.ImageEntry.COLUMN_NAME_NAME, image.getName());
+                    if (image.getPath() != null)
+                        value.put(GalleryDatabaseContract.ImageEntry.COLUMN_NAME_PATH, image.getPath());
+                    if (image.getAlbum().getId() != 0)
+                        value.put(GalleryDatabaseContract.ImageEntry.COLUMN_NAME_ALBUM_ID, image.getAlbum().getId());
+                    if (image.getFormat() != null)
+                        value.put(GalleryDatabaseContract.ImageEntry.COLUMN_NAME_FORMAT, image.getFormat());
+                    if (image.getOwner() != null)
+                        value.put(GalleryDatabaseContract.ImageEntry.COLUMN_NAME_OWNER, image.getOwner());
+                    if (image.getAlbumName() != null)
+                        value.put(GalleryDatabaseContract.ImageEntry.COLUMN_NAME_ALBUM_NAME, image.getAlbumName());
 
                     value.put(GalleryDatabaseContract.ImageEntry.COLUMN_NAME_ORDER, i.get());
 
                     long row = galleryWritable.insertWithOnConflict(GalleryDatabaseContract.ImageEntry.TABLE_NAME, null, value, SQLiteDatabase.CONFLICT_IGNORE);
                     if (insertOrUpdate && row == -1)
-                        galleryWritable.update(GalleryDatabaseContract.ImageEntry.TABLE_NAME, value, GalleryDatabaseContract.ImageEntry.COLUMN_NAME_ID + "=" + image.id, null);
+                        galleryWritable.update(GalleryDatabaseContract.ImageEntry.TABLE_NAME, value, GalleryDatabaseContract.ImageEntry.COLUMN_NAME_ID + "=" + image.getId(), null);
 
                     publishProgress(i.incrementAndGet(), j);
                 }
@@ -108,23 +108,23 @@ public class GalleryDatabaseAsync extends AsyncTask<Void, Integer, Boolean> {
 
                 for (Album album : albums) {
                     ContentValues value = new ContentValues();
-                    value.put(GalleryDatabaseContract.AlbumEntry.COLUMN_NAME_ID, album.id);
-                    if (album.name != null)
-                        value.put(GalleryDatabaseContract.AlbumEntry.COLUMN_NAME_NAME, album.name);
-                    if (album.owner != null)
-                        value.put(GalleryDatabaseContract.AlbumEntry.COLUMN_NAME_CREATOR_NAME, album.owner);
-                    if (album.creationDate != null)
-                        value.put(GalleryDatabaseContract.AlbumEntry.COLUMN_NAME_CREATION_DATE, album.creationDate);
-                    if (album.dates != null)
-                        value.put(GalleryDatabaseContract.AlbumEntry.COLUMN_NAME_DATES, album.dates.toString());
-                    if (album.categories != null)
-                        value.put(GalleryDatabaseContract.AlbumEntry.COLUMN_NAME_CATEGORIES, album.categories.toString());
-                    if (album.persons != null)
-                        value.put(GalleryDatabaseContract.AlbumEntry.COLUMN_NAME_PERSONS, album.persons.toString());
+                    value.put(GalleryDatabaseContract.AlbumEntry.COLUMN_NAME_ID, album.getId());
+                    if (album.getName() != null)
+                        value.put(GalleryDatabaseContract.AlbumEntry.COLUMN_NAME_NAME, album.getName());
+                    if (album.getOwner() != null)
+                        value.put(GalleryDatabaseContract.AlbumEntry.COLUMN_NAME_CREATOR_NAME, album.getOwner());
+                    if (album.getCreationDate() != null)
+                        value.put(GalleryDatabaseContract.AlbumEntry.COLUMN_NAME_CREATION_DATE, album.getCreationDate());
+                    if (album.getDates() != null)
+                        value.put(GalleryDatabaseContract.AlbumEntry.COLUMN_NAME_DATES, album.getDates().toString());
+                    if (album.getCategories() != null)
+                        value.put(GalleryDatabaseContract.AlbumEntry.COLUMN_NAME_CATEGORIES, album.getCategories().toString());
+                    if (album.getPersons() != null)
+                        value.put(GalleryDatabaseContract.AlbumEntry.COLUMN_NAME_PERSONS, album.getPersons().toString());
 
                     long row = galleryWritable.insertWithOnConflict(GalleryDatabaseContract.AlbumEntry.TABLE_NAME, null, value, SQLiteDatabase.CONFLICT_IGNORE);
                     if (insertOrUpdate && row == -1)
-                        galleryWritable.update(GalleryDatabaseContract.AlbumEntry.TABLE_NAME, value, GalleryDatabaseContract.ImageEntry.COLUMN_NAME_ID + "=" + album.id, null);
+                        galleryWritable.update(GalleryDatabaseContract.AlbumEntry.TABLE_NAME, value, GalleryDatabaseContract.ImageEntry.COLUMN_NAME_ID + "=" + album.getId(), null);
 
                     publishProgress(i.incrementAndGet(), j);
                 }

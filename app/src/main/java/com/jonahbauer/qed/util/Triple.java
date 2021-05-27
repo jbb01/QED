@@ -1,6 +1,6 @@
 package com.jonahbauer.qed.util;
 
-public class Triple<A,B,C> {
+public final class Triple<A,B,C> {
     public final A first;
     public final B second;
     public final C third;

@@ -3,7 +3,6 @@ package com.jonahbauer.qed;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -14,10 +13,12 @@ import androidx.fragment.app.FragmentManager;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.jonahbauer.qed.activities.GalleryAlbumActivity;
-import com.jonahbauer.qed.activities.ImageActivity;
 import com.jonahbauer.qed.activities.MainActivity;
 import com.jonahbauer.qed.activities.eventSheet.EventBottomSheet;
+import com.jonahbauer.qed.activities.imageActivity.ImageActivity;
 import com.jonahbauer.qed.activities.personSheet.PersonBottomSheet;
+import com.jonahbauer.qed.model.Event;
+import com.jonahbauer.qed.model.Person;
 
 public class DeepLinkingActivity extends FragmentActivity {
     private boolean mUsedIntent = false;
@@ -75,14 +76,14 @@ public class DeepLinkingActivity extends FragmentActivity {
                     if (path.startsWith("/person.php") || path.startsWith("/personen.php")) {
                         String person = data.getQueryParameter("person");
                         if (person != null && person.matches("\\d{1,5}")) {
-                            showBottomSheet(PersonBottomSheet.newInstance(Long.parseLong(person)));
+                            showBottomSheet(PersonBottomSheet.newInstance(new Person(Long.parseLong(person))));
                             mUsedIntent = true;
                             return;
                         }
                     } else if (path.startsWith("/veranstaltung.php") || path.startsWith("/veranstaltungen.php")) {
                         String event = data.getQueryParameter("veranstaltung");
                         if (event != null && event.matches("\\d{1,5}")) {
-                            showBottomSheet(EventBottomSheet.newInstance(Long.parseLong(event)));
+                            showBottomSheet(EventBottomSheet.newInstance(new Event(Long.parseLong(event))));
                             mUsedIntent = true;
                             return;
                         }
@@ -126,7 +127,6 @@ public class DeepLinkingActivity extends FragmentActivity {
             }
         }, true);
         bottomSheetDialogFragment.show(fragmentManager, TAG);
-        Log.d(Application.LOG_TAG_DEBUG, "DeepLinkingActivity: showing bottomsheet");
     }
 
     public static class QEDIntent {

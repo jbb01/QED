@@ -1,6 +1,7 @@
 package com.jonahbauer.qed.networking;
 
 import android.app.DownloadManager;
+import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Handler;
@@ -14,8 +15,10 @@ import androidx.annotation.Nullable;
 
 import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.R;
-import com.jonahbauer.qed.chat.Message;
-import com.jonahbauer.qed.chat.MessageAdapter;
+import com.jonahbauer.qed.activities.mainFragments.LogFragment;
+import com.jonahbauer.qed.model.Message;
+import com.jonahbauer.qed.model.adapter.MessageAdapter;
+import com.jonahbauer.qed.networking.async.QEDPageStreamReceiver;
 import com.jonahbauer.qed.networking.downloadManager.Download;
 import com.jonahbauer.qed.networking.downloadManager.DownloadListener;
 
@@ -29,7 +32,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.lang.ref.SoftReference;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -37,7 +39,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public abstract class QEDChatPages {
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
+public class QEDChatPages {
     private static final Map<String, ParseThread> threads = new HashMap<>();
     private static final Map<String, Download> asyncTasks = new HashMap<>();
 
@@ -57,35 +62,25 @@ public abstract class QEDChatPages {
      * @param chatLogReceiver a receiver handling progress updates and errors
      */
     @Nullable
-    public static Download getChatLog(String tag, @NonNull String options, QEDPageStreamReceiver chatLogReceiver, LogDownloadListener listener) {
-        boolean isFile = options.startsWith("FILE");
-
-        SoftReference<Application> applicationReference = Application.getApplicationReference();
-        Application application = applicationReference.get();
-
-        if (application == null) {
-            chatLogReceiver.onError(tag, null, new AssertionError("Application is null!"));
-            return null;
-        }
-
-        Uri fileUri;
-        File file;
-        if (isFile) {
-            file = null;
-            fileUri = Uri.parse(options.substring(4));
-        } else {
-            file = new File(application.getExternalCacheDir(), "chatLog.log");
-            file.deleteOnExit();
-            fileUri = Uri.fromFile(file);
-        }
+    public static Download getChatLog(String tag, @NonNull LogFragment.LogRequest logRequest, LogDownloadListener listener) {
+        boolean isFile = logRequest instanceof LogFragment.FileLogRequest;
 
         if (isFile) {
+            Uri fileUri = ((LogFragment.FileLogRequest) logRequest).getFile();
             listener.onDownloadCompleted(fileUri);
             return null;
         }
 
-        Uri uri = Uri.parse(application.getString(R.string.chat_server_history) + "?" + options);
-        Download download = new Download(Feature.CHAT, uri, file, null, listener, application.getString(R.string.download_notification_title), application.getString(R.string.download_notification_log_description));
+        Context context = listener.mContext;
+
+        File file = new File(context.getExternalCacheDir(), "chatLog.log");
+        file.deleteOnExit();
+
+
+        Uri uri = Uri.parse(NetworkConstants.CHAT_SERVER_HISTORY + logRequest.getQueryString());
+        String title = context.getString(R.string.download_notification_title);
+        String description = context.getString(R.string.download_notification_log_description);
+        Download download = new Download(Feature.CHAT, uri, file, null, listener, title, description);
 
         asyncTasks.put(tag, download);
 
@@ -156,13 +151,13 @@ public abstract class QEDChatPages {
         private final MessageAdapter mOut;
         private final Uri mSourceFileUri;
         private final Application mContext;
-        private final QEDPageStreamReceiver mChatLogReceiver;
+        private final QEDPageStreamReceiver<String> mChatLogReceiver;
         private final DownloadListener mDownloadListener;
 
         private boolean mCanceled;
 
 
-        private ParseThread(String tag, long id, @NonNull MessageAdapter out, Uri sourceFileUri, Application context, QEDPageStreamReceiver chatLogReceiver, DownloadListener downloadListener) {
+        private ParseThread(String tag, long id, @NonNull MessageAdapter out, Uri sourceFileUri, Application context, QEDPageStreamReceiver<String> chatLogReceiver, DownloadListener downloadListener) {
             this.mTag = tag;
             this.mId = id;
             this.mOut = out;
@@ -268,9 +263,9 @@ public abstract class QEDChatPages {
         private final String mTag;
         private final MessageAdapter mOut;
         private final Application mContext;
-        private final QEDPageStreamReceiver mChatLogReceiver;
+        private final QEDPageStreamReceiver<String> mChatLogReceiver;
 
-        public LogDownloadListener(String tag, MessageAdapter out, Application context, QEDPageStreamReceiver chatLogReceiver) {
+        public LogDownloadListener(String tag, MessageAdapter out, Application context, QEDPageStreamReceiver<String> chatLogReceiver) {
             this.mTag = tag;
             this.mOut = out;
             this.mContext = context;
@@ -297,7 +292,7 @@ public abstract class QEDChatPages {
         public void onError(long id, @Nullable String reason, @Nullable Throwable cause) {
             super.onError(id, reason, cause);
             if (mChatLogReceiver != null)
-                handler.post(() -> mChatLogReceiver.onError(mTag, QEDPageReceiver.REASON_NETWORK, null));
+                handler.post(() -> mChatLogReceiver.onError(mTag, Reason.NETWORK, null));
         }
 
         @Override

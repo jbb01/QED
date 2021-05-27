@@ -31,6 +31,7 @@ import com.jonahbauer.qed.database.ChatDatabase;
 import com.jonahbauer.qed.database.GalleryDatabase;
 import com.jonahbauer.qed.layoutStuff.SeekBarPreference;
 import com.jonahbauer.qed.pingNotifications.PingNotifications;
+import com.jonahbauer.qed.util.Preferences;
 
 import org.apache.commons.io.FileUtils;
 
@@ -160,13 +161,11 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.pref_general, rootKey);
 
-            bugReport = findPreference(Pref.General.BUG_REPORT);
-            if (bugReport != null)
-                bugReport.setOnPreferenceClickListener(this);
+            bugReport = findPreference(Preferences.general().keys().bugReport());
+            bugReport.setOnPreferenceClickListener(this);
 
-            github = findPreference(Pref.General.GITHUB);
-            if (github != null)
-                github.setOnPreferenceClickListener(this);
+            github = findPreference(Preferences.general().keys().github());
+            github.setOnPreferenceClickListener(this);
 
             if (BuildConfig.USES_FCM) {
                 pingNotifications = findPreference(Pref.FCM.PING_NOTIFICATION);
@@ -187,16 +186,16 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
 
         @Override
         public boolean onPreferenceClick(@NonNull Preference preference) {
-            if (preference.equals(pingNotifications)) {
+            if (preference == pingNotifications) {
                 if (pingNotifications.isChecked()) {
                     PingNotifications.getInstance(getContext()).registrationStage0();
                 }
                 return true;
-            } else if (preference.equals(bugReport)) {
+            } else if (preference == bugReport) {
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.github_project_issue_tracker)));
                 startActivity(intent);
                 return true;
-            } else if (preference.equals(github)) {
+            } else if (preference == github) {
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.github_project)));
                 startActivity(intent);
                 return true;
@@ -211,7 +210,6 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
         private SwitchPreference katex;
         private SwitchPreference links;
 
-//        private SeekBarPreference maxShownRows;
         public static final int[] maxShownRowsValues = {10_000, 20_000, 50_000, 100_000, 200_000, 500_000, Integer.MAX_VALUE};
         private static final String[] maxShownRowsStringValues = {"10.000", "20.000", "50.000", "100.000", "200.000", "500.000", "\u221E"};
 
@@ -220,24 +218,17 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
             setPreferencesFromResource(R.xml.pref_chat, rootKey);
             setHasOptionsMenu(true);
 
-            deleteDatabase = findPreference(Pref.Chat.DELETE_CHAT_DB);
+            katex = findPreference(Preferences.chat().keys().katex());
+            katex.setOnPreferenceChangeListener(this);
 
-            katex = findPreference(Pref.Chat.KATEX);
-            if (katex != null)
-                katex.setOnPreferenceChangeListener(this);
+            links = findPreference(Preferences.chat().keys().linkify());
+            links.setOnPreferenceChangeListener(this);
 
-            links = findPreference(Pref.Chat.SHOW_LINKS);
-            if (links != null)
-                links.setOnPreferenceChangeListener(this);
-            
-            if (deleteDatabase != null)
-                deleteDatabase.setOnPreferenceClickListener(this);
+            deleteDatabase = findPreference(Preferences.chat().keys().dbClear());
+            deleteDatabase.setOnPreferenceClickListener(this);
 
-            SeekBarPreference maxShownRows = findPreference("maxEntries");
-            if (maxShownRows != null) {
-                maxShownRows.setOnPreferenceChangeListener(this);
-                maxShownRows.setExternalValues(maxShownRowsValues, maxShownRowsStringValues);
-            }
+            SeekBarPreference maxShownRows = findPreference(Preferences.chat().keys().dbMaxResults());
+            maxShownRows.setExternalValues(maxShownRowsValues, maxShownRowsStringValues);
         }
 
         @Override
@@ -255,9 +246,9 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
             Context context = getActivity();
             if (context == null) return false;
 
-            if (preference.equals(deleteDatabase)) {
+            if (preference == deleteDatabase) {
                 AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
-                alertDialog.setMessage(R.string.confirm_delete_chat_database);
+                alertDialog.setMessage(R.string.preferences_chat_confirm_delete_db);
                 alertDialog.setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss());
                 alertDialog.setPositiveButton(R.string.delete, (dialog, which) -> {
                     ChatDatabase db = new ChatDatabase();
@@ -273,7 +264,7 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
 
         @Override
         public boolean onPreferenceChange(Preference preference, Object newValue) {
-            if (preference.equals(katex)) {
+            if (preference == katex) {
                 if (!(newValue instanceof Boolean)) return true;
                 boolean value = (Boolean) newValue;
 
@@ -290,7 +281,7 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
                         }
                     }
                 }
-            } else if (preference.equals(links)) {
+            } else if (preference == links) {
                 if (!(newValue instanceof Boolean)) return true;
                 boolean value = (Boolean) newValue;
 
@@ -307,13 +298,11 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
                         }
                     }
                 }
-            }/* else if (preference.equals(maxShownRows)) {
+            }
 
-            }*/
             return true;
         }
     }
-
 
     public static class GalleryPreferenceFragment extends PreferenceFragmentCompat implements Preference.OnPreferenceClickListener {
         private Preference deleteThumbnails;
@@ -325,13 +314,16 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.pref_gallery, rootKey);
 
-            deleteThumbnails = findPreference(Pref.Gallery.DELETE_THUMBNAILS);
-            deleteImages = findPreference(Pref.Gallery.DELETE_IMAGES);
-            showDir = findPreference(Pref.Gallery.SHOW_GALLERY_DIR);
-            deleteDatabase = findPreference(Pref.Gallery.DELETE_GALLERY_DB);
+            deleteThumbnails = findPreference(Preferences.gallery().keys().deleteThumbnails());
             deleteThumbnails.setOnPreferenceClickListener(this);
+
+            deleteImages = findPreference(Preferences.gallery().keys().deleteImages());
             deleteImages.setOnPreferenceClickListener(this);
+
+            showDir = findPreference(Preferences.gallery().keys().showDir());
             showDir.setOnPreferenceClickListener(this);
+
+            deleteDatabase = findPreference(Preferences.gallery().keys().deleteDatabase());
             deleteDatabase.setOnPreferenceClickListener(this);
         }
 
@@ -340,9 +332,9 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
             Context context = getActivity();
             if (context == null) return false;
 
-            if (preference.equals(deleteImages)) {
+            if (preference == deleteImages) {
                 AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
-                alertDialog.setMessage(R.string.confirm_delete_images);
+                alertDialog.setMessage(R.string.preferences_gallery_confirm_delete_images);
                 alertDialog.setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss());
                 alertDialog.setPositiveButton(R.string.delete, (dialog, which) -> {
                     File dir = context.getExternalFilesDir(getString(R.string.gallery_folder_images));
@@ -355,22 +347,19 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
                 });
                 alertDialog.show();
                 return true;
-            } else if (preference.equals(deleteThumbnails)) {
+            } else if (preference == deleteThumbnails) {
                 AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
-                alertDialog.setMessage(R.string.confirm_delete_thumbnails);
+                alertDialog.setMessage(R.string.preferences_gallery_confirm_delete_thumbnails);
                 alertDialog.setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss());
                 alertDialog.setPositiveButton(R.string.delete, (dialog, which) -> {
-                    File dir = new File(context.getExternalCacheDir(), context.getString(R.string.gallery_folder_thumbnails));
-                    if (dir.exists()) {
-                        try {
-                            FileUtils.cleanDirectory(dir);
-                        } catch (IOException ignored) {
-                        }
+                    try (GalleryDatabase galleryDatabase = new GalleryDatabase()) {
+                        galleryDatabase.init(requireContext());
+                        galleryDatabase.clearThumbnails();
                     }
                 });
                 alertDialog.show();
                 return true;
-            } else if (preference.equals(showDir)) {
+            } else if (preference == showDir) {
                 File dir = context.getExternalFilesDir("gallery");
                 if (dir == null) return false;
 
@@ -395,13 +384,13 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
                 }
 
                 return true;
-            } else if (preference.equals(deleteDatabase)) {
+            } else if (preference == deleteDatabase) {
                 AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
-                alertDialog.setMessage(R.string.confirm_delete_gallery_database);
+                alertDialog.setMessage(R.string.preferences_gallery_confirm_delete_gallery_database);
                 alertDialog.setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss());
                 alertDialog.setPositiveButton(R.string.delete, (dialog, which) -> {
                     GalleryDatabase db = new GalleryDatabase();
-                    db.init(getContext(), null);
+                    db.init(getContext());
                     db.clear();
                     db.close();
                 });
@@ -411,5 +400,4 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
             return false;
         }
     }
-
 }

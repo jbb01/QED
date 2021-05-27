@@ -39,7 +39,7 @@ import androidx.annotation.Px;
 import androidx.annotation.StyleRes;
 
 import com.jonahbauer.qed.R;
-import com.jonahbauer.qed.chat.Message;
+import com.jonahbauer.qed.model.Message;
 
 @SuppressWarnings({"unused"})
 public class MessageView extends RelativeLayout {
@@ -565,37 +565,37 @@ public class MessageView extends RelativeLayout {
     }
 
     private void setMessageInternal(@NonNull Message message) {
-        mName = message.name + (message.userName != null ? " | " + message.userName : "");
-        mMessage = message.message;
-        mId = String.valueOf(message.id);
+        mName = message.getName() + (message.getUserName() != null ? " | " + message.getUserName() : "");
+        mMessage = message.getMessage();
+        mId = String.valueOf(message.getId());
 
-        if (message.channel.isEmpty()) {
+        if (message.getChannel().isEmpty()) {
             mChannel = "(main)";
         } else {
-            mChannel = message.channel;
+            mChannel = message.getChannel();
         }
 
         if (mExtended) {
-            mDate = message.date;
+            mDate = message.getDate();
         } else {
-            String[] dates = message.date.split("(:|\\s)");
+            String[] dates = message.getDate().split("(:|\\s)");
             mDate = dates[1] + ":" + dates[2];
         }
 
         if (mName != null && !mName.matches("[\\s\\n\\r]*")) {
             mNameTextView.setVisibility(VISIBLE);
-            mNameTextColor = message.transformedColor;
+            mNameTextColor = message.getTransformedColor();
             mNameTextColorSet = true;
 
             mMessageTextColor = 0;
             mMessageTextColorSet = false;
         } else {
             mNameTextView.setVisibility(GONE);
-            mNameTextColor    = mMessageTextColor    = message.transformedColor;
+            mNameTextColor    = mMessageTextColor    = message.getTransformedColor();
             mNameTextColorSet = mMessageTextColorSet = true;
         }
 
-        this.mMessageId = message.id;
+        this.mMessageId = message.getId();
     }
 
     /**
@@ -997,9 +997,9 @@ public class MessageView extends RelativeLayout {
         return mLinkify;
     }
 
-    private static LinkifiedMessageOnTouchListener linkifiedMessageOnTouchListener = new LinkifiedMessageOnTouchListener();
+    private static final LinkifiedMessageOnTouchListener linkifiedMessageOnTouchListener = new LinkifiedMessageOnTouchListener();
     private static class LinkifiedMessageOnTouchListener implements OnTouchListener {
-        private static LinkMovementMethod2 movementMethod = new LinkMovementMethod2();
+        private static final LinkMovementMethod2 movementMethod = new LinkMovementMethod2();
 
         @SuppressLint("ClickableViewAccessibility")
         @Override

@@ -18,17 +18,19 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.Toolbar;
 
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.layoutStuff.viewPagerSideSheet.ViewPagerSideSheetBehavior;
 import com.jonahbauer.qed.layoutStuff.viewPagerSideSheet.ViewPagerSideSheetDialogFragment;
+import com.jonahbauer.qed.model.Event;
 import com.jonahbauer.qed.networking.QEDDBPages;
-import com.jonahbauer.qed.networking.QEDPageReceiver;
-import com.jonahbauer.qed.qeddb.event.Event;
+import com.jonahbauer.qed.networking.Reason;
+import com.jonahbauer.qed.networking.async.QEDPageReceiver;
 
 import static com.jonahbauer.qed.activities.eventSheet.EventFragment.ARG_EVENT;
-import static com.jonahbauer.qed.activities.eventSheet.EventFragment.ARG_EVENT_ID;
+import static com.jonahbauer.qed.activities.eventSheet.EventFragment.ARG_FETCH_DATA;
 import static com.jonahbauer.qed.activities.eventSheet.EventFragment.TAG_EVENT_FRAGMENT;
 
 public class EventSideSheet extends ViewPagerSideSheetDialogFragment implements QEDPageReceiver<Event> {
@@ -41,17 +43,12 @@ public class EventSideSheet extends ViewPagerSideSheetDialogFragment implements 
     private Event mEvent;
 
     @NonNull
-    public static EventSideSheet newInstance(long eventId) {
+    public static EventSideSheet newInstance(@NonNull Event event) {
         Bundle args = new Bundle();
-        args.putLong(ARG_EVENT_ID, eventId);
+        args.putParcelable(ARG_EVENT, event);
         EventSideSheet fragment = new EventSideSheet();
         fragment.setArguments(args);
         return fragment;
-    }
-
-    @NonNull
-    public static EventSideSheet newInstance(@NonNull Event event) {
-        return newInstance(event.id);
     }
 
     @Override
@@ -60,11 +57,12 @@ public class EventSideSheet extends ViewPagerSideSheetDialogFragment implements 
 
         Bundle args = getArguments();
         assert args != null;
-        long eventId = args.getLong(ARG_EVENT_ID);
         mEvent = args.getParcelable(ARG_EVENT);
+        assert mEvent != null;
 
-        if (mEvent == null) {
-            QEDDBPages.getEvent(getClass().toString(), eventId, this);
+        boolean fetch = args.getBoolean(EventFragment.ARG_FETCH_DATA, true);
+        if (fetch) {
+            QEDDBPages.getEvent(mEvent, this);
         }
     }
 
@@ -105,7 +103,7 @@ public class EventSideSheet extends ViewPagerSideSheetDialogFragment implements 
         mProgressBar = view.findViewById(R.id.progress_bar);
 
         mToolbar = view.findViewById(R.id.toolbar);
-        mToolbar.setNavigationIcon(getResources().getDrawable(R.drawable.ic_close, null));
+        mToolbar.setNavigationIcon(AppCompatResources.getDrawable(requireContext(), R.drawable.ic_close));
         mToolbar.setNavigationOnClickListener(v -> dismiss());
         mToolbar.setTitleTextColor(Color.BLACK);
         mToolbar.setVisibility(View.VISIBLE);
@@ -124,12 +122,12 @@ public class EventSideSheet extends ViewPagerSideSheetDialogFragment implements 
         });
 
         if (mEvent != null) {
-            onPageReceived(null, mEvent);
+            onPageReceived(mEvent);
         }
     }
 
     @Override
-    public void onPageReceived(String tag, Event event) {
+    public void onPageReceived(Event event) {
         if (mDismissed) return;
 
         mEvent = event;
@@ -140,7 +138,7 @@ public class EventSideSheet extends ViewPagerSideSheetDialogFragment implements 
             return;
         }
 
-        mToolbar.setTitle(event.title);
+        mToolbar.setTitle(event.getTitle());
         mProgressBar.setVisibility(View.GONE);
 
         openFragment();
@@ -156,15 +154,15 @@ public class EventSideSheet extends ViewPagerSideSheetDialogFragment implements 
     }
 
     @Override
-    public void onError(String tag, String reason, Throwable cause) {
-        QEDPageReceiver.super.onError(tag, reason, cause);
+    public void onError(Event event, String reason, Throwable cause) {
+        QEDPageReceiver.super.onError(event, reason, cause);
         if (mDismissed) return;
 
         final String errorString;
-        if (REASON_NETWORK.equals(reason) && getContext() != null)
+        if (Reason.NETWORK.equals(reason) && getContext() != null)
             errorString = getContext().getString(R.string.cant_connect);
         else if (getContext() != null)
-            errorString = getContext().getString(R.string.unknown_error);
+            errorString = getContext().getString(R.string.error_unknown);
         else
             errorString = "Severe Error!";
 
@@ -190,6 +188,7 @@ public class EventSideSheet extends ViewPagerSideSheetDialogFragment implements 
             Bundle args = getArguments();
             args = args != null ? args : new Bundle();
             args.putParcelable(ARG_EVENT, mEvent);
+            args.putBoolean(ARG_FETCH_DATA, false);
             EventBottomSheet eventBottomSheet = new EventBottomSheet();
             eventBottomSheet.setArguments(args);
             eventBottomSheet.show(getParentFragmentManager(), eventBottomSheet.getTag());

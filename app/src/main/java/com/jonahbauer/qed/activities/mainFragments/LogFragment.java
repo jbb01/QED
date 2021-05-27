@@ -8,10 +8,10 @@ import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.icu.util.TimeZone;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -38,95 +38,51 @@ import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.MainActivity;
 import com.jonahbauer.qed.activities.messageInfoSheet.MessageInfoBottomSheet;
-import com.jonahbauer.qed.chat.Message;
-import com.jonahbauer.qed.chat.MessageAdapter;
 import com.jonahbauer.qed.database.ChatDatabase;
 import com.jonahbauer.qed.database.ChatDatabaseReceiver;
+import com.jonahbauer.qed.model.Message;
+import com.jonahbauer.qed.model.adapter.MessageAdapter;
 import com.jonahbauer.qed.networking.QEDChatPages;
-import com.jonahbauer.qed.networking.QEDPageStreamReceiver;
+import com.jonahbauer.qed.networking.Reason;
+import com.jonahbauer.qed.networking.async.QEDPageStreamReceiver;
 import com.jonahbauer.qed.networking.downloadManager.Download;
 import com.jonahbauer.qed.networking.downloadManager.DownloadBroadcastReceiver;
 import com.jonahbauer.qed.networking.downloadManager.DownloadListener;
+import com.jonahbauer.qed.util.Preferences;
 
-import java.lang.ref.SoftReference;
+import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
 import static com.jonahbauer.qed.activities.mainFragments.LogFragment.Mode.DATE_INTERVAL;
 import static com.jonahbauer.qed.activities.mainFragments.LogFragment.Mode.DATE_RECENT;
+import static com.jonahbauer.qed.activities.mainFragments.LogFragment.Mode.FILE;
 import static com.jonahbauer.qed.activities.mainFragments.LogFragment.Mode.POST_INTERVAL;
 import static com.jonahbauer.qed.activities.mainFragments.LogFragment.Mode.POST_RECENT;
 import static com.jonahbauer.qed.activities.mainFragments.LogFragment.Mode.SINCE_OWN;
 
-public class LogFragment extends QEDFragment implements ChatDatabaseReceiver, QEDPageStreamReceiver {
-    private static final String DOWNLOAD_PROGRESS_STRING;
-    private static final String DOWNLOAD_PENDING_STRING;
-    private static final String DOWNLOAD_PAUSED_STRING;
-    private static final String DOWNLOAD_SUCCESSFUL_STRING;
-    private static final String DOWNLOAD_FAILED_STRING;
-    private static final String PARSE_PENDING_STRING;
-    private static final String PARSE_PROGRESS_STRING;
-    private static final String PARSE_FAILED_STRING;
-
+public class LogFragment extends QEDFragment implements ChatDatabaseReceiver, QEDPageStreamReceiver<String> {
     private static final String LOG_DOWNLOAD_ID_KEY = "downloadId";
+    private static final String ARGUMENT_LOG_REQUEST = "logRequest";
 
-    private static final String ARGUMENT_MODE = "mode";
-    private static final String ARGUMENT_CHANNEL = "channel";
-    private static final String ARGUMENT_DATA = "data";
-
-    private static final int KEY_DATE_RECENT_LAST = 0;
-
-    private static final int KEY_POST_RECENT_LAST = 1;
-
-    private static final int KEY_DATE_INTERVAL_FROM = 2;
-    private static final int KEY_DATE_INTERVAL_TO = 3;
-
-    private static final int KEY_POST_INTERVAL_FROM = 4;
-    private static final int KEY_POST_INTERVAL_TO = 5;
-
-    private static final int KEY_SINCE_OWN_SKIP = 6;
-
-    static {
-        SoftReference<Application> appRef = Application.getApplicationReference();
-        Application application = appRef.get();
-        if (application != null) {
-            DOWNLOAD_PROGRESS_STRING = application.getString(R.string.log_downloading);
-            DOWNLOAD_PENDING_STRING = application.getString(R.string.log_download_pending);
-            DOWNLOAD_PAUSED_STRING = application.getString(R.string.log_download_paused);
-            DOWNLOAD_SUCCESSFUL_STRING = application.getString(R.string.log_download_successful);
-            DOWNLOAD_FAILED_STRING = application.getString(R.string.log_download_failed);
-            PARSE_PROGRESS_STRING = application.getString(R.string.log_parsing);
-            PARSE_PENDING_STRING = application.getString(R.string.log_parse_pending);
-            PARSE_FAILED_STRING = application.getString(R.string.log_parse_failed);
-        } else {
-            Log.e(Application.LOG_TAG_ERROR, "", new Exception("Application is null!"));
-            DOWNLOAD_PROGRESS_STRING = "Error";
-            PARSE_PROGRESS_STRING = "Error";
-            PARSE_PENDING_STRING = "Error";
-            PARSE_FAILED_STRING = "Error";
-            DOWNLOAD_PENDING_STRING = "Error";
-            DOWNLOAD_PAUSED_STRING = "Error";
-            DOWNLOAD_FAILED_STRING = "Error";
-            DOWNLOAD_SUCCESSFUL_STRING = "Error";
-        }
-    }
 
     private SharedPreferences mSharedPreferences;
 
-    private Mode mMode;
-    private String mChannel;
-    private Long[] mData;
+    private LogRequest mLogRequest;
 
-    private String mPathData;
+    private Uri mFileUri;
     private EditText mPathEditText;
 
-    private String mOptions;
     private Download mLogDownload = null;
     private MessageAdapter mMessageAdapter;
 
@@ -163,12 +119,8 @@ public class LogFragment extends QEDFragment implements ChatDatabaseReceiver, QE
 
         Bundle args = getArguments();
         if (args != null) {
-            this.mMode = (Mode) args.getSerializable(ARGUMENT_MODE);
-            this.mChannel = args.getString(ARGUMENT_CHANNEL);
-            this.mData = ((Long[]) args.getSerializable(ARGUMENT_DATA));
+            this.mLogRequest = (OnlineLogRequest) args.getSerializable(ARGUMENT_LOG_REQUEST);
         }
-
-        fillWithStandard();
     }
 
     @Override
@@ -211,10 +163,12 @@ public class LogFragment extends QEDFragment implements ChatDatabaseReceiver, QE
                 return true;
             } else return false;
         });
-        mMessageListView.setPadding(mMessageListView.getPaddingLeft(),
+        mMessageListView.setPadding(
+                mMessageListView.getPaddingLeft(),
                 mMessageListView.getPaddingTop(),
                 mMessageListView.getPaddingRight() + mMessageListView.getVerticalScrollbarWidth(),
-                mMessageListView.getPaddingBottom());
+                mMessageListView.getPaddingBottom()
+        );
 
         setHasOptionsMenu(true);
 
@@ -236,111 +190,37 @@ public class LogFragment extends QEDFragment implements ChatDatabaseReceiver, QE
         mDatabase.init(view.getContext(), this);
     }
 
-    private void fillWithStandard() {
-        if (mMode == null) mMode = DATE_RECENT;
-        if (mChannel == null) mChannel = "";
-        if (mData == null) mData = new Long[8];
-
-        long now = Calendar.getInstance().getTimeInMillis();
-
-        if (mData[KEY_DATE_RECENT_LAST] == null) mData[KEY_DATE_RECENT_LAST] = 86400L;
-
-        if (mData[KEY_POST_RECENT_LAST] == null) mData[KEY_POST_RECENT_LAST] = 200L;
-
-        if (mData[KEY_DATE_INTERVAL_FROM] == null) mData[KEY_DATE_INTERVAL_FROM] = now - 86400L;
-        if (mData[KEY_DATE_INTERVAL_TO] == null) mData[KEY_DATE_INTERVAL_TO] = now;
-
-        if (mData[KEY_POST_INTERVAL_FROM] == null) mData[KEY_POST_INTERVAL_FROM] = 0L;
-        if (mData[KEY_POST_INTERVAL_TO] == null) mData[KEY_POST_INTERVAL_TO] = 0L;
-
-        if (mData[KEY_SINCE_OWN_SKIP] == null) mData[KEY_SINCE_OWN_SKIP] = 20L;
-    }
-
     private void reload() {
-        reload(null, null, null);
+        reload(null);
     }
-    private void reload(Mode mode, String channel, Long[] data) {
-        if (data != null) this.mData = data;
 
-        if (mode != null) this.mMode = mode;
-
-        if (channel != null) this.mChannel = channel;
-
-        fillWithStandard();
+    private void reload(LogRequest logRequest) {
+        if (logRequest != null) {
+            mLogRequest = logRequest;
+        }
+        if (mLogRequest == null) {
+            mLogRequest = new DateRecentLogRequest(Preferences.chat().getChannel(), 24, TimeUnit.HOURS);
+        }
 
         setStatus(0, 0, 0);
 
         mProgressTable.setVisibility(View.VISIBLE);
         mMessageListView.setVisibility(View.GONE);
         mLabelError.setVisibility(View.GONE);
-        String subtitle = "";
-
-        switch (this.mMode) {
-            case POST_RECENT: {
-                long last = this.mData[KEY_POST_RECENT_LAST];
-                mOptions = "mode=" + this.mMode.modeStr;
-                mOptions += "&last=" + last;
-                subtitle = MessageFormat.format(getString(R.string.log_subtitle_post_recent), last);
-                break;
-            }
-            case DATE_RECENT: {
-                long last = this.mData[KEY_DATE_RECENT_LAST];
-                mOptions = "mode=" + this.mMode.modeStr;
-                mOptions += "&last=" + last;
-                subtitle = MessageFormat.format(getString(R.string.log_subtitle_date_recent), last / 3600);
-                break;
-            }
-            case DATE_INTERVAL: {
-                long from = this.mData[KEY_DATE_INTERVAL_FROM];
-                long to = this.mData[KEY_DATE_INTERVAL_TO];
-
-                Date dateFrom = new Date(from);
-                Date dateTo = new Date(to);
-
-                mOptions = "mode=" + this.mMode.modeStr;
-                mOptions += "&from=" + MessageFormat.format("{0,date,yyyy-MM-dd}", dateFrom);
-                mOptions += "&to=" + MessageFormat.format("{0,date,yyyy-MM-dd}", dateTo);
-
-                subtitle = MessageFormat.format(getString(R.string.log_subtitle_date_interval), dateFrom, dateTo);
-                break;
-            }
-            case POST_INTERVAL: {
-                long from = this.mData[KEY_POST_INTERVAL_FROM];
-                long to = this.mData[KEY_POST_INTERVAL_TO];
-
-                mOptions = "mode=" + this.mMode.modeStr;
-                mOptions += "&from=" + from;
-                mOptions += "&to=" + to;
-
-                subtitle = MessageFormat.format(getString(R.string.log_subtitle_post_interval), from, to);
-                break;
-            }
-            case FILE: {
-                subtitle = getString(R.string.log_subtitle_file);
-                break;
-            }
-        }
-
-        mOptions += "&channel=" + this.mChannel;
-
-        this.mSubtitle.setText(subtitle);
-
         mMessageAdapter.clear();
 
         // handling of running downloads is done before reload is called
         if (mLogDownload != null) Download.stopDownload(mLogDownload);
 
-        if (mode == Mode.FILE) mOptions = "FILE" + mPathData;
+
+        mSubtitle.setText(mLogRequest.getSubtitle(getResources()));
 
         String tag = getClass().toString();
+        QEDChatPages.interrupt(tag);
 
-        QEDChatPages.interrupt(getClass().toString());
-
-        mDownloadListener = new QEDChatPages.LogDownloadListener(tag, mMessageAdapter, Objects.requireNonNull(mApplicationReference.get()), this);
-        mLogDownload = QEDChatPages.getChatLog(tag, mOptions, this, mDownloadListener);
+        mDownloadListener = createLogDownloadListener();
+        mLogDownload = QEDChatPages.getChatLog(tag, mLogRequest, mDownloadListener);
     }
-
-
 
     /**
      * Sets the checked item in the {@link #mMessageListView} and shows an appropriate toolbar.
@@ -371,14 +251,12 @@ public class LogFragment extends QEDFragment implements ChatDatabaseReceiver, QE
                     return false;
                 });
 
-                if (msg != null) toolbar.setTitle(msg.name);
+                if (msg != null) toolbar.setTitle(msg.getName());
             } else {
                 mainActivity.returnAltToolbar();
             }
         }
     }
-
-
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
@@ -395,22 +273,23 @@ public class LogFragment extends QEDFragment implements ChatDatabaseReceiver, QE
         return false;
     }
 
+    //<editor-fold desc="Lifecycle" defaultstate="collapsed">
     @Override
     public void onResume() {
         super.onResume();
         if (mLogDownload != null && (mDownloadListener == null || !mDownloadListener.equals(mLogDownload.getListener()))) {
             int downloadStatus = mLogDownload.getDownloadStatus();
-            if ((downloadStatus & (DownloadManager.STATUS_SUCCESSFUL | DownloadManager.STATUS_FAILED)) == 0) {
-                mDownloadListener = new QEDChatPages.LogDownloadListener(getClass().toString(), mMessageAdapter, Objects.requireNonNull(mApplicationReference.get()), this);
-
+            if ((downloadStatus & DownloadManager.STATUS_FAILED) == 0) {
+                // download not failed
+                mDownloadListener = createLogDownloadListener();
                 mLogDownload.attachListener(mDownloadListener);
-            } else if ((downloadStatus & DownloadManager.STATUS_SUCCESSFUL) == DownloadManager.STATUS_SUCCESSFUL) {
-                mDownloadListener = new QEDChatPages.LogDownloadListener(getClass().toString(), mMessageAdapter, Objects.requireNonNull(mApplicationReference.get()), this);
 
-                mLogDownload.attachListener(mDownloadListener);
-                DownloadBroadcastReceiver.cancelNotification(requireActivity(), mLogDownload.getDownloadId());
-            } else if ((downloadStatus & DownloadManager.STATUS_FAILED) == DownloadManager.STATUS_FAILED) {
-                onError(getClass().toString(), "download status is STATUS_FAILED", null);
+                if ((downloadStatus & DownloadManager.STATUS_SUCCESSFUL) == DownloadManager.STATUS_SUCCESSFUL) {
+                    // download successful
+                    DownloadBroadcastReceiver.cancelNotification(requireActivity(), mLogDownload.getDownloadId());
+                }
+            } else {
+                onError(getClass().toString(), Reason.NETWORK, null);
             }
         }
     }
@@ -430,13 +309,9 @@ public class LogFragment extends QEDFragment implements ChatDatabaseReceiver, QE
         super.onDestroy();
     }
 
-
     @Override
     public Boolean onDrop(boolean force) {
-        Application application = mApplicationReference.get();
-
-        Activity activity = getActivity();
-        if (!(activity instanceof MainActivity)) return true;
+        if (getActivity() == null) return true;
 
         @QEDChatPages.Status
         int asyncStatus = QEDChatPages.getStatus(getClass().toString());
@@ -444,31 +319,31 @@ public class LogFragment extends QEDFragment implements ChatDatabaseReceiver, QE
         boolean downloadRunning = (asyncStatus & (QEDChatPages.STATUS_DOWNLOAD_RUNNING | QEDChatPages.STATUS_DOWNLOAD_PENDING)) != 0;
         boolean parseRunning = (asyncStatus & (QEDChatPages.STATUS_PARSE_THREAD_ALIVE)) != 0;
 
-        final MainActivity mainActivity = (MainActivity) activity;
+        final MainActivity mainActivity = (MainActivity) getActivity();
 
-        if (force && application != null && downloadRunning) { // force closing
-            Toast.makeText(activity, R.string.log_download_continue_in_background_toast, Toast.LENGTH_LONG).show();
+        if (force && downloadRunning) { // force closing
+            Toast.makeText(mainActivity, R.string.log_download_continue_in_background_toast, Toast.LENGTH_LONG).show();
             downloadContinueInBackground();
             return true;
-        } else if (application != null && downloadRunning) {
+        } else if (downloadRunning) {
             AlertDialog.Builder builder = new AlertDialog.Builder(mainActivity);
-            builder.setMessage(R.string.log_download_running);
+            builder.setMessage(R.string.log_confirm_exit);
 
             // do nothing
-            builder.setPositiveButton(R.string.log_download_stay, (dialog, which) -> {
+            builder.setPositiveButton(R.string.log_confirm_exit_stay, (dialog, which) -> {
                 mainActivity.onDropResult(false);
                 dialog.dismiss();
             });
 
             // interrupt download manger, ui async task and parse thread
-            builder.setNegativeButton(R.string.log_download_cancel, (dialog, which) -> {
+            builder.setNegativeButton(R.string.log_confirm_exit_cancel, (dialog, which) -> {
                 mainActivity.onDropResult(true);
                 downloadGoAndCancel();
                 dialog.dismiss();
             });
 
             // interrupt ui async task
-            builder.setNeutralButton(R.string.log_download_continue_in_background, (dialog, which) -> {
+            builder.setNeutralButton(R.string.log_confirm_exit_continue_in_background, (dialog, which) -> {
                 mainActivity.onDropResult(true);
                 downloadContinueInBackground();
                 dialog.dismiss();
@@ -482,27 +357,26 @@ public class LogFragment extends QEDFragment implements ChatDatabaseReceiver, QE
 
             mDropAlertDialog = builder.show();
             return null;
-        } else if (application != null && parseRunning) {
+        } else if (parseRunning) {
             QEDChatPages.interrupt(getClass().toString());
             return true;
         } else {
             return true;
         }
     }
+
     private void downloadContinueInBackground() {
         DownloadListener listener = mLogDownload.getListener();
         if (listener != null)
             mLogDownload.detachListener(listener);
     }
+
     private void downloadGoAndCancel() {
         QEDChatPages.interrupt(getClass().toString());
     }
+    //</editor-fold>
 
-
-
-
-
-
+    //<editor-fold desc="Download Callback" defaultstate="collapsed">
     @Override
     public void onPageReceived(String tag) {
         if (mDropAlertDialog != null) mDropAlertDialog.cancel();
@@ -517,14 +391,14 @@ public class LogFragment extends QEDFragment implements ChatDatabaseReceiver, QE
     }
 
     @Override
-    public void onError(String tag, String reason, Throwable cause) {
+    public void onError(String tag, @Reason String reason, Throwable cause) {
         QEDPageStreamReceiver.super.onError(tag, reason, cause);
 
         mHandler.post(() -> {
-            if (REASON_NETWORK.equals(reason))
+            if (Reason.NETWORK.equals(reason))
                 mLabelError.setText(R.string.cant_connect);
             else
-                mLabelError.setText(R.string.unknown_error);
+                mLabelError.setText(R.string.error_unknown);
 
 
             mProgressTable.setVisibility(View.GONE);
@@ -568,9 +442,12 @@ public class LogFragment extends QEDFragment implements ChatDatabaseReceiver, QE
         }
     }
 
+    private QEDChatPages.LogDownloadListener createLogDownloadListener() {
+        return new QEDChatPages.LogDownloadListener(getClass().toString(), mMessageAdapter, (Application) getContext().getApplicationContext(), this);
+    }
+    //</editor-fold>
 
-
-
+    //<editor-fold desc="Database Callback" defaultstate="collapsed">
     @Override
     public void onReceiveResult(List<Message> messages) {}
 
@@ -587,10 +464,7 @@ public class LogFragment extends QEDFragment implements ChatDatabaseReceiver, QE
             Toast.makeText(getContext(), getString(R.string.database_save_done), Toast.LENGTH_SHORT).show();
         }
     }
-
-
-
-
+    //</editor-fold>
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -598,7 +472,7 @@ public class LogFragment extends QEDFragment implements ChatDatabaseReceiver, QE
             Uri uri = data.getData();
             if (uri != null) {
                 mPathEditText.setText(uri.getPath());
-                mPathData = uri.toString();
+                mFileUri = uri;
             }
         }
     }
@@ -614,11 +488,10 @@ public class LogFragment extends QEDFragment implements ChatDatabaseReceiver, QE
         @SuppressLint("InflateParams")
         View view1 = LayoutInflater.from(getContext()).inflate(R.layout.alert_dialog_log_mode, null);
 
-        Long[] data = new Long[8];
         AtomicReference<Mode> mode = new AtomicReference<>();
         AtomicReference<Date> dateStart = new AtomicReference<>();
         AtomicReference<Date> dateEnd = new AtomicReference<>();
-        String channel = null;
+        String channel = Preferences.chat().getChannel();
 
         Date date = android.icu.util.Calendar.getInstance(TimeZone.getDefault()).getTime();
         dateStart.set(date);
@@ -747,35 +620,37 @@ public class LogFragment extends QEDFragment implements ChatDatabaseReceiver, QE
 
         // Create dialog
         alertDialogBuilder.setPositiveButton(R.string.ok, (dialog, which) -> {
+            LogRequest logRequest = null;
             switch (mode.get()) {
                 case POST_RECENT:
                     try {
-                        data[KEY_POST_RECENT_LAST] = Long.parseLong(postRecentLast.getText().toString().trim());
+                        logRequest = new PostRecentLogRequest(channel, Long.parseLong(postRecentLast.getText().toString().trim()));
                     } catch (NumberFormatException ignored) {}
                     break;
                 case DATE_RECENT:
                     try {
-                        data[KEY_DATE_RECENT_LAST] = 3600 * Long.parseLong(dateRecentLast.getText().toString().trim());
+                        logRequest = new DateRecentLogRequest(channel, Long.parseLong(dateRecentLast.getText().toString().trim()), TimeUnit.HOURS);
                     } catch (NumberFormatException ignored) {}
                     break;
                 case DATE_INTERVAL:
-                    data[KEY_DATE_INTERVAL_FROM] = dateStart.get().getTime();
-                    data[KEY_DATE_INTERVAL_TO] = dateEnd.get().getTime();
-                    break;
-                case FILE:
+                    logRequest = new DateIntervalLogRequest(channel, dateStart.get(), dateEnd.get());
                     break;
                 case POST_INTERVAL:
                     try {
-                        data[KEY_POST_INTERVAL_FROM] = Long.parseLong(postIntervalStart.getText().toString().trim());
+                        logRequest = new PostIntervalLogRequest(
+                                channel,
+                                Long.parseLong(postIntervalStart.getText().toString().trim()),
+                                Long.parseLong(postIntervalEnd.getText().toString().trim())
+                        );
                     } catch (NumberFormatException ignored) {}
-
-                    try {
-                        data[KEY_POST_INTERVAL_TO] = Long.parseLong(postIntervalEnd.getText().toString().trim());
-                    } catch (NumberFormatException ignored) {}
+                    break;
+                case FILE:
+                    logRequest = new FileLogRequest(mFileUri);
+                    mFileUri = null;
                     break;
             }
 
-            reload(mode.get(), channel, data);
+            reload(logRequest);
             dialog.dismiss();
         });
 
@@ -795,7 +670,7 @@ public class LogFragment extends QEDFragment implements ChatDatabaseReceiver, QE
 
         switch (downloadStatus) {
             case 0:
-                mProgressText[0].setText(DOWNLOAD_PENDING_STRING);
+                mProgressText[0].setText(R.string.log_status_download_pending);
                 mProgressText[0].setEnabled(false);
 
                 mProgressIcons[0].setVisibility(View.VISIBLE);
@@ -804,7 +679,7 @@ public class LogFragment extends QEDFragment implements ChatDatabaseReceiver, QE
                 mProgressBars[0].setVisibility(View.INVISIBLE);
                 break;
             case 1:
-                mProgressText[0].setText(String.format(DOWNLOAD_PAUSED_STRING, data0 + "." + data1 + " MiB"));
+                mProgressText[0].setText(String.format(getString(R.string.log_status_download_paused), data0 + "." + data1 + " MiB"));
                 mProgressText[0].setEnabled(true);
 
                 mProgressIcons[0].setVisibility(View.VISIBLE);
@@ -813,7 +688,7 @@ public class LogFragment extends QEDFragment implements ChatDatabaseReceiver, QE
                 mProgressBars[0].setVisibility(View.INVISIBLE);
                 break;
             case 2:
-                mProgressText[0].setText(String.format(DOWNLOAD_PROGRESS_STRING, data0 + "." + data1 + " MiB"));
+                mProgressText[0].setText(String.format(getString(R.string.log_status_downloading), data0 + "." + data1 + " MiB"));
                 mProgressText[0].setEnabled(true);
 
                 mProgressIcons[0].setVisibility(View.INVISIBLE);
@@ -822,7 +697,7 @@ public class LogFragment extends QEDFragment implements ChatDatabaseReceiver, QE
                 mProgressBars[0].setVisibility(View.VISIBLE);
                 break;
             case 3:
-                mProgressText[0].setText(String.format(DOWNLOAD_SUCCESSFUL_STRING, data0 + "." + data1 + " MiB"));
+                mProgressText[0].setText(String.format(getString(R.string.log_status_download_successful), data0 + "." + data1 + " MiB"));
                 mProgressText[0].setEnabled(true);
 
                 mProgressIcons[0].setVisibility(View.VISIBLE);
@@ -831,7 +706,7 @@ public class LogFragment extends QEDFragment implements ChatDatabaseReceiver, QE
                 mProgressBars[0].setVisibility(View.INVISIBLE);
                 break;
             case 4:
-                mProgressText[0].setText(String.format(DOWNLOAD_FAILED_STRING, data0 + "." + data1 + " MiB"));
+                mProgressText[0].setText(String.format(getString(R.string.log_status_download_failed), data0 + "." + data1 + " MiB"));
                 mProgressText[0].setEnabled(true);
 
                 mProgressIcons[0].setVisibility(View.VISIBLE);
@@ -845,7 +720,7 @@ public class LogFragment extends QEDFragment implements ChatDatabaseReceiver, QE
 
         switch (parseStatus) {
             case 0:
-                mProgressText[1].setText(PARSE_PENDING_STRING);
+                mProgressText[1].setText(R.string.log_status_parse_pending);
                 mProgressText[1].setEnabled(false);
 
                 mProgressIcons[1].setVisibility(View.VISIBLE);
@@ -854,7 +729,7 @@ public class LogFragment extends QEDFragment implements ChatDatabaseReceiver, QE
                 mProgressBars[1].setVisibility(View.INVISIBLE);
                 break;
             case 1:
-                mProgressText[1].setText(String.format(PARSE_PROGRESS_STRING, data0 + "/" + data1));
+                mProgressText[1].setText(String.format(getString(R.string.log_status_parsing), data0 + "/" + data1));
                 mProgressText[1].setEnabled(true);
 
                 mProgressIcons[1].setVisibility(View.INVISIBLE);
@@ -863,7 +738,7 @@ public class LogFragment extends QEDFragment implements ChatDatabaseReceiver, QE
                 mProgressBars[1].setVisibility(View.VISIBLE);
                 break;
             case 2:
-                mProgressText[1].setText(String.format(PARSE_FAILED_STRING, data0 + "/" + data1));
+                mProgressText[1].setText(String.format(getString(R.string.log_status_parse_failed), data0 + "/" + data1));
                 mProgressText[1].setEnabled(true);
 
                 mProgressIcons[1].setVisibility(View.VISIBLE);
@@ -877,12 +752,174 @@ public class LogFragment extends QEDFragment implements ChatDatabaseReceiver, QE
     }
 
     public enum Mode {
-        POST_RECENT("postrecent"), DATE_RECENT("daterecent"), DATE_INTERVAL("dateinterval"), POST_INTERVAL("postinterval"), SINCE_OWN("fromownpost"), FILE("file");
+        POST_RECENT("postrecent"),
+        DATE_RECENT("daterecent"),
+        DATE_INTERVAL("dateinterval"),
+        POST_INTERVAL("postinterval"),
+        SINCE_OWN("fromownpost"),
+        FILE("file");
 
         final String modeStr;
 
         Mode(String modeStr) {
             this.modeStr = modeStr;
+        }
+    }
+
+    @Getter
+    @EqualsAndHashCode
+    public static abstract class LogRequest implements Serializable {
+        private final Mode mode;
+
+        protected LogRequest(Mode mode) {
+            this.mode = mode;
+        }
+
+        public abstract String getQueryString();
+
+        public abstract String getSubtitle(Resources resources);
+    }
+
+    @Getter
+    @EqualsAndHashCode(callSuper = true)
+    public static abstract class OnlineLogRequest extends LogRequest {
+        private final String channel;
+
+        protected OnlineLogRequest(Mode mode, String channel) {
+            super(mode);
+            this.channel = channel;
+        }
+    }
+
+    @Getter
+    @EqualsAndHashCode(callSuper = true)
+    public static class PostRecentLogRequest extends OnlineLogRequest {
+        private final long last;
+
+        protected PostRecentLogRequest(String channel, long last) {
+            super(POST_RECENT, channel);
+            this.last = last;
+        }
+
+        @Override
+        public String getQueryString() {
+            return "?mode=postrecent&last=" + last;
+        }
+
+        @Override
+        public String getSubtitle(Resources resources) {
+            return MessageFormat.format(resources.getString(R.string.log_subtitle_post_recent), last);
+        }
+    }
+
+    @Getter
+    @EqualsAndHashCode(callSuper = true)
+    public static class DateRecentLogRequest extends OnlineLogRequest {
+        private final long seconds;
+
+        protected DateRecentLogRequest(String channel, long duration, TimeUnit timeUnit) {
+            super(DATE_RECENT, channel);
+            this.seconds = timeUnit.toSeconds(duration);
+        }
+
+        @Override
+        public String getQueryString() {
+            return "?mode=daterecent&last=" + seconds;
+        }
+
+        @Override
+        public String getSubtitle(Resources resources) {
+            return MessageFormat.format(resources.getString(R.string.log_subtitle_date_recent), seconds / 3600);
+        }
+    }
+
+    @Getter
+    @EqualsAndHashCode(callSuper = true)
+    public static class PostIntervalLogRequest extends OnlineLogRequest {
+        private final long from;
+        private final long to;
+
+        protected PostIntervalLogRequest(String channel, long from, long to) {
+            super(POST_INTERVAL, channel);
+            this.from = from;
+            this.to = to;
+        }
+
+        @Override
+        public String getQueryString() {
+            return "?mode=postinterval&from=" + from + "&to=" + to;
+        }
+
+        @Override
+        public String getSubtitle(Resources resources) {
+            return MessageFormat.format(resources.getString(R.string.log_subtitle_post_interval), from, to);
+        }
+    }
+
+    @Getter
+    @EqualsAndHashCode(callSuper = true)
+    public static class DateIntervalLogRequest extends OnlineLogRequest {
+        private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd", Locale.GERMANY);
+
+        private final Date from;
+        private final Date to;
+
+        protected DateIntervalLogRequest(String channel, Date from, Date to) {
+            super(DATE_INTERVAL, channel);
+            this.from = from;
+            this.to = to;
+        }
+
+        @Override
+        public String getQueryString() {
+            return "?mode=dateinterval&from=" + DATE_FORMAT.format(from) + "&to=" + DATE_FORMAT.format(to);
+        }
+
+        @Override
+        public String getSubtitle(Resources resources) {
+            return MessageFormat.format(resources.getString(R.string.log_subtitle_date_interval), from, to);
+        }
+    }
+
+    @Getter
+    @EqualsAndHashCode(callSuper = true)
+    public static class SinceOwnLogRequest extends OnlineLogRequest {
+        private final long skip;
+
+        protected SinceOwnLogRequest(String channel, long skip) {
+            super(SINCE_OWN, channel);
+            this.skip = skip;
+        }
+
+        @Override
+        public String getQueryString() {
+            return "?mode=fromownpost&skip=" + skip;
+        }
+
+        @Override
+        public String getSubtitle(Resources resources) {
+            return resources.getString(R.string.log_subtitle_since_own);
+        }
+    }
+
+    @Getter
+    @EqualsAndHashCode(callSuper = true)
+    public static class FileLogRequest extends LogRequest {
+        private final Uri file;
+
+        protected FileLogRequest(Uri file) {
+            super(FILE);
+            this.file = file;
+        }
+
+        @Override
+        public String getQueryString() {
+            return "file://" + file.toString();
+        }
+
+        @Override
+        public String getSubtitle(Resources resources) {
+            return resources.getString(R.string.log_subtitle_file);
         }
     }
 }

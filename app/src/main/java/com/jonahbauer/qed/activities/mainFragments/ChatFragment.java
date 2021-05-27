@@ -5,7 +5,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
@@ -27,19 +26,18 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StyleRes;
 import androidx.appcompat.widget.Toolbar;
-import androidx.preference.PreferenceManager;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.jonahbauer.qed.NetworkListener;
-import com.jonahbauer.qed.Pref;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.MainActivity;
 import com.jonahbauer.qed.activities.messageInfoSheet.MessageInfoBottomSheet;
-import com.jonahbauer.qed.chat.Message;
-import com.jonahbauer.qed.chat.MessageAdapter;
 import com.jonahbauer.qed.database.ChatDatabase;
+import com.jonahbauer.qed.model.Message;
+import com.jonahbauer.qed.model.adapter.MessageAdapter;
 import com.jonahbauer.qed.networking.ChatWebSocket;
 import com.jonahbauer.qed.networking.ChatWebSocketListener;
+import com.jonahbauer.qed.networking.NetworkListener;
+import com.jonahbauer.qed.util.Preferences;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -51,7 +49,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class ChatFragment extends QEDFragment implements NetworkListener, AbsListView.OnScrollListener, ChatWebSocketListener {
     private Resources mRes;
     private ChatDatabase mDatabase;
-    private SharedPreferences mSharedPreferences;
 
     private final Object mSocketLock = new Object();
     private ChatWebSocket mWebSocket = null;
@@ -107,8 +104,6 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
         mQuickSettingsName = view.findViewById(R.id.quick_settings_name);
         mQuickSettingsChannel = view.findViewById(R.id.quick_settings_channel);
 
-        assert getContext() != null;
-        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
         mRes = getResources();
 
         mMessageEditText.setOnClickListener(a -> editTextClicked());
@@ -128,14 +123,14 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
             View editTextView = LayoutInflater.from(inputDialog.getContext()).inflate(R.layout.alert_dialog_edit_text, null);
 
             EditText inputEditText = editTextView.findViewById(R.id.input);
-            inputEditText.setText(mSharedPreferences.getString(Pref.Chat.NAME, ""));
+            inputEditText.setText(Preferences.chat().getName());
 
             inputDialog.setView(editTextView);
 
             inputDialog.setNegativeButton(mRes.getString(R.string.cancel), (dialog, which) -> dialog.cancel());
 
             inputDialog.setPositiveButton(mRes.getString(R.string.ok), (dialog, which) -> {
-                mSharedPreferences.edit().putString(Pref.Chat.NAME, inputEditText.getText().toString()).apply();
+                Preferences.chat().edit().setName(inputEditText.getText().toString()).apply();
                 dialog.dismiss();
             });
 
@@ -151,14 +146,14 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
             View editTextView = LayoutInflater.from(inputDialog.getContext()).inflate(R.layout.alert_dialog_edit_text, null);
 
             EditText inputEditText = editTextView.findViewById(R.id.input);
-            inputEditText.setText(mSharedPreferences.getString(Pref.Chat.CHANNEL, ""));
+            inputEditText.setText(Preferences.chat().getChannel());
 
             inputDialog.setView(editTextView);
 
             inputDialog.setNegativeButton(mRes.getString(R.string.cancel), (dialog, which) -> dialog.cancel());
 
             inputDialog.setPositiveButton(mRes.getString(R.string.ok), (dialog, which) -> {
-                mSharedPreferences.edit().putString(Pref.Chat.CHANNEL, inputEditText.getText().toString()).apply();
+                Preferences.chat().edit().setChannel(inputEditText.getText().toString()).apply();
                 reload();
                 dialog.dismiss();
             });
@@ -180,7 +175,6 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
             mShowQuickSettings = !mShowQuickSettings;
         });
 
-//        messageAdapter = new MessageAdapter(view.getContext(), new ArrayList<>(), mSharedPreferences.getBoolean(Pref.Chat.KATEX, false), mMathPreload);
         mMessageAdapter = new MessageAdapter(view.getContext(), new ArrayList<>(), mathPreload);
         mMessageListView.setAdapter(mMessageAdapter);
         mMessageListView.setOnScrollListener(this);
@@ -257,7 +251,7 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
                     return false;
                 });
 
-                if (msg != null) toolbar.setTitle(msg.name);
+                if (msg != null) toolbar.setTitle(msg.getName());
             } else {
                 mainActivity.returnAltToolbar();
             }
@@ -360,8 +354,8 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
 
         mDatabase.insert(message);
 
-        if (message.id < mTopPosition) mTopPosition = message.id;
-        if (message.bottag == 1 && mSharedPreferences.getBoolean(Pref.Chat.SHOW_SENSE,false)) return;
+        if (message.getId() < mTopPosition) mTopPosition = message.getId();
+        if (message.getBottag() == 1 && Preferences.chat().isSense()) return;
 
         mHandler.post(() -> {
             mMessageAdapter.add(message);
@@ -402,7 +396,7 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
 
     /**
      * Sends a chat post to the server
-     * The content of the post comes from {@link #mMessageEditText} and various preferences (e.g. {@link Pref.Chat#NAME} or {@link Pref.Chat#PUBLIC_ID})
+     * The content of the post comes from {@link #mMessageEditText} and various preferences.
      *
      * @param force if this is false the user will be prompted before sending empty posts
      */
@@ -432,36 +426,16 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
         }
     }
 
-//    static boolean scrollDown = false;
-//    static int scrollDurationLeft = 0;
-//    static long scrollStartTime;
-
     @Override
-    public void onScrollStateChanged(AbsListView view, int scrollState) {
-//        if (scrollState == SCROLL_STATE_TOUCH_SCROLL) {
-//            scrollDown = false;
-//        }
-    }
+    public void onScrollStateChanged(AbsListView view, int scrollState) {}
 
     @Override
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-//        if (scrollDown) {
-//            if (firstVisibleItem + visibleItemCount != totalItemCount) {
-//                view.smoothScrollToPositionFromTop(mMessageAdapter2.getCount(), 0, scrollDurationLeft -= (System.currentTimeMillis() - scrollStartTime));
-//            } else {
-//                scrollDown = false;
-//            }
-//        }
-
-
         if (mScrollDownButton != null) if (totalItemCount-visibleItemCount-firstVisibleItem > 0) mScrollDownButton.show();
         else mScrollDownButton.hide();
     }
 
     private void scrollDown() {
-//        scrollDown = true;
-//        scrollDurationLeft = 250;
-//        scrollStartTime = System.currentTimeMillis();
         mMessageListView.smoothScrollToPositionFromTop(mMessageAdapter.getCount(), 0, 250);
     }
 
@@ -469,7 +443,7 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
     public void onMessage(@NonNull Message message) {
         addPost(message, mInitDone);
 
-        if (mLastPostId < message.id) mLastPostId = message.id;
+        if (mLastPostId < message.getId()) mLastPostId = message.getId();
     }
 
     @Override
@@ -481,7 +455,7 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
         if (REASON_NETWORK.equals(reason))
             error(mRes.getString(R.string.cant_connect));
         else
-            error(mRes.getString(R.string.unknown_error));
+            error(mRes.getString(R.string.error_unknown));
 
         mHandler.postDelayed(() -> mNetworkError.set(false), 1000);
     }

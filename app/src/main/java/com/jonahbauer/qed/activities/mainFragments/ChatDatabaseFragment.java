@@ -2,7 +2,6 @@ package com.jonahbauer.qed.activities.mainFragments;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.drawable.Animatable;
 import android.os.Bundle;
 import android.view.View;
@@ -18,16 +17,15 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StyleRes;
 import androidx.appcompat.widget.Toolbar;
-import androidx.preference.PreferenceManager;
 
-import com.jonahbauer.qed.Pref;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.MainActivity;
 import com.jonahbauer.qed.activities.messageInfoSheet.MessageInfoBottomSheet;
-import com.jonahbauer.qed.chat.Message;
-import com.jonahbauer.qed.chat.MessageAdapter;
 import com.jonahbauer.qed.database.ChatDatabase;
 import com.jonahbauer.qed.database.ChatDatabaseReceiver;
+import com.jonahbauer.qed.model.Message;
+import com.jonahbauer.qed.model.adapter.MessageAdapter;
+import com.jonahbauer.qed.util.Preferences;
 import com.szagurskii.patternedtextwatcher.PatternedTextWatcher;
 
 import java.util.ArrayList;
@@ -64,8 +62,6 @@ public class ChatDatabaseFragment extends QEDFragment implements CompoundButton.
     private EditText mIdEditText;
     private TextView mHitsView;
 
-    private SharedPreferences mSharedPreferences;
-
     @NonNull
     public static ChatDatabaseFragment newInstance(@StyleRes int themeId) {
         Bundle args = new Bundle();
@@ -81,8 +77,6 @@ public class ChatDatabaseFragment extends QEDFragment implements CompoundButton.
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-
-        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
     @Override
@@ -173,7 +167,7 @@ public class ChatDatabaseFragment extends QEDFragment implements CompoundButton.
                     return false;
                 });
 
-                if (msg != null) toolbar.setTitle(msg.name);
+                if (msg != null) toolbar.setTitle(msg.getName());
             } else {
                 mainActivity.returnAltToolbar();
             }
@@ -182,42 +176,35 @@ public class ChatDatabaseFragment extends QEDFragment implements CompoundButton.
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        switch (buttonView.getId()) {
-            case R.id.expand_checkBox:
-                if (isChecked) {
-                    buttonView.setButtonDrawable(R.drawable.ic_arrow_up_accent_animation);
-                    ((Animatable) Objects.requireNonNull(buttonView.getButtonDrawable())).start();
-                    expand(mExpandable);
-                } else {
-                    buttonView.setButtonDrawable(R.drawable.ic_arrow_down_accent_animation);
-                    ((Animatable) Objects.requireNonNull(buttonView.getButtonDrawable())).start();
-                    collapse(mExpandable);
-                }
-                break;
-            case R.id.database_channel_checkbox:
-                mChannelEditText.setEnabled(isChecked);
-                if (isChecked) mChannelEditText.requestFocus();
-                break;
-            case R.id.database_message_checkbox:
-                mMessageEditText.setEnabled(isChecked);
-                if (isChecked) mMessageEditText.requestFocus();
-                break;
-            case R.id.database_name_checkbox:
-                mNameEditText.setEnabled(isChecked);
-                if (isChecked) mNameEditText.requestFocus();
-                break;
-            case R.id.database_dateFrom_checkbox:
-                mDateFromEditText.setEnabled(isChecked);
-                if (isChecked) mDateFromEditText.requestFocus();
-                break;
-            case R.id.database_dateTo_checkbox:
-                mDateToEditText.setEnabled(isChecked);
-                if (isChecked) mDateToEditText.requestFocus();
-                break;
-            case R.id.database_id_checkbox:
-                mIdEditText.setEnabled(isChecked);
-                if (isChecked) mIdEditText.requestFocus();
-                break;
+        int id = buttonView.getId();
+        if (id == R.id.expand_checkBox) {
+            if (isChecked) {
+                buttonView.setButtonDrawable(R.drawable.ic_arrow_up_accent_animation);
+                ((Animatable) Objects.requireNonNull(buttonView.getButtonDrawable())).start();
+                expand(mExpandable);
+            } else {
+                buttonView.setButtonDrawable(R.drawable.ic_arrow_down_accent_animation);
+                ((Animatable) Objects.requireNonNull(buttonView.getButtonDrawable())).start();
+                collapse(mExpandable);
+            }
+        } else if (id == R.id.database_channel_checkbox) {
+            mChannelEditText.setEnabled(isChecked);
+            if (isChecked) mChannelEditText.requestFocus();
+        } else if (id == R.id.database_message_checkbox) {
+            mMessageEditText.setEnabled(isChecked);
+            if (isChecked) mMessageEditText.requestFocus();
+        } else if (id == R.id.database_name_checkbox) {
+            mNameEditText.setEnabled(isChecked);
+            if (isChecked) mNameEditText.requestFocus();
+        } else if (id == R.id.database_dateFrom_checkbox) {
+            mDateFromEditText.setEnabled(isChecked);
+            if (isChecked) mDateFromEditText.requestFocus();
+        } else if (id == R.id.database_dateTo_checkbox) {
+            mDateToEditText.setEnabled(isChecked);
+            if (isChecked) mDateToEditText.requestFocus();
+        } else if (id == R.id.database_id_checkbox) {
+            mIdEditText.setEnabled(isChecked);
+            if (isChecked) mIdEditText.requestFocus();
         }
     }
 
@@ -280,7 +267,7 @@ public class ChatDatabaseFragment extends QEDFragment implements CompoundButton.
         }
         sql.append(" ORDER BY ").append(COLUMN_NAME_ID).append(" ASC");
 
-        int limit = mSharedPreferences.getInt(Pref.Chat.DATABASE_MAX_SEARCH_RESULTS, 50000);
+        int limit = Preferences.chat().getDbMaxResults();
         sql.append(" LIMIT ").append(limit).append(";");
 
         mMessageAdapter.clear();

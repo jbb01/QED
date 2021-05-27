@@ -19,13 +19,12 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
-import androidx.preference.PreferenceManager;
 
-import com.jonahbauer.qed.Pref;
 import com.jonahbauer.qed.R;
-import com.jonahbauer.qed.chat.Message;
 import com.jonahbauer.qed.layoutStuff.MathView;
 import com.jonahbauer.qed.layoutStuff.MessageView;
+import com.jonahbauer.qed.model.Message;
+import com.jonahbauer.qed.util.Preferences;
 
 public class MessageInfoFragment extends Fragment implements View.OnScrollChangeListener {
     private static final String ARGUMENT_MESSAGE = "message";
@@ -69,7 +68,7 @@ public class MessageInfoFragment extends Fragment implements View.OnScrollChange
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mKatex = PreferenceManager.getDefaultSharedPreferences(inflater.getContext()).getBoolean(Pref.Chat.KATEX, false);
+        mKatex = Preferences.chat().isKatex();
         return inflater.inflate(R.layout.fragment_message_info, container, false);
     }
 
@@ -87,20 +86,20 @@ public class MessageInfoFragment extends Fragment implements View.OnScrollChange
 
         // this is equal to #CCC multiplied by transformedColor (the same as the dark regions of background)
         int darkColor = Color.rgb(
-                Color.red(mMessage.transformedColor) * 204 / 255,
-                Color.green(mMessage.transformedColor) * 204 / 255,
-                Color.blue(mMessage.transformedColor) * 204 / 255);
+                Color.red(mMessage.getTransformedColor()) * 204 / 255,
+                Color.green(mMessage.getTransformedColor()) * 204 / 255,
+                Color.blue(mMessage.getTransformedColor()) * 204 / 255);
 
         if (mMessage != null) {
             View backgroundLayout = view.findViewById(R.id.background_layout);
             // choose random background image and set color
-            mBackground.setBackgroundResource(backgroundResId[(int) mMessage.id % backgroundResId.length]);
-            mBackground.setBackgroundTintList(ColorStateList.valueOf(mMessage.transformedColor));
+            mBackground.setBackgroundResource(backgroundResId[(int) mMessage.getId() % backgroundResId.length]);
+            mBackground.setBackgroundTintList(ColorStateList.valueOf(mMessage.getTransformedColor()));
             backgroundLayout.setBackgroundColor(darkColor);
             if (mToolbar != null) {
                 mToolbar.setBackgroundColor(darkColor);
                 mToolbar.setTitleTextColor(Color.WHITE);
-                mToolbar.setTitle(mMessage.name);
+                mToolbar.setTitle(mMessage.getName());
             }
 
             // wait for layout
@@ -175,21 +174,21 @@ public class MessageInfoFragment extends Fragment implements View.OnScrollChange
             ViewStub valueMessageMathStub = view.findViewById(R.id.value_message_math_stub);
 
             // set values
-            valueId.setText(String.valueOf(mMessage.id));
-            valueName.setText(mMessage.name);
-            valueTimestamp.setText(mMessage.date);
-            valueBottag.setText(String.valueOf(mMessage.bottag));
-            valueMessage.setText(mMessage.message);
-            valueChannel.setText(mMessage.channel.equals("") ? "(main)" : mMessage.channel);
+            valueId.setText(String.valueOf(mMessage.getId()));
+            valueName.setText(mMessage.getName());
+            valueTimestamp.setText(mMessage.getDate());
+            valueBottag.setText(String.valueOf(mMessage.getBottag()));
+            valueMessage.setText(mMessage.getMessage());
+            valueChannel.setText(mMessage.getChannel().equals("") ? "(main)" : mMessage.getChannel());
 
             if (mKatex) {
                 MathView mathView = (MathView) valueMessageMathStub.inflate();
-                mathView.setText(mMessage.message);
+                mathView.setText(mMessage.getMessage());
                 valueMessage.setVisibility(View.GONE);
             }
 
-            if (mMessage.userName != null) {
-                valueUsername.setText(String.format("%s (%s)", mMessage.userName, mMessage.userId));
+            if (mMessage.getUserName() != null) {
+                valueUsername.setText(String.format("%s (%s)", mMessage.getUserName(), mMessage.getUserId()));
                 view.findViewById(R.id.layout_username).setVisibility(View.VISIBLE);
                 view.findViewById(R.id.icon_username).setVisibility(View.VISIBLE);
             }

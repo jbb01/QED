@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:labelFor="@id/log_dialog_file_editText"
-        android:text="@string/log_dialog_file_title" />
+        android:text="@string/log_request_file_title" />
 
     <EditText
         android:id="@+id/log_dialog_file_editText"

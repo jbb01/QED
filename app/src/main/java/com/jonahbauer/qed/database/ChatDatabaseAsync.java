@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 
-import com.jonahbauer.qed.chat.Message;
+import com.jonahbauer.qed.model.Message;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -95,15 +95,15 @@ public class ChatDatabaseAsync extends AsyncTask<Object, Integer, Boolean> {
 
                 for (Message message : messages) {
                     ContentValues value = new ContentValues();
-                    value.put(COLUMN_NAME_ID, message.id);
-                    value.put(COLUMN_NAME_USERID, message.userId);
-                    value.put(COLUMN_NAME_USERNAME, message.userName);
-                    value.put(COLUMN_NAME_BOTTAG, message.bottag);
-                    value.put(COLUMN_NAME_COLOR, message.color);
-                    value.put(COLUMN_NAME_MESSAGE, message.message);
-                    value.put(COLUMN_NAME_DATE, message.date);
-                    value.put(COLUMN_NAME_NAME, message.name);
-                    value.put(COLUMN_NAME_CHANNEL, message.channel);
+                    value.put(COLUMN_NAME_ID, message.getId());
+                    value.put(COLUMN_NAME_USERID, message.getUserId());
+                    value.put(COLUMN_NAME_USERNAME, message.getUserName());
+                    value.put(COLUMN_NAME_BOTTAG, message.getBottag());
+                    value.put(COLUMN_NAME_COLOR, message.getColor());
+                    value.put(COLUMN_NAME_MESSAGE, message.getMessage());
+                    value.put(COLUMN_NAME_DATE, message.getDate());
+                    value.put(COLUMN_NAME_NAME, message.getName());
+                    value.put(COLUMN_NAME_CHANNEL, message.getChannel());
 
                     try {
                         chatWriteable.insertOrThrow(TABLE_NAME, null, value);

@@ -24,7 +24,7 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:padding="16dp"
-        android:entries="@array/modes" />
+        android:entries="@array/log_request_modes" />
 
     <include
         android:id="@+id/log_fragment_postrecent"

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:mContext=".activities.ImageActivity"
@@ -87,67 +88,14 @@
     </RelativeLayout>
     -->
 
-    <com.jonahbauer.qed.layoutStuff.AdvancedImageView
-        android:id="@+id/gallery_image"
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/gallery_image_view_pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:scaleType="matrix"
-        android:visibility="gone"
-        tools:visibility="visible"
-        tools:src="@tools:sample/backgrounds/scenic"
-        tools:ignore="ContentDescription" />
-
-    <ProgressBar
-        android:id="@+id/progress_bar_indeterminate"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_gravity="center_horizontal"
-        android:gravity="center_horizontal"
-        android:padding="100dp"
-        style="?android:attr/progressBarStyleLarge"
-        android:visibility="visible" />
-
-    <ProgressBar
-        android:id="@+id/progress_bar"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_gravity="center_horizontal"
-        android:gravity="center_horizontal"
-        android:padding="100dp"
-        android:progressDrawable="@drawable/circular_progress_bar"
-        android:secondaryProgress="100"
-        android:progressTint="@color/colorAccent"
-        android:secondaryProgressTint="#333"
-        android:progress="10"
-        android:max="100"
-        android:visibility="gone"/>
-
-    <TextView
-        android:id="@+id/progress_text"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:textColor="@android:color/white"
-        android:textSize="18sp"
-        android:visibility="gone"/>
+        android:layout_alignParentEnd="true"/>
 
     <RelativeLayout
         android:id="@+id/gallery_image_overlay_bottom"

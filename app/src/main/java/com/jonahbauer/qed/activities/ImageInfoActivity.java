@@ -21,7 +21,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.layoutStuff.Histogram;
-import com.jonahbauer.qed.qedgallery.image.Image;
+import com.jonahbauer.qed.model.Image;
 
 import org.jetbrains.annotations.Contract;
 
@@ -73,20 +73,20 @@ public class ImageInfoActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
 
-        Image image = (Image) intent.getSerializableExtra(EXTRA_IMAGE);
+        Image image = intent.getParcelableExtra(EXTRA_IMAGE);
         if (image != null) {
             LinearLayout detailContainer = findViewById(R.id.image_detail_container);
             LinearLayout qedContainer = findViewById(R.id.image_detail_qed_container);
             LinearLayout otherContainer = findViewById(R.id.image_detail_other_container);
 
-            if (image.path != null) {
-                File file = new File(image.path);
+            if (image.getPath() != null) {
+                File file = new File(image.getPath());
 
                 if (file.exists()) {
-                    Bitmap bitmap = BitmapFactory.decodeFile(image.path);
+                    Bitmap bitmap = BitmapFactory.decodeFile(image.getPath());
                     // create histogram
                     if (bitmap != null) {
-                        image.data.put(String.valueOf(R.string.image_info_resolution), bitmap.getWidth() + "x" + bitmap.getHeight());
+                        image.getData().put(String.valueOf(R.string.image_info_resolution), bitmap.getWidth() + "x" + bitmap.getHeight());
 
                         LinearLayout histogramContainer = findViewById(R.id.image_detail_histogram_container);
                         Histogram histogram = findViewById(R.id.image_detail_histogram);
@@ -94,23 +94,23 @@ public class ImageInfoActivity extends AppCompatActivity {
                         histogramContainer.setVisibility(View.VISIBLE);
                     }
 
-                    addLine(R.string.image_info_path, image.path, otherContainer);
+                    addLine(R.string.image_info_path, image.getPath(), otherContainer);
                 }
             }
 
-            image.data.keySet().stream()
+            image.getData().keySet().stream()
                     .map(string -> {
                         try {
                             return Integer.parseInt(string);
                         } catch (NumberFormatException ignored) {
-                            addLine(string, image.data.get(string), otherContainer);
+                            addLine(string, image.getData().get(string), otherContainer);
                             return -1;
                         }
                     })
                     .filter(i -> i != -1)
                     .sorted(Comparator.comparing(id -> INFO_PRIORITY.get(id, Integer.MAX_VALUE)))
                     .forEach(stringId -> {
-                        String value = image.data.get(String.valueOf(stringId));
+                        String value = image.getData().get(String.valueOf(stringId));
                         if (value == null) return;
 
                         LinearLayout container = null;

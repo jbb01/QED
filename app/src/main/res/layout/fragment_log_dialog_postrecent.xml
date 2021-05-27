@@ -12,7 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
-        android:text="@string/log_dialog_postrecent_before"
+        android:text="@string/log_request_postrecent_before"
         android:labelFor="@id/log_dialog_postrecent_editText"/>
 
     <EditText
@@ -42,6 +42,6 @@
         android:layout_height="wrap_content"
         android:layout_alignBottom="@id/log_dialog_postrecent_before"
         android:layout_alignParentEnd="true"
-        android:text="@string/log_dialog_postrecent_after" />
+        android:text="@string/log_request_postrecent_after" />
 
 </RelativeLayout>

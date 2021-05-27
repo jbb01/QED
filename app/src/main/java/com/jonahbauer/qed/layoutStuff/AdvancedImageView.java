@@ -1,12 +1,17 @@
 package com.jonahbauer.qed.layoutStuff;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
+import android.view.ViewParent;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Interpolator;
 
@@ -14,15 +19,8 @@ import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import org.jetbrains.annotations.Contract;
+import com.jonahbauer.qed.Application;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static com.jonahbauer.qed.layoutStuff.AdvancedImageView.Mode.DRAG;
-import static com.jonahbauer.qed.layoutStuff.AdvancedImageView.Mode.NONE;
-import static com.jonahbauer.qed.layoutStuff.AdvancedImageView.Mode.ZOOM;
 
 /**
  * <p>
@@ -34,14 +32,9 @@ import static com.jonahbauer.qed.layoutStuff.AdvancedImageView.Mode.ZOOM;
  * </p>
  */
 public class AdvancedImageView extends androidx.appcompat.widget.AppCompatImageView {
-    private Mode mMode = NONE;
-    private boolean mDragging;
-
-    private final PointF mStart = new PointF();
-    private final PointF mZoomCenter = new PointF();
-    private float mOldDistance = 0.0f;
-
+    // the maximum scale at which the image fits the screen
     private float mFitScale;
+    // the minimum scale at which there are no black borders, divided by mFitScale
     private float mOverfitScaleFactor;
 
     private final Matrix mMatrix = new Matrix();
@@ -52,22 +45,29 @@ public class AdvancedImageView extends androidx.appcompat.widget.AppCompatImageV
     private int mSrcWidth;
     private int mSrcHeight;
 
-    private long mLastClick;
-
     private boolean mFit = false;
 
     private Animator mAnimator;
 
+    private final GestureDetector mGestureDetector;
+    private final GestureListener mGestureListener;
+    private final ScaleGestureDetector mScaleGestureDetector;
+
     public AdvancedImageView(Context context) {
-        super(context);
+        this(context, null);
     }
 
     public AdvancedImageView(Context context, AttributeSet attrs) {
-        super(context, attrs);
+        this(context, attrs, 0);
     }
 
     public AdvancedImageView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+
+        mGestureListener = new GestureListener();
+        mGestureDetector = new GestureDetector(context, mGestureListener);
+        mGestureDetector.setOnDoubleTapListener(mGestureListener);
+        mScaleGestureDetector = new ScaleGestureDetector(context, mGestureListener);
     }
 
     @Override
@@ -83,35 +83,27 @@ public class AdvancedImageView extends androidx.appcompat.widget.AppCompatImageV
     @Override
     public void setImageBitmap(Bitmap bm) {
         super.setImageBitmap(bm);
-
-        Drawable source = getDrawable();
-
-        if (source == null) return;
-
-        mSrcHeight = source.getIntrinsicHeight();
-        mSrcWidth = source.getIntrinsicWidth();
-
         init();
     }
 
     @Override
     public void setImageDrawable(@Nullable Drawable drawable) {
         super.setImageDrawable(drawable);
-
-        Drawable source = getDrawable();
-
-        if (source == null) return;
-
-        mSrcHeight = source.getIntrinsicHeight();
-        mSrcWidth = source.getIntrinsicWidth();
-
         init();
     }
 
     @Override
     public void setImageResource(@DrawableRes int resId) {
         super.setImageResource(resId);
+        init();
+    }
 
+    /**
+     * Initializes this ImageView by calculating base values and centering the image.
+     *
+     * These base values are {@link #mSrcHeight}, {@link #mSrcWidth}, {@link #mFitScale}, {@link #mOverfitScaleFactor}.
+     */
+    private void init() {
         Drawable source = getDrawable();
 
         if (source == null) return;
@@ -119,10 +111,6 @@ public class AdvancedImageView extends androidx.appcompat.widget.AppCompatImageV
         mSrcHeight = source.getIntrinsicHeight();
         mSrcWidth = source.getIntrinsicWidth();
 
-        init();
-    }
-
-    private void init() {
         float scaleX = ((float) mViewWidth) / ((float) mSrcWidth);
         float scaleY = ((float) mViewHeight) / ((float) mSrcHeight);
         mFitScale = Math.min(scaleX, scaleY);
@@ -135,170 +123,36 @@ public class AdvancedImageView extends androidx.appcompat.widget.AppCompatImageV
         centerAndScale(mMatrix, mFitScale);
         setImageMatrix(mMatrix);
 
-        mFit = true;
+        setFit(true);
     }
 
     @Override
-    public boolean onTouchEvent(@NonNull MotionEvent event) {
-        switch (event.getActionMasked()) {
-            case MotionEvent.ACTION_DOWN: // on first down start dragging
-                mMode = DRAG;
-                mStart.set(event.getX(), event.getY());
-                mSavedMatrix.set(mMatrix);
+    @SuppressLint("ClickableViewAccessibility")
+    public boolean onTouchEvent(MotionEvent event) {
+        mGestureDetector.onTouchEvent(event);
+        mScaleGestureDetector.onTouchEvent(event);
 
-                if (mAnimator != null) mAnimator.cancel();
-                break;
-            case MotionEvent.ACTION_POINTER_DOWN: // on second down start zooming
-                mOldDistance = spacing(event, 0 ,1);
-                if (mOldDistance > 10f && event.getPointerCount() == 2) {
-                    mMode = ZOOM;
-                    mSavedMatrix.set(mMatrix);
-                    midPoint(mZoomCenter, event, 0 , 1);
-                }
-
-                // more than 2 fingers -> do nothing
-                if (event.getPointerCount() > 2) mMode = NONE;
-                break;
-            case MotionEvent.ACTION_POINTER_UP: // if only two fingers remain start zooming, one finger -> dragging
-                if (event.getPointerCount() == 3) { // lifted pointer is still counted
-                    List<Integer> indices = new ArrayList<>(Arrays.asList(0,1,2));
-                    indices.remove((Integer) event.getActionIndex());
-
-                    mOldDistance = spacing(event, indices.get(0), indices.get(1));
-                    if (mOldDistance > 10f && event.getPointerCount() == 3) {
-                        mMode = ZOOM;
-                        mSavedMatrix.set(mMatrix);
-                        midPoint(mZoomCenter, event, indices.get(0), indices.get(1));
-                    }
-
-                    if (mAnimator != null) mAnimator.cancel();
-                } else if (event.getPointerCount() == 2) {
-                    int indexStillDown;
-                    if (event.getActionIndex() == 0)
-                        indexStillDown = 1;
-                    else
-                        indexStillDown = 0;
-
-                    mMode = DRAG;
-                    mStart.set(event.getX(indexStillDown), event.getY(indexStillDown));
-                    mSavedMatrix.set(mMatrix);
-                    mDragging = true;
-
-                    if (mAnimator != null) mAnimator.cancel();
-                } else {
-                    mMode = NONE;
-                }
-                break;
-            case MotionEvent.ACTION_UP:
-                // if no bigger motion has been detected interpret as click
-                if (mMode == DRAG && !mDragging) {
-                    performClick();
-                    break;
-                }
-
-                if (mAnimator != null && !mAnimator.mCanceled) break;
-
-                mSavedMatrix.set(mMatrix);
-                if (fixPositionAndScale(mMatrix)) {
-                    animate(mSavedMatrix, mMatrix);
-                    mFit = false;
-                }
-
-                // reset
-                mDragging = false;
-                mMode = NONE;
-                break;
-            case MotionEvent.ACTION_MOVE:
-                if (mAnimator != null && !mAnimator.mCanceled) break;
-
-                if (mMode == DRAG && mDragging) {
-                    // translate image
-                    mMatrix.set(mSavedMatrix);
-                    float tmpTranslateX = event.getX() - mStart.x;
-                    float tmpTranslateY = event.getY() - mStart.y;
-                    mMatrix.postTranslate(tmpTranslateX, tmpTranslateY);
-                } else if (mMode == DRAG) {
-                    // start dragging only when the motion is big enough
-                    if (squaredDistance(mStart.x, mStart.y, event.getX(), event.getY()) > 100) {
-                        mDragging = true;
-                    }
-                    break;
-                } else if (mMode == ZOOM) {
-                    // scale image
-                    float newDistance = spacing(event, 0 , 1);
-                    if (newDistance > 10f) {
-                        mMatrix.set(mSavedMatrix);
-                        float tmpScale = newDistance / mOldDistance;
-                        mMatrix.postScale(tmpScale, tmpScale, mZoomCenter.x, mZoomCenter.y);
-                    }
-                }
-                mFit = false;
-                setImageMatrix(mMatrix);
-                break;
+        int action = event.getActionMasked();
+        if (action == MotionEvent.ACTION_UP) {
+            mGestureListener.onUp(event);
+        } else if (action == MotionEvent.ACTION_POINTER_DOWN) {
+            mGestureListener.onPointerDown(event);
+        } else if (action == MotionEvent.ACTION_POINTER_UP) {
+            mGestureListener.onPointerUp(event);
         }
 
         return true;
     }
 
-    @Override
-    public boolean performClick() {
-        long time = System.currentTimeMillis();
+    private void setFit(boolean fit) {
+        if (this.mFit != fit) {
+            this.mFit = fit;
 
-        if (time - mLastClick < 500) { // double tap
-            if (mAnimator != null) mAnimator.cancel();
-
-            if (!mFit) {
-                mSavedMatrix.set(mMatrix);
-                centerAndScale(mMatrix, mFitScale);
-                animate(mSavedMatrix, mMatrix);
-                mFit = true;
-                mLastClick = -500;
-            } else {
-                mSavedMatrix.set(mMatrix);
-                mMatrix.postScale(mOverfitScaleFactor, mOverfitScaleFactor, mStart.x, mStart.y);
-                fixPositionAndScale(mMatrix);
-                animate(mSavedMatrix, mMatrix);
-                mFit = false;
-                mLastClick = -500;
+            ViewParent parent = this.getParent();
+            if (parent != null) {
+                parent.requestDisallowInterceptTouchEvent(!this.mFit);
             }
-            return true;
-        } else {
-            mLastClick = time;
-            mSavedMatrix.set(mMatrix);
-            if (fixPositionAndScale(mMatrix)) {
-                animate(mSavedMatrix, mMatrix);
-                mFit = false;
-            }
-            return super.performClick();
         }
-    }
-
-    /**
-     * @return the square of the euclidian distance between the two points (x1,y1) and (x2,y2)
-     */
-    @Contract(pure = true)
-    private static float squaredDistance(float x1, float y1, float x2, float y2) {
-        float dx = x1 - x2;
-        float dy = y1 - y2;
-        return dx * dx + dy * dy;
-    }
-
-    /**
-     * @return the distance between the pointers with indices {@param index1} and {@param index2}
-     */
-    private static float spacing(@NonNull MotionEvent event, int index1, int index2) {
-        float dx = event.getX(index1) - event.getX(index2);
-        float dy = event.getY(index1) - event.getY(index2);
-        return (float) Math.sqrt(dx * dx + dy * dy);
-    }
-
-    /**
-     * calculates the mid point between the two given pointers of the motion event and stores it to {@param point}
-     */
-    private static void midPoint(@NonNull final PointF point, @NonNull MotionEvent event, int index1, int index2) {
-        float x = event.getX(index1) + event.getX(index2);
-        float y = event.getY(index1) + event.getY(index2);
-        point.set(x / 2, y / 2);
     }
 
     /**
@@ -420,6 +274,8 @@ public class AdvancedImageView extends androidx.appcompat.widget.AppCompatImageV
         
         final Matrix mTarget;
 
+        final Throwable creationStackTrace;
+
         private Animator(@NonNull Matrix initState, @NonNull Matrix finalState) {
             mInterpolator = new AccelerateDecelerateInterpolator();
             mStartTime = System.currentTimeMillis();
@@ -438,6 +294,8 @@ public class AdvancedImageView extends androidx.appcompat.widget.AppCompatImageV
             mInitY = initValues[Matrix.MTRANS_Y];
             
             this.mTarget = initState;
+
+            this.creationStackTrace = new Throwable();
         }
 
         @Override
@@ -463,6 +321,10 @@ public class AdvancedImageView extends androidx.appcompat.widget.AppCompatImageV
 
             if (t < 1f) {
                 post(this);
+            } else {
+                if (mFinalScale == mFitScale) {
+                    setFit(true);
+                }
             }
         }
 
@@ -471,7 +333,108 @@ public class AdvancedImageView extends androidx.appcompat.widget.AppCompatImageV
         }
     }
 
-    enum Mode {
-        ZOOM, DRAG, NONE
+    @SuppressWarnings({"unused", "UnusedReturnValue"})
+    private class GestureListener extends GestureDetector.SimpleOnGestureListener implements ScaleGestureDetector.OnScaleGestureListener {
+        private final PointF mStart = new PointF();
+
+        private boolean mScrolling;
+        private boolean mDoubleTap;
+        private float mOldScaleFactor = 1;
+
+        @Override
+        public boolean onDown(@NonNull MotionEvent e) {
+            // onDown is called after onDoubleTap and animations due to double tapping should not be canceled.
+            if (!mDoubleTap && mAnimator != null) mAnimator.cancel();
+
+            mDoubleTap = false;
+            mScrolling = false;
+            mOldScaleFactor = 1;
+
+            mSavedMatrix.set(mMatrix);
+            mStart.set(e.getX(), e.getY());
+            return true;
+        }
+
+        public boolean onUp(@NonNull MotionEvent e) {
+            if (mScrolling) {
+                mSavedMatrix.set(mMatrix);
+                if (fixPositionAndScale(mMatrix)) {
+                    animate(mSavedMatrix, mMatrix);
+                    setFit(false);
+                }
+            }
+            return true;
+        }
+
+        public boolean onPointerDown(@NonNull MotionEvent e) {
+            if (e.getPointerCount() > 1) {
+                // this triggers requestDisallowInterceptTouchEvent
+                setFit(false);
+                return true;
+            }
+            return false;
+        }
+
+        public boolean onPointerUp(@NonNull MotionEvent e) {return false;}
+
+        @Override
+        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+            if (mFit) return false;
+
+            mScrolling = true;
+
+            mMatrix.postTranslate(-distanceX, -distanceY);
+            setFit(false);
+            setImageMatrix(mMatrix);
+            return true;
+        }
+
+        @Override
+        public boolean onSingleTapConfirmed(MotionEvent e) {
+            return AdvancedImageView.super.performClick();
+        }
+
+        @Override
+        public boolean onDoubleTap(MotionEvent e) {
+            if (mAnimator != null) mAnimator.cancel();
+
+            mDoubleTap = true;
+
+            if (!mFit) {
+                mSavedMatrix.set(mMatrix);
+                centerAndScale(mMatrix, mFitScale);
+                animate(mSavedMatrix, mMatrix);
+                setFit(true);
+            } else {
+                mSavedMatrix.set(mMatrix);
+                mMatrix.postScale(mOverfitScaleFactor, mOverfitScaleFactor, mStart.x, mStart.y);
+                fixPositionAndScale(mMatrix);
+                animate(mSavedMatrix, mMatrix);
+                setFit(false);
+            }
+            return true;
+        }
+
+        @Override
+        public boolean onScale(@NonNull ScaleGestureDetector detector) {
+            Log.d(Application.LOG_TAG_DEBUG, "onTouchEvent: scaling: " + detector.getPreviousSpan());
+
+            float scaleFactor = detector.getScaleFactor() / mOldScaleFactor;
+            mOldScaleFactor = detector.getScaleFactor();
+
+            mMatrix.postScale(scaleFactor, scaleFactor, detector.getFocusX(), detector.getFocusY());
+            setFit(false);
+            setImageMatrix(mMatrix);
+            return false;
+        }
+
+        @Override
+        public boolean onScaleBegin(ScaleGestureDetector detector) {
+            return true;
+        }
+
+        @Override
+        public void onScaleEnd(ScaleGestureDetector detector) {
+        }
     }
 }

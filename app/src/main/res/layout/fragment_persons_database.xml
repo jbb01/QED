@@ -229,7 +229,7 @@
         android:textAlignment="center"
         android:textSize="16sp"
         android:gravity="center"
-        android:text="@string/unknown_error"
+        android:text="@string/error_unknown"
         android:visibility="gone"/>
 
     <LinearLayout

@@ -3,9 +3,11 @@ package com.jonahbauer.qed.activities.eventSheet;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.util.DisplayMetrics;
+import android.util.Pair;
 import android.util.TypedValue;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
@@ -30,8 +32,8 @@ import com.google.android.material.tabs.TabLayoutMediator;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.layoutStuff.FixedHeaderAdapter;
 import com.jonahbauer.qed.layoutStuff.viewPagerBottomSheet.ViewPagerBottomSheetFragmentStateAdapter;
-import com.jonahbauer.qed.qeddb.event.Event;
-import com.jonahbauer.qed.qeddb.person.Person;
+import com.jonahbauer.qed.model.Event;
+import com.jonahbauer.qed.model.Registration;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -40,11 +42,14 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import lombok.EqualsAndHashCode;
 
 public class EventFragment extends Fragment {
     static final String TAG_EVENT_FRAGMENT = "eventFragment";
-    static final String ARG_EVENT_ID = "eventId";
     static final String ARG_EVENT = "event";
+    static final String ARG_FETCH_DATA = "fetchData";
 
     @StyleRes
     private int mThemeId;
@@ -197,7 +202,7 @@ public class EventFragment extends Fragment {
             if (event == null) return;
 
             // Add Name
-            String name = event.title;
+            String name = event.getTitle();
             if (name != null) {
                 ((TextView) view.findViewById(R.id.event_name_big)).setText(name);
             }
@@ -206,19 +211,19 @@ public class EventFragment extends Fragment {
 
             // Add Time
             String startString;
-            if (event.start != null) {
-                startString = MessageFormat.format("{0,date,dd.MM.yyyy}", event.start);
-            } else if (event.startString != null) {
-                startString = event.startString;
+            if (event.getStart() != null) {
+                startString = MessageFormat.format("{0,date}", event.getStart());
+            } else if (event.getStartString() != null) {
+                startString = event.getStartString();
             } else {
                 startString = getString(R.string.error);
             }
 
             String endString;
-            if (event.end != null) {
-                endString = MessageFormat.format("{0,date,dd.MM.yyyy}", event.end);
-            } else if (event.endString != null) {
-                endString = event.endString;
+            if (event.getEnd() != null) {
+                endString = MessageFormat.format("{0,date}", event.getEnd());
+            } else if (event.getEndString() != null) {
+                endString = event.getEndString();
             } else {
                 endString = getString(R.string.error);
             }
@@ -226,53 +231,87 @@ public class EventFragment extends Fragment {
             String time = startString + " - " + endString;
             View timeView = addListItem(list, R.drawable.ic_event_time, time, R.string.event_subtitle_time, false);
 
-            if (event.start != null && event.end != null) {
+            if (event.getStart() != null && event.getEnd() != null) {
                 timeView.setOnClickListener(a -> {
                     Intent intent = new Intent(Intent.ACTION_INSERT)
                             .setData(CalendarContract.Events.CONTENT_URI)
                             .putExtra(CalendarContract.Events.TITLE, name)
-                            .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, event.start.getTime())
-                            .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, event.end.getTime())
-                            .putExtra(CalendarContract.EXTRA_EVENT_ALL_DAY, true);
+                            .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, event.getStart().getTime())
+                            .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, event.getEnd().getTime())
+                            .putExtra(CalendarContract.EXTRA_EVENT_ALL_DAY, true)
+                            .putExtra(CalendarContract.Events.EVENT_LOCATION, event.getHotelAddress())
+                            .putExtra(Intent.EXTRA_EMAIL, event.getEmailOrga());
 
-                    startActivity(intent);
+                    if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+                        startActivity(intent);
+                    }
                 });
             }
 
             // Add Deadline
-            if (event.deadline != null) {
-                addListItem(list, R.drawable.ic_event_deadline, MessageFormat.format("{0,date,dd.MM.yyyy HH:mm:ss}", event.deadline), R.string.event_subtitle_deadline, true);
-            } else if (event.deadlineString != null) {
-                addListItem(list, R.drawable.ic_event_deadline, event.deadlineString, R.string.event_subtitle_deadline, true);
+            if (event.getDeadline() != null) {
+                addListItem(list, R.drawable.ic_event_deadline, MessageFormat.format("{0,date} {0,time}", event.getDeadline()), R.string.event_subtitle_deadline, true);
+            } else if (event.getDeadlineString() != null && !event.getDeadlineString().trim().equals("")) {
+                addListItem(list, R.drawable.ic_event_deadline, event.getDeadlineString(), R.string.event_subtitle_deadline, true);
             }
 
             // Add Cost
-            int cost = event.cost;
+            int cost = event.getCost();
             if (cost != -1) {
                 addListItem(list, R.drawable.ic_event_cost, String.valueOf(cost), R.string.event_subtitle_cost, true);
             }
 
             // Add Max Members
-            int maxParticipants = event.maxParticipants;
+            int maxParticipants = event.getMaxParticipants();
             if (maxParticipants != -1) {
                 addListItem(list, R.drawable.ic_event_max_member, String.valueOf(maxParticipants), R.string.event_subtitle_max_members, true);
             }
 
             // Add Hotel
-            String hotel = event.hotel;
+            String hotel = event.getHotel();
             if (hotel != null && !hotel.trim().equals("")) {
                 addListItem(list, R.drawable.ic_event_hotel, hotel, R.string.event_subtitle_hotel, true);
             }
 
+            // Add Hotel address
+            String hotelAddress = event.getHotelAddress();
+            if (hotelAddress != null && !hotelAddress.trim().equals("")) {
+                View addressView = addListItem(list, R.drawable.ic_event_hotel_address, hotelAddress, R.string.event_subtitle_hotel_address, true);
+                addressView.setOnClickListener(v -> {
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(Uri.parse("geo:0,0?q=" + hotelAddress));
+                    if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+                        startActivity(intent);
+                    }
+                });
+            }
 
-            // Add Organizers
-            List<Person> organizers = event.organizers;
-            {
-                int i = 0;
-                for (Person organizer : organizers) {
-                    addListItem(list, i == 0 ? R.drawable.ic_event_orga : -1, organizer.firstName + " " + organizer.lastName, R.string.event_subtitle_orga, i == 0);
-                    i++;
-                }
+            // Add Orga Email
+            String emailOrga = event.getEmailOrga();
+            if (emailOrga != null && !emailOrga.trim().equals("")) {
+                View emailView = addListItem(list, R.drawable.ic_event_mail, emailOrga, R.string.event_subtitle_mail_orga, true);
+                emailView.setOnClickListener(v -> {
+                    Intent intent = new Intent(Intent.ACTION_SENDTO);
+                    intent.setType("*/*");
+                    intent.putExtra(Intent.EXTRA_EMAIL, new String[] {emailOrga});
+                    if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+                        startActivity(intent);
+                    }
+                });
+            }
+
+            // Add All Email
+            String emailAll = event.getEmailAll();
+            if (emailAll != null && !emailAll.trim().equals("")) {
+                View emailView = addListItem(list, R.drawable.ic_event_mail, emailAll, R.string.event_subtitle_mail_all, true);
+                emailView.setOnClickListener(v -> {
+                    Intent intent = new Intent(Intent.ACTION_SENDTO);
+                    intent.setType("*/*");
+                    intent.putExtra(Intent.EXTRA_EMAIL, new String[] {emailAll});
+                    if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+                        startActivity(intent);
+                    }
+                });
             }
         }
     }
@@ -290,8 +329,9 @@ public class EventFragment extends Fragment {
             PersonListAdapter personListAdapter = new PersonListAdapter(
                     getContext(),
                     new ArrayList<>(),
-                    person -> person.participationStatus,
-                    Comparator.comparing((Person person) -> person.participationStatus).thenComparing(Person.COMPARATOR_FIRST_NAME),
+                    person -> new PersonListAdapter.Section(person.second.getStatus(), requireContext()),
+                    Comparator.comparing((Pair<String, Registration> person) -> person.second.getStatus())
+                              .thenComparing((Pair<String, Registration> person) -> person.first),
                     view.findViewById(R.id.fixed_header));
             ListView personListView = view.findViewById(R.id.event_member_list);
             personListView.setAdapter(personListAdapter);
@@ -306,27 +346,36 @@ public class EventFragment extends Fragment {
             if (event == null) return;
 
             // Add Participants
-            personListAdapter.addAll(event.participants);
+            personListAdapter.addAll(
+                    event.getParticipants()
+                         .entrySet()
+                         .stream()
+                         .map(e -> Pair.create(e.getKey(), e.getValue()))
+                         .collect(Collectors.toList())
+            );
         }
 
-        private static class PersonListAdapter extends FixedHeaderAdapter<Person, Person.ParticipationStatus> implements SectionIndexer/*, AdapterView.OnItemClickListener, View.OnTouchListener*/ {
+        private static class PersonListAdapter extends FixedHeaderAdapter<Pair<String, Registration>, PersonListAdapter.Section> implements SectionIndexer/*, AdapterView.OnItemClickListener, View.OnTouchListener*/ {
 
-            PersonListAdapter(Context context, @NonNull List<Person> itemList, @NonNull Function<Person, Person.ParticipationStatus> headerMap, Comparator<? super Person> comparator, View fixedHeader) {
+            PersonListAdapter(Context context,
+                              @NonNull List<Pair<String, Registration>> itemList,
+                              @NonNull Function<Pair<String, Registration>, Section> headerMap,
+                              Comparator<? super Pair<String, Registration>> comparator,
+                              View fixedHeader) {
                 super(context, itemList, headerMap, comparator, fixedHeader);
             }
 
             @NonNull
             @Override
-            protected View getItemView(Person person, @Nullable View convertView, @NonNull ViewGroup parent, LayoutInflater inflater) {
+            protected View getItemView(Pair<String, Registration> person, @Nullable View convertView, @NonNull ViewGroup parent, LayoutInflater inflater) {
                 View view = inflater.inflate(R.layout.list_item_title_subtitle, parent, false);
 
-                String name = person.firstName + " " + person.lastName;
+                String name = person.first;
                 TextView title = view.findViewById(R.id.title);
                 TextView subtitle = view.findViewById(R.id.subtitle);
 
                 title.setText(name);
-                subtitle.setText(person.email);
-                subtitle.setVisibility(View.VISIBLE);
+                subtitle.setVisibility(View.GONE);
 
                 ((ImageView) view.findViewById(R.id.header)).setImageResource(0);
 
@@ -334,21 +383,24 @@ public class EventFragment extends Fragment {
             }
 
             @Override
-            protected void setHeader(@NonNull View view, Person.ParticipationStatus header) {
-                switch (header) {
-                    case ORGA:
-                        ((ImageView) view.findViewById(R.id.header)).setImageResource(R.drawable.ic_event_orga);
-                        break;
-                    case MEMBER_OPEN:
-                        ((ImageView) view.findViewById(R.id.header)).setImageResource(R.drawable.ic_event_member_open);
-                        break;
-                    case MEMBER_CONFIRMED:
-                    case MEMBER_PARTICIPATED:
-                        ((ImageView) view.findViewById(R.id.header)).setImageResource(R.drawable.ic_event_member_confirmed);
-                        break;
-                    case MEMBER_OPT_OUT:
-                        ((ImageView) view.findViewById(R.id.header)).setImageResource(R.drawable.ic_event_member_opt_out);
-                        break;
+            protected void setHeader(@NonNull View view, Section header) {
+                ((ImageView) view.findViewById(R.id.header)).setImageResource(header.status.toDrawableRes());
+            }
+
+            @EqualsAndHashCode(exclude = "title")
+            private static class Section {
+                private final Registration.Status status;
+                private final String title;
+
+                private Section(Registration.Status status, Context context) {
+                    this.status = status;
+                    this.title = context.getString(status.toStringRes());
+                }
+
+                @NonNull
+                @Override
+                public String toString() {
+                    return title;
                 }
             }
 

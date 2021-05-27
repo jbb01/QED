@@ -74,5 +74,10 @@ class GalleryDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(SQL_DELETE_ENTRIES_THUMBS);
         onCreate(db);
     }
+
+    public void clearThumbnails(@NonNull SQLiteDatabase db) {
+        db.execSQL(SQL_DELETE_ENTRIES_THUMBS);
+        db.execSQL(SQL_CREATE_ENTRIES_THUMBS);
+    }
 }
 

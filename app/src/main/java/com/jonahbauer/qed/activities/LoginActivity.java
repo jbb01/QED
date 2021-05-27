@@ -9,22 +9,26 @@ import android.os.Handler;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.preference.PreferenceManager;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.jonahbauer.qed.Application;
-import com.jonahbauer.qed.NetworkListener;
-import com.jonahbauer.qed.Pref;
 import com.jonahbauer.qed.R;
+import com.jonahbauer.qed.networking.Feature;
+import com.jonahbauer.qed.networking.NetworkListener;
 import com.jonahbauer.qed.networking.login.UserLoginTask;
+import com.jonahbauer.qed.util.Preferences;
+
+import java.io.Serializable;
 
 public class LoginActivity extends AppCompatActivity implements NetworkListener, UserLoginTask.LoginCallback {
-    public static final String ERROR_MESSAGE = "errorMessage";
-    public static final String DONT_START_MAIN = "dontStartMain";
+    public static final String EXTRA_ERROR_MESSAGE = "errorMessage";
+    public static final String EXTRA_DONT_START_MAIN = "dontStartMain";
+    public static final String EXTRA_FEATURE = "feature";
 
     private UserLoginTask mAuthTask = null;
 
@@ -37,12 +41,18 @@ public class LoginActivity extends AppCompatActivity implements NetworkListener,
 
     private boolean mDoubleBackToExitPressedOnce = false;
     private boolean mDontStartMain;
+    private Feature mFeature;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean(Pref.General.LOGGED_IN,false).apply();
+        Serializable extraFeature = getIntent().getSerializableExtra(EXTRA_FEATURE);
+        if (extraFeature instanceof Feature) {
+            mFeature = (Feature) extraFeature;
+        } else {
+            mFeature = Feature.CHAT;
+        }
 
         setContentView(R.layout.activity_login);
         mUsernameView = findViewById(R.id.username);
@@ -51,6 +61,12 @@ public class LoginActivity extends AppCompatActivity implements NetworkListener,
         mPasswordLayout = findViewById(R.id.password_layout);
         mProgressView = findViewById(R.id.login_progress);
         mLoginFormView = findViewById(R.id.login_form);
+
+        CheckBox mRememberMeCheckBox = findViewById(R.id.remember_me_checkbox);
+        mRememberMeCheckBox.setChecked(Preferences.general().isRememberMe());
+        mRememberMeCheckBox.setOnCheckedChangeListener(
+                (buttonView, isChecked) -> Preferences.general().edit().setRememberMe(isChecked).apply()
+        );
 
         mPasswordView.setOnEditorActionListener((textView, id, keyEvent) -> {
             if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
@@ -62,11 +78,11 @@ public class LoginActivity extends AppCompatActivity implements NetworkListener,
         mUsernameLayout.setErrorEnabled(true);
         mPasswordLayout.setErrorEnabled(true);
 
-        Button mUsernameSignInButton = findViewById(R.id.username_sign_in_button);
+        Button mUsernameSignInButton = findViewById(R.id.sign_in_button);
         mUsernameSignInButton.setOnClickListener(view -> attemptLogin());
 
-        mDontStartMain = getIntent().getBooleanExtra(DONT_START_MAIN, false);
-        String errorMessage = getIntent().getStringExtra(ERROR_MESSAGE);
+        mDontStartMain = getIntent().getBooleanExtra(EXTRA_DONT_START_MAIN, false);
+        String errorMessage = getIntent().getStringExtra(EXTRA_ERROR_MESSAGE);
         if (errorMessage != null) {
             Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
         }
@@ -83,10 +99,11 @@ public class LoginActivity extends AppCompatActivity implements NetworkListener,
         mPasswordView.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
 
         String username = mUsernameView.getText().toString();
-        String password = mPasswordView.getText().toString();
+        char[] password = new char[mPasswordView.getText().length()];
+        mPasswordView.getText().getChars(0, password.length, password, 0);
 
         showProgress(true);
-        mAuthTask = new UserLoginTask(username, password, this, this);
+        mAuthTask = new UserLoginTask(username, password, mFeature, this);
         mAuthTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 

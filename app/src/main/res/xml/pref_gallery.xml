@@ -9,7 +9,7 @@
             android:key="@string/preferences_gallery_offline_mode_key"
             android:selectAllOnFocus="true"
             android:singleLine="true"
-            android:title="@string/preferences_Gallery_offline_mode"
+            android:title="@string/preferences_gallery_offline_mode"
             android:icon="@drawable/ic_settings_offline_mode"
             android:summaryOn="@string/preferences_gallery_offline_mode_true_summary"
             android:summaryOff="@string/preferences_gallery_offline_mode_false_summary" />

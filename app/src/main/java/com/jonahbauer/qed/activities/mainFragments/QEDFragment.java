@@ -12,15 +12,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.activities.MainActivity;
 
-import java.lang.ref.SoftReference;
-
-@SuppressWarnings("WeakerAccess")
 public abstract class QEDFragment extends Fragment {
     protected final Handler mHandler = new Handler(Looper.getMainLooper());
-    protected final SoftReference<Application> mApplicationReference = Application.getApplicationReference();
 
     protected static final String ARGUMENT_THEME_ID = "themeId";
     protected static final String ARGUMENT_LAYOUT_ID = "layoutId";

@@ -22,10 +22,11 @@ import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.personSheet.PersonBottomSheet;
 import com.jonahbauer.qed.activities.personSheet.PersonSideSheet;
 import com.jonahbauer.qed.layoutStuff.CheckBoxTriStates;
+import com.jonahbauer.qed.model.Person;
+import com.jonahbauer.qed.model.adapter.PersonAdapter;
 import com.jonahbauer.qed.networking.QEDDBPages;
-import com.jonahbauer.qed.networking.QEDPageReceiver;
-import com.jonahbauer.qed.qeddb.person.Person;
-import com.jonahbauer.qed.qeddb.person.PersonAdapter;
+import com.jonahbauer.qed.networking.Reason;
+import com.jonahbauer.qed.networking.async.QEDPageReceiver;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,7 +77,7 @@ public class PersonDatabaseFragment extends QEDFragment implements CompoundButto
         mErrorLabel.setVisibility(View.GONE);
         mPersonListView.setVisibility(View.GONE);
         mSearchButton.setEnabled(false);
-        QEDDBPages.getPersonList(getClass().toString(), this);
+        QEDDBPages.getPersonList(this);
     }
 
     @Override
@@ -100,7 +101,7 @@ public class PersonDatabaseFragment extends QEDFragment implements CompoundButto
         mPersonAdapter = new PersonAdapter(getContext(), new ArrayList<>(), PersonAdapter.SortMode.FIRST_NAME, view.findViewById(R.id.fixed_header));
         mPersonListView.setAdapter(mPersonAdapter);
         mPersonListView.setOnScrollListener(mPersonAdapter);
-        mPersonListView.setOnItemClickListener((parent, view1, position, id) -> showBottomSheetDialogFragment(Objects.requireNonNull(mPersonAdapter.getItem((int) id)).id));
+        mPersonListView.setOnItemClickListener((parent, view1, position, id) -> showBottomSheetDialogFragment(mPersonAdapter.getItem((int) id)));
 
         mSearchButton.setOnClickListener(a -> search());
         sortByFirstNameRadioButton.setOnClickListener(this::onRadioButtonClicked);
@@ -121,39 +122,34 @@ public class PersonDatabaseFragment extends QEDFragment implements CompoundButto
 
     @Override
     public void onCheckedChanged(@NonNull CompoundButton buttonView, boolean isChecked) {
-        switch (buttonView.getId()) {
-            case R.id.expand_checkBox:
-                if (isChecked) {
-                    buttonView.setButtonDrawable(R.drawable.ic_arrow_up_accent_animation);
-                    ((Animatable) Objects.requireNonNull(buttonView.getButtonDrawable())).start();
-                    expand(mExpand);
-                } else {
-                    buttonView.setButtonDrawable(R.drawable.ic_arrow_down_accent_animation);
-                    ((Animatable) Objects.requireNonNull(buttonView.getButtonDrawable())).start();
-                    collapse(mExpand);
-                }
-                break;
-            case R.id.database_firstName_checkbox:
-                mFirstNameEditText.setEnabled(isChecked);
-                if (isChecked) mFirstNameEditText.requestFocus();
-                break;
-            case R.id.database_lastName_checkbox:
-                mLastNameEditText.setEnabled(isChecked);
-                if (isChecked) mLastNameEditText.requestFocus();
-                break;
+        int id = buttonView.getId();
+        if (id == R.id.expand_checkBox) {
+            if (isChecked) {
+                buttonView.setButtonDrawable(R.drawable.ic_arrow_up_accent_animation);
+                ((Animatable) Objects.requireNonNull(buttonView.getButtonDrawable())).start();
+                expand(mExpand);
+            } else {
+                buttonView.setButtonDrawable(R.drawable.ic_arrow_down_accent_animation);
+                ((Animatable) Objects.requireNonNull(buttonView.getButtonDrawable())).start();
+                collapse(mExpand);
+            }
+        } else if (id == R.id.database_firstName_checkbox) {
+            mFirstNameEditText.setEnabled(isChecked);
+            if (isChecked) mFirstNameEditText.requestFocus();
+        } else if (id == R.id.database_lastName_checkbox) {
+            mLastNameEditText.setEnabled(isChecked);
+            if (isChecked) mLastNameEditText.requestFocus();
         }
     }
 
     private void onRadioButtonClicked(@NonNull View view) {
         boolean checked = ((RadioButton) view).isChecked();
 
-        switch (view.getId()) {
-            case R.id.database_sort_first_name_radio_button:
-                if (checked) mSortLastName = false;
-                break;
-            case R.id.database_sort_last_name_radio_button:
-                if (checked) mSortLastName = true;
-                break;
+        int id = view.getId();
+        if (id == R.id.database_sort_first_name_radio_button) {
+            if (checked) mSortLastName = false;
+        } else if (id == R.id.database_sort_last_name_radio_button) {
+            if (checked) mSortLastName = true;
         }
     }
 
@@ -169,12 +165,12 @@ public class PersonDatabaseFragment extends QEDFragment implements CompoundButto
         List<Person> result = new ArrayList<>();
 
         for (Person person : mPersons) {
-            if (mFirstNameCheckBox.isChecked() && !person.firstName.contains(mFirstNameEditText.getText().toString().trim())) continue;
-            if (mLastNameCheckBox.isChecked() && !person.lastName.contains(mLastNameEditText.getText().toString().trim())) continue;
-            if (mMemberCheckBox.getState() == CheckBoxTriStates.UNCHECKED && person.member) continue;
-            else if (mMemberCheckBox.getState() == CheckBoxTriStates.CHECKED && !person.member) continue;
-            if (mActiveCheckBox.getState() == CheckBoxTriStates.UNCHECKED && person.active) continue;
-            else if (mActiveCheckBox.getState() == CheckBoxTriStates.CHECKED && !person.active) continue;
+            if (mFirstNameCheckBox.isChecked() && !person.getFirstName().contains(mFirstNameEditText.getText().toString().trim())) continue;
+            if (mLastNameCheckBox.isChecked() && !person.getLastName().contains(mLastNameEditText.getText().toString().trim())) continue;
+            if (mMemberCheckBox.getState() == CheckBoxTriStates.UNCHECKED && person.isMember()) continue;
+            else if (mMemberCheckBox.getState() == CheckBoxTriStates.CHECKED && !person.isMember()) continue;
+            if (mActiveCheckBox.getState() == CheckBoxTriStates.UNCHECKED && person.isActive()) continue;
+            else if (mActiveCheckBox.getState() == CheckBoxTriStates.CHECKED && !person.isActive()) continue;
             result.add(person);
         }
 
@@ -189,7 +185,7 @@ public class PersonDatabaseFragment extends QEDFragment implements CompoundButto
     }
 
     @Override
-    public void onPageReceived(String tag, List<Person> persons) {
+    public void onPageReceived(List<Person> persons) {
         this.mPersons.clear();
         mPersonAdapter.clear();
 
@@ -206,30 +202,30 @@ public class PersonDatabaseFragment extends QEDFragment implements CompoundButto
     }
 
     @Override
-    public void onError(String tag, String reason, Throwable cause) {
-        QEDPageReceiver.super.onError(tag, reason, cause);
+    public void onError(List<Person> persons, String reason, Throwable cause) {
+        QEDPageReceiver.super.onError(persons, reason, cause);
 
         final String errorString;
 
-        if (REASON_NETWORK.equals(reason)) {
+        if (Reason.NETWORK.equals(reason)) {
             errorString = getString(R.string.database_offline);
         } else {
-            errorString = getString(R.string.unknown_error);
+            errorString = getString(R.string.error_unknown);
         }
 
         setError(errorString);
     }
 
-    private void showBottomSheetDialogFragment(long personId) {
+    private void showBottomSheetDialogFragment(@NonNull Person person) {
         FragmentManager fragmentManager = getParentFragmentManager();
 
         int orientation = getResources().getConfiguration().orientation;
 
         if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-            PersonBottomSheet personBottomSheet = PersonBottomSheet.newInstance(personId);
+            PersonBottomSheet personBottomSheet = PersonBottomSheet.newInstance(person);
             personBottomSheet.show(fragmentManager, personBottomSheet.getTag());
         } else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            PersonSideSheet personSideSheet = PersonSideSheet.newInstance(personId);
+            PersonSideSheet personSideSheet = PersonSideSheet.newInstance(person);
             personSideSheet.show(fragmentManager, personSideSheet.getTag());
         }
     }

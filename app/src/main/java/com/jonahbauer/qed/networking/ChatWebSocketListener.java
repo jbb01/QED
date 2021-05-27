@@ -5,7 +5,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.jonahbauer.qed.Application;
-import com.jonahbauer.qed.chat.Message;
+import com.jonahbauer.qed.model.Message;
 
 public interface ChatWebSocketListener {
     String REASON_NETWORK = "network error";

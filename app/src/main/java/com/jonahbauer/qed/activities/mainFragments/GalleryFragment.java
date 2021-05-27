@@ -1,7 +1,6 @@
 package com.jonahbauer.qed.activities.mainFragments;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -15,17 +14,17 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StyleRes;
-import androidx.preference.PreferenceManager;
 
-import com.jonahbauer.qed.Pref;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.GalleryAlbumActivity;
 import com.jonahbauer.qed.database.GalleryDatabase;
 import com.jonahbauer.qed.database.GalleryDatabaseReceiver;
+import com.jonahbauer.qed.model.Album;
+import com.jonahbauer.qed.model.adapter.AlbumAdapter;
 import com.jonahbauer.qed.networking.QEDGalleryPages;
-import com.jonahbauer.qed.networking.QEDPageReceiver;
-import com.jonahbauer.qed.qedgallery.album.Album;
-import com.jonahbauer.qed.qedgallery.album.AlbumAdapter;
+import com.jonahbauer.qed.networking.Reason;
+import com.jonahbauer.qed.networking.async.QEDPageReceiver;
+import com.jonahbauer.qed.util.Preferences;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,8 +35,6 @@ public class GalleryFragment extends QEDFragment implements QEDPageReceiver<List
     private TextView mOfflineLabel;
 
     private boolean mOnline;
-
-    private SharedPreferences mSharedPreferences;
 
     private AlbumAdapter mGalleryAdapter;
     private GalleryDatabase mGalleryDatabase;
@@ -58,12 +55,10 @@ public class GalleryFragment extends QEDFragment implements QEDPageReceiver<List
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        assert getContext() != null;
-        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
         mOnline = false;
 
         mGalleryDatabase = new GalleryDatabase();
-        mGalleryDatabase.init(getContext(), this);
+        mGalleryDatabase.init(getContext());
     }
 
     @Override
@@ -76,7 +71,7 @@ public class GalleryFragment extends QEDFragment implements QEDPageReceiver<List
             Album album = mGalleryAdapter.getItem((int) id);
 
             if (album == null) return;
-            if (mOnline || album.imageListDownloaded) {
+            if (mOnline || album.isImageListDownloaded()) {
                 Intent intent = new Intent(GalleryFragment.this.getContext(), GalleryAlbumActivity.class);
                 intent.putExtra(GalleryAlbumActivity.GALLERY_ALBUM_KEY, album);
                 startActivity(intent);
@@ -88,7 +83,7 @@ public class GalleryFragment extends QEDFragment implements QEDPageReceiver<List
         mSearchProgress = view.findViewById(R.id.search_progress);
         mOfflineLabel = view.findViewById(R.id.label_offline);
 
-        if (!mSharedPreferences.getBoolean(Pref.Gallery.OFFLINE_MODE, false)) {
+        if (!Preferences.gallery().isOfflineMode()) {
             mOfflineLabel.setOnClickListener(v -> switchToOnlineMode());
         } else {
             mOfflineLabel.setOnClickListener(null);
@@ -101,7 +96,7 @@ public class GalleryFragment extends QEDFragment implements QEDPageReceiver<List
     public void onResume() {
         super.onResume();
 
-        if (!mSharedPreferences.getBoolean(Pref.Gallery.OFFLINE_MODE, false))
+        if (!Preferences.gallery().isOfflineMode())
             switchToOnlineMode();
         else
             switchToOfflineMode();
@@ -125,22 +120,24 @@ public class GalleryFragment extends QEDFragment implements QEDPageReceiver<List
     }
 
     @Override
-    public void onPageReceived(String tag, List<Album> albums) {
+    public void onPageReceived(List<Album> albums) {
         mGalleryAdapter.clear();
         mGalleryAdapter.addAll(albums);
         mGalleryAdapter.notifyDataSetChanged();
         mSearchProgress.setVisibility(View.GONE);
         mGalleryListView.setVisibility(View.VISIBLE);
 
-        mGalleryDatabase.insertAllAlbums(albums, false);
+        mGalleryDatabase.insertAllAlbums(albums, false, this);
         mOnline = true;
     }
 
     @Override
-    public void onError(String tag, String reason, Throwable cause) {
-        QEDPageReceiver.super.onError(tag, reason, cause);
+    public void onError(List<Album> albums, String reason, Throwable cause) {
+        QEDPageReceiver.super.onError(albums, reason, cause);
 
-        if (REASON_NETWORK.equals(reason))
+        // TODO error handling
+
+        if (Reason.NETWORK.equals(reason))
             switchToOfflineMode();
     }
 
@@ -152,7 +149,8 @@ public class GalleryFragment extends QEDFragment implements QEDPageReceiver<List
         mOfflineLabel.post(() -> {
             mOfflineLabel.setVisibility(View.VISIBLE);
 
-            if (!mSharedPreferences.getBoolean(Pref.Gallery.OFFLINE_MODE, false))
+            if (!Preferences.gallery().isOfflineMode())
+                // offline mode was chosen as a last resort
                 Toast.makeText(getContext(), mOfflineLabel.getContext().getString(R.string.login_failed_switching_to_offline), Toast.LENGTH_SHORT).show();
         });
 
@@ -173,6 +171,6 @@ public class GalleryFragment extends QEDFragment implements QEDPageReceiver<List
             mOfflineLabel.setVisibility(View.GONE);
         });
 
-        QEDGalleryPages.getAlbumList(getClass().toString(), this);
+        QEDGalleryPages.getAlbumList(this);
     }
 }

@@ -1,0 +1,28 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:baselineAligned="false">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:paddingStart="0dp"
+        android:paddingEnd="5dp"
+        android:clipToPadding="false"
+        android:clipChildren="false">
+        <FrameLayout
+            tools:layout_width="100dp"
+            android:id="@+id/settings_header"
+            android:elevation="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"/>
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/settings_content"
+        android:layout_width="0dp"
+        android:layout_marginStart="-5dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"/>
+</LinearLayout>

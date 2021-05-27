@@ -1,6 +1,6 @@
 package com.jonahbauer.qed.database;
 
-import com.jonahbauer.qed.chat.Message;
+import com.jonahbauer.qed.model.Message;
 
 import java.util.List;
 

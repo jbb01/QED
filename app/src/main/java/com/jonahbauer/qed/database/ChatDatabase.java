@@ -8,7 +8,7 @@ import android.os.AsyncTask;
 
 import androidx.annotation.NonNull;
 
-import com.jonahbauer.qed.chat.Message;
+import com.jonahbauer.qed.model.Message;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +24,7 @@ import static com.jonahbauer.qed.database.ChatDatabaseContract.ChatEntry.COLUMN_
 import static com.jonahbauer.qed.database.ChatDatabaseContract.ChatEntry.COLUMN_NAME_USERNAME;
 import static com.jonahbauer.qed.database.ChatDatabaseContract.ChatEntry.TABLE_NAME;
 
-public class ChatDatabase {
+public class ChatDatabase implements AutoCloseable {
     private ChatDatabaseHelper mChatDatabaseHelper;
     private ChatDatabaseReceiver mReceiver;
     private List<ChatDatabaseAsync> mAsyncTasks;
@@ -48,15 +48,15 @@ public class ChatDatabase {
     @SuppressWarnings("UnusedReturnValue")
     public long insert(@NonNull Message message) {
         ContentValues value = new ContentValues();
-        value.put(COLUMN_NAME_ID,message.id);
-        value.put(COLUMN_NAME_USERID,message.userId);
-        value.put(COLUMN_NAME_USERNAME,message.userName);
-        value.put(COLUMN_NAME_BOTTAG,message.bottag);
-        value.put(COLUMN_NAME_COLOR,message.color);
-        value.put(COLUMN_NAME_MESSAGE,message.message);
-        value.put(COLUMN_NAME_DATE,message.date);
-        value.put(COLUMN_NAME_NAME,message.name);
-        value.put(COLUMN_NAME_CHANNEL,message.channel);
+        value.put(COLUMN_NAME_ID,message.getId());
+        value.put(COLUMN_NAME_USERID,message.getUserId());
+        value.put(COLUMN_NAME_USERNAME,message.getUserName());
+        value.put(COLUMN_NAME_BOTTAG,message.getBottag());
+        value.put(COLUMN_NAME_COLOR,message.getColor());
+        value.put(COLUMN_NAME_MESSAGE,message.getMessage());
+        value.put(COLUMN_NAME_DATE,message.getDate());
+        value.put(COLUMN_NAME_NAME,message.getName());
+        value.put(COLUMN_NAME_CHANNEL,message.getChannel());
 
         long row = -1;
 
@@ -87,4 +87,3 @@ public class ChatDatabase {
         }
     }
 }
-

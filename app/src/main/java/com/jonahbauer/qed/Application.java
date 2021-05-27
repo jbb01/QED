@@ -14,8 +14,14 @@ import android.widget.Toast;
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.preference.PreferenceManager;
-import androidx.security.crypto.EncryptedSharedPreferences;
 import androidx.security.crypto.MasterKeys;
+
+import com.jonahbauer.qed.crypt.MyEncryptedSharedPreferences;
+import com.jonahbauer.qed.crypt.PasswordStorage;
+import com.jonahbauer.qed.networking.NetworkListener;
+import com.jonahbauer.qed.networking.cookies.QEDCookieHandler;
+import com.jonahbauer.qed.networking.downloadManager.Download;
+import com.jonahbauer.qed.util.Preferences;
 
 import org.jetbrains.annotations.Contract;
 
@@ -31,19 +37,6 @@ public class Application extends android.app.Application implements android.app.
     @SuppressWarnings("unused")
     public static final String LOG_TAG_DEBUG = "com.jonahbauer.qed::debug";
 
-    public static final String KEY_USERNAME = "username";
-    public static final String KEY_PASSWORD = "password";
-    public static final String KEY_USERID = "userid";
-
-    public static final String KEY_CHAT_PWHASH = "chat_pwhash";
-
-    public static final String KEY_GALLERY_PWHASH = "gallery_pwhash";
-    public static final String KEY_GALLERY_PHPSESSID = "gallery_phpsessid";
-
-    public static final String KEY_DATABASE_SESSION_COOKIE = "db_sessioncookie";
-    public static final String KEY_DATABASE_SESSIONID = "db_sessionid";
-    public static final String KEY_DATABASE_SESSIONID2 = "db_sessionid2";
-
     @SuppressWarnings("unused")
     public static final String KEY_FCM_DEVICE_TOKEN = "fcmDeviceToken";
     @SuppressWarnings("unused")
@@ -52,6 +45,7 @@ public class Application extends android.app.Application implements android.app.
     public static final String NOTIFICATION_CHANNEL_ID = "qednotification";
 
 
+    private static final String COOKIE_SHARED_PREFERENCE_FILE = "com.jonahbauer.qed_cookies";
     private static final String ENCRYPTED_SHARED_PREFERENCE_FILE = "com.jonahbauer.qed_encrypted";
 
 
@@ -59,80 +53,10 @@ public class Application extends android.app.Application implements android.app.
     private static boolean sForeground;
 
     private static SoftReference<Application> sContext;
-    private SharedPreferences mSharedPreferences;
-    private SharedPreferences mEncryptedSharedPreferences;
 
     private Activity mActivity;
-    private final Set<Activity> mExistingActivities;
+    private final Set<Activity> mExistingActivities = new HashSet<>();
     private ConnectionStateMonitor mConnectionStateMonitor;
-
-    {
-        mExistingActivities = new HashSet<>();
-    }
-
-    /**
-     * Loads data from the default shared preferences.
-     *
-     * @param key a key mapping to the data entry
-     * @param encrypted should be the same value as used when saving the data entry
-     * @return the stored value, null if none is stored
-     */
-    public String loadData(String key, boolean encrypted) {
-        if (encrypted) {
-            try {
-                loadEncryptedSharedPreferences();
-
-                return mEncryptedSharedPreferences.getString(key, null);
-            } catch (NullPointerException e) {
-                return null;
-            }
-        } else {
-            return mSharedPreferences.getString(key, null);
-        }
-    }
-
-    /**
-     * Stores data to the default shared preferences.
-     *
-     * When {@param encrypted} is true the data will be encrypted using a key from the Android Keystore.
-     * That way it is almost impossible to extract the value from the shared preferences even with root permission.
-     *
-     * @param data the data value
-     * @param key a key mapping to the data entry
-     * @param encrypted should be the same value as used when saving the data entry
-     */
-    public void saveData(String data, String key, boolean encrypted) {
-        if (encrypted) {
-            try {
-                loadEncryptedSharedPreferences();
-
-                mEncryptedSharedPreferences.edit().putString(key, data).apply();
-            } catch (NullPointerException ignored) {}
-        } else {
-            mSharedPreferences.edit().putString(key, data).apply();
-        }
-    }
-
-    private void loadEncryptedSharedPreferences() {
-        if (this.mEncryptedSharedPreferences != null) return;
-
-        try {
-            KeyGenParameterSpec keyGenParameterSpec = MasterKeys.AES256_GCM_SPEC;
-            String masterKeyAlias = MasterKeys.getOrCreate(keyGenParameterSpec);
-
-            this.mEncryptedSharedPreferences = EncryptedSharedPreferences
-                    .create(
-                            ENCRYPTED_SHARED_PREFERENCE_FILE,
-                            masterKeyAlias,
-                            this,
-                            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-                    );
-        } catch (GeneralSecurityException | IOException e) {
-            Toast.makeText(this, R.string.master_key_error, Toast.LENGTH_SHORT).show();
-            throw new NullPointerException();
-        }
-    }
 
     @Override
     public void onCreate() {
@@ -142,7 +66,21 @@ public class Application extends android.app.Application implements android.app.
         Pref.init(getResources());
 
         sContext = new SoftReference<>(this);
-        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        // Setup cookie handler
+        SharedPreferences cookieSharedPreferences = getEncryptedSharedPreferences(COOKIE_SHARED_PREFERENCE_FILE);
+        QEDCookieHandler.init(cookieSharedPreferences);
+
+        // Setup password storage
+        MyEncryptedSharedPreferences passwordSharedPreferences = getEncryptedSharedPreferences(ENCRYPTED_SHARED_PREFERENCE_FILE);
+        PasswordStorage.init(passwordSharedPreferences);
+
+        // Setup preferences
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        Preferences.init(preferences, this.getResources());
+
+        // Initialize Download
+        Download.init(this);
 
         mConnectionStateMonitor = new ConnectionStateMonitor(this);
         sOnline = false;
@@ -156,6 +94,7 @@ public class Application extends android.app.Application implements android.app.
         unregisterActivityLifecycleCallbacks(this);
     }
 
+    //<editor-fold desc="Activity Lifecycle Listener" defaultstate="collapsed">
     @Override
     public void onActivityCreated(@NonNull Activity activity, Bundle savedInstanceState) {
         this.mActivity = activity;
@@ -188,6 +127,7 @@ public class Application extends android.app.Application implements android.app.
     public void onActivityDestroyed(@NonNull Activity activity) {
         mExistingActivities.remove(activity);
     }
+    //</editor-fold>
 
     @Contract(pure = true)
     @NonNull
@@ -239,7 +179,6 @@ public class Application extends android.app.Application implements android.app.
         Application.sForeground = foreground;
     }
 
-
     /**
      * Creates a notification channel for android versions greater than Oreo
      */
@@ -283,6 +222,24 @@ public class Application extends android.app.Application implements android.app.
                 return Color.argb(255, 0x00, 0xdd, 0xff);
             default:
                 throw new AssertionError("(value % 10 + 10) % 10 is not in range 0 to 9!");
+        }
+    }
+
+    private MyEncryptedSharedPreferences getEncryptedSharedPreferences(String name) {
+        try {
+            KeyGenParameterSpec keyGenParameterSpec = MasterKeys.AES256_GCM_SPEC;
+            String masterKeyAlias = MasterKeys.getOrCreate(keyGenParameterSpec);
+
+            return MyEncryptedSharedPreferences.create(
+                    name,
+                    masterKeyAlias,
+                    this,
+                    MyEncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                    MyEncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+            );
+        } catch (GeneralSecurityException | IOException e) {
+            Toast.makeText(this, R.string.master_key_error, Toast.LENGTH_SHORT).show();
+            throw new NullPointerException();
         }
     }
 }
