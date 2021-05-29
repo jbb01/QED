@@ -1,23 +1,17 @@
 package com.jonahbauer.qed.activities;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.material.textfield.TextInputLayout;
-import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.R;
+import com.jonahbauer.qed.databinding.ActivityLoginBinding;
 import com.jonahbauer.qed.networking.Feature;
 import com.jonahbauer.qed.networking.NetworkListener;
 import com.jonahbauer.qed.networking.login.UserLoginTask;
@@ -30,14 +24,9 @@ public class LoginActivity extends AppCompatActivity implements NetworkListener,
     public static final String EXTRA_DONT_START_MAIN = "dontStartMain";
     public static final String EXTRA_FEATURE = "feature";
 
-    private UserLoginTask mAuthTask = null;
+    private UserLoginTask authTask = null;
 
-    private EditText mUsernameView;
-    private EditText mPasswordView;
-    private TextInputLayout mUsernameLayout;
-    private TextInputLayout mPasswordLayout;
-    private View mProgressView;
-    private View mLoginFormView;
+    private ActivityLoginBinding binding;
 
     private boolean mDoubleBackToExitPressedOnce = false;
     private boolean mDontStartMain;
@@ -54,32 +43,26 @@ public class LoginActivity extends AppCompatActivity implements NetworkListener,
             mFeature = Feature.CHAT;
         }
 
-        setContentView(R.layout.activity_login);
-        mUsernameView = findViewById(R.id.username);
-        mPasswordView = findViewById(R.id.password);
-        mUsernameLayout = findViewById(R.id.username_layout);
-        mPasswordLayout = findViewById(R.id.password_layout);
-        mProgressView = findViewById(R.id.login_progress);
-        mLoginFormView = findViewById(R.id.login_form);
+        binding = ActivityLoginBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-        CheckBox mRememberMeCheckBox = findViewById(R.id.remember_me_checkbox);
-        mRememberMeCheckBox.setChecked(Preferences.general().isRememberMe());
-        mRememberMeCheckBox.setOnCheckedChangeListener(
+        binding.rememberMeCheckbox.setChecked(Preferences.general().isRememberMe());
+        binding.rememberMeCheckbox.setOnCheckedChangeListener(
                 (buttonView, isChecked) -> Preferences.general().edit().setRememberMe(isChecked).apply()
         );
 
-        mPasswordView.setOnEditorActionListener((textView, id, keyEvent) -> {
+        binding.password.setOnEditorActionListener((textView, id, keyEvent) -> {
             if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
                 attemptLogin();
                 return true;
             }
             return false;
         });
-        mUsernameLayout.setErrorEnabled(true);
-        mPasswordLayout.setErrorEnabled(true);
 
-        Button mUsernameSignInButton = findViewById(R.id.sign_in_button);
-        mUsernameSignInButton.setOnClickListener(view -> attemptLogin());
+        binding.usernameLayout.setErrorEnabled(true);
+        binding.passwordLayout.setErrorEnabled(true);
+
+        binding.signInButton.setOnClickListener(view -> attemptLogin());
 
         mDontStartMain = getIntent().getBooleanExtra(EXTRA_DONT_START_MAIN, false);
         String errorMessage = getIntent().getStringExtra(EXTRA_ERROR_MESSAGE);
@@ -89,50 +72,33 @@ public class LoginActivity extends AppCompatActivity implements NetworkListener,
     }
 
     private void attemptLogin() {
-        if (mAuthTask != null) {
+        if (authTask != null) {
             return;
         }
 
-        mUsernameLayout.setError(null);
-        mPasswordLayout.setError(null);
-        mUsernameView.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
-        mPasswordView.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+        binding.usernameLayout.setError(null);
+        binding.passwordLayout.setError(null);
+        binding.username.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+        binding.password.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
 
-        String username = mUsernameView.getText().toString();
-        char[] password = new char[mPasswordView.getText().length()];
-        mPasswordView.getText().getChars(0, password.length, password, 0);
+        String username = binding.username.getText().toString();
+        char[] password = new char[binding.password.getText().length()];
+        binding.password.getText().getChars(0, password.length, password, 0);
 
         showProgress(true);
-        mAuthTask = new UserLoginTask(username, password, mFeature, this);
-        mAuthTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        authTask = new UserLoginTask(username, password, mFeature, this);
+        authTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     private void showProgress(final boolean show) {
-        int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
-
-        mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-        mLoginFormView.animate().setDuration(shortAnimTime).alpha(
-                show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-            }
-        });
-
-        mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-        mProgressView.animate().setDuration(shortAnimTime).alpha(
-                show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            }
-        });
+        binding.loginForm.setVisibility(show ? View.GONE : View.VISIBLE);
+        binding.loginProgress.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
     @Override
     public void onBackPressed() {
         if (mDoubleBackToExitPressedOnce) {
-            ((Application)getApplication()).finish();
+            finishAffinity();
             return;
         }
 
@@ -144,24 +110,17 @@ public class LoginActivity extends AppCompatActivity implements NetworkListener,
 
     @Override
     public void onConnectionFail() {
-        mPasswordLayout.post(() -> {
-            mPasswordLayout.setError(getString(R.string.cant_connect));
-            mPasswordView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_error_red, 0);
-            mPasswordView.requestFocus();
-        });
+        binding.passwordLayout.post(() -> setError(getString(R.string.cant_connect)));
     }
 
     @Override
     public void onConnectionRegain() {
-        mPasswordLayout.post(() -> {
-            mPasswordLayout.setError(null);
-            mPasswordView.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
-        });
+        binding.passwordLayout.post(() -> setError(null));
     }
 
     @Override
     public void onResult(Boolean success) {
-        mAuthTask = null;
+        authTask = null;
         showProgress(false);
 
         if (success == null) {
@@ -174,16 +133,25 @@ public class LoginActivity extends AppCompatActivity implements NetworkListener,
             LoginActivity.this.finish();
             finish();
         } else {
-            mPasswordLayout.setError(getString(R.string.login_error_incorrect_data));
-            mPasswordView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_error_red, 0);
-            mPasswordView.requestFocus();
+            setError(getString(R.string.login_error_incorrect_data));
         }
     }
 
     @Override
     public void onCancelled() {
-        mAuthTask = null;
+        authTask = null;
         showProgress(false);
+    }
+
+    private void setError(String string) {
+        binding.passwordLayout.setError(string);
+
+        if (string != null) {
+            binding.password.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_error_red, 0);
+            binding.password.requestFocus();
+        } else {
+            binding.password.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+        }
     }
 }
 

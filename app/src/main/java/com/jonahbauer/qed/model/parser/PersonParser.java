@@ -31,6 +31,7 @@ public final class PersonParser extends HtmlParser<Person> {
     }
 
     private void parseGeneral(Person person, Element element) {
+        if (element == null) return;
         element.select("dl dt")
                .forEach(dt -> {
                    try {
@@ -59,11 +60,14 @@ public final class PersonParser extends HtmlParser<Person> {
                            }
                            case "Eingetreten:": {
                                Element time = value.child(0);
-                               person.setMemberSinceString(time.text());
-                               person.setMemberSince(parseDate(time.attr("datetime")));
+                               person.setDateOfJoiningString(time.text());
+                               person.setDateOfJoining(parseDate(time.attr("datetime")));
                                break;
                            }
                            case "Ausgetreten:": {
+                               Element time = value.child(0);
+                               person.setLeavingDateString(time.text());
+                               person.setLeavingDate(parseDate(time.attr("datetime")));
                                break;
                            }
                            case "Aktuell Mitglied:": {
@@ -82,6 +86,7 @@ public final class PersonParser extends HtmlParser<Person> {
     }
 
     private void parseAdditional(Person person, Element element) {
+        if (element == null) return;
         element.select("dl dt")
                .forEach(dt -> {
                    try {
@@ -98,8 +103,12 @@ public final class PersonParser extends HtmlParser<Person> {
                                person.setRailcard(value.text());
                                break;
                            }
-                           case "Anmerkungen:":
+                           case "Anmerkungen:": {
+                               person.setNotes(value.text());
+                               break;
+                           }
                            case "Essenswünsche:": {
+                               person.setFood(value.text());
                                break;
                            }
                        }
@@ -110,12 +119,20 @@ public final class PersonParser extends HtmlParser<Person> {
     }
 
     private void parseAddresses(Person person, Element element) {
+        if (element == null) return;
         if (element.selectFirst("i") != null) return;
 
-        element.select(".address").forEach(address -> person.getAddresses().add(address.text()));
+        element.select(".address").forEach(address ->
+                person.getAddresses().add(
+                        address.html()
+                               .replaceAll("\\s*<br>\\s*", "\n")
+                               .trim()
+                )
+        );
     }
 
     private void parseContacts(Person person, Element element) {
+        if (element == null) return;
         if (element.selectFirst("i") != null) return;
 
         element.select("dl dt")
@@ -136,6 +153,7 @@ public final class PersonParser extends HtmlParser<Person> {
     }
 
     private void parseRegistrations(Person person, Element element) {
+        if (element == null) return;
         if (element.selectFirst("p > i") != null) return;
 
         element.select("ul li").forEach(li -> {
@@ -146,10 +164,10 @@ public final class PersonParser extends HtmlParser<Person> {
                 Element statusElement = li.selectFirst("i");
                 String statusString = statusElement != null ? statusElement.text() : "";
 
+                boolean orga = statusString.contains("Orga");
+
                 Registration.Status status = Registration.Status.CONFIRMED;
-                if (statusString.contains("Orga")) {
-                    status = Registration.Status.ORGA;
-                } else if (statusString.contains("abgesagt")) {
+                if (statusString.contains("abgesagt")) {
                     status = Registration.Status.CANCELLED;
                 } else if (statusString.contains("offen")) {
                     status = Registration.Status.OPEN;
@@ -157,6 +175,7 @@ public final class PersonParser extends HtmlParser<Person> {
 
                 Registration registration = new Registration(id);
                 registration.setStatus(status);
+                registration.setOrganizer(orga);
 
                 person.getEvents().put(event, registration);
             } catch (Exception e) {

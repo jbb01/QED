@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <com.jonahbauer.qed.layoutStuff.AdvancedImageView
+    <com.jonahbauer.qed.layoutStuff.views.AdvancedImageView
         android:id="@+id/gallery_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

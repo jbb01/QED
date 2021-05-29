@@ -5,13 +5,11 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.security.keystore.KeyGenParameterSpec;
 import android.widget.Toast;
 
-import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.preference.PreferenceManager;
 import androidx.security.crypto.MasterKeys;
@@ -194,34 +192,6 @@ public class Application extends android.app.Application implements android.app.
             NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
             if (notificationManager != null)
                 notificationManager.createNotificationChannel(channel);
-        }
-    }
-    
-    @ColorInt
-    public static int colorful(int value) {
-        switch ((value % 10 + 10) % 10) {
-            case 0:
-                return Color.argb(255, 0x33, 0xb5, 0xe5);
-            case 1:
-                return Color.argb(255, 0x99, 0xcc, 0x00);
-            case 2:
-                return Color.argb(255, 0xff, 0x44, 0x44);
-            case 3:
-                return Color.argb(255, 0x00, 0x99, 0xcc);
-            case 4:
-                return Color.argb(255, 0x66, 0x99, 0x00);
-            case 5:
-                return Color.argb(255, 0xcc, 0x00, 0x00);
-            case 6:
-                return Color.argb(255, 0xaa, 0x66, 0xcc);
-            case 7:
-                return Color.argb(255, 0xff, 0xbb, 0x33);
-            case 8:
-                return Color.argb(255, 0xff, 0x88, 0x00);
-            case 9:
-                return Color.argb(255, 0x00, 0xdd, 0xff);
-            default:
-                throw new AssertionError("(value % 10 + 10) % 10 is not in range 0 to 9!");
         }
     }
 

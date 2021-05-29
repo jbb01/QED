@@ -1,6 +1,5 @@
 package com.jonahbauer.qed.activities.mainFragments;
 
-import android.content.res.Configuration;
 import android.graphics.drawable.Animatable;
 import android.os.Bundle;
 import android.view.View;
@@ -16,12 +15,10 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StyleRes;
-import androidx.fragment.app.FragmentManager;
 
 import com.jonahbauer.qed.R;
-import com.jonahbauer.qed.activities.personSheet.PersonBottomSheet;
-import com.jonahbauer.qed.activities.personSheet.PersonSideSheet;
-import com.jonahbauer.qed.layoutStuff.CheckBoxTriStates;
+import com.jonahbauer.qed.activities.sheets.person.PersonInfoBottomSheet;
+import com.jonahbauer.qed.layoutStuff.views.CheckBoxTriStates;
 import com.jonahbauer.qed.model.Person;
 import com.jonahbauer.qed.model.adapter.PersonAdapter;
 import com.jonahbauer.qed.networking.QEDDBPages;
@@ -217,17 +214,8 @@ public class PersonDatabaseFragment extends QEDFragment implements CompoundButto
     }
 
     private void showBottomSheetDialogFragment(@NonNull Person person) {
-        FragmentManager fragmentManager = getParentFragmentManager();
-
-        int orientation = getResources().getConfiguration().orientation;
-
-        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-            PersonBottomSheet personBottomSheet = PersonBottomSheet.newInstance(person);
-            personBottomSheet.show(fragmentManager, personBottomSheet.getTag());
-        } else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            PersonSideSheet personSideSheet = PersonSideSheet.newInstance(person);
-            personSideSheet.show(fragmentManager, personSideSheet.getTag());
-        }
+        PersonInfoBottomSheet sheet = PersonInfoBottomSheet.newInstance(person,R.style.AppTheme_BottomSheetDialog);
+        sheet.show(getParentFragmentManager(), sheet.getTag());
     }
 
     private void setError(String error) {

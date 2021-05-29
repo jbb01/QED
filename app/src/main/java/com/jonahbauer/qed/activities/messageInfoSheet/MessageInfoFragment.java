@@ -21,8 +21,8 @@ import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 
 import com.jonahbauer.qed.R;
-import com.jonahbauer.qed.layoutStuff.MathView;
-import com.jonahbauer.qed.layoutStuff.MessageView;
+import com.jonahbauer.qed.layoutStuff.views.MathView;
+import com.jonahbauer.qed.layoutStuff.views.MessageView;
 import com.jonahbauer.qed.model.Message;
 import com.jonahbauer.qed.util.Preferences;
 
@@ -76,7 +76,7 @@ public class MessageInfoFragment extends Fragment implements View.OnScrollChange
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mContent = view.findViewById(R.id.content);
+        mContent = view.findViewById(R.id.content_holder);
         mMessageView = view.findViewById(R.id.message);
         mBackground = view.findViewById(R.id.background);
         mContentShadow = view.findViewById(R.id.content_shadow);

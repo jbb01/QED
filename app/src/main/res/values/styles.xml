@@ -17,7 +17,6 @@
         <item name="listIconColor">#444</item>
 
         <item name="bottomSheetDialogTheme">@style/AppTheme.BottomSheetDialog</item>
-        <item name="sideSheetDialogTheme">@style/AppTheme.SideSheetDialog</item>
 
         <item name="buttonStyle">@style/AppTheme.Button</item>
         <item name="textAppearanceButton">@style/AppTheme.TextAppearance.Button</item>
@@ -26,7 +25,6 @@
         <item name="textAppearanceListItemSecondary">@style/AppTheme.TextAppearance.ListItemSecondary</item>
         <item name="textAppearanceListItemSmall">@style/AppTheme.TextAppearance.ListItemSmall</item>
 
-        <item name="dividerColor">#F0F0F0</item>
         <item name="divider">@drawable/divider</item>
         <item name="dividerHorizontal">?divider</item>
         <item name="android:divider">?divider</item>
@@ -60,7 +58,6 @@
         <item name="colorControlNormal">@color/color_control_normal</item>
         <item name="background">@color/colorPrimary</item>
         <item name="colorPrimary">?attr/background</item>
-        <!--<item name="colorControlHighlight">@android:color/darker_gray</item>-->
     </style>
 
     <style name="AppTheme.Button" parent="Widget.AppCompat.Button">
@@ -104,9 +101,6 @@
 
         <item name="android:windowAnimationStyle">@style/AppTheme.Animation.BottomSheetDialog</item>
     </style>
-    <style name="AppTheme.SideSheetDialog" parent="AppTheme.BottomSheetDialog">
-        <item name="android:windowAnimationStyle">@style/AppTheme.Animation.SideSheetDialog</item>
-    </style>
 
     <style name="AppTheme.Animation"/>
     <style name="AppTheme.Animation.BottomSheetDialog">
@@ -116,16 +110,6 @@
     <style name="AppTheme.Animation.SideSheetDialog">
         <item name="android:windowEnterAnimation">@anim/slide_in_right</item>
         <item name="android:windowExitAnimation">@anim/slide_out_right</item>
-    </style>
-
-
-
-
-
-    <style name="AppTheme.Variant" parent="AppTheme">
-        <item name="colorPrimary">@color/colorPrimary2</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark2</item>
-        <item name="colorAccent">@color/colorAccent2</item>
     </style>
 
     <style name="AppTheme.Dialog" parent="Theme.AppCompat.Light.Dialog">

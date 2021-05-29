@@ -13,10 +13,10 @@ public class NetworkConstants {
 
     public static final String DATABASE_SERVER_LOGIN = "https://qeddb.qed-verein.de/login";
     public static final String DATABASE_SERVER_LOGOUT = "https://qeddb.qed-verein.de/logout";
-    public static final String DATABASE_SERVER_PERSON = "https://qeddb.qed-verein.de/people/";
     public static final String DATABASE_SERVER_PERSONS = "https://qeddb.qed-verein.de/people_as_table";
-    public static final String DATABASE_SERVER_EVENT = "https://qeddb.qed-verein.de/events/";
+    public static final String DATABASE_SERVER_PERSON = "https://qeddb.qed-verein.de/people/";
     public static final String DATABASE_SERVER_EVENTS = "https://qeddb.qed-verein.de/events_as_table";
+    public static final String DATABASE_SERVER_EVENT = "https://qeddb.qed-verein.de/events/";
     public static final String DATABASE_SERVER_REGISTRATION = "https://qeddb.qed-verein.de/registrations/";
 
     public static final String GALLERY_SERVER_LOGIN = "https://qedgallery.qed-verein.de/account.php";

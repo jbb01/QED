@@ -6,7 +6,7 @@ import android.os.Parcelable;
 import androidx.annotation.NonNull;
 
 import java.util.Date;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +30,13 @@ public class Event implements Comparable<Event>, Parcelable {
     private String hotelAddress;
     private String emailOrga;
     private String emailAll;
-    private final Map<String, Registration> participants = new HashMap<>();
+    private final Map<String, Registration> participants = new LinkedHashMap<>();
+    private String notes;
+
+    private Map<String, Registration> organizers;
+    private int organizersValid = 0;
+
+    private boolean loaded;
 
     @Override
     @NonNull
@@ -49,6 +55,17 @@ public class Event implements Comparable<Event>, Parcelable {
         if (emailAll != null) entries.add( "\"emailAll\":\"" + emailAll + "\"");
         if (!participants.isEmpty()) entries.add( "\"participants\":\"" + participants + "\"");
         return entries.stream().collect(Collectors.joining(", ", "{", "}"));
+    }
+
+    public Map<String, Registration> getOrganizers() {
+        if (organizers == null || organizersValid != participants.hashCode()) {
+            organizers = participants.entrySet().stream()
+                                     .filter(entry -> entry.getValue().isOrganizer())
+                                     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+            organizersValid = participants.hashCode();
+        }
+
+        return organizers;
     }
 
     @Override
@@ -78,11 +95,14 @@ public class Event implements Comparable<Event>, Parcelable {
         dest.writeInt(cost);
         dest.writeInt(maxParticipants);
         dest.writeString(hotel);
+        dest.writeString(notes);
+
         dest.writeInt(participants.size());
         for (Map.Entry<String, Registration> entry : participants.entrySet()) {
             dest.writeString(entry.getKey());
             dest.writeLong(entry.getValue().getId());
         }
+        dest.writeByte((byte)(loaded ? 1 : 0));
     }
 
     public static final Parcelable.Creator<Event> CREATOR = new Parcelable.Creator<Event>() {
@@ -99,6 +119,7 @@ public class Event implements Comparable<Event>, Parcelable {
             event.cost = source.readInt();
             event.maxParticipants = source.readInt();
             event.hotel = source.readString();
+            event.notes = source.readString();
 
             int participantCount = source.readInt();
             for (int i = 0; i < participantCount; i++) {
@@ -107,6 +128,9 @@ public class Event implements Comparable<Event>, Parcelable {
                         new Registration(source.readLong())
                 );
             }
+
+            event.loaded = source.readByte() != 0;
+
             return event;
         }
 

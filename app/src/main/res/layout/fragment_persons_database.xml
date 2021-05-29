@@ -87,7 +87,7 @@
                     android:layout_height="wrap_content"
                     android:paddingStart="1dp"
                     android:paddingEnd="1dp">
-                    <com.jonahbauer.qed.layoutStuff.CheckBoxTriStates
+                    <com.jonahbauer.qed.layoutStuff.views.CheckBoxTriStates
                         android:id="@+id/database_active_checkbox"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -95,7 +95,7 @@
                         android:layout_marginEnd="10dp"
                         android:textColor="@color/person_database_search_headers"
                         android:text="@string/persons_database_active_checkbox" />
-                    <com.jonahbauer.qed.layoutStuff.CheckBoxTriStates
+                    <com.jonahbauer.qed.layoutStuff.views.CheckBoxTriStates
                         android:id="@+id/database_member_checkbox"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"

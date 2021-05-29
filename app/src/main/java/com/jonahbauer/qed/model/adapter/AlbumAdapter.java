@@ -10,9 +10,9 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
-import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.model.Album;
+import com.jonahbauer.qed.util.Themes;
 
 import java.util.List;
 import java.util.Objects;
@@ -41,7 +41,7 @@ public class AlbumAdapter extends ArrayAdapter<Album> {
         }
 
         ImageView galleryIcon = view.findViewById(R.id.gallery_icon);
-        galleryIcon.setColorFilter(Application.colorful(album.getName().chars().sum()));
+        galleryIcon.setColorFilter(Themes.colorful(album.getName().chars().sum()));
 
         ((TextView)view.findViewById(R.id.gallery_name)).setText(album.getName());
 

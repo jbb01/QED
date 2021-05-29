@@ -1,23 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/person"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:paddingStart="@dimen/person_padding_horizontal"
-    android:paddingEnd="@dimen/person_padding_horizontal"
-    android:paddingTop="@dimen/person_padding_vertical"
-    android:paddingBottom="@dimen/person_padding_vertical"
-    android:clipToPadding="false"
-    android:layout_gravity="center"
-    android:descendantFocusability="blocksDescendants">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <import type="com.jonahbauer.qed.util.Themes"/>
+        <import type="java.text.MessageFormat"/>
+
+        <variable name="person" type="com.jonahbauer.qed.model.Person" />
+        <variable name="invertedInitials" type="boolean"/>
+    </data>
+
     <RelativeLayout
-        android:id="@+id/person_layout"
+        android:id="@+id/person"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:elevation="1dp"
-        tools:ignore="UselessParent">
+        android:paddingHorizontal="@dimen/person_padding_horizontal"
+        android:paddingVertical="@dimen/person_padding_vertical"
+        android:clipToPadding="false"
+        android:layout_gravity="center"
+        android:descendantFocusability="blocksDescendants">
 
         <TextView
             android:id="@+id/header"
@@ -43,6 +44,7 @@
             android:adjustViewBounds="true"
             android:layout_gravity="center"
             android:contentDescription="@string/content_description_icon"
+            app:tint="@{Themes.colorful(person.id)}"
             tools:tint="@android:color/holo_green_dark"/>
 
         <TextView
@@ -56,6 +58,7 @@
             android:gravity="center"
             android:textStyle="bold"
             android:textColor="@color/person_database_initials"
+            android:text="@{person.getInitials(invertedInitials)}"
             tools:text="MM"/>
 
         <TextView
@@ -64,6 +67,7 @@
             android:layout_height="wrap_content"
             android:layout_toEndOf="@id/person_initials_circle"
             android:layout_alignParentTop="true"
+            android:text="@{person.getFullName(invertedInitials)}"
             style="?attr/textAppearanceListItemSecondary"
             tools:text="Max Mustermann"/>
 
@@ -77,6 +81,7 @@
             android:layout_toEndOf="@id/person_name"
             android:paddingStart="5dp"
             android:paddingEnd="0dp"
+            android:text="@{!person.active ? @string/persons_database_inactive : !person.member ? @string/persons_database_non_member : ``}"
             style="?attr/textAppearanceListItemSmall"
             tools:text="(inaktiv)"/>
 
@@ -87,7 +92,8 @@
             android:layout_toEndOf="@id/person_initials_circle"
             android:layout_alignParentEnd="true"
             android:layout_below="@id/person_name"
+            android:text="@{person.email ?? @string/persons_database_no_email}"
             style="?attr/textAppearanceListItemSmall"
             tools:text="max.mustermann@email.com"/>
     </RelativeLayout>
-</RelativeLayout>
+</layout>

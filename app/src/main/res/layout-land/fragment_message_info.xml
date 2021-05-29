@@ -19,7 +19,7 @@
             tools:layout_width="230dp"
             tools:backgroundTint="@android:color/holo_green_light"/>
 
-        <com.jonahbauer.qed.layoutStuff.MessageView
+        <com.jonahbauer.qed.layoutStuff.views.MessageView
             android:id="@+id/message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -46,7 +46,7 @@
     </RelativeLayout>
 
     <androidx.core.widget.NestedScrollView
-        android:id="@+id/content"
+        android:id="@+id/content_holder"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:transitionName="content"

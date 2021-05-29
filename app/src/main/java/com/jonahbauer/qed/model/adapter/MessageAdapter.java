@@ -11,8 +11,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.jonahbauer.qed.R;
-import com.jonahbauer.qed.layoutStuff.MathView;
-import com.jonahbauer.qed.layoutStuff.MessageView;
+import com.jonahbauer.qed.layoutStuff.views.MathView;
+import com.jonahbauer.qed.layoutStuff.views.MessageView;
 import com.jonahbauer.qed.model.Message;
 import com.jonahbauer.qed.util.Preferences;
 

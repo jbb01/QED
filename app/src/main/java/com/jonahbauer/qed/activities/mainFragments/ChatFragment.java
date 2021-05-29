@@ -330,7 +330,7 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
      * @param notify if {@link MessageAdapter#notifyDataSetChanged()} should be called
      */
     private void addPost(@NonNull Message message, boolean notify) {
-        assert getContext() != null;
+        if (getContext() == null) return;
 
         if (Message.PONG.equals(message)) {
             mInitDone = true;

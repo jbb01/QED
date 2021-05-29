@@ -3,6 +3,10 @@ apply plugin: 'com.android.application'
 android {
     signingConfigs {
         release {
+            storeFile file('C:\\Users\\Jonah\\Desktop\\QED\\.keystore')
+            storePassword 'Q3D-Ch4t'
+            keyAlias = 'key0'
+            keyPassword 'Q3D-Ch4t'
         }
     }
 
@@ -51,6 +55,11 @@ android {
         targetCompatibility 1.8
         sourceCompatibility 1.8
     }
+
+    buildFeatures {
+        viewBinding true
+        dataBinding true
+    }
 }
 
 apply plugin: 'com.android.application'
@@ -79,8 +88,9 @@ dependencies {
 
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
 
-    compileOnly 'org.projectlombok:lombok:1.18.18'
-    annotationProcessor 'org.projectlombok:lombok:1.18.18'
+    //noinspection AnnotationProcessorOnCompilePath
+    compileOnly 'org.projectlombok:lombok:1.18.20'
+    annotationProcessor 'org.projectlombok:lombok:1.18.20'
 
     withGoogleImplementation 'com.google.firebase:firebase-messaging:20.2.1'
 

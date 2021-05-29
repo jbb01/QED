@@ -17,6 +17,7 @@ public class Registration implements Parcelable {
     private Event event;
     private Person person;
     private Status status;
+    private boolean organizer;
 
     @Override
     public int describeContents() {
@@ -46,13 +47,11 @@ public class Registration implements Parcelable {
     };
 
     public enum Status {
-        ORGA, PARTICIPATED, CONFIRMED, OPEN, CANCELLED;
+        PARTICIPATED, CONFIRMED, OPEN, CANCELLED;
 
         @StringRes
         public int toStringRes() {
             switch (this) {
-                case ORGA:
-                    return R.string.registration_status_orga;
                 case PARTICIPATED:
                     return R.string.registration_status_participated;
                 case CONFIRMED:
@@ -69,11 +68,9 @@ public class Registration implements Parcelable {
         @DrawableRes
         public int toDrawableRes() {
             switch (this) {
-                case ORGA:
-                    return R.drawable.ic_event_orga;
-                default:
                 case OPEN:
                     return R.drawable.ic_event_member_open;
+                default:
                 case CONFIRMED:
                 case PARTICIPATED:
                     return R.drawable.ic_event_member_confirmed;

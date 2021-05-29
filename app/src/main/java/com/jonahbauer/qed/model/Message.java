@@ -21,11 +21,13 @@ import java.util.Date;
 import java.util.Locale;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * An object representing a message in the qed chat
  */
 @Data
+@EqualsAndHashCode(of = "id")
 public class Message implements Parcelable, Comparable<Message>, Serializable {
     private static final SimpleDateFormat sdfIn = new SimpleDateFormat("yyyy-MM-dd", Locale.GERMANY);
     private static final SimpleDateFormat sdfOut = new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY);
@@ -130,11 +132,6 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
         hsv[2] = 0.85f;
 
         return Color.HSVToColor(hsv);
-    }
-
-    @Override
-    public int hashCode() {
-        return (int) id;
     }
 
     @Override

@@ -18,8 +18,6 @@
     <dimen name="person_padding_horizontal">10dp</dimen>
     <dimen name="person_divider">1dp</dimen>
 
-    <dimen name="event_time_size">14sp</dimen>
-    <dimen name="event_name_size">16sp</dimen>
     <dimen name="event_padding_vertical">10dp</dimen>
     <dimen name="event_padding_horizontal">10dp</dimen>
     <dimen name="event_divider">1dp</dimen>

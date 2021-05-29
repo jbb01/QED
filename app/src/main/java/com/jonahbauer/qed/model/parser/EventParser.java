@@ -36,6 +36,7 @@ public final class EventParser extends HtmlParser<Event> {
     }
 
     private void parseGeneral(Event event, Element element) {
+        if (element == null) return;
         element.select("dl dt")
                .forEach(dt -> {
                    try {
@@ -98,8 +99,12 @@ public final class EventParser extends HtmlParser<Event> {
                                event.setEmailAll(mail);
                                break;
                            }
+                           case "Anmerkungen:": {
+                               String notes = value.text();
+                               event.setNotes(notes);
+                               break;
+                           }
                            default: {
-                               System.out.println();
                                break;
                            }
                        }
@@ -110,6 +115,7 @@ public final class EventParser extends HtmlParser<Event> {
     }
 
     private void parseRegistrations(Event event, Element element) {
+        if (element == null) return;
         element.select("dl dt")
                .forEach(dt -> {
                    String key = dt.text();
@@ -123,10 +129,10 @@ public final class EventParser extends HtmlParser<Event> {
                                Element statusElement = div.selectFirst("i");
                                String statusString = statusElement != null ? statusElement.text() : "";
 
+                               boolean orga = statusString.contains("Orga");
+
                                Registration.Status status = Registration.Status.CONFIRMED;
-                               if (statusString.contains("Orga")) {
-                                   status = Registration.Status.ORGA;
-                               } else if (statusString.contains("abgesagt")) {
+                               if (statusString.contains("abgesagt")) {
                                    status = Registration.Status.CANCELLED;
                                } else if (statusString.contains("offen")) {
                                    status = Registration.Status.OPEN;
@@ -134,6 +140,7 @@ public final class EventParser extends HtmlParser<Event> {
 
                                Registration registration = new Registration(id);
                                registration.setStatus(status);
+                               registration.setOrganizer(orga);
 
                                event.getParticipants().put(participant, registration);
                            } catch (Exception e) {

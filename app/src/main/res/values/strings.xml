@@ -115,41 +115,55 @@
     <string name="persons_database_sort_last_name">Last Name</string>
     <string name="persons_database_inactive">(inactive)</string>
     <string name="persons_database_non_member">(no member)</string>
+    <string name="persons_database_no_email"><i>private</i></string>
     <!-- Events Database Fragment -->
     <string name="title_fragment_events_database">Events</string>
 
     <!-- Person Bottom Sheet -->
-    <string name="person_tab_personal_data">Personal Data</string>
-    <string name="person_tab_qed">QED</string>
+    <string name="person_section_personal">Personal Data</string>
+    <string name="person_section_additional">Additional Information</string>
+    <string name="person_section_addresses">Addresses</string>
+    <string name="person_section_contacts">Contact Information</string>
+    <string name="person_section_registrations">Registrations</string>
+    <string name="person_subtitle_mail">Email Address</string>
+    <string name="person_title_birthday">{0,date}</string>
     <string name="person_subtitle_birthday">Birthday</string>
+    <string name="person_title_date_of_joining">{0,date}</string>
+    <string name="person_subtitle_date_of_joining">Date of Joining</string>
+    <string name="person_title_leaving_date">{0,date}</string>
+    <string name="person_subtitle_leaving_date">Leaving Date</string>
+    <string name="person_title_member_true">Yes</string>
+    <string name="person_title_member_false">No</string>
+    <string name="person_subtitle_member">Currently Member</string>
+    <string name="person_title_active_true">Yes</string>
+    <string name="person_title_active_false">No</string>
+    <string name="person_subtitle_active">Active Profile</string>
     <string name="person_subtitle_station">Train Station</string>
-    <string name="person_subtitle_email">Email Address</string>
-    <string name="person_subtitle_memberSince">Member Since</string>
-    <string name="person_no_events">Nothing to see here!</string>
-    <string name="person_active">Active</string>
-    <string name="person_inactive">Inactive</string>
+    <string name="person_subtitle_railcard">Railcard</string>
+    <string name="person_subtitle_food">Food Preferences</string>
+    <string name="person_subtitle_notes">Notes</string>
+
 
     <!-- Event Bottom Sheet -->
-    <string name="event_tab_overview">Overview</string>
-    <string name="event_tab_members">Participants</string>
+    <string name="event_section_information">General</string>
+    <string name="event_section_organization">Organizers</string>
+    <string name="event_section_participants">Participants</string>
+    <string name="event_title_time">{0,date} - {1,date}</string>
     <string name="event_subtitle_time">Time Frame</string>
+    <string name="event_title_deadline">{0,date} {0,time}</string>
     <string name="event_subtitle_deadline">Registration Deadline</string>
-    <string name="event_subtitle_cost">Costs</string>
-    <string name="event_subtitle_max_members">Maximum Number of Participants</string>
     <string name="event_subtitle_hotel">Venue</string>
     <string name="event_subtitle_hotel_address">Venue Address</string>
-    <string name="event_subtitle_mail_orga">Email Organizers</string>
-    <string name="event_subtitle_mail_all">Email Participants</string>
-    <string name="event_subtitle_orga">Orga</string>
-    <string name="event_sign_up">Sign Up</string>
-    <string name="event_sign_up_success">Signed Up Successfully!</string>
-    <string name="event_sign_up_deadline_exceeded">Deadline exceeded!</string>
-    <string name="event_sign_up_already_signed_up">Already Signed Up!</string>
-    <string name="event_sign_up_unknown_event">Unknown Event!</string>
-    <string name="event_sign_up_confirm">Do you really want to sign up for %s?</string>
+    <string name="event_subtitle_cost">Costs</string>
+    <string name="event_subtitle_max_participants">Maximum Number of Participants</string>
+    <string name="event_subtitle_notes">Notes</string>
+    <string name="event_subtitle_mail_organizers">Email Organizers</string>
+    <string name="event_subtitle_mail_participants">Email Participants</string>
+    <string name="event_show_more">Show More</string>
+    <string name="event_show_less">Show Less</string>
 
     <!-- Registration -->
-    <string name="registration_status_orga">Organizer</string>
+    <string name="registration_orga">Organizer</string>
     <string name="registration_status_participated">participated</string>
     <string name="registration_status_confirmed">confirmed</string>
     <string name="registration_status_open">open</string>

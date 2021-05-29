@@ -23,7 +23,7 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.database.GalleryDatabase;
-import com.jonahbauer.qed.layoutStuff.AdvancedImageView;
+import com.jonahbauer.qed.layoutStuff.views.AdvancedImageView;
 import com.jonahbauer.qed.model.Image;
 import com.jonahbauer.qed.networking.QEDGalleryPages;
 import com.jonahbauer.qed.networking.Reason;

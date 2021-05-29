@@ -61,10 +61,6 @@
     <color name="event_database_text">@android:color/black</color>
     <color name="event_database_time">#383838</color>
 
-    <!-- Person Bottom Sheet -->
-    <color name="person_big_name">@android:color/black</color>
-    <color name="person_icons">#868686</color>
-
     <!-- Event Bottom Sheet -->
     <color name="event_big_name">@android:color/black</color>
     <color name="event_icons">#868686</color>

@@ -43,17 +43,59 @@ public class Person implements Parcelable {
 
     private String homeStation;
     private String railcard;
+    private String food;
+    private String notes;
 
     private boolean member;
     private boolean active;
 
-    private String memberSinceString;
-    private Date memberSince;
+    private String dateOfJoiningString;
+    private Date dateOfJoining;
+
+    private String leavingDateString;
+    private Date leavingDate;
+
+    private boolean loaded;
 
     // Pair of type and number/name
     private ArrayList<Pair<String, String>> contacts = new ArrayList<>();
     private ArrayList<String> addresses = new ArrayList<>();
     private Map<String, Registration> events = new LinkedHashMap<>();
+
+    public String getFullName() {
+        return getFullName(false);
+    }
+
+    public String getFullName(boolean inverted) {
+        if (inverted) {
+            return getLastName() + ", " + getFirstName();
+        } else {
+            return getFirstName() + " " + getLastName();
+        }
+    }
+
+    public String getInitials(boolean inverted) {
+        String out = "";
+        String first = inverted ? lastName : firstName;
+        String last = inverted ? firstName : lastName;
+
+        if (first != null && first.length() > 0) {
+            out += first.charAt(0);
+        }
+
+        if (last != null && last.length() > 0) {
+            out += last.charAt(0);
+        }
+
+        return out;
+    }
+
+    public boolean hasAdditionalInformation() {
+        return (homeStation != null && !homeStation.trim().equals(""))
+                || (railcard != null && !railcard.trim().equals(""))
+                || (food != null && !food.trim().equals(""))
+                || (notes != null && !notes.trim().equals(""));
+    }
 
     @NonNull
     @Override
@@ -68,7 +110,7 @@ public class Person implements Parcelable {
         if (id != -1) entries.add( "\"id\":" + id);
         entries.add( "\"member\":" + member);
         entries.add( "\"active\":" + active);
-        if (memberSince != null) entries.add( "\"memberSince\":\"" + memberSince + "\"");
+        if (dateOfJoining != null) entries.add( "\"memberSince\":\"" + dateOfJoining + "\"");
         if (!contacts.isEmpty()) entries.add( "\"contacts\":" + contacts.stream().map(number -> "{\"note\":\"" + number.first + "\", \"number\":\"" + number.second + "\"}").collect(Collectors.joining(", ", "[", "]")));
         if (!addresses.isEmpty()) entries.add( "\"addresses\":" + addresses);
         if (!events.isEmpty()) entries.add( "\"events\":" + events.entrySet().stream().map(event -> "{\"event\":\"" + event.getKey() + "\", \"registration\":\"" + event.getValue() + "\"}").collect(Collectors.joining(", ", "[", "]")));
@@ -91,8 +133,10 @@ public class Person implements Parcelable {
         dest.writeString(homeStation);
         dest.writeString(railcard);
         dest.writeInt((member ? 2 : 0) + (active ? 1 : 0));
-        dest.writeString(memberSinceString);
-        dest.writeSerializable(memberSince);
+        dest.writeString(dateOfJoiningString);
+        dest.writeSerializable(dateOfJoining);
+        dest.writeString(leavingDateString);
+        dest.writeSerializable(leavingDate);
         dest.writeInt(contacts.size());
         for (Pair<String, String> number : contacts) {
             dest.writeString(number.first);
@@ -104,6 +148,9 @@ public class Person implements Parcelable {
             dest.writeString(event.getKey());
             dest.writeLong(event.getValue().getId());
         }
+        dest.writeString(food);
+        dest.writeString(notes);
+        dest.writeByte((byte)(loaded ? 1 : 0));
     }
 
     public static final Parcelable.Creator<Person> CREATOR = new Parcelable.Creator<Person>() {
@@ -121,8 +168,10 @@ public class Person implements Parcelable {
             int memberActive = source.readInt();
             person.member = memberActive / 2 == 1;
             person.active = memberActive % 2 == 1;
-            person.memberSinceString = source.readString();
-            person.memberSince = (Date) source.readSerializable();
+            person.dateOfJoiningString = source.readString();
+            person.dateOfJoining = (Date) source.readSerializable();
+            person.leavingDateString = source.readString();
+            person.leavingDate = (Date) source.readSerializable();
 
             int phoneNumberCount = source.readInt();
             for (int i = 0; i < phoneNumberCount; i++) {
@@ -141,6 +190,11 @@ public class Person implements Parcelable {
                         new Registration(source.readLong())
                 );
             }
+
+            person.food = source.readString();
+            person.notes = source.readString();
+
+            person.loaded = source.readByte() != 0;
 
             return person;
         }

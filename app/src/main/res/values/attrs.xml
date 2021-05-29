@@ -73,7 +73,6 @@
     <attr name="sideSheetDialogTheme" format="reference"/>
     <attr name="messageStyle" format="reference"/>
     <attr name="colorPrimaryLight" format="color"/>
-    <attr name="dividerColor" format="color"/>
     <attr name="preferenceIconColor" format="color"/>
     <attr name="listIconColor" format="color"/>
 </resources>

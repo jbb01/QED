@@ -134,7 +134,7 @@ public class MessageInfoBottomSheet extends BottomSheetDialogFragment {
 
         // inflate new version of fragment so that layout matches orientation
         if (view != null) view.post(() -> {
-            View content = view.findViewById(R.id.content);
+            View content = view.findViewById(R.id.content_holder);
 
             Fragment fragment = MessageInfoFragment.newInstance(mMessage);
 

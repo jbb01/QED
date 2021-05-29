@@ -32,7 +32,6 @@ import com.google.android.material.navigation.NavigationView;
 import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.BuildConfig;
 import com.jonahbauer.qed.R;
-import com.jonahbauer.qed.activities.eventSheet.EventBottomSheet;
 import com.jonahbauer.qed.activities.mainFragments.ChatDatabaseFragment;
 import com.jonahbauer.qed.activities.mainFragments.ChatFragment;
 import com.jonahbauer.qed.activities.mainFragments.EventDatabaseFragment;
@@ -40,9 +39,6 @@ import com.jonahbauer.qed.activities.mainFragments.GalleryFragment;
 import com.jonahbauer.qed.activities.mainFragments.LogFragment;
 import com.jonahbauer.qed.activities.mainFragments.PersonDatabaseFragment;
 import com.jonahbauer.qed.activities.mainFragments.QEDFragment;
-import com.jonahbauer.qed.activities.personSheet.PersonBottomSheet;
-import com.jonahbauer.qed.model.Event;
-import com.jonahbauer.qed.model.Person;
 import com.jonahbauer.qed.networking.NetworkListener;
 import com.jonahbauer.qed.networking.login.QEDLogout;
 import com.jonahbauer.qed.util.Preferences;
@@ -420,8 +416,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             String person = queries.getOrDefault("person", null);
                             if (activity != null) {
                                 if (person != null && person.matches("\\d{1,5}")) {
-                                    PersonBottomSheet personBottomSheet = PersonBottomSheet.newInstance(new Person(Long.parseLong(person)));
-                                    personBottomSheet.show(activity.getSupportFragmentManager(), personBottomSheet.getTag());
+                                    long personId = Long.parseLong(person);
+                                    // TODO show person bottom sheet
                                     activity.mShouldReloadFragment = false;
                                 } else {
                                     activity.mNewSelection = DrawerSelection.DATABASE_PEOPLE;
@@ -436,8 +432,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 if (event != null && event.matches("\\d{1,5}")) {
                                     try {
                                         long eventId = Long.parseLong(event);
-                                        EventBottomSheet eventBottomSheet = EventBottomSheet.newInstance(new Event(eventId));
-                                        eventBottomSheet.show(activity.getSupportFragmentManager(), eventBottomSheet.getTag());
+                                        // TODO show event bottom sheet
                                         activity.mShouldReloadFragment = false;
                                     } catch (NumberFormatException ignored) {}
                                 } else {

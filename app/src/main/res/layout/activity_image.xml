@@ -57,7 +57,7 @@
             android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true">
 
-            <com.jonahbauer.qed.layoutStuff.VisibilityChangingImageButton
+            <com.jonahbauer.qed.layoutStuff.views.VisibilityChangingImageButton
                 android:id="@+id/image_download"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -66,7 +66,7 @@
                 android:paddingEnd="8dp"
                 android:src="@drawable/ic_menu_download"
                 tools:ignore="ContentDescription" />
-            <com.jonahbauer.qed.layoutStuff.VisibilityChangingImageButton
+            <com.jonahbauer.qed.layoutStuff.views.VisibilityChangingImageButton
                 android:id="@+id/image_launch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -75,7 +75,7 @@
                 android:paddingEnd="8dp"
                 android:src="@drawable/ic_menu_launch"
                 tools:ignore="ContentDescription" />
-            <com.jonahbauer.qed.layoutStuff.VisibilityChangingImageButton
+            <com.jonahbauer.qed.layoutStuff.views.VisibilityChangingImageButton
                 android:id="@+id/image_info"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

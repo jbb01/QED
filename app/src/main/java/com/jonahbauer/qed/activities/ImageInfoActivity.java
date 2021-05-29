@@ -20,7 +20,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.jonahbauer.qed.R;
-import com.jonahbauer.qed.layoutStuff.Histogram;
+import com.jonahbauer.qed.layoutStuff.views.Histogram;
 import com.jonahbauer.qed.model.Image;
 
 import org.jetbrains.annotations.Contract;

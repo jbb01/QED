@@ -47,7 +47,6 @@
     <string name="title_fragment_events_database">Veranstaltungen</string>
     <string name="title_fragment_gallery">Galerie</string>
     <string name="title_fragment_log">Log</string>
-    <string name="title_fragment_persons_database">Personen</string>
     <string name="yes">Ja</string>
     <string name="preferences_header_general">Allgemein</string>
     <string name="preferences_header_gallery">Galerie</string>
@@ -71,16 +70,6 @@
     <string name="drawer_settings">Einstellungen</string>
     <string name="album_empty">Dieses Album ist leer</string>
     <string name="error">Fehler!</string>
-    <string name="event_subtitle_cost">Kosten</string>
-    <string name="event_subtitle_deadline">Anmeldeschluss</string>
-    <string name="event_subtitle_hotel">Unterkunft</string>
-    <string name="event_subtitle_hotel_address">Adresse der Unterkunft</string>
-    <string name="event_subtitle_mail_orga">Email Orgas</string>
-    <string name="event_subtitle_mail_all">Email Teilnehmer</string>
-    <string name="event_subtitle_max_members">Maximale Teilnehmerzahl</string>
-    <string name="event_subtitle_time">Zeitraum</string>
-    <string name="event_tab_members">Teilnehmer</string>
-    <string name="event_tab_overview">Übersicht</string>
     <string name="gallery_login_failed">Galerie Login fehlgeschlagen</string>
     <string name="image_already_original">Das ist bereits die Originaldatei, möchtest du sie erneut herunterladen?</string>
     <string name="image_async_still_running">Es laufen noch Downloads. Wenn du jetzt zurückgehst werden sie abgebrochen. Möchtest du fortfahren?</string>
@@ -112,26 +101,6 @@
     <string name="notQED">Diese App steht in keiner offiziellen Verbindung zum Quod Erat Demonstrandum e.V.</string>
     <string name="offline_mode">Offline-Modus</string>
     <string name="ok">OK</string>
-    <string name="person_active">Aktiv</string>
-    <string name="person_inactive">Inaktiv</string>
-    <string name="person_no_events">Hier gibt es nichts zu sehen!</string>
-    <string name="person_subtitle_birthday">Geburtstag</string>
-    <string name="person_subtitle_email">Emailadresse</string>
-    <string name="person_subtitle_memberSince">Mitglied seit</string>
-    <string name="person_subtitle_station">Heimatbahnhof</string>
-    <string name="person_tab_personal_data">Persönliche Daten</string>
-    <string name="person_tab_qed">QED</string>
-    <string name="persons_database_active_checkbox">Aktiv</string>
-    <string name="persons_database_firstName_checkbox">Vorname</string>
-    <string name="persons_database_firstName_hint">Vorname</string>
-    <string name="persons_database_lastName_checkbox">Nachname</string>
-    <string name="persons_database_lastName_hint">Nachname</string>
-    <string name="persons_database_member_checkbox">Mitglied</string>
-    <string name="persons_database_sort">Sortieren nach</string>
-    <string name="persons_database_sort_first_name">Vornamen</string>
-    <string name="persons_database_sort_last_name">Nachnamen</string>
-    <string name="persons_database_inactive">(inaktiv)</string>
-    <string name="persons_database_non_member">(kein Mitglied)</string>
     <string name="preferences_gallery_offline_mode">Offline-Modus</string>
     <string name="preferences_chat_channel_title">Channel</string>
     <string name="preferences_chat_katex_title">KaTeX Rendering (Beta)</string>
@@ -193,21 +162,6 @@
     <string name="preferences_general_bug_report_summary">Bitte benutze den GitHub Issue Tracker für Fehlerberichte. Füge so viele Informationen wie möglich bei (Android und App-Version, Schritte zum reproduzieren, …).</string>
     <string name="preferences_general_github_title">GitHub-Projekt</string>
     <string name="preferences_general_remember_me_title">Passwort speichern</string>
-    <string name="event_sign_up">Anmelden</string>
-    <string name="event_sign_up_success">Erfolgreich angemeldet!</string>
-    <string name="event_sign_up_deadline_exceeded">Anmeldeschluss vorüber!</string>
-    <string name="event_sign_up_already_signed_up">Du bist bereits angemeldet!</string>
-    <string name="event_sign_up_unknown_event">Unbekannte Veranstaltung!</string>
-    <string name="event_sign_up_confirm">Möchtest du dich wirklich zu %s anmelden?</string>
-    <string name="event_subtitle_orga">Orga</string>
-
-
-    <!-- Registration -->
-    <string name="registration_status_orga">Orga</string>
-    <string name="registration_status_participated">teilgenommen</string>
-    <string name="registration_status_confirmed">bestätigt</string>
-    <string name="registration_status_open">offen</string>
-    <string name="registration_status_cancelled">abgemeldet</string>
 
     <string name="image_info">@string/info</string>
     <string name="image_open_with">Öffnen mit…</string>
@@ -265,4 +219,69 @@
     <string name="message_info_title_timestamp">Zeitstempel</string>
     <string name="message_info_title_bottag">Bottag</string>
     <string name="message_info_title_message">Nachricht</string>
+
+
+    <!-- Event Bottom Sheet -->
+    <string name="event_section_information">Informationen</string>
+    <string name="event_section_organization">Organisatoren</string>
+    <string name="event_section_participants">Teilnehmer</string>
+    <string name="event_title_time">{0,date} - {1,date}</string>
+    <string name="event_subtitle_time">Zeitraum</string>
+    <string name="event_title_deadline">{0,date} {0,time}</string>
+    <string name="event_subtitle_deadline">Anmeldeschluss</string>
+    <string name="event_subtitle_hotel">Unterkunft</string>
+    <string name="event_subtitle_hotel_address">Adresse der Unterkunft</string>
+    <string name="event_subtitle_cost">Kosten</string>
+    <string name="event_subtitle_max_participants">Maximale Teilnehmerzahl</string>
+    <string name="event_subtitle_notes">Anmerkungen</string>
+    <string name="event_subtitle_mail_organizers">Email Orgas</string>
+    <string name="event_subtitle_mail_participants">Email Teilnehmer</string>
+    <string name="event_show_more">Mehr anzeigen</string>
+    <string name="event_show_less">Weniger anzeigen</string>
+
+    <!-- Person Bottom Sheet -->
+    <string name="person_section_personal">Personendaten</string>
+    <string name="person_section_additional">Weitere Informationen</string>
+    <string name="person_section_addresses">Adressen</string>
+    <string name="person_section_contacts">Kontaktinformationen</string>
+    <string name="person_section_registrations">Anmeldungen</string>
+    <string name="person_subtitle_mail">E-Mail Adresse</string>
+    <string name="person_title_birthday">{0,date}</string>
+    <string name="person_subtitle_birthday">Geburtstag</string>
+    <string name="person_title_date_of_joining">{0,date}</string>
+    <string name="person_subtitle_date_of_joining">Eintrittsdatum</string>
+    <string name="person_title_leaving_date">{0,date}</string>
+    <string name="person_subtitle_leaving_date">Austrittsdatum</string>
+    <string name="person_title_member_true">Ja</string>
+    <string name="person_title_member_false">Nein</string>
+    <string name="person_subtitle_member">Aktuell Mitglied</string>
+    <string name="person_title_active_true">Ja</string>
+    <string name="person_title_active_false">Nein</string>
+    <string name="person_subtitle_active">Aktives Profil</string>
+    <string name="person_subtitle_station">Heimatbahnhof</string>
+    <string name="person_subtitle_railcard">Bahnermäßigung</string>
+    <string name="person_subtitle_food">Essenswünsche</string>
+    <string name="person_subtitle_notes">Anmerkungen</string>
+
+    <!-- Registration -->
+    <string name="registration_orga">Orga</string>
+    <string name="registration_status_participated">teilgenommen</string>
+    <string name="registration_status_confirmed">bestätigt</string>
+    <string name="registration_status_open">offen</string>
+    <string name="registration_status_cancelled">abgemeldet</string>
+
+    <!-- Persons Database Fragment -->
+    <string name="title_fragment_persons_database">Personen</string>
+    <string name="persons_database_active_checkbox">Aktiv</string>
+    <string name="persons_database_firstName_checkbox">Vorname</string>
+    <string name="persons_database_firstName_hint">Vorname</string>
+    <string name="persons_database_lastName_checkbox">Nachname</string>
+    <string name="persons_database_lastName_hint">Nachname</string>
+    <string name="persons_database_member_checkbox">Mitglied</string>
+    <string name="persons_database_sort">Sortieren nach</string>
+    <string name="persons_database_sort_first_name">Vornamen</string>
+    <string name="persons_database_sort_last_name">Nachnamen</string>
+    <string name="persons_database_inactive">(inaktiv)</string>
+    <string name="persons_database_non_member">(kein Mitglied)</string>
+    <string name="persons_database_no_email"><i>privat</i></string>
 </resources>

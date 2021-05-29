@@ -4,19 +4,17 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.R;
+import com.jonahbauer.qed.databinding.ListItemPersonBinding;
 import com.jonahbauer.qed.layoutStuff.FixedHeaderAdapter;
 import com.jonahbauer.qed.model.Person;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Function;
 
 import static com.jonahbauer.qed.model.Person.COMPARATOR_FIRST_NAME;
@@ -67,60 +65,33 @@ public class PersonAdapter extends FixedHeaderAdapter<Person, Character> {
     };
 
     private SortMode mSort;
-    private final String inactive;
-    private final String nonMember;
 
     public PersonAdapter(Context context, @NonNull List<Person> itemList, SortMode sort, View fixedHeader) {
         super(context, itemList, headerMapFirstName, COMPARATOR_FIRST_NAME, fixedHeader);
         setSortMode(sort);
-        inactive = context.getString(R.string.persons_database_inactive);
-        nonMember = context.getString(R.string.persons_database_non_member);
     }
 
     @NonNull
     @Override
     protected View getItemView(Person person, @Nullable View convertView, @NonNull ViewGroup parent, LayoutInflater inflater) {
-        View view;
+        ListItemPersonBinding binding;
+
         if (convertView != null) {
-            view = convertView;
+            binding = (ListItemPersonBinding) convertView.getTag();
         } else {
-            view = Objects.requireNonNull(inflater).inflate(R.layout.list_item_person, parent, false);
+            binding = ListItemPersonBinding.inflate(inflater, parent, false);
+            binding.getRoot().setTag(binding);
         }
 
-        ImageView initialsCircle = view.findViewById(R.id.person_initials_circle);
-        initialsCircle.setColorFilter(Application.colorful((person.getFirstName() + person.getLastName()).chars().sum()));
-
-        String name = "";
-        if (mSort == SortMode.FIRST_NAME) name = person.getFirstName() + " " + person.getLastName();
-        else if (mSort == SortMode.LAST_NAME) name = person.getLastName() + ", " + person.getFirstName();
-        String email = person.getEmail();
-        String active = !person.isActive() ? inactive : (!person.isMember() ? nonMember : "");
-        ((TextView)view.findViewById(R.id.person_name)).setText(name);
-        ((TextView)view.findViewById(R.id.person_email)).setText(email);
-        ((TextView)view.findViewById(R.id.person_active)).setText(active);
-        ((TextView)view.findViewById(R.id.header)).setText("");
-
-        if (mSort == SortMode.FIRST_NAME) {
-            ((TextView) view.findViewById(R.id.person_initials)).setText(
-                    String.format("%s%s",
-                            person.getFirstName().charAt(0),
-                            String.valueOf(person.getLastName()).charAt(0)
-                    )
-            );
-        } else if (mSort == SortMode.LAST_NAME) {
-            ((TextView) view.findViewById(R.id.person_initials)).setText(
-                    String.format("%s%s",
-                            person.getLastName().charAt(0),
-                            String.valueOf(person.getFirstName()).charAt(0)
-                    )
-            );
-        }
-
-        return view;
+        binding.setPerson(person);
+        binding.setInvertedInitials(mSort == SortMode.LAST_NAME);
+        binding.header.setText("");
+        return binding.getRoot();
     }
 
     @Override
     protected void setHeader(@NonNull View view, Character header) {
+        // TODO use databinding when database fragment uses it
         ((TextView)view.findViewById(R.id.header)).setText(String.valueOf(header));
     }
 
