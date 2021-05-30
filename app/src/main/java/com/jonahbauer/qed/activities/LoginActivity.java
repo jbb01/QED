@@ -147,7 +147,7 @@ public class LoginActivity extends AppCompatActivity implements NetworkListener,
         binding.passwordLayout.setError(string);
 
         if (string != null) {
-            binding.password.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_error_red, 0);
+            binding.password.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_error, 0);
             binding.password.requestFocus();
         } else {
             binding.password.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);

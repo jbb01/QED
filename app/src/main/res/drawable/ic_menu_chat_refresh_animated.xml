@@ -2,6 +2,6 @@
 <animated-vector android:drawable="@drawable/ic_menu_chat_refresh"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <target
-        android:animation="@animator/ic_refresh_rotate"
+        android:animation="@animator/ic_rotate_360"
         android:name="refresh"/>
 </animated-vector>

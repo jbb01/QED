@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/fragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal" >
+    android:orientation="horizontal">
 
     <RelativeLayout
         android:id="@+id/background_layout"
@@ -64,7 +65,7 @@
                 android:layout_alignParentTop="true"
                 android:layout_alignParentStart="true"
                 android:padding="8dp"
-                android:tint="?listIconColor"
+                app:tint="?colorOnBackgroundVariant"
                 android:src="@drawable/ic_message_info_id"
                 tools:ignore="ContentDescription" />
 
@@ -99,7 +100,7 @@
                 android:layout_below="@id/icon_id"
                 android:layout_alignParentStart="true"
                 android:padding="8dp"
-                android:tint="?listIconColor"
+                app:tint="?colorOnBackgroundVariant"
                 android:src="@drawable/ic_message_info_name"
                 tools:ignore="ContentDescription" />
 
@@ -134,7 +135,7 @@
                 android:layout_below="@id/icon_name"
                 android:layout_alignParentStart="true"
                 android:padding="8dp"
-                android:tint="?listIconColor"
+                app:tint="?colorOnBackgroundVariant"
                 android:src="@drawable/ic_message_info_username"
                 android:visibility="gone"
                 tools:visibility="visible"
@@ -174,7 +175,7 @@
                 android:layout_below="@id/icon_username"
                 android:layout_alignParentStart="true"
                 android:padding="8dp"
-                android:tint="?listIconColor"
+                app:tint="?colorOnBackgroundVariant"
                 android:src="@drawable/ic_message_info_channel"
                 tools:ignore="ContentDescription" />
 
@@ -209,7 +210,7 @@
                 android:layout_below="@id/icon_channel"
                 android:layout_alignParentStart="true"
                 android:padding="8dp"
-                android:tint="?listIconColor"
+                app:tint="?colorOnBackgroundVariant"
                 android:src="@drawable/ic_message_info_time"
                 tools:ignore="ContentDescription" />
 
@@ -244,7 +245,7 @@
                 android:layout_below="@id/icon_timestamp"
                 android:layout_alignParentStart="true"
                 android:padding="8dp"
-                android:tint="?listIconColor"
+                app:tint="?colorOnBackgroundVariant"
                 android:src="@drawable/ic_message_info_bottag"
                 tools:ignore="ContentDescription" />
 
@@ -279,7 +280,7 @@
                 android:layout_below="@id/icon_bottag"
                 android:layout_alignParentStart="true"
                 android:padding="8dp"
-                android:tint="?listIconColor"
+                app:tint="?colorOnBackgroundVariant"
                 android:src="@drawable/ic_message_info_message"
                 tools:ignore="ContentDescription" />
 

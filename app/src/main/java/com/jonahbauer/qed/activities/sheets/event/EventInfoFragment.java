@@ -2,6 +2,7 @@ package com.jonahbauer.qed.activities.sheets.event;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.StyleRes;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.databinding.BindingAdapter;
 import androidx.databinding.ViewDataBinding;
@@ -78,7 +80,12 @@ public class EventInfoFragment extends AbstractInfoFragment {
 
         binding.toggleParticipantsButton.setOnClick(this::toggleParticipants);
         binding.toggleParticipantsButton.icon.setColorFilter(getColor());
-        binding.toggleParticipantsButton.title.setTextAppearance(R.style.AppTheme_TextAppearance_Button);
+
+        TypedValue typedValue = new TypedValue();
+        getContext().getTheme().resolveAttribute(R.attr.textAppearanceButton, typedValue, true);
+        @StyleRes int textAppearanceButton = typedValue.data;
+
+        binding.toggleParticipantsButton.title.setTextAppearance(textAppearanceButton);
         binding.toggleParticipantsButton.title.setTextColor(getColor());
     }
 

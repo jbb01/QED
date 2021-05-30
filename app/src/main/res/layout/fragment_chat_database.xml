@@ -19,7 +19,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/chat_database_search_background"
+            android:background="?colorSurface"
             android:elevation="5dp"
             tools:ignore="UselessParent">
             <TableLayout
@@ -43,7 +43,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
                         android:layout_marginEnd="10dp"
-                        android:textColor="@color/chat_database_search_headers"
+                        android:textColor="?colorOnSurface"
                         android:text="@string/chat_database_channel_checkbox" />
                     <EditText
                         android:id="@+id/database_channel_editText"
@@ -68,7 +68,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
                         android:layout_marginEnd="10dp"
-                        android:textColor="@color/chat_database_search_headers"
+                        android:textColor="?colorOnSurface"
                         android:text="@string/chat_database_message_checkbox" />
                     <EditText
                         android:id="@+id/database_message_editText"
@@ -93,7 +93,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
                         android:layout_marginEnd="10dp"
-                        android:textColor="@color/chat_database_search_headers"
+                        android:textColor="?colorOnSurface"
                         android:text="@string/chat_database_name_checkbox" />
                     <EditText
                         android:id="@+id/database_name_editText"
@@ -118,7 +118,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
                         android:layout_marginEnd="10dp"
-                        android:textColor="@color/chat_database_search_headers"
+                        android:textColor="?colorOnSurface"
                         android:text="@string/chat_database_dateFrom_checkbox" />
                     <EditText
                         android:id="@+id/database_dateFrom_editText"
@@ -143,7 +143,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
                         android:layout_marginEnd="10dp"
-                        android:textColor="@color/chat_database_search_headers"
+                        android:textColor="?colorOnSurface"
                         android:text="@string/chat_database_dateTo_checkbox" />
                     <EditText
                         android:id="@+id/database_dateTo_editText"
@@ -168,7 +168,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
                         android:layout_marginEnd="10dp"
-                        android:textColor="@color/chat_database_search_headers"
+                        android:textColor="?colorOnSurface"
                         android:text="@string/chat_database_id_checkbox" />
                     <EditText
                         android:id="@+id/database_id_editText"
@@ -250,7 +250,6 @@
         android:scrollbarStyle="outsideInset"
         android:fastScrollAlwaysVisible="true"
         android:fastScrollEnabled="true"
-        android:visibility="gone"
-        tools:listitem="@layout/extended_message" />
+        android:visibility="gone" />
 
 </RelativeLayout>

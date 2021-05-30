@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
     <item
         android:left="5.857864376269049511983112757904dp"
         android:top="0dp"
         android:width="14.142135623730950488016887242097dp"
-        android:height="14.142135623730950488016887242097dp"
-        android:id="@+id/message_background_triangle">
+        android:height="14.142135623730950488016887242097dp">
             <rotate
                 android:pivotX="100%"
                 android:pivotY="0%"
@@ -13,7 +13,7 @@
                 android:toDegrees="0">
                 <shape
                     android:shape="rectangle">
-                    <solid android:color="@color/chat_message_background"/>
+                    <solid android:color="?colorSurface"/>
                 </shape>
             </rotate>
     </item>
@@ -22,7 +22,8 @@
         android:bottom="0dp"
         android:right="0dp"
         android:left="10dp"
-        android:id="@+id/message_background_bubble">
+        tools:width="100dp"
+        tools:height="20dp">
         <shape
             android:shape="rectangle">
             <corners
@@ -34,7 +35,7 @@
                 android:bottom="5dp"
                 android:left="18dp"
                 android:right="8dp" />
-            <solid android:color="@color/chat_message_background"/>
+            <solid android:color="?colorSurface"/>
         </shape>
     </item>
 </layer-list>

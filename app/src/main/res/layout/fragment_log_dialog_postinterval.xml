@@ -30,7 +30,6 @@
         android:ems="10"
         android:inputType="number"
         android:selectAllOnFocus="true"
-        android:theme="@style/AppTheme"
         android:importantForAutofill="no" />
 
     <TextView
@@ -63,7 +62,6 @@
         android:ems="10"
         android:inputType="number"
         android:selectAllOnFocus="true"
-        android:theme="@style/AppTheme"
         android:importantForAutofill="no" />
 
 </RelativeLayout>

@@ -2,7 +2,7 @@
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     tools:parentTag="RelativeLayout"
-    tools:theme="@style/AppTheme.Message"
+    tools:theme="@style/Widget.App.Message"
     tools:background="@android:color/darker_gray">
 
 <!--
@@ -28,7 +28,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textAppearance="@style/AppTheme.TextAppearance.Message.Data"
+                android:textAppearance="@style/TextAppearance.App.Message.Data"
                 android:textStyle="italic"
                 tools:text="(main)"/>
 
@@ -37,7 +37,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="3dp"
-                android:textAppearance="@style/AppTheme.TextAppearance.Message.Data"
+                android:textAppearance="@style/TextAppearance.App.Message.Data"
                 android:textAlignment="textEnd"
                 tools:text="#2185476"/>
         </TableRow>
@@ -50,7 +50,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textAppearance="@style/AppTheme.TextAppearance.Message.Name"
+                android:textAppearance="@style/TextAppearance.App.Message.Name"
                 android:clickable="false"
                 android:focusable="false"
                 tools:text="Max Mustermann" />
@@ -63,14 +63,14 @@
                 android:clickable="false"
                 android:focusable="false"
                 android:layout_marginStart="3dp"
-                android:textAppearance="@style/AppTheme.TextAppearance.Message.Data"
+                android:textAppearance="@style/TextAppearance.App.Message.Data"
                 tools:text="2019-11-02 13:37:00"/>
         </TableRow>
         <TextView
             android:id="@+id/message_message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/AppTheme.TextAppearance.Message.Message"
+            android:textAppearance="@style/TextAppearance.App.Message.Message"
             android:clickable="false"
             android:focusable="false"
             tools:text="Musternachricht             " />

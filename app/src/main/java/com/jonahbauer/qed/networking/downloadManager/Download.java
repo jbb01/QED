@@ -5,15 +5,11 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.networking.Feature;
-import com.jonahbauer.qed.networking.exceptions.InvalidCredentialsException;
-import com.jonahbauer.qed.networking.exceptions.NetworkException;
 
 import java.io.File;
 import java.io.IOException;
@@ -104,41 +100,22 @@ public class Download extends AsyncTask<Void, Void, Void> {
     protected Void doInBackground(Void... voids) {
         if (mFeature == null) return null;
 
-        try {
-            // TODO
-            // ensure logged in
-//            QEDLogin.ensureDataAvailable(mFeature);
-            if (false) {
-                throw new NetworkException(null);
-            }
+        // create download request
+        DownloadManager.Request request = new DownloadManager.Request(mSourceUri);
+        mHeaderMap.forEach((key, values) -> values.forEach(value -> request.addRequestHeader(key, value)));
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE);
+        request.setDestinationUri(Uri.fromFile(mTargetFile));
 
-            if (false) {
-                throw new InvalidCredentialsException();
-            }
+        if (mNotificationTitle != null) request.setTitle(mNotificationTitle);
+        if (mNotificationDescription != null) request.setDescription(mNotificationDescription);
 
-            // create download request
-            DownloadManager.Request request = new DownloadManager.Request(mSourceUri);
-            mHeaderMap.forEach((key, values) -> values.forEach(value -> request.addRequestHeader(key, value)));
-            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE);
-            request.setDestinationUri(Uri.fromFile(mTargetFile));
+        mId = DOWNLOAD_MANAGER.enqueue(request);
 
-            if (mNotificationTitle != null) request.setTitle(mNotificationTitle);
-            if (mNotificationDescription != null) request.setDescription(mNotificationDescription);
-
-            mId = DOWNLOAD_MANAGER.enqueue(request);
-
-            synchronized (DOWNLOADS) {
-                DOWNLOADS.put(mId, this);
-            }
-
-            if (mListener != null) mListener.attach(mId, DOWNLOAD_MANAGER);
-        } catch (NetworkException e) {
-            Log.e(Application.LOG_TAG_ERROR, e.getMessage(), e);
-            if (mListener != null) mListener.onError(mId, "ERROR_NETWORK_ERROR", e);
-        } catch (InvalidCredentialsException e) {
-            Log.e(Application.LOG_TAG_ERROR, e.getMessage(), e);
-            if (mListener != null) mListener.onError(mId, "ERROR_INVALID_CREDENTIALS", e);
+        synchronized (DOWNLOADS) {
+            DOWNLOADS.put(mId, this);
         }
+
+        if (mListener != null) mListener.attach(mId, DOWNLOAD_MANAGER);
 
         return null;
     }

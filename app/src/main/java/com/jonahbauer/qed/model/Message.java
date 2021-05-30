@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.jonahbauer.qed.Application;
+import com.jonahbauer.qed.util.Preferences;
 
 import org.jetbrains.annotations.Contract;
 import org.json.JSONException;
@@ -125,13 +126,17 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
     }
 
     private int transformColor(int color) {
-        float[] hsv = new float[3];
-        Color.colorToHSV(color, hsv);
+        if (Preferences.general().isNightMode()) {
+            return color;
+        } else {
+            float[] hsv = new float[3];
+            Color.colorToHSV(color, hsv);
 
-        hsv[1] = 1/*-(1-hsv[1])*0.2f*/;
-        hsv[2] = 0.85f;
+            hsv[1] = 1/*-(1-hsv[1])*0.2f*/;
+            hsv[2] = 0.85f;
 
-        return Color.HSVToColor(hsv);
+            return Color.HSVToColor(hsv);
+        }
     }
 
     @Override

@@ -6,13 +6,11 @@
     android:orientation="vertical"
     tools:mContext="com.jonahbauer.qed.activities.GalleryAlbumActivity">
 
-    <androidx.appcompat.widget.Toolbar
+    <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
-        android:theme="@style/AppTheme.ActionBarTheme" />
-
+        style="?toolbarStyle"/>
 
     <TextView
         android:id="@+id/label_offline"
@@ -22,7 +20,8 @@
         android:textAlignment="center"
         android:gravity="center"
         android:textSize="16sp"
-        android:textColor="@color/offline_label_font"
+        android:background="?colorSurface"
+        android:textColor="?colorOnSurface"
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
         android:visibility="gone"
@@ -44,7 +43,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/chat_database_search_background"
+            android:background="?colorSurface"
             android:elevation="5dp"
             tools:ignore="UselessParent">
             <TableLayout
@@ -67,7 +66,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
                         android:layout_marginEnd="10dp"
-                        android:textColor="@color/album_search_headers"
+                        android:textColor="?colorOnSurface"
                         android:text="@string/album_photographer_radio_button" />
                     <Spinner
                         android:id="@+id/album_photographer_spinner"
@@ -90,7 +89,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
                         android:layout_marginEnd="10dp"
-                        android:textColor="@color/album_search_headers"
+                        android:textColor="?colorOnSurface"
                         android:text="@string/album_date_radio_button" />
                     <Spinner
                         android:id="@+id/album_date_spinner"
@@ -113,7 +112,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
                         android:layout_marginEnd="10dp"
-                        android:textColor="@color/album_search_headers"
+                        android:textColor="?colorOnSurface"
                         android:text="@string/album_category_radio_button" />
                     <Spinner
                         android:id="@+id/album_category_spinner"

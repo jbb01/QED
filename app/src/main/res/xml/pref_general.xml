@@ -19,7 +19,7 @@
             android:singleLine="true"
             android:title="@string/preferences_general_github_title"
             android:icon="@drawable/ic_settings_github"
-            android:summary="@string/github_project"/>
+            android:summary="@string/preferences_general_github_summary"/>
 
         <Preference
             android:defaultValue="false"
@@ -29,5 +29,17 @@
             android:title="@string/preferences_general_bug_report_title"
             android:summary="@string/preferences_general_bug_report_summary"
             android:icon="@drawable/ic_settings_bug_report" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:title="@string/preferences_general_group_appearance">
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="@string/preferences_general_night_mode_key"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="@string/preferences_general_night_mode_title"
+            android:icon="@drawable/ic_settings_night_mode"
+            android:summary="@string/preferences_general_night_mode_summary"/>
     </PreferenceCategory>
 </androidx.preference.PreferenceScreen>

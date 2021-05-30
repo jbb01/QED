@@ -21,8 +21,6 @@
     <string name="chat_refresh">Aktualisieren</string>
     <string name="chat_scroll_down_button_content_description">Nach unten scrollen</string>
     <string name="coming_soon">Coming soon</string>
-    <string name="preferences_gallery_confirm_delete_images">Möchtest du wirklich alle gespeicherten Bilder löschen?</string>
-    <string name="preferences_gallery_confirm_delete_thumbnails">Möchtest du wirklich alle gespeicherten Thumbnails löschen?</string>
     <string name="content_description_divider">Trennlinie</string>
     <string name="content_description_icon">Icon</string>
     <string name="database_hits">Treffer</string>
@@ -41,17 +39,12 @@
     <string name="title_activity_image">Foto</string>
     <string name="title_activity_log_dialog">Logs</string>
     <string name="title_activity_login">Anmelden</string>
-    <string name="title_activity_settings">Einstellungen</string>
     <string name="title_fragment_chat">Chat</string>
     <string name="title_fragment_chat_database">Datenbank</string>
     <string name="title_fragment_events_database">Veranstaltungen</string>
     <string name="title_fragment_gallery">Galerie</string>
     <string name="title_fragment_log">Log</string>
     <string name="yes">Ja</string>
-    <string name="preferences_header_general">Allgemein</string>
-    <string name="preferences_header_gallery">Galerie</string>
-    <string name="preferences_header_chat">Chat</string>
-    <string name="preferences_gallery_show_dir">Speicherort öffnen</string>
     <string name="album_photographer_radio_button">Fotograph</string>
     <string name="album_not_downloaded">Dieses Album ist nicht heruntergeladen.</string>
     <string name="album_info_creator">Albumersteller</string>
@@ -101,34 +94,15 @@
     <string name="notQED">Diese App steht in keiner offiziellen Verbindung zum Quod Erat Demonstrandum e.V.</string>
     <string name="offline_mode">Offline-Modus</string>
     <string name="ok">OK</string>
-    <string name="preferences_gallery_offline_mode">Offline-Modus</string>
-    <string name="preferences_chat_channel_title">Channel</string>
-    <string name="preferences_chat_katex_title">KaTeX Rendering (Beta)</string>
-    <string name="preferences_chat_name_title">Name</string>
-    <string name="preferences_chat_public_id_title">Öffentliche ID</string>
-    <string name="preferences_chat_linkify_title">Links anzeigen</string>
-    <string name="preferences_chat_sense_title">Sinn anzeigen</string>
-    <string name="preferences_gallery_delete_images">Gespeicherte Bilder löschen</string>
-    <string name="preferences_gallery_delete_thumbnails">Gespeicherte Thumbnails löschen</string>
-    <string name="preferences_gallery_offline_mode_false_summary">Alle Features sind uneingeschränkt verwendbar. Bilder werden heruntergeladen, sobald benötigt.</string>
-    <string name="preferences_gallery_offline_mode_true_summary">Die Galerie verwendet nut bereits heruntergeladene Daten. Einige Funktionen sind nur eingeschränkt verfügbar.</string>
     <string name="log_subtitle_date_interval">Posts vom {0,date,dd.MM.yyyy} bis zum {1,date,dd.MM.yyyy}</string>
     <string name="log_subtitle_date_recent">Posts der letzten {0,choice,1#|2#{0} }Stunde{0,choice,1#|2#n}</string>
     <string name="log_subtitle_post_recent">Letzte{0,choice,1#r|2# {0}} Post{0,choice,1#|2#s}</string>
     <string name="image_download_non_picture">Du bist im Begriff eine Audio- oder Video-Datei herunterzuladen. Eine WLAN-Verbindung wird empfohlen. Möchtest du fortfahren?</string>
-    <string name="preferences_chat_group_appearance">Darstellung</string>
-    <string name="preferences_chat_colorful_title">Farbige Nachrichten</string>
-    <string name="preferences_chat_group_database">Chat-Datenbank</string>
-    <string name="preferences_chat_delete_db_title">Chat-Datenbank löschen</string>
-    <string name="preferences_chat_confirm_delete_db">Möchtest du wirklich die gesamte Offline-Chat-Datenbank löschen?</string>
-    <string name="preferences_gallery_confirm_delete_gallery_database">Möchtest du wirklich die Galerie-Datenbank löschen?</string>
-    <string name="preferences_gallery_group_fs">Dateisystem</string>
     <string name="error_unknown">Ein unbekannter Fehler trat auf.</string>
     <string name="error_login">Login fehlgeschlagen.</string>
     <string name="error_network">Ein Netzwerk-Fehler trat auf.</string>
     <string name="error_404">Die angeforderte Ressource wurde nicht gefunden.</string>
     <string name="error_user">Fehler in Layer 8</string>
-    <string name="preferences_gallery_delete_db_title">Galerie-Datenbank löschen</string>
     <string name="offline_mode_not_available">Im Offline-Modus nicht verfügbar.</string>
     <string name="album_invalid">Dieses Album existiert nicht.</string>
     <string name="image_overwrite_offline_mode">Du befindest dich im Offline-Modus. Möchtest du das Bild trotzdem herunterladen?</string>
@@ -158,10 +132,6 @@
     <string name="log_subtitle_since_own">Seit eigenem Post</string>
     <string name="log_subtitle_file">Datei</string>
     <string name="log_request_mode_postinterval">postinterval</string>
-    <string name="preferences_general_bug_report_title">Fehler melden</string>
-    <string name="preferences_general_bug_report_summary">Bitte benutze den GitHub Issue Tracker für Fehlerberichte. Füge so viele Informationen wie möglich bei (Android und App-Version, Schritte zum reproduzieren, …).</string>
-    <string name="preferences_general_github_title">GitHub-Projekt</string>
-    <string name="preferences_general_remember_me_title">Passwort speichern</string>
 
     <string name="image_info">@string/info</string>
     <string name="image_open_with">Öffnen mit…</string>
@@ -200,7 +170,6 @@
     <string name="message_info">@string/info</string>
     <string name="album_info">@string/info</string>
     <string name="message_reply">Antworten</string>
-    <string name="preferences_chat_db_max_result_title">Maximale Anzahl an Suchergebnissen</string>
 
     <string-array name="chat_database_max_entries_value_strings">
         <item>10.000</item>
@@ -284,4 +253,44 @@
     <string name="persons_database_inactive">(inaktiv)</string>
     <string name="persons_database_non_member">(kein Mitglied)</string>
     <string name="persons_database_no_email"><i>privat</i></string>
+
+    <!-- Preference Activity -->
+    <string name="title_activity_settings">Einstellungen</string>
+    <string name="preferences_header_chat">Chat</string>
+    <string name="preferences_header_gallery">Galerie</string>
+    <string name="preferences_header_general">Allgemein</string>
+
+    <string name="preferences_general_group_appearance">Darstellung</string>
+    <string name="preferences_general_bug_report_title">Fehler melden</string>
+    <string name="preferences_general_bug_report_summary">Bitte benutze den GitHub Issue Tracker für Fehlerberichte. Füge so viele Informationen wie möglich bei (Android und App-Version, Schritte zum reproduzieren, …).</string>
+    <string name="preferences_general_github_title">GitHub-Projekt</string>
+    <string name="preferences_general_github_summary">https://github.com/jbb01/QED</string>
+    <string name="preferences_general_remember_me_title">Passwort speichern</string>
+    <string name="preferences_general_night_mode_title">Nachtmodus</string>
+    <string name="preferences_general_night_mode_summary">Ein Theme so schwarz wie deine Seele</string>
+
+    <string name="preferences_chat_group_database">Chat-Datenbank</string>
+    <string name="preferences_chat_group_appearance">Darstellung</string>
+    <string name="preferences_chat_name_title">Name</string>
+    <string name="preferences_chat_channel_title">Channel</string>
+    <string name="preferences_chat_sense_title">Sinn anzeigen</string>
+    <string name="preferences_chat_public_id_title">Öffentliche ID</string>
+    <string name="preferences_chat_linkify_title">Links anzeigen</string>
+    <string name="preferences_chat_katex_title">KaTeX Rendering (Beta)</string>
+    <string name="preferences_chat_colorful_title">Farbige Nachrichten</string>
+    <string name="preferences_chat_db_max_result_title">Maximale Anzahl an Suchergebnissen</string>
+    <string name="preferences_chat_delete_db_title">Chat-Datenbank löschen</string>
+    <string name="preferences_chat_confirm_delete_db">Möchtest du wirklich die gesamte Offline-Chat-Datenbank löschen?</string>
+
+    <string name="preferences_gallery_group_fs">Dateisystem</string>
+    <string name="preferences_gallery_delete_thumbnails">Gespeicherte Thumbnails löschen</string>
+    <string name="preferences_gallery_delete_images">Gespeicherte Bilder löschen</string>
+    <string name="preferences_gallery_offline_mode">Offline-Modus</string>
+    <string name="preferences_gallery_offline_mode_true_summary">Die Galerie verwendet nut bereits heruntergeladene Daten. Einige Funktionen sind nur eingeschränkt verfügbar.</string>
+    <string name="preferences_gallery_offline_mode_false_summary">Alle Features sind uneingeschränkt verwendbar. Bilder werden heruntergeladen, sobald benötigt.</string>
+    <string name="preferences_gallery_show_dir">Speicherort öffnen</string>
+    <string name="preferences_gallery_delete_db_title">Galerie-Datenbank löschen</string>
+    <string name="preferences_gallery_confirm_delete_thumbnails">Möchtest du wirklich alle gespeicherten Thumbnails löschen?</string>
+    <string name="preferences_gallery_confirm_delete_images">Möchtest du wirklich alle gespeicherten Bilder löschen?</string>
+    <string name="preferences_gallery_confirm_delete_gallery_database">Möchtest du wirklich die Galerie-Datenbank löschen?</string>
 </resources>

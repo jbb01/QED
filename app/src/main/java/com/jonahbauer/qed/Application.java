@@ -11,6 +11,7 @@ import android.security.keystore.KeyGenParameterSpec;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.preference.PreferenceManager;
 import androidx.security.crypto.MasterKeys;
 
@@ -76,6 +77,13 @@ public class Application extends android.app.Application implements android.app.
         // Setup preferences
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         Preferences.init(preferences, this.getResources());
+
+        // Activate Night Mode
+        if (Preferences.general().isNightMode()) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
 
         // Initialize Download
         Download.init(this);

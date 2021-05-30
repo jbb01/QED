@@ -33,7 +33,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@{person.fullName}"
-                    android:textColor="@color/event_big_name"
+                    android:textColor="?colorOnBackground"
                     android:textSize="30sp"
                     tools:text="@tools:sample/full_names"/>
             </LinearLayout>
@@ -49,6 +49,7 @@
                     android:layout_height="wrap_content"
                     android:textAllCaps="true"
                     android:textStyle="bold"
+                    android:textColor="?colorOnBackground"
                     android:text="@string/person_section_personal"/>
 
                 <include layout="@layout/list_item"
@@ -89,9 +90,7 @@
 
             <View
                 android:visibility="@{person.hasAdditionalInformation() ? View.VISIBLE : View.GONE}"
-                android:layout_height="@dimen/person_divider"
-                android:layout_width="match_parent"
-                android:background="?divider"/>
+                style="?dividerStyle"/>
 
             <LinearLayout
                 android:visibility="@{person.hasAdditionalInformation() ? View.VISIBLE : View.GONE}"
@@ -106,6 +105,7 @@
                     android:layout_height="wrap_content"
                     android:textAllCaps="true"
                     android:textStyle="bold"
+                    android:textColor="?colorOnBackground"
                     android:text="@string/person_section_additional"/>
 
                 <include layout="@layout/list_item"
@@ -135,9 +135,7 @@
 
             <View
                 android:visibility="@{person.addresses.size() > 0 ? View.VISIBLE : View.GONE}"
-                android:layout_height="@dimen/person_divider"
-                android:layout_width="match_parent"
-                android:background="?divider"/>
+                style="?dividerStyle"/>
 
             <LinearLayout
                 android:visibility="@{person.addresses.size() > 0 ? View.VISIBLE : View.GONE}"
@@ -151,6 +149,7 @@
                     android:layout_height="wrap_content"
                     android:textAllCaps="true"
                     android:textStyle="bold"
+                    android:textColor="?colorOnBackground"
                     android:text="@string/person_section_addresses"/>
 
                 <include layout="@layout/list_item"
@@ -167,9 +166,7 @@
 
             <View
                 android:visibility="@{person.contacts.size() > 0 ? View.VISIBLE : View.GONE}"
-                android:layout_height="@dimen/person_divider"
-                android:layout_width="match_parent"
-                android:background="?divider"/>
+                style="?dividerStyle"/>
 
             <LinearLayout
                 android:visibility="@{person.contacts.size() > 0 ? View.VISIBLE : View.GONE}"
@@ -183,6 +180,7 @@
                     android:layout_height="wrap_content"
                     android:textAllCaps="true"
                     android:textStyle="bold"
+                    android:textColor="?colorOnBackground"
                     android:text="@string/person_section_contacts"/>
 
                 <LinearLayout
@@ -194,9 +192,7 @@
 
             <View
                 android:visibility="@{person.events.isEmpty() ? View.GONE : View.VISIBLE}"
-                android:layout_height="@dimen/person_divider"
-                android:layout_width="match_parent"
-                android:background="?divider"/>
+                style="?dividerStyle"/>
 
             <LinearLayout
                 android:visibility="@{person.events.isEmpty() ? View.GONE : View.VISIBLE}"
@@ -210,6 +206,7 @@
                     android:layout_height="wrap_content"
                     android:textAllCaps="true"
                     android:textStyle="bold"
+                    android:textColor="?colorOnBackground"
                     android:text="@string/person_section_registrations"/>
 
                 <LinearLayout
@@ -223,9 +220,7 @@
 
             <View
                 android:visibility="@{person.events.isEmpty() ? View.GONE : View.VISIBLE}"
-                android:layout_height="@dimen/person_divider"
-                android:layout_width="match_parent"
-                android:background="?divider"/>
+                style="?dividerStyle"/>
 
             <include layout="@layout/list_item"
                 android:visibility="@{person.events.isEmpty() ? View.GONE : View.VISIBLE}"
@@ -233,10 +228,7 @@
                 app:icon="@{@drawable/ic_arrow_down_accent}"
                 app:title="@{@string/event_show_more}"/>
 
-            <View
-                android:layout_height="@dimen/person_divider"
-                android:layout_width="match_parent"
-                android:background="?divider"/>
+            <View style="?dividerStyle"/>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </layout>

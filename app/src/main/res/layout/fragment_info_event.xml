@@ -33,7 +33,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@{event.title}"
-                    android:textColor="@color/event_big_name"
+                    android:textColor="?colorOnBackground"
                     android:textSize="30sp"
                     tools:text="Akademie 2018"/>
             </LinearLayout>
@@ -49,6 +49,7 @@
                     android:layout_height="wrap_content"
                     android:textAllCaps="true"
                     android:textStyle="bold"
+                    android:textColor="?colorOnBackground"
                     android:text="@string/event_section_information"/>
 
                 <include layout="@layout/list_item"
@@ -95,10 +96,7 @@
                     app:subtitle="@{@string/event_subtitle_notes}"/>
             </LinearLayout>
 
-            <View
-                android:layout_height="@dimen/event_divider"
-                android:layout_width="match_parent"
-                android:background="?divider"/>
+            <View style="?dividerStyle"/>
 
             <LinearLayout
                 android:id="@+id/orga_section"
@@ -113,6 +111,7 @@
                     android:layout_height="wrap_content"
                     android:textAllCaps="true"
                     android:textStyle="bold"
+                    android:textColor="?colorOnBackground"
                     android:text="@string/event_section_organization"/>
 
                 <include layout="@layout/list_item"
@@ -131,9 +130,7 @@
 
             <View
                 android:visibility="@{event.participants.size() == event.organizers.size() ? View.GONE : View.VISIBLE}"
-                android:layout_height="@dimen/event_divider"
-                android:layout_width="match_parent"
-                android:background="?divider"/>
+                style="?dividerStyle"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -146,6 +143,7 @@
                     android:layout_height="wrap_content"
                     android:textAllCaps="true"
                     android:textStyle="bold"
+                    android:textColor="?colorOnBackground"
                     android:text="@string/event_section_participants"/>
 
                 <include layout="@layout/list_item"
@@ -166,9 +164,7 @@
 
             <View
                 android:visibility="@{event.participants.size() == event.organizers.size() ? View.GONE : View.VISIBLE}"
-                android:layout_height="@dimen/event_divider"
-                android:layout_width="match_parent"
-                android:background="?divider"/>
+                style="?dividerStyle"/>
 
             <include layout="@layout/list_item"
                 android:visibility="@{event.participants.size() == event.organizers.size() ? View.GONE : View.VISIBLE}"
@@ -176,10 +172,7 @@
                 app:icon="@{@drawable/ic_arrow_down_accent}"
                 app:title="@{@string/event_show_more}"/>
 
-            <View
-                android:layout_height="@dimen/event_divider"
-                android:layout_width="match_parent"
-                android:background="?divider"/>
+            <View style="?dividerStyle"/>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </layout>

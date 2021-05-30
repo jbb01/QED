@@ -16,14 +16,13 @@
         android:elevation="2dp"
         tools:visibility="visible"/>
 
-    <androidx.appcompat.widget.Toolbar
+    <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:layout_below="@id/gallery_image_overlay_top"
         android:background="#88000000"
-        android:elevation="2dp"
-        android:theme="@style/AppTheme.ActionBarTheme" />
+        android:elevation="2dp" />
 
     <!--
     <RelativeLayout

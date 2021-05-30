@@ -4,7 +4,7 @@
     android:height="24dp"
     android:viewportWidth="24.0"
     android:viewportHeight="24.0"
-    android:tint="?preferenceIconColor">
+    android:tint="?colorSecondary">
 
     <clip-path
         android:pathData="M0,0h24v24h-24z M3.92,3.61 l-1.27,1.27  l17.47,17.47 l1.27,-1.27 z"/>

@@ -49,6 +49,7 @@ public class Preferences {
 
         private final String KEY_BUG_REPORT;
         private final String KEY_GITHUB;
+        private final String KEY_NIGHT_MODE;
 
 
         private final Keys mKeys;
@@ -59,6 +60,7 @@ public class Preferences {
 
             KEY_BUG_REPORT = resources.getString(R.string.preferences_general_bug_report_key);
             KEY_GITHUB = resources.getString(R.string.preferences_general_github_key);
+            KEY_NIGHT_MODE = resources.getString(R.string.preferences_general_night_mode_key);
 
             mKeys = new Keys();
         }
@@ -69,6 +71,10 @@ public class Preferences {
 
         public boolean isRememberMe() {
             return mSharedPreferences.getBoolean(KEY_REMEMBER_ME, false);
+        }
+
+        public boolean isNightMode() {
+            return mSharedPreferences.getBoolean(KEY_NIGHT_MODE, false);
         }
 
         public Keys keys() {
@@ -92,6 +98,10 @@ public class Preferences {
 
             public String github() {
                 return KEY_GITHUB;
+            }
+
+            public String nightMode() {
+                return KEY_NIGHT_MODE;
             }
         }
 

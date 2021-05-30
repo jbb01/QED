@@ -46,7 +46,7 @@
         android:padding="100dp"
         android:progressDrawable="@drawable/circular_progress_bar"
         android:secondaryProgress="100"
-        android:progressTint="@color/colorAccent"
+        android:progressTint="@color/colorSecondary"
         android:secondaryProgressTint="#333"
         android:progress="10"
         android:max="100"

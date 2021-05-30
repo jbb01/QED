@@ -18,42 +18,36 @@
             android:layout_alignParentStart="true"
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
-            android:layout_below="@id/toolbar_container"
+            android:layout_below="@id/toolbar"
             android:orientation="vertical" />
 
-        <com.google.android.material.appbar.AppBarLayout
-            android:id="@+id/toolbar_container"
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="?actionBarSize"
             android:layout_alignParentStart="true"
             android:layout_alignParentEnd="true"
             android:layout_alignParentTop="true"
-            android:theme="@style/AppTheme.ActionBarTheme">
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"/>
-        </com.google.android.material.appbar.AppBarLayout>
+            style="?toolbarStyle"/>
 
-        <androidx.appcompat.widget.Toolbar
+        <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/alt_toolbar"
             android:layout_width="match_parent"
             android:layout_height="?actionBarSize"
-            android:theme="?actionBarTheme"
             android:visibility="gone"
-            android:layout_alignStart="@id/toolbar_container"
-            android:layout_alignEnd="@id/toolbar_container"
-            android:layout_alignTop="@id/toolbar_container"
-            android:layout_alignBottom="@id/toolbar_container"
+            android:layout_alignStart="@id/toolbar"
+            android:layout_alignEnd="@id/toolbar"
+            android:layout_alignTop="@id/toolbar"
+            android:layout_alignBottom="@id/toolbar"
             android:background="?colorPrimaryLight"
-            android:translationZ="10dp"/>
+            android:translationZ="10dp"
+            style="?toolbarStyle"/>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="5dp"
             android:layout_alignParentStart="true"
             android:layout_alignParentEnd="true"
-            android:layout_below="@id/toolbar_container"
             android:background="@drawable/bottom_shadow"/>
     </RelativeLayout>
 

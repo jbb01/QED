@@ -31,7 +31,6 @@
         android:paddingTop="@dimen/activity_vertical_margin"
         android:paddingBottom="@dimen/activity_vertical_margin"
         android:selectAllOnFocus="true"
-        android:theme="@style/AppTheme"
         android:importantForAutofill="no" />
 
     <TextView
@@ -65,7 +64,6 @@
         android:paddingTop="@dimen/activity_vertical_margin"
         android:paddingBottom="@dimen/activity_vertical_margin"
         android:selectAllOnFocus="true"
-        android:theme="@style/AppTheme"
         android:importantForAutofill="no" />
 
 </RelativeLayout>

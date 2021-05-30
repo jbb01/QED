@@ -4,7 +4,7 @@
     android:id="@+id/message_message_math"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:textAppearance="@style/AppTheme.TextAppearance.Message.Message"
+    android:textAppearance="@style/TextAppearance.App.Message.Message"
     android:clickable="false"
     android:focusable="false"
     android:visibility="gone"

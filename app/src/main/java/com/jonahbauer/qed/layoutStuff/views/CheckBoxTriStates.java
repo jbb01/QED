@@ -9,13 +9,15 @@ import android.widget.CompoundButton;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.content.res.AppCompatResources;
 
+import com.google.android.material.checkbox.MaterialCheckBox;
 import com.jonahbauer.qed.R;
 
 /**
  * Base on https://stackoverflow.com/a/40939367/3950497 answer.
  */
-public class CheckBoxTriStates extends androidx.appcompat.widget.AppCompatCheckBox {
+public class CheckBoxTriStates extends MaterialCheckBox {
 
     static public final int UNKNOWN = -1;
 
@@ -57,13 +59,11 @@ public class CheckBoxTriStates extends androidx.appcompat.widget.AppCompatCheckB
     private boolean mRestoring;
 
     public CheckBoxTriStates(Context context) {
-        super(context);
-        init();
+        this(context, null);
     }
 
     public CheckBoxTriStates(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        init();
+        this(context, attrs, R.attr.triCheckboxStyle);
     }
 
     public CheckBoxTriStates(Context context, AttributeSet attrs, int defStyleAttr) {
@@ -77,6 +77,7 @@ public class CheckBoxTriStates extends androidx.appcompat.widget.AppCompatCheckB
 
     private void setState(int state) {
         if(!this.mRestoring && this.mState != state) {
+            setChecked(state != UNKNOWN);
             this.mState = state;
 
             if(this.mClientListener != null) {
@@ -143,7 +144,7 @@ public class CheckBoxTriStates extends androidx.appcompat.widget.AppCompatCheckB
                 else btnDrawable = R.drawable.ic_checkbox_unchecked_to_checked_animated;
                 break;
         }
-        setButtonDrawable(btnDrawable);
+        setButtonDrawable(AppCompatResources.getDrawable(getContext(), btnDrawable));
         if (getButtonDrawable() instanceof Animatable) ((Animatable)getButtonDrawable()).start();
     }
 

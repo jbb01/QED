@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.res.Configuration;
 import android.graphics.Rect;
 import android.os.Bundle;
-import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +12,6 @@ import android.view.Window;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.StyleRes;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -26,20 +24,15 @@ import com.jonahbauer.qed.model.Message;
 
 public class MessageInfoBottomSheet extends BottomSheetDialogFragment {
     private static final String ARGUMENT_MESSAGE = "message";
-    private static final String ARGUMENT_THEME_ID = "themeId";
 
     private Message mMessage;
 
     private BottomSheetCallback mSheetCallback;
 
-    @StyleRes
-    private int mThemeId;
-
     @NonNull
-    public static MessageInfoBottomSheet newInstance(Message message, @StyleRes int themeId) {
+    public static MessageInfoBottomSheet newInstance(Message message) {
         Bundle args = new Bundle();
         args.putParcelable(ARGUMENT_MESSAGE, message);
-        args.putInt(ARGUMENT_THEME_ID, themeId);
         MessageInfoBottomSheet sheet = new MessageInfoBottomSheet();
         sheet.setArguments(args);
         return sheet;
@@ -54,17 +47,11 @@ public class MessageInfoBottomSheet extends BottomSheetDialogFragment {
         Bundle args = getArguments();
         assert args != null;
         mMessage = args.getParcelable(ARGUMENT_MESSAGE);
-        mThemeId = args.getInt(ARGUMENT_THEME_ID);
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if (mThemeId != 0) {
-            ContextThemeWrapper wrapper = new ContextThemeWrapper(inflater.getContext(), mThemeId);
-            inflater.getContext().getTheme().setTo(wrapper.getTheme());
-        }
-
         View view = inflater.inflate(R.layout.bottom_sheet_with_fragment, container, false);
         view.setOnClickListener(v -> dismiss());
 

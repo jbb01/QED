@@ -4,7 +4,6 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.StyleRes;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.jonahbauer.qed.activities.sheets.AbstractInfoBottomSheet;
@@ -14,15 +13,13 @@ import com.jonahbauer.qed.util.Themes;
 
 public class PersonInfoBottomSheet extends AbstractInfoBottomSheet {
     private static final String ARGUMENT_PERSON = "person";
-    private static final String ARGUMENT_THEME_ID = "themeId";
 
     private PersonViewModel personViewModel;
 
     @NonNull
-    public static PersonInfoBottomSheet newInstance(Person person, @StyleRes int themeId) {
+    public static PersonInfoBottomSheet newInstance(Person person) {
         Bundle args = new Bundle();
         args.putParcelable(ARGUMENT_PERSON, person);
-        args.putInt(ARGUMENT_THEME_ID, themeId);
         PersonInfoBottomSheet sheet = new PersonInfoBottomSheet();
         sheet.setArguments(args);
         return sheet;

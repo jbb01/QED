@@ -1,6 +1,5 @@
 <resources>
     <!-- Servers -->
-    <string name="github_project" translatable="false">https://github.com/jbb01/QED</string>
     <string name="github_project_issue_tracker" translatable="false">https://github.com/jbb01/QED/issues/new</string>
 
     <string name="view_pager_bottom_sheet_behavior" translatable="false">com.jonahbauer.qed.layoutStuff.viewPagerBottomSheet.ViewPagerBottomSheetBehavior</string>
@@ -187,6 +186,7 @@
     <string name="preferences_general_github_key" translatable="false">general.github</string>
     <string name="preferences_general_drawer_selection_key" translatable="false">general.drawer_selection</string>
     <string name="preferences_general_remember_me_key" translatable="false">general.remember_me</string>
+    <string name="preferences_general_night_mode_key" translatable="false">general.night_mode</string>
 
     <string name="preferences_gallery_delete_thumbnails_key" translatable="false">gallery.delete_thumbnails</string>
     <string name="preferences_gallery_delete_images_key" translatable="false">gallery.delete_images</string>
@@ -200,10 +200,14 @@
     <string name="preferences_header_gallery">Gallery</string>
     <string name="preferences_header_general">General</string>
 
+    <string name="preferences_general_group_appearance">Appearance</string>
     <string name="preferences_general_bug_report_title">Bug Report</string>
     <string name="preferences_general_bug_report_summary">Please use the GitHub Issue Tracker for reporting bugs. Include as much information as possible (Android and app version, steps to reproduce, …).</string>
     <string name="preferences_general_github_title">GitHub Project</string>
+    <string name="preferences_general_github_summary">https://github.com/jbb01/QED</string>
     <string name="preferences_general_remember_me_title">Remember Me</string>
+    <string name="preferences_general_night_mode_title">Night Mode</string>
+    <string name="preferences_general_night_mode_summary">A theme as black as your soul.</string>
 
     <string name="preferences_chat_group_database">Chat Database</string>
     <string name="preferences_chat_group_appearance">Appearance</string>

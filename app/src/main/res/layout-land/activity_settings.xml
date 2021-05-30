@@ -19,10 +19,14 @@
             android:layout_height="match_parent"/>
     </LinearLayout>
 
+    <View
+        android:layout_height="match_parent"
+        android:layout_width="?android:dividerHeight"
+        android:background="?dividerVertical" />
+
     <FrameLayout
         android:id="@+id/settings_content"
         android:layout_width="0dp"
-        android:layout_marginStart="-5dp"
         android:layout_height="match_parent"
         android:layout_weight="1"/>
 </LinearLayout>

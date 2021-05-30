@@ -4,7 +4,7 @@
     android:height="24dp"
     android:viewportWidth="24.0"
     android:viewportHeight="24.0"
-    android:tint="?preferenceIconColor">
+    android:tint="?colorSecondary">
     <path
         android:fillColor="@android:color/white"
         android:pathData="M 5,1.5 h2 v3.5 h3.5 v2 h-3.5 v3.5 h-2 v-3.5 h-3.5 v-2 h3.5" />

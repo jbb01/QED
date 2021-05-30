@@ -14,6 +14,7 @@ import com.jonahbauer.qed.networking.NetworkConstants;
 import com.jonahbauer.qed.networking.NetworkUtils;
 import com.jonahbauer.qed.networking.exceptions.InvalidCredentialsException;
 import com.jonahbauer.qed.networking.exceptions.NetworkException;
+import com.jonahbauer.qed.util.Preferences;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -223,7 +224,7 @@ public final class QEDLogin {
      */
     public static void login(@NonNull Feature feature, boolean promptIfNecessary) throws InvalidCredentialsException, NetworkException {
         try {
-            // TODO if no password store is enabled switch to promptLogin immediately
+            if (!Preferences.general().isRememberMe()) throw new InvalidCredentialsException("Remember me is deactivated.");
             switch (feature) {
                 case CHAT:
                     QEDLogin.loginChat();

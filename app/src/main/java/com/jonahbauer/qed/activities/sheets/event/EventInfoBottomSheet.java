@@ -4,7 +4,6 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.StyleRes;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.jonahbauer.qed.activities.sheets.AbstractInfoBottomSheet;
@@ -14,15 +13,13 @@ import com.jonahbauer.qed.util.Themes;
 
 public class EventInfoBottomSheet extends AbstractInfoBottomSheet {
     private static final String ARGUMENT_EVENT = "event";
-    private static final String ARGUMENT_THEME_ID = "themeId";
 
     private EventViewModel eventViewModel;
 
     @NonNull
-    public static EventInfoBottomSheet newInstance(Event event, @StyleRes int themeId) {
+    public static EventInfoBottomSheet newInstance(Event event) {
         Bundle args = new Bundle();
         args.putParcelable(ARGUMENT_EVENT, event);
-        args.putInt(ARGUMENT_THEME_ID, themeId);
         EventInfoBottomSheet sheet = new EventInfoBottomSheet();
         sheet.setArguments(args);
         return sheet;

@@ -64,7 +64,7 @@ public class EventDatabaseFragment extends QEDFragment implements QEDPageReceive
     }
 
     private void showBottomSheetDialogFragment(@NonNull Event event) {
-        EventInfoBottomSheet sheet = EventInfoBottomSheet.newInstance(event, R.style.AppTheme_BottomSheetDialog);
+        EventInfoBottomSheet sheet = EventInfoBottomSheet.newInstance(event);
         sheet.show(getParentFragmentManager(), sheet.getTag());
     }
 

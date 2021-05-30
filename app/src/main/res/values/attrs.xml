@@ -70,9 +70,23 @@
         <attr name="android:colorPressedHighlight" format="color"/>
     </declare-styleable>
 
-    <attr name="sideSheetDialogTheme" format="reference"/>
+    <attr name="dividerStyle" format="reference"/>
     <attr name="messageStyle" format="reference"/>
+    <attr name="triCheckboxStyle" format="reference"/>
+
     <attr name="colorPrimaryLight" format="color"/>
-    <attr name="preferenceIconColor" format="color"/>
-    <attr name="listIconColor" format="color"/>
+    <attr name="colorOnSurfaceVariant" format="color"/>
+    <attr name="colorOnBackgroundVariant" formate="color"/>
+
+    <attr name="accentColor0" format="color"/>
+    <attr name="accentColor1" format="color"/>
+    <attr name="accentColor2" format="color"/>
+    <attr name="accentColor3" format="color"/>
+    <attr name="accentColor4" format="color"/>
+    <attr name="accentColor5" format="color"/>
+    <attr name="accentColor6" format="color"/>
+    <attr name="accentColor7" format="color"/>
+    <attr name="accentColor8" format="color"/>
+    <attr name="accentColor9" format="color"/>
+    <attr name="colorOnAccentColor" format="color"/>
 </resources>

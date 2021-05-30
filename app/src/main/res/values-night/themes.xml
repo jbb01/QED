@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Themes -->
+    <style name="Theme.App" parent="Theme.MaterialComponents.Light.DarkActionBar">
+        <!-- Color Palette -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryLight">@color/colorPrimaryLight</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+
+        <item name="colorOnPrimary">@android:color/white</item>
+
+        <item name="colorAccent">@color/colorSecondary</item>
+        <item name="colorSecondary">@color/colorSecondary</item>
+        <item name="colorOnSecondary">@android:color/black</item>
+
+        <item name="android:colorBackground">@color/colorBackground</item>
+        <item name="colorOnBackground">@android:color/white</item>
+        <item name="colorOnBackgroundVariant">@android:color/darker_gray</item>
+
+        <item name="colorSurface">@color/colorSurface</item>
+        <item name="colorOnSurface">@android:color/white</item>
+        <item name="colorOnSurfaceVariant">@android:color/darker_gray</item>
+
+        <item name="colorError">@android:color/holo_red_light</item>
+        <item name="colorOnError">@android:color/white</item>
+        <item name="accentColor0">@color/accentColor0</item>
+        <item name="accentColor1">@color/accentColor1</item>
+        <item name="accentColor2">@color/accentColor2</item>
+        <item name="accentColor3">@color/accentColor3</item>
+        <item name="accentColor4">@color/accentColor4</item>
+        <item name="accentColor5">@color/accentColor5</item>
+        <item name="accentColor6">@color/accentColor6</item>
+        <item name="accentColor7">@color/accentColor7</item>
+        <item name="accentColor8">@color/accentColor8</item>
+        <item name="accentColor9">@color/accentColor9</item>
+        <item name="colorOnAccentColor">@color/colorOnAccentColor</item>
+
+        <item name="android:textColorPrimary">?colorOnBackground</item>
+        <item name="android:textColorSecondary">?colorOnSurface</item>
+        <item name="android:textColorHint">?colorOnSurfaceVariant</item>
+
+        <!-- Dialog Themes -->
+        <item name="android:dialogTheme">@style/ThemeOverlay.App.Dialog</item>
+        <item name="android:alertDialogTheme">@style/ThemeOverlay.App.Dialog.Alert</item>
+        <item name="android:datePickerDialogTheme">@style/ThemeOverlay.App.Dialog</item>
+        <item name="android:timePickerDialogTheme">@style/ThemeOverlay.App.Dialog</item>
+        <item name="dialogTheme">?android:dialogTheme</item>
+        <item name="alertDialogTheme">?android:alertDialogTheme</item>
+        <item name="materialAlertDialogTheme">?android:alertDialogTheme</item>
+
+        <!-- Styles -->
+        <item name="materialButtonStyle">@style/Widget.App.Button</item>
+        <item name="floatingActionButtonStyle">@style/Widget.App.FloatingActionButton</item>
+        <item name="toolbarStyle">@style/Widget.MaterialComponents.Toolbar.Primary</item>
+        <item name="messageStyle">@style/Widget.App.Message</item>
+        <item name="triCheckboxStyle">?checkboxStyle</item>
+        <item name="dividerStyle">@style/Widget.App.Divider</item>
+
+        <!-- Text Appearances -->
+        <item name="textAppearanceButton">@style/TextAppearance.App.Button</item>
+
+        <item name="textAppearanceListItem">@style/TextAppearance.App.ListItem</item>
+        <item name="textAppearanceListItemSecondary">@style/TextAppearance.App.ListItemSecondary</item>
+        <item name="textAppearanceListItemSmall">@style/TextAppearance.App.ListItemSmall</item>
+
+        <item name="divider">@drawable/divider</item>
+        <item name="dividerHorizontal">?divider</item>
+        <item name="dividerVertical">@drawable/divider_vertical</item>
+        <item name="android:divider">?divider</item>
+        <item name="android:listDivider">?divider</item>
+        <item name="android:horizontalDivider">?dividerHorizontal</item>
+        <item name="android:verticalDivider">?dividerVertical</item>
+        <item name="android:dividerHeight">1dp</item>
+
+        <item name="windowNoTitle">false</item>
+        <item name="windowActionBar">true</item>
+    </style>
+
+    <style name="Theme.App.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.App.SplashScreen">
+        <item name="android:windowBackground">@drawable/splash_screen</item>
+    </style>
+
+    <style name="Theme.App.Translucent">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
+
+    <!-- ThemeOverlays -->
+    <style name="ThemeOverlay.App.Dialog" parent="ThemeOverlay.MaterialComponents.Dialog">
+        <item name="buttonStyle">@style/Widget.App.Button</item>
+        <item name="buttonBarButtonStyle">@style/Widget.App.Button</item>
+        <item name="android:colorBackground">@color/colorBackground</item>
+        <item name="android:windowBackground">@color/colorBackground</item>
+    </style>
+    <style name="ThemeOverlay.App.Dialog.Alert" parent="ThemeOverlay.MaterialComponents.Dialog.Alert">
+        <item name="buttonStyle">@style/Widget.App.Button</item>
+        <item name="buttonBarButtonStyle">@style/Widget.App.Button</item>
+        <item name="android:colorBackground">@color/colorBackground</item>
+        <item name="android:windowBackground">@color/colorBackground</item>
+    </style>
+</resources>

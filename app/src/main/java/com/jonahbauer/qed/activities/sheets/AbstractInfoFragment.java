@@ -5,7 +5,6 @@ import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -21,7 +20,6 @@ import androidx.databinding.OnRebindCallback;
 import androidx.databinding.ViewDataBinding;
 import androidx.fragment.app.Fragment;
 
-import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.databinding.FragmentInfoBinding;
 
@@ -156,7 +154,6 @@ public abstract class AbstractInfoFragment extends Fragment implements View.OnSc
         } else if (alpha == 0) {
             binding.toolbar.setTitle("");
             binding.toolbar.setVisibility(View.VISIBLE);
-            binding.toolbarLayout.setVisibility(View.VISIBLE);
 
             // merge toolbar and background
             float toolbarTransition = (totalFadeOut * actionBarSize - (contentHolder.getTop() - scrollY)) / ((totalFadeOut - 1) * actionBarSize);
@@ -175,16 +172,10 @@ public abstract class AbstractInfoFragment extends Fragment implements View.OnSc
                 layoutParams.height = (int) height;
             }
             binding.toolbar.setLayoutParams(layoutParams);
-            binding.toolbarLayout.setElevation(toolbarTransition * 30 + 1);
+            binding.toolbar.setElevation(elevation);
         } else {
             binding.toolbar.setVisibility(View.GONE);
-            binding.toolbarLayout.setVisibility(View.GONE);
         }
-
-        binding.toolbar.setVisibility(alpha == 0 ? View.VISIBLE : View.GONE);
-        binding.toolbar.setVisibility(View.VISIBLE);
-
-        Log.d(Application.LOG_TAG_DEBUG, contentHolder.getTop() + ";" + scrollY + ";" + contentHolder.getBottom());
     }
 
     private ViewGroup getContentRoot() {

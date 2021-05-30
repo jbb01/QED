@@ -214,7 +214,7 @@ public class PersonDatabaseFragment extends QEDFragment implements CompoundButto
     }
 
     private void showBottomSheetDialogFragment(@NonNull Person person) {
-        PersonInfoBottomSheet sheet = PersonInfoBottomSheet.newInstance(person,R.style.AppTheme_BottomSheetDialog);
+        PersonInfoBottomSheet sheet = PersonInfoBottomSheet.newInstance(person);
         sheet.show(getParentFragmentManager(), sheet.getTag());
     }
 

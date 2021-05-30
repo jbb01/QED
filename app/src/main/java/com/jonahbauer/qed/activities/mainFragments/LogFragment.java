@@ -244,7 +244,7 @@ public class LogFragment extends QEDFragment implements ChatDatabaseReceiver, QE
                 toolbar.inflateMenu(R.menu.menu_message);
                 toolbar.setOnMenuItemClickListener(item -> {
                     if (item.getItemId() == R.id.message_info) {
-                        MessageInfoBottomSheet sheet = MessageInfoBottomSheet.newInstance(msg, R.style.AppTheme_BottomSheetDialog);
+                        MessageInfoBottomSheet sheet = MessageInfoBottomSheet.newInstance(msg);
                         sheet.show(getChildFragmentManager(), sheet.getTag());
                     }
 
@@ -535,7 +535,7 @@ public class LogFragment extends QEDFragment implements ChatDatabaseReceiver, QE
         View.OnClickListener dateEditTextClickListener = v1 -> {
             android.icu.util.Calendar calendar = android.icu.util.Calendar.getInstance(TimeZone.getDefault());
 
-            DatePickerDialog dialog = new DatePickerDialog(context, R.style.AppTheme_Dialog, dateSetListener,
+            DatePickerDialog dialog = new DatePickerDialog(context, dateSetListener,
                     calendar.get(android.icu.util.Calendar.YEAR), calendar.get(android.icu.util.Calendar.MONTH),
                     calendar.get(android.icu.util.Calendar.DAY_OF_MONTH));
 

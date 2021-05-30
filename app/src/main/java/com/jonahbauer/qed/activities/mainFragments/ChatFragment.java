@@ -242,7 +242,7 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
                 toolbar.inflateMenu(R.menu.menu_chat_message);
                 toolbar.setOnMenuItemClickListener(item -> {
                     if (item.getItemId() == R.id.message_info) {
-                        MessageInfoBottomSheet sheet = MessageInfoBottomSheet.newInstance(msg, R.style.AppTheme_BottomSheetDialog);
+                        MessageInfoBottomSheet sheet = MessageInfoBottomSheet.newInstance(msg);
                         sheet.show(getChildFragmentManager(), sheet.getTag());
                     } else if (item.getItemId() == R.id.message_reply) {
                         Toast.makeText(requireContext(), R.string.coming_soon, Toast.LENGTH_SHORT).show();
@@ -422,7 +422,7 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
             mMessageEditText.setText("");
             mMessageEditText.requestFocus();
         } else {
-            mHandler.post(() -> mMessageEditText.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.ic_error_red,0));
+            mHandler.post(() -> mMessageEditText.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.ic_error,0));
         }
     }
 

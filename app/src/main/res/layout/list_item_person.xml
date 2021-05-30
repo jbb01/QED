@@ -28,7 +28,7 @@
             android:layout_alignTop="@id/person_name"
             android:layout_alignBottom="@id/person_email"
             android:gravity="center"
-            android:textColor="#000"
+            android:textColor="?colorOnBackground"
             tools:text="M"/>
 
         <ImageView
@@ -57,7 +57,7 @@
             android:layout_alignBottom="@id/person_initials_circle"
             android:gravity="center"
             android:textStyle="bold"
-            android:textColor="@color/person_database_initials"
+            android:textColor="?colorOnAccentColor"
             android:text="@{person.getInitials(invertedInitials)}"
             tools:text="MM"/>
 

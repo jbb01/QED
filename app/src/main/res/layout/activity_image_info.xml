@@ -8,12 +8,11 @@
     android:orientation="vertical"
     tools:mContext=".activities.ImageInfoActivity">
 
-    <androidx.appcompat.widget.Toolbar
+    <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="#000"
-        android:theme="@style/AppTheme.ActionBarTheme" />
+        android:background="#000" />
     <View
         android:id="@+id/line"
         android:layout_width="match_parent"

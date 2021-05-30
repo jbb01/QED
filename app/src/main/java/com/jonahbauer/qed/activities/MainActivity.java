@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        setTheme(R.style.AppTheme_NoActionBar);
+        setTheme(R.style.Theme_App_NoActionBar);
         super.onCreate(savedInstanceState);
 
         mNewSelection = Preferences.general().getDrawerSelection();
@@ -318,22 +318,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     // cache miss
                     switch (selected) {
                         case CHAT:
-                            mFragment = ChatFragment.newInstance(R.style.AppTheme);
+                            mFragment = ChatFragment.newInstance(R.style.Theme_App);
                             break;
                         case CHAT_DATABASE:
-                            mFragment = ChatDatabaseFragment.newInstance(R.style.AppTheme);
+                            mFragment = ChatDatabaseFragment.newInstance(R.style.Theme_App);
                             break;
                         case CHAT_LOG:
-                            mFragment = LogFragment.newInstance(R.style.AppTheme);
+                            mFragment = LogFragment.newInstance(R.style.Theme_App);
                             break;
                         case DATABASE_PEOPLE:
-                            mFragment = PersonDatabaseFragment.newInstance(R.style.AppTheme);
+                            mFragment = PersonDatabaseFragment.newInstance(R.style.Theme_App);
                             break;
                         case DATABASE_EVENTS:
-                            mFragment = EventDatabaseFragment.newInstance(R.style.AppTheme);
+                            mFragment = EventDatabaseFragment.newInstance(R.style.Theme_App);
                             break;
                         case GALLERY:
-                            mFragment = GalleryFragment.newInstance(R.style.AppTheme);
+                            mFragment = GalleryFragment.newInstance(R.style.Theme_App);
                             break;
                         default:
                             throw new AssertionError();

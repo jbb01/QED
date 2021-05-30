@@ -2,6 +2,7 @@ package com.jonahbauer.qed.activities.sheets.person;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.StyleRes;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.util.Pair;
 import androidx.databinding.BindingAdapter;
@@ -82,7 +84,12 @@ public class PersonInfoFragment extends AbstractInfoFragment {
 
         binding.toggleEventsButton.setOnClick(this::toggleEvents);
         binding.toggleEventsButton.icon.setColorFilter(getColor());
-        binding.toggleEventsButton.title.setTextAppearance(R.style.AppTheme_TextAppearance_Button);
+
+        TypedValue typedValue = new TypedValue();
+        getContext().getTheme().resolveAttribute(R.attr.textAppearanceButton, typedValue, true);
+        @StyleRes int textAppearanceButton = typedValue.data;
+
+        binding.toggleEventsButton.title.setTextAppearance(textAppearanceButton);
         binding.toggleEventsButton.title.setTextColor(getColor());
     }
 

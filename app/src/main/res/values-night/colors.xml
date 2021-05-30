@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#202225</color>
+    <color name="colorPrimaryDark">#000000</color>
+    <color name="colorPrimaryLight">#47494d</color>
+
+    <color name="colorSecondary">#52c7b8</color>
+    <color name="colorSecondaryDark">#019688</color>
+    <color name="colorSecondaryLight">#88faea</color>
+
+    <color name="colorAccent2">#009688</color>
+    <color name="colorAccentDark2">#00675B</color>
+    <color name="colorAccentLight2">#52C7B8</color>
+
+    <color name="colorBackground">#2F3136</color>
+    <color name="colorSurface">#36393f</color>
+
+    <color name="dateBannerBackground">@color/colorSurface</color>
+
+    <!-- Progressbar -->
+    <color name="progressbar_background_start">@color/colorBackground</color>
+    <color name="progressbar_background_center">@color/colorBackground</color>
+    <color name="progressbar_background_end">@color/colorBackground</color>
+    <color name="progressbar_progress_start">#CC3366</color>
+    <color name="progressbar_progress_center">#FF4080</color>
+    <color name="progressbar_progress_end">#99264D</color>
+
+    <!-- Album -->
+    <color name="album_info_headers">@android:color/black</color>
+    <color name="image_info_headers">@android:color/black</color>
+
+</resources>

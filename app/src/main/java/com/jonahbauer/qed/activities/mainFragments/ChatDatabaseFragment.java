@@ -160,7 +160,7 @@ public class ChatDatabaseFragment extends QEDFragment implements CompoundButton.
                 toolbar.inflateMenu(R.menu.menu_message);
                 toolbar.setOnMenuItemClickListener(item -> {
                     if (item.getItemId() == R.id.message_info) {
-                        MessageInfoBottomSheet sheet = MessageInfoBottomSheet.newInstance(msg, R.style.AppTheme_BottomSheetDialog);
+                        MessageInfoBottomSheet sheet = MessageInfoBottomSheet.newInstance(msg);
                         sheet.show(getChildFragmentManager(), sheet.getTag());
                     }
 
@@ -335,7 +335,7 @@ public class ChatDatabaseFragment extends QEDFragment implements CompoundButton.
             }
             if (localError) {
                 error = true;
-                mDateFromEditText.post(() -> mDateFromEditText.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_error_red, 0));
+                mDateFromEditText.post(() -> mDateFromEditText.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_error, 0));
             } else {
                 mDateFromEditText.post(() -> mDateFromEditText.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0));
             }
@@ -390,7 +390,7 @@ public class ChatDatabaseFragment extends QEDFragment implements CompoundButton.
             }
             if (localError) {
                 error = true;
-                mDateToEditText.post(() -> mDateToEditText.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_error_red, 0));
+                mDateToEditText.post(() -> mDateToEditText.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_error, 0));
             } else {
                 mDateToEditText.post(() -> mDateToEditText.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0));
             }
@@ -422,7 +422,7 @@ public class ChatDatabaseFragment extends QEDFragment implements CompoundButton.
             }
             if (localError) {
                 error = true;
-                mIdEditText.post(() -> mIdEditText.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_error_red, 0));
+                mIdEditText.post(() -> mIdEditText.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_error, 0));
             } else {
                 mIdEditText.post(() -> mIdEditText.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0));
             }

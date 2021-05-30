@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.res.Configuration;
 import android.graphics.Rect;
 import android.os.Bundle;
-import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +13,6 @@ import android.view.Window;
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.StyleRes;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -25,32 +23,13 @@ import com.jonahbauer.qed.databinding.BottomSheetWithFragmentBinding;
 import com.jonahbauer.qed.layoutStuff.ColorfulBottomSheetCallback;
 
 public abstract class AbstractInfoBottomSheet extends BottomSheetDialogFragment {
-    protected static final String ARGUMENT_THEME_ID = "themeId";
-
     private BottomSheetBehavior.BottomSheetCallback sheetCallback;
 
-    @StyleRes
-    private int themeId;
-
     public AbstractInfoBottomSheet() {}
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        Bundle args = getArguments();
-        assert args != null;
-        themeId = args.getInt(ARGUMENT_THEME_ID);
-    }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if (themeId != 0) {
-            ContextThemeWrapper wrapper = new ContextThemeWrapper(inflater.getContext(), themeId);
-            inflater.getContext().getTheme().setTo(wrapper.getTheme());
-        }
-
         BottomSheetWithFragmentBinding binding = BottomSheetWithFragmentBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
         view.setOnClickListener(v -> dismiss());
