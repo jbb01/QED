@@ -1,5 +1,6 @@
-package com.jonahbauer.qed.activities.sheets.event;
+package com.jonahbauer.qed.model.viewmodel;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -10,14 +11,14 @@ import com.jonahbauer.qed.networking.QEDDBPages;
 import com.jonahbauer.qed.networking.async.QEDPageReceiver;
 import com.jonahbauer.qed.util.StatusWrapper;
 
-public class EventViewModel extends ViewModel implements QEDPageReceiver<Event> {
-    public static final int STATUS_PRELOADED = 0;
-    public static final int STATUS_LOADED = 1;
-    public static final int STATUS_ERROR = -1;
+import static com.jonahbauer.qed.util.StatusWrapper.STATUS_ERROR;
+import static com.jonahbauer.qed.util.StatusWrapper.STATUS_LOADED;
+import static com.jonahbauer.qed.util.StatusWrapper.STATUS_PRELOADED;
 
+public class EventViewModel extends ViewModel implements QEDPageReceiver<Event> {
     private final MutableLiveData<StatusWrapper<Event>> event = new MutableLiveData<>();
 
-    public void load(Event event) {
+    public void load(@NonNull Event event) {
         if (!event.isLoaded()) {
             this.event.setValue(StatusWrapper.wrap(event, STATUS_PRELOADED));
             QEDDBPages.getEvent(event, this);
@@ -32,7 +33,7 @@ public class EventViewModel extends ViewModel implements QEDPageReceiver<Event> 
 
 
     @Override
-    public void onPageReceived(@Nullable Event out) {
+    public void onPageReceived(@NonNull Event out) {
         out.setLoaded(true);
         this.event.setValue(StatusWrapper.wrap(out, STATUS_LOADED));
     }

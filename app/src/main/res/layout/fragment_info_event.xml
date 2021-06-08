@@ -11,168 +11,160 @@
     </data>
 
     <!--suppress AndroidDomInspection -->
-    <androidx.core.widget.NestedScrollView
-        android:id="@+id/common"
-        android:transitionName="common"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scrollbars="vertical">
+        android:layout_height="wrap_content"
+        android:background="?colorSurface"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="@dimen/activity_vertical_margin"
+            android:paddingHorizontal="@dimen/activity_horizontal_margin">
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@{event.title}"
+                android:textColor="?colorOnSurface"
+                android:textSize="30sp"
+                tools:text="Akademie 2018"/>
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?android:colorBackground"
             android:orientation="vertical">
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+            <TextView
                 android:paddingVertical="@dimen/activity_vertical_margin"
-                android:paddingHorizontal="@dimen/activity_horizontal_margin">
-                <TextView
-                    android:id="@+id/title"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@{event.title}"
-                    android:textColor="?colorOnBackground"
-                    android:textSize="30sp"
-                    tools:text="Akademie 2018"/>
-            </LinearLayout>
-
-            <LinearLayout
+                android:paddingHorizontal="@dimen/activity_horizontal_margin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
-                <TextView
-                    android:paddingVertical="@dimen/activity_vertical_margin"
-                    android:paddingHorizontal="@dimen/activity_horizontal_margin"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textAllCaps="true"
-                    android:textStyle="bold"
-                    android:textColor="?colorOnBackground"
-                    android:text="@string/event_section_information"/>
-
-                <include layout="@layout/list_item"
-                    app:onClick="@{(view) -> Intents.recordToCalendar(view.context, event)}"
-                    app:icon="@{@drawable/ic_event_time}"
-                    app:title="@{(event.start != null &amp;&amp; event.end != null) ? MessageFormat.format(@string/event_title_time, event.start, event.end) : event.startString + ` - ` + event.endString }"
-                    app:subtitle="@{@string/event_subtitle_time}"/>
-
-                <include layout="@layout/list_item"
-                    android:visibility="@{(event.deadline != null || event.deadlineString != null) ? View.VISIBLE : View.GONE}"
-                    app:icon="@{@drawable/ic_event_deadline}"
-                    app:title="@{event.deadline != null ? MessageFormat.format(@string/event_title_deadline,event.deadline) : event.deadlineString}"
-                    app:subtitle="@{@string/event_subtitle_deadline}"/>
-
-                <include layout="@layout/list_item"
-                    android:visibility="@{event.hotel != null ? View.VISIBLE : View.GONE}"
-                    app:icon="@{@drawable/ic_event_hotel}"
-                    app:title="@{event.hotel}"
-                    app:subtitle="@{@string/event_subtitle_hotel}"/>
-
-                <include layout="@layout/list_item"
-                    android:visibility="@{event.hotelAddress != null ? View.VISIBLE : View.GONE}"
-                    app:onClick="@{(view) -> Intents.showOnMap(view.context, event.hotelAddress)}"
-                    app:icon="@{@drawable/ic_event_hotel_address}"
-                    app:title="@{event.hotelAddress}"
-                    app:subtitle="@{@string/event_subtitle_hotel_address}" />
-
-                <include layout="@layout/list_item"
-                    android:visibility="@{event.cost != 0 ? View.VISIBLE : View.GONE}"
-                    app:icon="@{@drawable/ic_event_cost}"
-                    app:title="@{String.valueOf(event.cost)}"
-                    app:subtitle="@{@string/event_subtitle_cost}"/>
-
-                <include layout="@layout/list_item"
-                    android:visibility="@{event.maxParticipants != 0 ? View.VISIBLE : View.GONE}"
-                    app:icon="@{@drawable/ic_event_max_member}"
-                    app:title="@{String.valueOf(event.maxParticipants)}"
-                    app:subtitle="@{@string/event_subtitle_max_participants}"/>
-
-                <include layout="@layout/list_item"
-                    android:visibility="@{event.notes != null ? View.VISIBLE : View.GONE}"
-                    app:icon="@{@drawable/ic_event_notes}"
-                    app:title="@{event.notes}"
-                    app:subtitle="@{@string/event_subtitle_notes}"/>
-            </LinearLayout>
-
-            <View style="?dividerStyle"/>
-
-            <LinearLayout
-                android:id="@+id/orga_section"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <TextView
-                    android:paddingHorizontal="@dimen/activity_horizontal_margin"
-                    android:paddingVertical="@dimen/activity_vertical_margin"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textAllCaps="true"
-                    android:textStyle="bold"
-                    android:textColor="?colorOnBackground"
-                    android:text="@string/event_section_organization"/>
-
-                <include layout="@layout/list_item"
-                    android:visibility="@{event.emailOrga != null ? View.VISIBLE : View.GONE}"
-                    app:onClick="@{(view) -> Intents.sendTo(view.context, event.emailOrga)}"
-                    app:icon="@{@drawable/ic_event_mail}"
-                    app:title="@{event.emailOrga}"
-                    app:subtitle="@{@string/event_subtitle_mail_organizers}"/>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    app:event_organizers="@{event.organizers}"/>
-            </LinearLayout>
-
-            <View
-                android:visibility="@{event.participants.size() == event.organizers.size() ? View.GONE : View.VISIBLE}"
-                style="?dividerStyle"/>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-                <TextView
-                    android:paddingHorizontal="@dimen/activity_horizontal_margin"
-                    android:paddingVertical="@dimen/activity_vertical_margin"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textAllCaps="true"
-                    android:textStyle="bold"
-                    android:textColor="?colorOnBackground"
-                    android:text="@string/event_section_participants"/>
-
-                <include layout="@layout/list_item"
-                    android:visibility="@{event.emailAll != null ? View.VISIBLE : View.GONE}"
-                    app:onClick="@{(view) -> Intents.sendTo(view.context, event.emailAll)}"
-                    app:icon="@{@drawable/ic_event_mail}"
-                    app:title="@{event.emailAll}"
-                    app:subtitle="@{@string/event_subtitle_mail_participants}"/>
-
-                <LinearLayout
-                    android:visibility="gone"
-                    android:id="@+id/participant_list"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    app:event_participants="@{event.participants}"/>
-            </LinearLayout>
-
-            <View
-                android:visibility="@{event.participants.size() == event.organizers.size() ? View.GONE : View.VISIBLE}"
-                style="?dividerStyle"/>
+                android:textAllCaps="true"
+                android:textStyle="bold"
+                android:textColor="?colorOnSurface"
+                android:text="@string/event_section_information"/>
 
             <include layout="@layout/list_item"
-                android:visibility="@{event.participants.size() == event.organizers.size() ? View.GONE : View.VISIBLE}"
-                android:id="@+id/toggle_participants_button"
-                app:icon="@{@drawable/ic_arrow_down_accent}"
-                app:title="@{@string/event_show_more}"/>
+                app:onClick="@{(view) -> Intents.recordToCalendar(view.context, event)}"
+                app:icon="@{@drawable/ic_event_time}"
+                app:title="@{(event.start != null &amp;&amp; event.end != null) ? MessageFormat.format(@string/event_title_time, event.start, event.end) : event.startString + ` - ` + event.endString }"
+                app:subtitle="@{@string/event_subtitle_time}"/>
 
-            <View style="?dividerStyle"/>
+            <include layout="@layout/list_item"
+                android:visibility="@{(event.deadline != null || event.deadlineString != null) ? View.VISIBLE : View.GONE}"
+                app:icon="@{@drawable/ic_event_deadline}"
+                app:title="@{event.deadline != null ? MessageFormat.format(@string/event_title_deadline,event.deadline) : event.deadlineString}"
+                app:subtitle="@{@string/event_subtitle_deadline}"/>
+
+            <include layout="@layout/list_item"
+                android:visibility="@{event.hotel != null ? View.VISIBLE : View.GONE}"
+                app:icon="@{@drawable/ic_event_hotel}"
+                app:title="@{event.hotel}"
+                app:subtitle="@{@string/event_subtitle_hotel}"/>
+
+            <include layout="@layout/list_item"
+                android:visibility="@{event.hotelAddress != null ? View.VISIBLE : View.GONE}"
+                app:onClick="@{(view) -> Intents.showOnMap(view.context, event.hotelAddress)}"
+                app:icon="@{@drawable/ic_event_hotel_address}"
+                app:title="@{event.hotelAddress}"
+                app:subtitle="@{@string/event_subtitle_hotel_address}" />
+
+            <include layout="@layout/list_item"
+                android:visibility="@{event.cost != 0 ? View.VISIBLE : View.GONE}"
+                app:icon="@{@drawable/ic_event_cost}"
+                app:title="@{String.valueOf(event.cost)}"
+                app:subtitle="@{@string/event_subtitle_cost}"/>
+
+            <include layout="@layout/list_item"
+                android:visibility="@{event.maxParticipants != 0 ? View.VISIBLE : View.GONE}"
+                app:icon="@{@drawable/ic_event_max_member}"
+                app:title="@{String.valueOf(event.maxParticipants)}"
+                app:subtitle="@{@string/event_subtitle_max_participants}"/>
+
+            <include layout="@layout/list_item"
+                android:visibility="@{event.notes != null ? View.VISIBLE : View.GONE}"
+                app:icon="@{@drawable/ic_event_notes}"
+                app:title="@{event.notes}"
+                app:subtitle="@{@string/event_subtitle_notes}"/>
         </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
+
+        <View style="?dividerStyle"/>
+
+        <LinearLayout
+            android:id="@+id/orga_section"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:paddingHorizontal="@dimen/activity_horizontal_margin"
+                android:paddingVertical="@dimen/activity_vertical_margin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAllCaps="true"
+                android:textStyle="bold"
+                android:textColor="?colorOnSurface"
+                android:text="@string/event_section_organization"/>
+
+            <include layout="@layout/list_item"
+                android:visibility="@{event.emailOrga != null ? View.VISIBLE : View.GONE}"
+                app:onClick="@{(view) -> Intents.sendTo(view.context, event.emailOrga)}"
+                app:icon="@{@drawable/ic_event_mail}"
+                app:title="@{event.emailOrga}"
+                app:subtitle="@{@string/event_subtitle_mail_organizers}"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:event_organizers="@{event.organizers}"/>
+        </LinearLayout>
+
+        <View
+            android:visibility="@{event.participants.size() == event.organizers.size() ? View.GONE : View.VISIBLE}"
+            style="?dividerStyle"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:paddingHorizontal="@dimen/activity_horizontal_margin"
+                android:paddingVertical="@dimen/activity_vertical_margin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAllCaps="true"
+                android:textStyle="bold"
+                android:textColor="?colorOnSurface"
+                android:text="@string/event_section_participants"/>
+
+            <include layout="@layout/list_item"
+                android:visibility="@{event.emailAll != null ? View.VISIBLE : View.GONE}"
+                app:onClick="@{(view) -> Intents.sendTo(view.context, event.emailAll)}"
+                app:icon="@{@drawable/ic_event_mail}"
+                app:title="@{event.emailAll}"
+                app:subtitle="@{@string/event_subtitle_mail_participants}"/>
+
+            <LinearLayout
+                android:visibility="gone"
+                android:id="@+id/participant_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:event_participants="@{event.participants}"/>
+        </LinearLayout>
+
+        <View
+            android:visibility="@{event.participants.size() == event.organizers.size() ? View.GONE : View.VISIBLE}"
+            style="?dividerStyle"/>
+
+        <include layout="@layout/list_item"
+            android:visibility="@{event.participants.size() == event.organizers.size() ? View.GONE : View.VISIBLE}"
+            android:id="@+id/toggle_participants_button"
+            app:icon="@{@drawable/ic_arrow_down_accent}"
+            app:title="@{@string/event_show_more}"/>
+
+        <View style="?dividerStyle"/>
+    </LinearLayout>
 </layout>

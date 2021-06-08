@@ -50,7 +50,6 @@ public class MathView extends LinearLayout {
     private int mTextStyle;
     @Dimension @Px private float mTextSize;
     @ColorInt private int mTextColor;
-    @StyleRes private int mTextAppearance = -1;
 
     public MathView(Context context) {
         this(context, null);
@@ -77,21 +76,27 @@ public class MathView extends LinearLayout {
 
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.MathView, defStyleAttr, defStyleRes);
 
-        TextView _default = new TextView(context);
-        mTextSize = _default.getTextSize();
-        mTextStyle = _default.getTypeface().getStyle();
-        mTextColor = _default.getCurrentTextColor();
+        mTextSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 14, getResources().getDisplayMetrics());
+        mTextColor = Color.BLACK;
 
-        mText = typedArray.getString(R.styleable.MathView_android_text);
+        int textAppearanceResId = typedArray.getResourceId(R.styleable.MathView_android_textAppearance, -1);
+        if (textAppearanceResId != -1) {
+            @SuppressLint("CustomViewStyleable")
+            TypedArray textAppearance = context.obtainStyledAttributes(
+                    textAppearanceResId,
+                    new int[] {android.R.attr.textSize, android.R.attr.textColor, android.R.attr.textStyle}
+            );
+            mTextSize = textAppearance.getDimension(0, mTextSize);
+            mTextColor = textAppearance.getColor(1, mTextColor);
+            mTextStyle = textAppearance.getInt(2, 0);
+
+            textAppearance.recycle();
+        }
+
         mTextSize = typedArray.getDimension(R.styleable.MathView_android_textSize, mTextSize);
-        mTextStyle = typedArray.getInt(R.styleable.MathView_android_textStyle, mTextStyle);
-        mTextColor = typedArray.getColor(R.styleable.MathView_android_textColor, mTextColor);
-        mTextAppearance = typedArray.getResourceId(R.styleable.MathView_android_textAppearance, -1);
-
-        if (mTextAppearance != -1) _default.setTextAppearance(mTextAppearance);
-        _default.setTextSize(mTextSize);
-        _default.setTypeface(_default.getTypeface(), mTextStyle);
-        _default.setTextColor(mTextColor);
+        mTextColor = typedArray.getColor(R.styleable.MathView_android_textSize, mTextColor);
+        mTextStyle = typedArray.getInt(R.styleable.MathView_android_textSize, mTextStyle);
+        mText = typedArray.getString(R.styleable.MathView_android_text);
 
         typedArray.recycle();
 
@@ -101,6 +106,7 @@ public class MathView extends LinearLayout {
     public void setText(@Nullable String text) {
         this.setText(text, -1);
     }
+
     public void setText(@Nullable String text, long id) {
         if (Objects.equals(text, mText)) return;
 
@@ -121,7 +127,10 @@ public class MathView extends LinearLayout {
             if (displayed || inline) {
                 // add as math view
                 str = "\\[" + str.substring(2, str.length() - 2) + "\\]";
-                InternalMathView mathView = InternalMathView.getInternalMathView(mContext, null, str, inline, mTextSize, i, id,this);
+                InternalMathView mathView = InternalMathView.getInternalMathView(mContext, null, str, (int) mTextSize, mTextColor, inline, i, id,this);
+                mathView.setTextSize((int) mTextSize);
+                mathView.setTextColor(mTextColor);
+                mathView.load();
 
                 mInternalMathViews.add(new Triple<>(str, i, id));
 
@@ -133,7 +142,6 @@ public class MathView extends LinearLayout {
                 textView.setText(str);
                 mTextViews.add(textView);
 
-                if (mTextAppearance != -1) textView.setTextAppearance(mTextAppearance);
                 textView.setTypeface(textView.getTypeface(), mTextStyle);
                 textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, mTextSize);
                 textView.setTextColor(mTextColor);
@@ -220,18 +228,34 @@ public class MathView extends LinearLayout {
      * Extract all latex components of the given text, create {@code InternalMathView}s for them and preload them.
      * @param context a context for view creation
      * @param text a text possibly containing latex
-     * @param size font size
      * @param id message id (used for caching)
      * @param preloadLayout a layout for the view to preload
      */
-    public static void extractAndPreload(Context context, String text, float size, long id, @Nullable LinearLayout preloadLayout) {
+    public static void extractAndPreload(
+            Context context,
+            @Nullable AttributeSet attrs,
+            String text,
+            @Dimension @Px int textSize, @ColorInt int textColor,
+            long id, @Nullable LinearLayout preloadLayout) {
         String[] split = getLaTeX(text);
         for (int i = 0; i < split.length; i++) {
             boolean inline = split[i].startsWith("\\(") && split[i].endsWith("\\)");
             boolean displayed = split[i].startsWith("\\[") && split[i].endsWith("\\]");
+            String latex = null;
 
-            if (inline) InternalMathView.preload(context, "\\[" + split[i].substring(2, split[i].length() - 2) + "\\]", true, size, preloadLayout, i, id);
-            else if (displayed) InternalMathView.preload(context, split[i], false, size, preloadLayout, i, id);
+            if (inline) {
+                latex = "\\[" + split[i].substring(2, split[i].length() - 2) + "\\]";
+            } else if (displayed) {
+                latex = split[i];
+            }
+
+            if (latex != null) {
+                InternalMathView.preload(
+                        context, attrs, latex,
+                        textSize, textColor, inline,
+                        preloadLayout, i, id
+                );
+            }
         }
     }
 
@@ -252,12 +276,16 @@ public class MathView extends LinearLayout {
          * @param attrs a attribute set used for creating a new InternalMathView
          * @param laTeX the latex literal to be displayed
          * @param inline inline or displayed latex
-         * @param size font size
          * @param index part index as part of whole message (used for caching)
          * @param id message id (used for caching)
          * @param owner displaying MathView
          */
-        public static InternalMathView getInternalMathView(Context context, AttributeSet attrs, String laTeX, boolean inline, float size, int index, long id, MathView owner) {
+        public static InternalMathView getInternalMathView(
+                Context context,
+                @Nullable AttributeSet attrs,
+                String laTeX,
+                @Dimension @Px int textSize, @ColorInt int textColor, boolean inline,
+                int index, long id, MathView owner) {
             int cachePos = Objects.hash(laTeX, index, id, owner);
 
             // load owned math view
@@ -289,7 +317,11 @@ public class MathView extends LinearLayout {
                 }
             }
 
-            InternalMathView internalMathView = new InternalMathView(context, attrs, laTeX, inline, size);
+            InternalMathView internalMathView = new InternalMathView(context, attrs, laTeX, inline);
+            internalMathView.setTextSize(textSize);
+            internalMathView.setTextColor(textColor);
+            internalMathView.setInline(inline);
+            internalMathView.load();
             cache.put(cachePos, new SoftReference<>(internalMathView));
             return internalMathView;
         }
@@ -298,13 +330,22 @@ public class MathView extends LinearLayout {
          * @param context a context for view creation
          * @param laTeX a latex literal to be displayed
          * @param inline inline or displayed latex
-         * @param size font size
          * @param preloadLayout a layout for the view to preload
          * @param index part index as part of whole message (used for caching)
          * @param id message id (used for caching)
          */
-        public static void preload(Context context, String laTeX, boolean inline, float size, @Nullable LinearLayout preloadLayout, int index, long id) {
-            InternalMathView mathView = new InternalMathView(context, null, laTeX, inline, size);
+        public static void preload(
+                Context context,
+                @Nullable AttributeSet attrs,
+                String laTeX,
+                @Dimension @Px int textSize, @ColorInt int textColor, boolean inline,
+                @Nullable LinearLayout preloadLayout,
+                int index, long id) {
+            InternalMathView mathView = new InternalMathView(context, attrs, laTeX, inline);
+            mathView.setTextSize(textSize);
+            mathView.setTextColor(textColor);
+            mathView.setInline(inline);
+            mathView.load();
             if (preloadLayout != null) {
                 preloadLayout.addView(mathView);
             }
@@ -332,14 +373,21 @@ public class MathView extends LinearLayout {
 
 
         private String laTeX;
-        private final boolean inline;
         private float startX;
         private int scrollStartX;
         private int maxScrollX;
 
+        private boolean inline;
+        @ColorInt
+        private int textColor = Color.BLACK;
+        @Dimension @Px
+        private int textSize = 20;
+
+        private boolean dirty = true;
+
 
         @SuppressLint("SetJavaScriptEnabled")
-        public InternalMathView(Context context, AttributeSet attrs, String laTeX, boolean inline, float size) {
+        public InternalMathView(Context context, AttributeSet attrs, String laTeX, boolean inline) {
             super(context, attrs);
 
             this.inline = inline;
@@ -347,14 +395,10 @@ public class MathView extends LinearLayout {
             if (inline) setScrollBarSize(0);
 
             LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            if (inline) {
-                layoutParams.setMargins(0, - (int) size, 0, - (int) size);
-            }
             setLayoutParams(layoutParams);
 
             getSettings().setJavaScriptEnabled(true);
             getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
-            getSettings().setDefaultFontSize((int)(size * 0.5f));
             setBackgroundColor(Color.TRANSPARENT);
 
             setVerticalScrollBarEnabled(false);
@@ -362,7 +406,6 @@ public class MathView extends LinearLayout {
 
             setText(laTeX);
         }
-
 
         @Override
         @SuppressLint("ClickableViewAccessibility")
@@ -400,15 +443,50 @@ public class MathView extends LinearLayout {
 
         public void setText(String laTeX) {
             this.laTeX = laTeX;
-
-            Chunk chunk = getChunk();
-            chunk.set("formula", laTeX);
-
-            this.loadDataWithBaseURL(null, chunk.toString(), "text/html", "utf-8", "about:blank");
         }
 
         public String getText() {
             return laTeX;
+        }
+
+        public void setTextColor(@ColorInt int textColor) {
+            if (this.textColor != textColor) {
+                this.dirty = true;
+                this.textColor = textColor;
+            }
+        }
+
+        public void setTextSize(@Dimension @Px int size) {
+            if (this.textSize != size) {
+                this.dirty = true;
+                this.textSize = size;
+                getSettings().setDefaultFontSize(size / 2);
+            }
+        }
+
+        public void setInline(boolean inline) {
+            if (this.inline != inline) {
+                this.dirty = true;
+                this.inline = inline;
+//                setHorizontalScrollBarEnabled(!inline);
+            }
+        }
+
+        public void load() {
+            if (!dirty) return;
+            dirty = false;
+
+            if (inline) {
+                ((LinearLayout.LayoutParams) getLayoutParams()).setMargins(0, -textSize, 0, -textSize);
+            }
+
+            Chunk chunk = getChunk();
+            chunk.set("formula", laTeX);
+
+            String hexColor = String.format("#%06X", (0xFFFFFF & textColor));
+            chunk.set("textColor", hexColor);
+
+            this.loadDataWithBaseURL(null, chunk.toString(), "text/html", "utf-8", "about:blank");
         }
     }
 }

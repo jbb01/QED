@@ -1,6 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.App" parent="Theme.MaterialComponents.Light.DarkActionBar">
+    <style name="Base.Theme.App" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+<!--        <item name="android:ambientShadowAlpha">1</item>-->
+<!--        <item name="android:spotShadowAlpha">1</item>-->
+
+        <!-- Dialog Themes -->
+        <item name="android:dialogTheme">@style/ThemeOverlay.App.Dialog</item>
+        <item name="android:alertDialogTheme">@style/ThemeOverlay.App.Dialog.Alert</item>
+        <item name="android:datePickerDialogTheme">@style/ThemeOverlay.App.Dialog</item>
+        <item name="android:timePickerDialogTheme">@style/ThemeOverlay.App.Dialog</item>
+        <item name="dialogTheme">?android:dialogTheme</item>
+        <item name="alertDialogTheme">?android:alertDialogTheme</item>
+        <item name="materialAlertDialogTheme">?android:alertDialogTheme</item>
+
+        <!-- Styles -->
+        <item name="materialButtonStyle">@style/Widget.App.Button</item>
+        <item name="floatingActionButtonStyle">@style/Widget.App.FloatingActionButton</item>
+        <item name="toolbarStyle">@style/Widget.MaterialComponents.Toolbar.Primary</item>
+        <item name="messageStyle">@style/Widget.App.Message</item>
+        <item name="triCheckboxStyle">?checkboxStyle</item>
+        <item name="dividerStyle">@style/Widget.App.Divider</item>
+        <item name="textInputStyle">@style/Widget.Design.TextInputLayout</item>
+        <item name="android:spinnerItemStyle">@style/Widget.App.TextView.SpinnerItem</item>
+
+        <!-- Text Appearances -->
+        <item name="android:textAppearance">@style/TextAppearance.App</item>
+        <item name="textAppearanceButton">@style/TextAppearance.App.Button</item>
+        <item name="textAppearanceListItem">@style/TextAppearance.App.ListItem</item>
+        <item name="textAppearanceListItemSecondary">@style/TextAppearance.App.ListItemSecondary</item>
+        <item name="textAppearanceListItemSmall">@style/TextAppearance.App.ListItemSmall</item>
+        <item name="android:textAppearanceListItemSmall">?textAppearanceListItemSmall</item>
+
+        <item name="divider">@drawable/divider</item>
+        <item name="dividerHorizontal">?divider</item>
+        <item name="dividerVertical">@drawable/divider_vertical</item>
+        <item name="android:divider">?divider</item>
+        <item name="android:listDivider">?divider</item>
+        <item name="android:horizontalDivider">?dividerHorizontal</item>
+        <item name="android:verticalDivider">?dividerVertical</item>
+        <item name="android:dividerHeight">1dp</item>
+
+        <item name="windowNoTitle">false</item>
+        <item name="windowActionBar">true</item>
+    </style>
+
+    <style name="Theme.App" parent="Base.Theme.App">
         <!-- Color Palette -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryLight">@color/colorPrimaryLight</item>
@@ -37,6 +81,7 @@
 
         <item name="android:textColorPrimary">?colorOnBackground</item>
         <item name="android:textColorSecondary">?colorOnSurface</item>
+        <item name="android:textColorTertiary">?colorOnSurfaceVariant</item>
         <item name="android:textColorHint">?colorOnSurfaceVariant</item>
 
         <!-- Dialog Themes -->
@@ -44,6 +89,7 @@
         <item name="android:alertDialogTheme">@style/ThemeOverlay.App.Dialog.Alert</item>
         <item name="android:datePickerDialogTheme">@style/ThemeOverlay.App.Dialog</item>
         <item name="android:timePickerDialogTheme">@style/ThemeOverlay.App.Dialog</item>
+        <item name="bottomSheetDialogTheme">@style/ThemeOverlay.App.BottomSheetDialog</item>
         <item name="dialogTheme">?android:dialogTheme</item>
         <item name="alertDialogTheme">?android:alertDialogTheme</item>
         <item name="materialAlertDialogTheme">?android:alertDialogTheme</item>
@@ -55,13 +101,16 @@
         <item name="messageStyle">@style/Widget.App.Message</item>
         <item name="triCheckboxStyle">?checkboxStyle</item>
         <item name="dividerStyle">@style/Widget.App.Divider</item>
+        <item name="textInputStyle">@style/Widget.Design.TextInputLayout</item>
+        <item name="android:spinnerItemStyle">@style/Widget.App.TextView.SpinnerItem</item>
 
         <!-- Text Appearances -->
+        <item name="android:textAppearance">@style/TextAppearance.App</item>
         <item name="textAppearanceButton">@style/TextAppearance.App.Button</item>
-
         <item name="textAppearanceListItem">@style/TextAppearance.App.ListItem</item>
         <item name="textAppearanceListItemSecondary">@style/TextAppearance.App.ListItemSecondary</item>
         <item name="textAppearanceListItemSmall">@style/TextAppearance.App.ListItemSmall</item>
+        <item name="android:textAppearanceListItemSmall">?textAppearanceListItemSmall</item>
 
         <item name="divider">@drawable/divider</item>
         <item name="dividerHorizontal">?divider</item>
@@ -102,5 +151,8 @@
         <item name="buttonStyle">@style/Widget.App.Button</item>
         <item name="buttonBarButtonStyle">@style/Widget.App.Button</item>
         <item name="android:colorBackground">@color/colorBackground</item>
+    </style>
+    <style name="ThemeOverlay.App.BottomSheetDialog" parent="@style/ThemeOverlay.MaterialComponents.BottomSheetDialog">
+        <item name="android:windowIsFloating">false</item>
     </style>
 </resources>

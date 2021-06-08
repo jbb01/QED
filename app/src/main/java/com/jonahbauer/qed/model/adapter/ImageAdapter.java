@@ -206,7 +206,7 @@ public class ImageAdapter extends ArrayAdapter<Image> implements QEDPageStreamRe
     }
 
     @Override
-    public void onPageReceived(String tag) {
+    public void onPageReceived(@NonNull String tag) {
         Triple<Image, ImageView, ProgressBar> triple = mByTag.get(tag);
         assert triple != null;
 

@@ -1,6 +1,7 @@
 package com.jonahbauer.qed.activities.sheets;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.res.Configuration;
 import android.graphics.Rect;
 import android.os.Bundle;
@@ -17,20 +18,30 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.jonahbauer.qed.R;
-import com.jonahbauer.qed.databinding.BottomSheetWithFragmentBinding;
+import com.jonahbauer.qed.databinding.SingleFragmentBinding;
 import com.jonahbauer.qed.layoutStuff.ColorfulBottomSheetCallback;
 
 public abstract class AbstractInfoBottomSheet extends BottomSheetDialogFragment {
-    private BottomSheetBehavior.BottomSheetCallback sheetCallback;
+    private BottomSheetBehavior.BottomSheetCallback mSheetCallback;
+    private Window mDialogWindow;
 
     public AbstractInfoBottomSheet() {}
+
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext(), R.style.ThemeOverlay_App_BottomSheetDialog);
+        mDialogWindow = bottomSheetDialog.getWindow();
+        return bottomSheetDialog;
+    }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        BottomSheetWithFragmentBinding binding = BottomSheetWithFragmentBinding.inflate(inflater, container, false);
+        SingleFragmentBinding binding = SingleFragmentBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
         view.setOnClickListener(v -> dismiss());
         adjustHeight(view);
@@ -74,15 +85,12 @@ public abstract class AbstractInfoBottomSheet extends BottomSheetDialogFragment 
             public void onWindowAttached() {
                 View touchOutside = view.getRootView().findViewById(R.id.touch_outside);
 
-                Activity activity = requireActivity();
-                Window rootWindow = activity.getWindow();
-
-                if (sheetCallback == null) {
-                    sheetCallback = new ColorfulBottomSheetCallback(AbstractInfoBottomSheet.this, rootWindow, touchOutside, getColor());
+                if (mSheetCallback == null) {
+                    mSheetCallback = new ColorfulBottomSheetCallback(mDialogWindow, touchOutside, getColor());
                 }
 
                 mBehavior = BottomSheetBehavior.from((View) view.getParent());
-                mBehavior.addBottomSheetCallback(sheetCallback);
+                mBehavior.addBottomSheetCallback(mSheetCallback);
             }
 
             @Override
@@ -90,7 +98,7 @@ public abstract class AbstractInfoBottomSheet extends BottomSheetDialogFragment 
                 view.getViewTreeObserver().removeOnWindowAttachListener(this);
 
                 if (mBehavior != null)
-                    mBehavior.removeBottomSheetCallback(sheetCallback);
+                    mBehavior.removeBottomSheetCallback(mSheetCallback);
             }
         });
 

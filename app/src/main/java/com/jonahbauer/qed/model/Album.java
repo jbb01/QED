@@ -21,11 +21,14 @@ public class Album implements Parcelable {
     private String name;
     private String owner;
     private String creationDate;
+    private boolean private_;
     private final List<Person> persons = new ArrayList<>();
     private final List<Date> dates = new ArrayList<>();
     private final List<String> categories = new ArrayList<>();
     private final List<Image> images = new ArrayList<>();
     private boolean imageListDownloaded;
+
+    private boolean loaded;
 
     @NonNull
     @Override
@@ -34,11 +37,12 @@ public class Album implements Parcelable {
         if (id != -1) entries.add("\"id\":" + id);
         if (name != null) entries.add("\"name\":\"" + name + "\"");
         if (owner != null) entries.add("\"owner\":\"" + owner + "\"");
-        if (creationDate != null) entries.add("\"creationDate\":" + creationDate);
+        if (creationDate != null) entries.add("\"creationDate\":\"" + creationDate + "\"");
+        entries.add("\"private\": " + private_);
         if (!persons.isEmpty()) entries.add("\"persons\":" + persons);
         if (!dates.isEmpty()) entries.add("\"dates\":" + dates);
         if (!categories.isEmpty()) entries.add("\"categories\":" + categories);
-        if (!images.isEmpty()) entries.add("\"images\":" + images);
+//        if (!images.isEmpty()) entries.add("\"images\":" + images);
         entries.add("\"imageListDownloaded\":" + imageListDownloaded);
         return entries.stream().collect(Collectors.joining(", ", "{", "}"));
     }
@@ -54,6 +58,7 @@ public class Album implements Parcelable {
         dest.writeString(name);
         dest.writeString(owner);
         dest.writeString(creationDate);
+        dest.writeInt(private_ ? 1 : 0);
         dest.writeTypedList(persons);
         dest.writeInt(dates.size());
         for (Date date : dates) {
@@ -72,6 +77,7 @@ public class Album implements Parcelable {
             album.name = source.readString();
             album.owner = source.readString();
             album.creationDate = source.readString();
+            album.private_ = source.readInt() != 0;
             source.readTypedList(album.persons, Person.CREATOR);
 
             int dateSize = source.readInt();
@@ -81,7 +87,7 @@ public class Album implements Parcelable {
 
             source.readStringList(album.categories);
             source.readTypedList(album.images, Image.CREATOR);
-            album.imageListDownloaded = source.readInt() == 1;
+            album.imageListDownloaded = source.readInt() != 0;
             return album;
         }
 

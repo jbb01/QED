@@ -10,31 +10,48 @@
         android:orientation="horizontal"
         android:clipChildren="false">
 
-        <View
-            android:id="@+id/solid_background"
-            android:layout_height="0dp"
-            android:layout_width="0dp"
-            android:layout_alignStart="@id/background"
-            android:layout_alignEnd="@id/background"
-            android:layout_alignTop="@id/background"
-            android:layout_alignBottom="@id/background" />
-
-        <View
+        <RelativeLayout
             android:id="@+id/background"
             android:layout_alignParentTop="true"
             android:layout_alignParentStart="true"
             android:layout_alignParentBottom="true"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            tools:background="@drawable/background_4"
-            tools:backgroundTint="@android:color/holo_green_light"
-            tools:layout_width="230dp"/>
+            tools:layout_width="230dp">
+            <View
+                android:id="@+id/background_solid"
+                android:layout_height="0dp"
+                android:layout_width="0dp"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentBottom="true" />
 
-        <LinearLayout
-            android:id="@+id/content_holder"
+            <ImageView
+                android:id="@+id/background_pattern"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentBottom="true"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:tintMode="multiply"
+                android:scaleType="centerCrop"
+                tools:src="@drawable/background_4"
+                tools:tint="@android:color/holo_green_light"/>
+        </RelativeLayout>
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/common"
+            android:transitionName="common"
             android:layout_toEndOf="@id/background"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"/>
+            android:scrollbars="vertical">
+            <LinearLayout
+                android:id="@+id/content_holder"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"/>
+        </androidx.core.widget.NestedScrollView>
     </RelativeLayout>
 </layout>

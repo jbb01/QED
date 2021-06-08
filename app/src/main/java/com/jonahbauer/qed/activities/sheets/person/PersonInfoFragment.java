@@ -23,15 +23,17 @@ import com.jonahbauer.qed.databinding.FragmentInfoPersonBinding;
 import com.jonahbauer.qed.databinding.ListItemBinding;
 import com.jonahbauer.qed.model.Person;
 import com.jonahbauer.qed.model.Registration;
+import com.jonahbauer.qed.model.viewmodel.PersonViewModel;
 import com.jonahbauer.qed.util.Intents;
+import com.jonahbauer.qed.util.StatusWrapper;
 import com.jonahbauer.qed.util.Themes;
 
 import java.util.List;
 import java.util.Map;
 
 public class PersonInfoFragment extends AbstractInfoFragment {
-    private PersonViewModel personViewModel;
-    private FragmentInfoPersonBinding binding;
+    private PersonViewModel mPersonViewModel;
+    private FragmentInfoPersonBinding mBinding;
 
     public static PersonInfoFragment newInstance() {
         return new PersonInfoFragment();
@@ -43,19 +45,24 @@ public class PersonInfoFragment extends AbstractInfoFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        personViewModel = new ViewModelProvider(requireActivity()).get(PersonViewModel.class);
+        mPersonViewModel = new ViewModelProvider(requireActivity()).get(PersonViewModel.class);
     }
 
     @Nullable
     @Override
     public ViewDataBinding onCreateContentView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        binding = FragmentInfoPersonBinding.inflate(inflater, container, true);
-        personViewModel.getPerson().observe(getViewLifecycleOwner(), eventStatusWrapper -> binding.setPerson(eventStatusWrapper.getValue()));
-        return binding;
+        mBinding = FragmentInfoPersonBinding.inflate(inflater, container, true);
+        mPersonViewModel.getPerson().observe(getViewLifecycleOwner(), eventStatusWrapper -> mBinding.setPerson(eventStatusWrapper.getValue()));
+        return mBinding;
     }
 
+    @NonNull
     private Person getPerson() {
-        return personViewModel.getPerson().getValue().getValue();
+        StatusWrapper<Person> wrapper = mPersonViewModel.getPerson().getValue();
+        assert wrapper != null : "StatusWrapper should not be null";
+        Person person = wrapper.getValue();
+        assert person != null : "Person should not be null";
+        return person;
     }
 
     @Override
@@ -75,27 +82,27 @@ public class PersonInfoFragment extends AbstractInfoFragment {
 
     @Override
     protected float getTitleBottom() {
-        return binding.title.getBottom();
+        return mBinding.title.getBottom();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        binding.toggleEventsButton.setOnClick(this::toggleEvents);
-        binding.toggleEventsButton.icon.setColorFilter(getColor());
+        mBinding.toggleEventsButton.setOnClick(this::toggleEvents);
+        mBinding.toggleEventsButton.icon.setColorFilter(getColor());
 
         TypedValue typedValue = new TypedValue();
-        getContext().getTheme().resolveAttribute(R.attr.textAppearanceButton, typedValue, true);
+        requireContext().getTheme().resolveAttribute(R.attr.textAppearanceButton, typedValue, true);
         @StyleRes int textAppearanceButton = typedValue.data;
 
-        binding.toggleEventsButton.title.setTextAppearance(textAppearanceButton);
-        binding.toggleEventsButton.title.setTextColor(getColor());
+        mBinding.toggleEventsButton.title.setTextAppearance(textAppearanceButton);
+        mBinding.toggleEventsButton.title.setTextColor(getColor());
     }
 
     public void toggleEvents(View v) {
-        LinearLayout list = binding.registrationList;
-        ListItemBinding button = binding.toggleEventsButton;
+        LinearLayout list = mBinding.registrationList;
+        ListItemBinding button = mBinding.toggleEventsButton;
 
         boolean visible = list.getVisibility() == View.VISIBLE;
         list.setVisibility(visible ? View.GONE : View.VISIBLE);

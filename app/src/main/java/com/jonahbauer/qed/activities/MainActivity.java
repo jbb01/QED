@@ -39,6 +39,7 @@ import com.jonahbauer.qed.activities.mainFragments.GalleryFragment;
 import com.jonahbauer.qed.activities.mainFragments.LogFragment;
 import com.jonahbauer.qed.activities.mainFragments.PersonDatabaseFragment;
 import com.jonahbauer.qed.activities.mainFragments.QEDFragment;
+import com.jonahbauer.qed.activities.settings.RootSettingsActivity;
 import com.jonahbauer.qed.networking.NetworkListener;
 import com.jonahbauer.qed.networking.login.QEDLogout;
 import com.jonahbauer.qed.util.Preferences;
@@ -230,7 +231,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         int itemId = menuItem.getItemId();
         if (itemId == R.id.nav_settings) {
-            Intent intent = new Intent(this, SettingsActivity.class);
+            Intent intent = new Intent(this, RootSettingsActivity.class);
             startActivity(intent);
             return true;
         } else if (itemId == R.id.nav_logout) {

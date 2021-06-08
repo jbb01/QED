@@ -378,7 +378,7 @@ public class LogFragment extends QEDFragment implements ChatDatabaseReceiver, QE
 
     //<editor-fold desc="Download Callback" defaultstate="collapsed">
     @Override
-    public void onPageReceived(String tag) {
+    public void onPageReceived(@NonNull String tag) {
         if (mDropAlertDialog != null) mDropAlertDialog.cancel();
 
         mSharedPreferences.edit().putLong(LOG_DOWNLOAD_ID_KEY, -1).apply();

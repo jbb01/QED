@@ -14,7 +14,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.recyclerview.widget.RecyclerView;
@@ -346,7 +345,7 @@ public class ImageViewHolder extends RecyclerView.ViewHolder implements QEDPageR
     }
 
     @Override
-    public void onPageReceived(@Nullable Image out) {
+    public void onPageReceived(@NonNull Image out) {
         if (out != null) {
             onInfoReceived(out);
         } else {

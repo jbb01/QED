@@ -120,7 +120,7 @@ public class GalleryFragment extends QEDFragment implements QEDPageReceiver<List
     }
 
     @Override
-    public void onPageReceived(List<Album> albums) {
+    public void onPageReceived(@NonNull List<Album> albums) {
         mGalleryAdapter.clear();
         mGalleryAdapter.addAll(albums);
         mGalleryAdapter.notifyDataSetChanged();

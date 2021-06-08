@@ -22,7 +22,7 @@ public abstract class HtmlParser<T> implements Parser<T> {
 
     @NonNull
     @Contract("!null, _ -> param1")
-    protected abstract T parse(@NonNull T obj, Document document);
+    protected abstract T parse(@NonNull T obj, Document document) throws HtmlParseException;
 
     protected Date parseDate(String date) {
         try {

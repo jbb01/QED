@@ -36,6 +36,8 @@ public final class AsyncLoadQEDPage<T> extends AsyncTask<Void, Void, String> {
     private final BiFunction<T, String, T> mParser;
     private final T mHolder;
 
+    private Exception mException;
+
     /**
      * Loads the website from url.
      *
@@ -62,7 +64,7 @@ public final class AsyncLoadQEDPage<T> extends AsyncTask<Void, Void, String> {
     @Override
     protected String doInBackground(Void... voids) {
         if (mApplication == null) {
-            Log.e(Application.LOG_TAG_ERROR, "", new Exception("Application is null!"));
+            Log.e(Application.LOG_TAG_ERROR, "", new NullPointerException("Application is null!"));
             return null;
         }
 
@@ -93,25 +95,36 @@ public final class AsyncLoadQEDPage<T> extends AsyncTask<Void, Void, String> {
             httpsURLConnection.disconnect();
 
             return out;
-        } catch (IOException e) {
-            Log.e(Application.LOG_TAG_ERROR, e.getMessage(), e);
-            mReceiver.onError(mHolder, Reason.NETWORK, e);
-            return null;
-        } catch (InvalidCredentialsException e) {
-            Log.e(Application.LOG_TAG_ERROR, e.getMessage(), e);
-            mReceiver.onError(mHolder, Reason.UNABLE_TO_LOG_IN, null);
-            return null;
         } catch (Exception e) {
             Log.e(Application.LOG_TAG_ERROR, e.getMessage(), e);
-            mReceiver.onError(mHolder, Reason.UNKNOWN, null);
+            mException = e;
             return null;
         }
     }
 
     @Override
     protected void onPostExecute(String s) {
-        if (s != null)
-            mReceiver.onPageReceived(mParser.apply(mHolder, s));
+        if (s != null) {
+            T out;
+
+            try {
+                out = mParser.apply(mHolder, s);
+            } catch (Exception e) {
+                Log.e(Application.LOG_TAG_ERROR, e.getMessage(), e);
+                mReceiver.onError(mHolder, e.getMessage(), null);
+                return;
+            }
+
+            mReceiver.onPageReceived(out);
+        } else if (mException != null) {
+            if (mException instanceof IOException) {
+                mReceiver.onError(mHolder, Reason.NETWORK, mException);
+            } else if (mException instanceof InvalidCredentialsException) {
+                mReceiver.onError(mHolder, Reason.UNABLE_TO_LOG_IN, mException);
+            } else {
+                mReceiver.onError(mHolder, mException.getMessage(), mException);
+            }
+        }
     }
 
     @NotNull

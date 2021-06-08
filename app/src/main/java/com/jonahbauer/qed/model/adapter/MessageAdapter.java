@@ -1,14 +1,18 @@
 package com.jonahbauer.qed.model.adapter;
 
 import android.content.Context;
+import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.Px;
 
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.layoutStuff.views.MathView;
@@ -37,6 +41,10 @@ public class MessageAdapter extends ArrayAdapter<Message> {
     private boolean mKatexSet;
     private final boolean mLinkifySet;
 
+    @Px
+    private float mDefaultTextSize;
+    @ColorInt
+    private int mDefaultTextColor;
     private final LinearLayout mathPreload;
 
     public MessageAdapter(Context context, @NonNull List<Message> messageList, @Nullable LinearLayout mathPreload) {
@@ -63,7 +71,26 @@ public class MessageAdapter extends ArrayAdapter<Message> {
         if (!messageList.isEmpty()) findDateBanners();
 
         mDp3 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3, context.getResources().getDisplayMetrics());
+        obtainDefaultTextAppearance();
         reload();
+    }
+
+    private void obtainDefaultTextAppearance() {
+        mDefaultTextSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 14, mContext.getResources().getDisplayMetrics());
+        mDefaultTextColor = Color.BLACK;
+
+        TypedArray typedArray = mContext.obtainStyledAttributes(R.style.Widget_App_Message, R.styleable.MessageView);
+        int textAppearanceResId = typedArray.getResourceId(R.styleable.MessageView_messageTextAppearance, -1);
+        if (textAppearanceResId != -1) {
+            TypedArray textAppearance = mContext.obtainStyledAttributes(textAppearanceResId, new int[] {android.R.attr.textSize, android.R.attr.textColor});
+            mDefaultTextSize = textAppearance.getDimension(0, mDefaultTextSize);
+            mDefaultTextColor = textAppearance.getColor(1, mDefaultTextColor);
+            textAppearance.recycle();
+        }
+        mDefaultTextSize = typedArray.getDimension(R.styleable.MessageView_messageTextSize, mDefaultTextSize);
+        mDefaultTextColor = typedArray.getColor(R.styleable.MessageView_messageTextColor, mDefaultTextColor);
+
+        typedArray.recycle();
     }
 
     @NonNull
@@ -105,9 +132,8 @@ public class MessageAdapter extends ArrayAdapter<Message> {
         findDateBanners();
 
         if (mKatex) {
-            float size = mContext.getResources().getDimensionPixelSize(R.dimen.message_text_size);
             for (Message message : collection) {
-                MathView.extractAndPreload(mContext, message.getMessage(), size, message.getId(), mathPreload);
+                MathView.extractAndPreload(mContext, null, message.getMessage(), (int) mDefaultTextSize, mDefaultTextColor, message.getId(), mathPreload);
             }
         }
     }
@@ -117,8 +143,7 @@ public class MessageAdapter extends ArrayAdapter<Message> {
         checkDateBanner();
 
         if (mKatex) {
-            float size = mContext.getResources().getDimensionPixelSize(R.dimen.message_text_size);
-            MathView.extractAndPreload(mContext, message.getMessage(), size, message.getId(), mathPreload);
+            MathView.extractAndPreload(mContext, null, message.getMessage(), (int) mDefaultTextSize, mDefaultTextColor, message.getId(), mathPreload);
         }
     }
 
@@ -189,9 +214,8 @@ public class MessageAdapter extends ArrayAdapter<Message> {
         MathView.clearCache();
         if (mathPreload != null) mathPreload.removeAllViews();
         if (mKatex && !mExtended) {
-            float size = mContext.getResources().getDimensionPixelSize(R.dimen.message_text_size);
             for (Message message : mMessageList) {
-                MathView.extractAndPreload(mContext, message.getMessage(), size, message.getId(), mathPreload);
+                MathView.extractAndPreload(mContext, null, message.getMessage(), (int) mDefaultTextSize, mDefaultTextColor, message.getId(), mathPreload);
             }
         }
     }

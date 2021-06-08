@@ -5,17 +5,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
 import com.jonahbauer.qed.R;
+import com.jonahbauer.qed.databinding.ListItemAlbumBinding;
 import com.jonahbauer.qed.model.Album;
-import com.jonahbauer.qed.util.Themes;
 
 import java.util.List;
-import java.util.Objects;
 
 public class AlbumAdapter extends ArrayAdapter<Album> {
     private final Context mContext;
@@ -32,20 +29,17 @@ public class AlbumAdapter extends ArrayAdapter<Album> {
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         final Album album = mAlbumList.get(position);
 
-        View view;
+        ListItemAlbumBinding binding;
         if (convertView != null) {
-            view = convertView;
+            binding = (ListItemAlbumBinding) convertView.getTag();
         } else {
             LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            view = Objects.requireNonNull(inflater).inflate(R.layout.list_item_gallery, parent, false);
+            binding = ListItemAlbumBinding.inflate(inflater, parent, false);
+            binding.getRoot().setTag(binding);
         }
 
-        ImageView galleryIcon = view.findViewById(R.id.gallery_icon);
-        galleryIcon.setColorFilter(Themes.colorful(album.getName().chars().sum()));
-
-        ((TextView)view.findViewById(R.id.gallery_name)).setText(album.getName());
-
-        return view;
+        binding.setAlbum(album);
+        return binding.getRoot();
     }
 
     public void add(int index, Album album) {

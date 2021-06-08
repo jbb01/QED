@@ -69,7 +69,7 @@ public class EventDatabaseFragment extends QEDFragment implements QEDPageReceive
     }
 
     @Override
-    public void onPageReceived(List<Event> events) {
+    public void onPageReceived(@NonNull List<Event> events) {
         mEventAdapter.clear();
         mEventAdapter.addAll(events);
         mEventAdapter.notifyDataSetChanged();

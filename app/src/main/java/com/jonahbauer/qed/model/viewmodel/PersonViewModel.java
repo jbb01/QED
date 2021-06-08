@@ -1,5 +1,6 @@
-package com.jonahbauer.qed.activities.sheets.person;
+package com.jonahbauer.qed.model.viewmodel;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -10,14 +11,14 @@ import com.jonahbauer.qed.networking.QEDDBPages;
 import com.jonahbauer.qed.networking.async.QEDPageReceiver;
 import com.jonahbauer.qed.util.StatusWrapper;
 
-public class PersonViewModel extends ViewModel implements QEDPageReceiver<Person> {
-    public static final int STATUS_PRELOADED = 0;
-    public static final int STATUS_LOADED = 1;
-    public static final int STATUS_ERROR = -1;
+import static com.jonahbauer.qed.util.StatusWrapper.STATUS_ERROR;
+import static com.jonahbauer.qed.util.StatusWrapper.STATUS_LOADED;
+import static com.jonahbauer.qed.util.StatusWrapper.STATUS_PRELOADED;
 
+public class PersonViewModel extends ViewModel implements QEDPageReceiver<Person> {
     private final MutableLiveData<StatusWrapper<Person>> person = new MutableLiveData<>();
 
-    public void load(Person person) {
+    public void load(@NonNull Person person) {
         if (!person.isLoaded()) {
             this.person.setValue(StatusWrapper.wrap(person, STATUS_PRELOADED));
             QEDDBPages.getPerson(person, this);
@@ -31,7 +32,7 @@ public class PersonViewModel extends ViewModel implements QEDPageReceiver<Person
     }
 
     @Override
-    public void onPageReceived(@Nullable Person out) {
+    public void onPageReceived(@NonNull Person out) {
         out.setLoaded(true);
         this.person.setValue(StatusWrapper.wrap(out, STATUS_LOADED));
     }

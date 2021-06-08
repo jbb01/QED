@@ -161,6 +161,17 @@
     <string name="event_show_more">Show More</string>
     <string name="event_show_less">Show Less</string>
 
+    <!-- Album Bottom Sheet -->
+    <string name="album_section_general">General</string>
+    <string name="album_section_persons">Persons</string>
+    <string name="album_section_categories">Categories</string>
+    <string name="album_subtitle_owner">Owner</string>
+    <string name="album_subtitle_creation_date">Creation Date</string>
+    <string name="album_title_dates">{0,date} - {1,date}</string>
+    <string name="album_subtitle_dates">Time</string>
+    <string name="album_subtitle_image_count">Image Count</string>
+    <string name="album_title_private">Private Album</string>
+
     <!-- Registration -->
     <string name="registration_orga">Organizer</string>
     <string name="registration_status_participated">participated</string>

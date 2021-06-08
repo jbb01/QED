@@ -182,7 +182,7 @@ public class PersonDatabaseFragment extends QEDFragment implements CompoundButto
     }
 
     @Override
-    public void onPageReceived(List<Person> persons) {
+    public void onPageReceived(@NonNull List<Person> persons) {
         this.mPersons.clear();
         mPersonAdapter.clear();
 

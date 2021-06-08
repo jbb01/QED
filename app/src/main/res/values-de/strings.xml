@@ -208,6 +208,17 @@
     <string name="event_show_more">Mehr anzeigen</string>
     <string name="event_show_less">Weniger anzeigen</string>
 
+    <!-- Album Bottom Sheet -->
+    <string name="album_section_general">Allgemein</string>
+    <string name="album_section_persons">Personen</string>
+    <string name="album_section_categories">Kategorien</string>
+    <string name="album_subtitle_owner">Besitzer</string>
+    <string name="album_subtitle_creation_date">Erstelldatum</string>
+    <string name="album_title_dates">{0,date} - {1,date}</string>
+    <string name="album_subtitle_dates">Zeitraum</string>
+    <string name="album_subtitle_image_count">Anzahl der Bilder</string>
+    <string name="album_title_private">Privates Album</string>
+
     <!-- Person Bottom Sheet -->
     <string name="person_section_personal">Personendaten</string>
     <string name="person_section_additional">Weitere Informationen</string>

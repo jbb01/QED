@@ -22,13 +22,15 @@ import com.jonahbauer.qed.databinding.FragmentInfoEventBinding;
 import com.jonahbauer.qed.databinding.ListItemBinding;
 import com.jonahbauer.qed.model.Event;
 import com.jonahbauer.qed.model.Registration;
+import com.jonahbauer.qed.model.viewmodel.EventViewModel;
+import com.jonahbauer.qed.util.StatusWrapper;
 import com.jonahbauer.qed.util.Themes;
 
 import java.util.Map;
 
 public class EventInfoFragment extends AbstractInfoFragment {
-    private EventViewModel eventViewModel;
-    private FragmentInfoEventBinding binding;
+    private EventViewModel mEventViewModel;
+    private FragmentInfoEventBinding mBinding;
 
     public static EventInfoFragment newInstance() {
         return new EventInfoFragment();
@@ -40,18 +42,23 @@ public class EventInfoFragment extends AbstractInfoFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        eventViewModel = new ViewModelProvider(requireActivity()).get(EventViewModel.class);
+        mEventViewModel = new ViewModelProvider(requireActivity()).get(EventViewModel.class);
     }
 
     @Override
     protected ViewDataBinding onCreateContentView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        binding = FragmentInfoEventBinding.inflate(inflater, container, true);
-        eventViewModel.getEvent().observe(getViewLifecycleOwner(), eventStatusWrapper -> binding.setEvent(eventStatusWrapper.getValue()));
-        return binding;
+        mBinding = FragmentInfoEventBinding.inflate(inflater, container, true);
+        mEventViewModel.getEvent().observe(getViewLifecycleOwner(), eventStatusWrapper -> mBinding.setEvent(eventStatusWrapper.getValue()));
+        return mBinding;
     }
 
+    @NonNull
     private Event getEvent() {
-        return eventViewModel.getEvent().getValue().getValue();
+        StatusWrapper<Event> wrapper = mEventViewModel.getEvent().getValue();
+        assert wrapper != null : "StatusWrapper should not be null";
+        Event event = wrapper.getValue();
+        assert event != null : "Event should not be null";
+        return event;
     }
 
     @Override
@@ -71,27 +78,27 @@ public class EventInfoFragment extends AbstractInfoFragment {
 
     @Override
     protected float getTitleBottom() {
-        return binding.title.getBottom();
+        return mBinding.title.getBottom();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        binding.toggleParticipantsButton.setOnClick(this::toggleParticipants);
-        binding.toggleParticipantsButton.icon.setColorFilter(getColor());
+        mBinding.toggleParticipantsButton.setOnClick(this::toggleParticipants);
+        mBinding.toggleParticipantsButton.icon.setColorFilter(getColor());
 
         TypedValue typedValue = new TypedValue();
-        getContext().getTheme().resolveAttribute(R.attr.textAppearanceButton, typedValue, true);
+        requireContext().getTheme().resolveAttribute(R.attr.textAppearanceButton, typedValue, true);
         @StyleRes int textAppearanceButton = typedValue.data;
 
-        binding.toggleParticipantsButton.title.setTextAppearance(textAppearanceButton);
-        binding.toggleParticipantsButton.title.setTextColor(getColor());
+        mBinding.toggleParticipantsButton.title.setTextAppearance(textAppearanceButton);
+        mBinding.toggleParticipantsButton.title.setTextColor(getColor());
     }
 
     public void toggleParticipants(View v) {
-        LinearLayout list = binding.participantList;
-        ListItemBinding button = binding.toggleParticipantsButton;
+        LinearLayout list = mBinding.participantList;
+        ListItemBinding button = mBinding.toggleParticipantsButton;
 
         boolean visible = list.getVisibility() == View.VISIBLE;
         list.setVisibility(visible ? View.GONE : View.VISIBLE);

@@ -18,22 +18,28 @@ import lombok.Data;
 public class Event implements Comparable<Event>, Parcelable {
     private final long id;
     private String title;
-    private Date start;
-    private Date end;
-    private Date deadline;
-    private String startString;
-    private String endString;
-    private String deadlineString;
     private int cost;
+    private String notes;
     private int maxParticipants;
+
+    private Date start;
+    private String startString;
+
+    private Date end;
+    private String endString;
+
+    private Date deadline;
+    private String deadlineString;
+
     private String hotel;
     private String hotelAddress;
+
     private String emailOrga;
     private String emailAll;
     private final Map<String, Registration> participants = new LinkedHashMap<>();
-    private String notes;
 
     private Map<String, Registration> organizers;
+    // hash code of participants map for calculated organizers
     private int organizersValid = 0;
 
     private boolean loaded;

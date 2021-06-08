@@ -43,7 +43,6 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
                         android:layout_marginEnd="10dp"
-                        android:textColor="?colorOnSurface"
                         android:text="@string/persons_database_firstName_checkbox" />
                     <EditText
                         android:id="@+id/database_firstName_editText"
@@ -68,7 +67,6 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
                         android:layout_marginEnd="10dp"
-                        android:textColor="?colorOnSurface"
                         android:text="@string/persons_database_lastName_checkbox" />
                     <EditText
                         android:id="@+id/database_lastName_editText"
@@ -94,13 +92,11 @@
                         android:layout_marginStart="5dp"
                         android:layout_marginEnd="10dp"
                         style="?triCheckboxStyle"
-                        android:textColor="?colorOnSurface"
                         android:text="@string/persons_database_active_checkbox" />
                     <com.jonahbauer.qed.layoutStuff.views.CheckBoxTriStates
                         android:id="@+id/database_member_checkbox"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="?colorOnSurface"
                         android:text="@string/persons_database_member_checkbox" />
                 </TableRow>
 
@@ -125,8 +121,7 @@
                         android:layout_marginEnd="10dp"
                         android:gravity="center_vertical"
                         android:layout_gravity="center_vertical"
-                        android:text="@string/persons_database_sort"
-                        android:textColor="?colorOnSurface"/>
+                        android:text="@string/persons_database_sort"/>
                     <RadioGroup
                         android:id="@+id/database_sort_radio_group"
                         android:layout_width="wrap_content"
@@ -185,6 +180,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
+                android:buttonTint="?colorSecondary"
                 android:button="@drawable/ic_arrow_down_accent_animation"/>
 
         </RelativeLayout>

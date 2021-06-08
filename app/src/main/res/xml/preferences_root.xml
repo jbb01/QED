@@ -1,21 +1,31 @@
 <androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <Preference
+        android:selectable="true"
         android:key="settings_header_general"
-        android:fragment="com.jonahbauer.qed.activities.SettingsActivity$GeneralPreferenceFragment"
+        android:fragment="com.jonahbauer.qed.activities.settings.GeneralPreferenceFragment"
         android:icon="@drawable/ic_settings_general"
         android:title="@string/preferences_header_general" />
 
     <Preference
+        android:selectable="true"
         android:key="settings_header_chat"
-        android:fragment="com.jonahbauer.qed.activities.SettingsActivity$ChatPreferenceFragment"
+        android:fragment="com.jonahbauer.qed.activities.settings.ChatPreferenceFragment"
         android:icon="@drawable/ic_settings_chat"
         android:title="@string/preferences_header_chat" />
 
     <Preference
+        android:selectable="true"
         android:key="settings_header_gallery"
-        android:fragment="com.jonahbauer.qed.activities.SettingsActivity$GalleryPreferenceFragment"
+        android:fragment="com.jonahbauer.qed.activities.settings.GalleryPreferenceFragment"
         android:icon="@drawable/ic_settings_gallery"
         android:title="@string/preferences_header_gallery" />
+
+    <Preference
+        android:selectable="true"
+        android:key="settings_header_debug"
+        android:fragment="com.jonahbauer.qed.activities.settings.DebugPreferenceFragment"
+        android:icon="@drawable/ic_settings_bug_report"
+        android:title="Debug"/>
 
 </androidx.preference.PreferenceScreen>

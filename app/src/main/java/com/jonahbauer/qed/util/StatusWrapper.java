@@ -4,6 +4,10 @@ import lombok.Data;
 
 @Data
 public class StatusWrapper<T> {
+    public static final int STATUS_PRELOADED = 0;
+    public static final int STATUS_LOADED = 1;
+    public static final int STATUS_ERROR = -1;
+
     private T value;
     private int code;
     private String message;

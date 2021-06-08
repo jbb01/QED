@@ -9,12 +9,14 @@ import androidx.lifecycle.ViewModelProvider;
 import com.jonahbauer.qed.activities.sheets.AbstractInfoBottomSheet;
 import com.jonahbauer.qed.activities.sheets.AbstractInfoFragment;
 import com.jonahbauer.qed.model.Event;
+import com.jonahbauer.qed.model.viewmodel.EventViewModel;
+import com.jonahbauer.qed.util.StatusWrapper;
 import com.jonahbauer.qed.util.Themes;
 
 public class EventInfoBottomSheet extends AbstractInfoBottomSheet {
     private static final String ARGUMENT_EVENT = "event";
 
-    private EventViewModel eventViewModel;
+    private EventViewModel mEventViewModel;
 
     @NonNull
     public static EventInfoBottomSheet newInstance(Event event) {
@@ -34,8 +36,15 @@ public class EventInfoBottomSheet extends AbstractInfoBottomSheet {
         Bundle args = getArguments();
         assert args != null;
 
-        eventViewModel = new ViewModelProvider(getActivity()).get(EventViewModel.class);
-        eventViewModel.load(args.getParcelable(ARGUMENT_EVENT));
+        Event event = args.getParcelable(ARGUMENT_EVENT);
+        if (event == null) {
+            // TODO show toast
+            dismiss();
+            return;
+        }
+
+        mEventViewModel = new ViewModelProvider(requireActivity()).get(EventViewModel.class);
+        mEventViewModel.load(event);
     }
 
     @Override
@@ -48,7 +57,12 @@ public class EventInfoBottomSheet extends AbstractInfoBottomSheet {
         return EventInfoFragment.newInstance();
     }
 
+    @NonNull
     private Event getEvent() {
-        return eventViewModel.getEvent().getValue().getValue();
+        StatusWrapper<Event> wrapper = mEventViewModel.getEvent().getValue();
+        assert wrapper != null : "StatusWrapper should not be null";
+        Event event = wrapper.getValue();
+        assert event != null : "Event should not be null";
+        return event;
     }
 }

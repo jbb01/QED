@@ -29,7 +29,7 @@
             android:layout_height="50dp"
             android:padding="8dp"
             android:src="@{icon}"
-            app:tint="?colorOnBackgroundVariant"
+            app:tint="?colorOnSurfaceVariant"
             tools:src="@drawable/ic_event_time"
             tools:tint="@android:color/black"
             tools:ignore="ContentDescription" />

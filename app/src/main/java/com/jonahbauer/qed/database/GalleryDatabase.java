@@ -228,6 +228,7 @@ public class GalleryDatabase implements AutoCloseable {
 
                     Image image = new Image(id);
                     image.setName(name);
+                    image.setAlbum(album);
 
                     out.add(image);
                 }
@@ -237,9 +238,9 @@ public class GalleryDatabase implements AutoCloseable {
         }
     }
 
-    public void getAlbumData(@NonNull Album album) {
+    public boolean getAlbumData(@NonNull Album album) {
         try (SQLiteDatabase galleryReadable = mGalleryDatabaseHelper.getReadableDatabase()) {
-            try (Cursor cursor = galleryReadable.query(AlbumEntry.TABLE_NAME, new String[]{AlbumEntry.COLUMN_NAME_NAME, AlbumEntry.COLUMN_NAME_CREATOR_NAME, AlbumEntry.COLUMN_NAME_CREATION_DATE}, AlbumEntry.COLUMN_NAME_ID + "=" + album.getId(), null, null, null, null, "1")) {
+            try (Cursor cursor = galleryReadable.query(AlbumEntry.TABLE_NAME, new String[]{AlbumEntry.COLUMN_NAME_NAME, AlbumEntry.COLUMN_NAME_CREATOR_NAME, AlbumEntry.COLUMN_NAME_CREATION_DATE, AlbumEntry.COLUMN_NAME_IMAGE_LIST_DOWNLOADED}, AlbumEntry.COLUMN_NAME_ID + "=" + album.getId(), null, null, null, null, "1")) {
                 if (cursor.moveToNext()) {
                     String name = cursor.getString(0);
                     String creatorName = cursor.getString(1);
@@ -251,6 +252,10 @@ public class GalleryDatabase implements AutoCloseable {
                         album.setOwner(creatorName);
                     if (StringUtils.isEmpty(album.getCreationDate()) && creationDate != null)
                         album.setCreationDate(creationDate);
+
+                    return !cursor.isNull(3) && cursor.getInt(3) != 0;
+                } else {
+                    return false;
                 }
             }
         }

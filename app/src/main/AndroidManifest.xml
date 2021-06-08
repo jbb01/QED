@@ -16,16 +16,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.App">
 
-        <provider
-            android:name=".GenericFileProvider"
-            android:authorities="com.jonahbauer.qed.fileprovider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/provider_paths" />
-        </provider>
-
+        <!-- Deep Linking Activity -->
         <activity
             android:name=".DeepLinkingActivity"
             android:excludeFromRecents="true"
@@ -33,15 +24,14 @@
             android:label="QED"
             android:launchMode="singleInstance"
             android:noHistory="true"
-            android:theme="@style/Theme.App.Translucent" >
-
+            android:theme="@style/Theme.App.Translucent">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:scheme="test"/>
+                <data android:scheme="test" />
             </intent-filter>
 
             <!-- Image Activity -->
@@ -51,9 +41,8 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:scheme="http"/>
-                <data android:scheme="https"/>
-
+                <data android:scheme="http" />
+                <data android:scheme="https" />
                 <data
                     android:host="qedgallery.qed-verein.de"
                     android:pathPrefix="/image_view.php" />
@@ -66,9 +55,8 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:scheme="http"/>
-                <data android:scheme="https"/>
-
+                <data android:scheme="http" />
+                <data android:scheme="https" />
                 <data
                     android:host="qedgallery.qed-verein.de"
                     android:pathPrefix="/album_view.php" />
@@ -81,9 +69,8 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:scheme="http"/>
-                <data android:scheme="https"/>
-
+                <data android:scheme="http" />
+                <data android:scheme="https" />
                 <data
                     android:host="qeddb.qed-verein.de"
                     android:pathPrefix="/personen.php" />
@@ -107,9 +94,13 @@
                     android:pathPrefix="/album_list.php" />
             </intent-filter>
         </activity>
+
+        <!-- Login Activity -->
         <activity
             android:name=".activities.LoginActivity"
             android:label="@string/title_activity_login" />
+
+        <!-- Main Activity -->
         <activity
             android:name=".activities.MainActivity"
             android:configChanges="orientation|screenSize"
@@ -124,16 +115,29 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Settings Activities -->
         <activity
-            android:name=".activities.SettingsActivity"
+            android:name=".activities.settings.RootSettingsActivity"
             android:label="@string/title_activity_settings"
-            android:launchMode="singleTask"
             android:parentActivityName=".activities.MainActivity"
             android:theme="@style/Theme.App">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activities.MainActivity" />
         </activity>
+        <activity
+            android:name=".activities.settings.SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".activities.settings.RootSettingsActivity"
+            android:configChanges="screenSize|orientation"
+            android:theme="@style/Theme.App">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activities.settings.RootSettingsActivity" />
+        </activity>
+
+        <!-- Gallery Activities -->
         <activity
             android:name=".activities.GalleryAlbumActivity"
             android:configChanges="orientation|screenSize"
@@ -146,14 +150,33 @@
         </activity>
         <activity
             android:name=".activities.imageActivity.ImageActivity"
-            android:label="@string/title_activity_image"
             android:configChanges="orientation|screenSize"
+            android:label="@string/title_activity_image"
             android:theme="@style/Theme.App.NoActionBar" />
         <activity
             android:name=".activities.ImageInfoActivity"
-            android:label="@string/title_activity_image_info"
             android:configChanges="orientation|screenSize"
-            android:theme="@style/Theme.App.NoActionBar"/>
+            android:label="@string/title_activity_image_info"
+            android:theme="@style/Theme.App.NoActionBar" />
+
+        <!-- Info Activities -->
+        <activity
+            android:name=".activities.sheets.event.EventInfoActivity"
+            android:theme="@style/Theme.App.NoActionBar" />
+        <activity
+            android:name=".activities.sheets.person.PersonInfoActivity"
+            android:theme="@style/Theme.App.NoActionBar" />
+
+
+        <provider
+            android:name=".GenericFileProvider"
+            android:authorities="com.jonahbauer.qed.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths" />
+        </provider>
 
         <receiver
             android:name=".networking.downloadManager.DownloadBroadcastReceiver"

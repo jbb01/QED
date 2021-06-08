@@ -43,7 +43,6 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
                         android:layout_marginEnd="10dp"
-                        android:textColor="?colorOnSurface"
                         android:text="@string/chat_database_channel_checkbox" />
                     <EditText
                         android:id="@+id/database_channel_editText"
@@ -68,7 +67,6 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
                         android:layout_marginEnd="10dp"
-                        android:textColor="?colorOnSurface"
                         android:text="@string/chat_database_message_checkbox" />
                     <EditText
                         android:id="@+id/database_message_editText"
@@ -93,7 +91,6 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
                         android:layout_marginEnd="10dp"
-                        android:textColor="?colorOnSurface"
                         android:text="@string/chat_database_name_checkbox" />
                     <EditText
                         android:id="@+id/database_name_editText"
@@ -118,7 +115,6 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
                         android:layout_marginEnd="10dp"
-                        android:textColor="?colorOnSurface"
                         android:text="@string/chat_database_dateFrom_checkbox" />
                     <EditText
                         android:id="@+id/database_dateFrom_editText"
@@ -143,7 +139,6 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
                         android:layout_marginEnd="10dp"
-                        android:textColor="?colorOnSurface"
                         android:text="@string/chat_database_dateTo_checkbox" />
                     <EditText
                         android:id="@+id/database_dateTo_editText"
@@ -168,7 +163,6 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
                         android:layout_marginEnd="10dp"
-                        android:textColor="?colorOnSurface"
                         android:text="@string/chat_database_id_checkbox" />
                     <EditText
                         android:id="@+id/database_id_editText"

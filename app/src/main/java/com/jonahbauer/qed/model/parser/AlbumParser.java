@@ -5,6 +5,8 @@ import androidx.annotation.NonNull;
 import com.jonahbauer.qed.model.Album;
 import com.jonahbauer.qed.model.Image;
 import com.jonahbauer.qed.model.Person;
+import com.jonahbauer.qed.networking.Reason;
+import com.jonahbauer.qed.networking.parser.HtmlParseException;
 import com.jonahbauer.qed.networking.parser.HtmlParser;
 
 import org.jsoup.nodes.Document;
@@ -39,6 +41,8 @@ public final class AlbumParser extends HtmlParser<Album> {
     @NonNull
     @Override
     protected Album parse(@NonNull Album album, Document document) {
+        checkError(document);
+
         // Album name
         String albumName = document.selectFirst("main h2").text();
         if (albumName.endsWith(TITLE_SUFFIX)) {
@@ -56,6 +60,17 @@ public final class AlbumParser extends HtmlParser<Album> {
         parseImageTable(album, document.select(".imagetable img"));
 
         return album;
+    }
+
+    private void checkError(Document document) {
+        Element error = document.selectFirst(".error");
+        if (error != null) {
+            if (error.text().contains("AlbumNotFoundException")) {
+                throw new HtmlParseException(Reason.NOT_FOUND);
+            } else {
+                throw new HtmlParseException();
+            }
+        }
     }
 
     private void parseImageTable(Album album, Elements elements) {

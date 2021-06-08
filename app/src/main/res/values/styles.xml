@@ -26,17 +26,19 @@
 
         <item name="android:elevation">3dp</item>
     </style>
-
     <style name="Widget.App.Divider" parent="">
         <item name="android:background">?divider</item>
         <item name="android:layout_height">?android:dividerHeight</item>
         <item name="android:layout_width">match_parent</item>
     </style>
+    <style name="Widget.App.TextView.SpinnerItem" parent="Widget.AppCompat.TextView.SpinnerItem">
+        <item name="android:textColor">?android:textColorPrimaryDisableOnly</item>
+    </style>
 
     <!-- TextAppearance -->
     <style name="TextAppearance.App" parent="android:TextAppearance.Material.Body1"/>
     <style name="TextAppearance.App.Button" parent="android:TextAppearance.Material.Button">
-        <item name="android:textColor">?attr/colorAccent</item>
+        <item name="android:textColor">?colorSecondary</item>
     </style>
     <style name="TextAppearance.App.ListItem" parent="android:TextAppearance.Material.Subhead"/>
     <style name="TextAppearance.App.ListItemSecondary" parent="TextAppearance.App.ListItem">

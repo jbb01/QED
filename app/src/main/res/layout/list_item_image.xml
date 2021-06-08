@@ -9,7 +9,7 @@
     android:padding="5dp"
     android:clipToPadding="false"
     android:layout_gravity="center"
-    android:background="#fff"
+    android:background="?colorSurface"
     android:descendantFocusability="blocksDescendants">
 
     <ImageView

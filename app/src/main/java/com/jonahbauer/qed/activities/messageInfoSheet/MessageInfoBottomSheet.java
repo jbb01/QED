@@ -52,7 +52,7 @@ public class MessageInfoBottomSheet extends BottomSheetDialogFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.bottom_sheet_with_fragment, container, false);
+        View view = inflater.inflate(R.layout.single_fragment, container, false);
         view.setOnClickListener(v -> dismiss());
 
         adjustHeight(view);
@@ -96,7 +96,7 @@ public class MessageInfoBottomSheet extends BottomSheetDialogFragment {
                 Window rootWindow = activity.getWindow();
 
                 mBehavior = BottomSheetBehavior.from((View) view.getParent());
-                mBehavior.addBottomSheetCallback(mSheetCallback != null ? mSheetCallback : (mSheetCallback = new ColorfulBottomSheetCallback(MessageInfoBottomSheet.this, rootWindow, touchOutside, mMessage.getTransformedColor())));
+                mBehavior.addBottomSheetCallback(mSheetCallback != null ? mSheetCallback : (mSheetCallback = new ColorfulBottomSheetCallback(rootWindow, touchOutside, mMessage.getTransformedColor())));
             }
 
             @Override
