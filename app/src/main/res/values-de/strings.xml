@@ -1,55 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- General -->
     <string name="app_name">QED</string>
+    <string name="ok">OK</string>
     <string name="cancel">Abbrechen</string>
+    <string name="yes">Ja</string>
+    <string name="no">Nein</string>
+    <string name="delete">Löschen</string>
+    <string name="deleted">Gelöscht</string>
+    <string name="delete_error">Löschen fehlgeschlagen</string>
+    <string name="save">Speichern</string>
+    <string name="saved">Gespeichert</string>
+    <string name="save_error">Speichern fehlgeschlagen</string>
+    <string name="search">Suchen</string>
+    <string name="retry">Erneut versuchen</string>
+    <string name="hits">%,d Treffer</string>
+
+
     <string name="cant_connect">Keine Verbindung zum Internet möglich</string>
     <string name="chat_button_send">Senden</string>
     <string name="chat_database_channel_checkbox">Channel</string>
     <string name="chat_database_channel_hint">Channel</string>
     <string name="chat_database_dateFrom_checkbox">von</string>
-    <string name="chat_database_dateFrom_hint">yyyy-mm-dd hh:mm:ss</string>
+    <string name="chat_database_dateFrom_hint">dd.mm.yyyy</string>
+    <string name="chat_database_timeFrom_hint">HH:MM</string>
     <string name="chat_database_dateTo_checkbox">bis</string>
-    <string name="chat_database_dateTo_hint">yyyy-mm-dd hh:mm:ss</string>
+    <string name="chat_database_dateTo_hint">dd.mm.yyyy</string>
+    <string name="chat_database_timeTo_hint">HH:MM</string>
     <string name="chat_database_id_checkbox">ID</string>
     <string name="chat_database_message_checkbox">Nachricht</string>
     <string name="chat_database_message_hint">Nachricht</string>
     <string name="chat_database_name_checkbox">Name</string>
     <string name="chat_database_name_hint">Name</string>
     <string name="chat_empty_message">Du bist im Begriff eine leere Nachricht zu senden. Möchtest du fortfahren?</string>
-    <string name="chat_login_failed">Chat Login fehlgeschlagen</string>
     <string name="chat_message_hint">Nachricht schreiben</string>
     <string name="chat_refresh">Aktualisieren</string>
     <string name="chat_scroll_down_button_content_description">Nach unten scrollen</string>
     <string name="coming_soon">Coming soon</string>
-    <string name="content_description_divider">Trennlinie</string>
-    <string name="content_description_icon">Icon</string>
-    <string name="database_hits">Treffer</string>
-    <string name="database_login_failed">Datenbank Login fehlgeschlagen</string>
     <string name="database_offline">Keine Verbindung zum Internet möglich.\nDie Datenbank ist offline nicht verfügbar.</string>
     <string name="database_empty">Die Datenbank scheint leer zu sein.\nHast du den Mitgliedsbeitrag bezahlt?</string>
-    <string name="database_save_done">Gespeichert</string>
-    <string name="database_search_button">Suchen</string>
-    <string name="delete">Löschen</string>
     <string name="double_back_to_exit_toast">Erneut drücken zum Verlassen</string>
     <string name="drawer_chat">Chat</string>
     <string name="drawer_chat_db">Datenbank</string>
     <string name="chat_database_id_hint">vonID-bisID</string>
-    <string name="thumbnail">thumbnail</string>
     <string name="title_activity_album">Album</string>
     <string name="title_activity_image">Foto</string>
-    <string name="title_activity_log_dialog">Logs</string>
-    <string name="title_activity_login">Anmelden</string>
     <string name="title_fragment_chat">Chat</string>
     <string name="title_fragment_chat_database">Datenbank</string>
     <string name="title_fragment_events_database">Veranstaltungen</string>
     <string name="title_fragment_gallery">Galerie</string>
     <string name="title_fragment_log">Log</string>
-    <string name="yes">Ja</string>
     <string name="album_photographer_radio_button">Fotograph</string>
     <string name="album_not_downloaded">Dieses Album ist nicht heruntergeladen.</string>
-    <string name="album_info_creator">Albumersteller</string>
-    <string name="album_info_creation_dates">Aufgenommen</string>
-    <string name="album_info_creation_date">Erstellt am</string>
     <string name="album_date_radio_button">Datum</string>
     <string name="album_category_radio_button">Kategorie</string>
     <string name="drawer_chat_heading">Chat</string>
@@ -61,39 +63,23 @@
     <string name="drawer_logout">Abmelden</string>
     <string name="drawer_persons">Personen</string>
     <string name="drawer_settings">Einstellungen</string>
-    <string name="album_empty">Dieses Album ist leer</string>
+    <string name="album_empty">Dieses Album scheint leer zu sein.</string>
     <string name="error">Fehler!</string>
-    <string name="gallery_login_failed">Galerie Login fehlgeschlagen</string>
+    <string name="gallery_empty">Die Galerie scheint leer zu sein.</string>
+    <string name="gallery_offline_mode">Verbinding fehlgeschlagen. Diese App ist offline.</string>
+    <string name="gallery_forced_offline_mode">Der Offline-Modus ist eingeschaltet.</string>
+    <string name="gallery_disable_offline_mode">Ausschalten</string>
     <string name="image_already_original">Das ist bereits die Originaldatei, möchtest du sie erneut herunterladen?</string>
     <string name="image_async_still_running">Es laufen noch Downloads. Wenn du jetzt zurückgehst werden sie abgebrochen. Möchtest du fortfahren?</string>
     <string name="image_not_downloaded">Dieses Bild ist nicht heruntergeladen</string>
     <string name="image_suffix_original">" (original)"</string>
     <string name="info">Details</string>
     <string name="log_action_save">In Datenbank speichern</string>
-    <string name="log_request_mode_dateinterval">dateinterval</string>
-    <string name="log_request_mode_daterecent">daterecent</string>
-    <string name="log_request_dateinterval_from">Von</string>
-    <string name="log_request_dateinterval_to">Bis</string>
-    <string name="log_request_daterecent_after">Stunden</string>
-    <string name="log_request_daterecent_before">Letzte</string>
-    <string name="log_dialog_mode_label">Modus</string>
-    <string name="log_request_postrecent_after">Posts</string>
-    <string name="log_request_postrecent_before">Letzte</string>
-    <string name="log_request_mode_postrecent">postrecent</string>
-    <string name="log_request_mode_file">file</string>
     <string name="log_wait_for_save">Bitte warte bis das Speichern abgeschlossen ist.</string>
-    <string name="login_action_sign_in">Anmelden</string>
-    <string name="login_action_sign_in_short">Anmelden</string>
-    <string name="login_error_incorrect_data">Logindaten sind ungültig</string>
-    <string name="login_failed_switching_to_offline">Login fehlgeschlagen.</string>
-    <string name="login_prompt_password">Passwort</string>
-    <string name="login_prompt_username">Benutzername</string>
-    <string name="no">Nein</string>
     <string name="no_file_explorer">Es konnte kein Dateiexplorer gefunden werden.</string>
     <string name="no_internet">Etwas ist schief gelaufen. Bitte überprüfe deine Internetverbidung.</string>
     <string name="notQED">Diese App steht in keiner offiziellen Verbindung zum Quod Erat Demonstrandum e.V.</string>
     <string name="offline_mode">Offline-Modus</string>
-    <string name="ok">OK</string>
     <string name="log_subtitle_date_interval">Posts vom {0,date,dd.MM.yyyy} bis zum {1,date,dd.MM.yyyy}</string>
     <string name="log_subtitle_date_recent">Posts der letzten {0,choice,1#|2#{0} }Stunde{0,choice,1#|2#n}</string>
     <string name="log_subtitle_post_recent">Letzte{0,choice,1#r|2# {0}} Post{0,choice,1#|2#s}</string>
@@ -102,6 +88,7 @@
     <string name="error_login">Login fehlgeschlagen.</string>
     <string name="error_network">Ein Netzwerk-Fehler trat auf.</string>
     <string name="error_404">Die angeforderte Ressource wurde nicht gefunden.</string>
+    <string name="error_empty">Diese Liste ist leer.</string>
     <string name="error_user">Fehler in Layer 8</string>
     <string name="offline_mode_not_available">Im Offline-Modus nicht verfügbar.</string>
     <string name="album_invalid">Dieses Album existiert nicht.</string>
@@ -113,8 +100,8 @@
     <string name="log_status_download_paused">Download pausiert… %s</string>
     <string name="log_status_download_successful">Download erfolgreich. %s</string>
     <string name="log_status_download_failed">Download fehlgeschlagen. %s</string>
-    <string name="log_status_downloading">Download im Gange… %s</string>
-    <string name="log_status_parsing">JSON wird interpretiert… %s</string>
+    <string name="log_status_downloading">Download im Gange… %.2f MiB</string>
+    <string name="log_status_parsing">JSON wird interpretiert… %d / %d</string>
     <string name="log_status_parse_pending">JSON Interpretation ausstehend…</string>
     <string name="log_status_parse_failed">JSON Interpretation fefhlgeschlagen. %s</string>
 
@@ -127,15 +114,21 @@
     <string name="master_key_error">Passwort konnte nicht gespeichert werden.</string>
     <string name="download_notification_title">QED</string>
     <string name="download_notification_log_description">Chatlog</string>
-    <string name="log_request_file_title">Datei</string>
     <string name="log_subtitle_post_interval">Posts von #{0} bis #{1}</string>
     <string name="log_subtitle_since_own">Seit eigenem Post</string>
     <string name="log_subtitle_file">Datei</string>
-    <string name="log_request_mode_postinterval">postinterval</string>
 
     <string name="image_info">@string/info</string>
     <string name="image_open_with">Öffnen mit…</string>
     <string name="image_download_original">Original herunterladen</string>
+
+    <!-- Login Activity -->
+    <string name="title_activity_login">Anmelden</string>
+    <string name="login_action_sign_in">Anmelden</string>
+    <string name="login_action_sign_in_short">Anmelden</string>
+    <string name="login_error_incorrect_data">Logindaten sind ungültig</string>
+    <string name="login_prompt_password">Passwort</string>
+    <string name="login_prompt_username">Benutzername</string>
 
     <!-- Image Info Activity -->
     <string name="title_activity_image_info">Informationen</string>
@@ -163,8 +156,7 @@
     <string name="image_info_owner">Besitzer</string>
     <string name="image_info_upload_date">Hochgeladen</string>
 
-    <string name="image_info_other_details">Andere</string>
-    <string name="image_info_thumbnail_path">Thumbnail-Pfad</string>
+    <string name="image_info_other_details">Sonstiges</string>
     <string name="image_info_path">Pfad</string>
 
     <string name="message_info">@string/info</string>
@@ -264,6 +256,25 @@
     <string name="persons_database_inactive">(inaktiv)</string>
     <string name="persons_database_non_member">(kein Mitglied)</string>
     <string name="persons_database_no_email"><i>privat</i></string>
+
+    <!-- Log Dialog Activity -->
+    <string name="title_activity_log_dialog">Logs</string>
+    <string name="log_dialog_mode_label">Mode</string>
+    <string name="log_request_postrecent_before">Letzte</string>
+    <string name="log_request_postrecent_after">Posts</string>
+    <string name="log_request_sinceown_before">Überspringe</string>
+    <string name="log_request_sinceown_after">Posts</string>
+    <string name="log_request_daterecent_before">Letzte</string>
+    <string name="log_request_daterecent_after">Stunden</string>
+    <string name="log_request_dateinterval_from">Von</string>
+    <string name="log_request_dateinterval_to">Bis</string>
+    <string name="log_request_file_title">Datei</string>
+    <string name="log_request_mode_postrecent">postrecent</string>
+    <string name="log_request_mode_daterecent">daterecent</string>
+    <string name="log_request_mode_dateinterval">dateinterval</string>
+    <string name="log_request_mode_postinterval">postinterval</string>
+    <string name="log_request_mode_sinceown">fromownpost</string>
+    <string name="log_request_mode_file">file</string>
 
     <!-- Preference Activity -->
     <string name="title_activity_settings">Einstellungen</string>

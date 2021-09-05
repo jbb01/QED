@@ -15,6 +15,7 @@ import androidx.appcompat.content.res.AppCompatResources;
 import androidx.databinding.BindingAdapter;
 import androidx.databinding.ViewDataBinding;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelStoreOwner;
 
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.sheets.AbstractInfoFragment;
@@ -42,13 +43,19 @@ public class EventInfoFragment extends AbstractInfoFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mEventViewModel = new ViewModelProvider(requireActivity()).get(EventViewModel.class);
+        ViewModelStoreOwner owner = getParentFragment();
+        if (owner == null) owner = requireActivity();
+        mEventViewModel = new ViewModelProvider(owner).get(EventViewModel.class);
     }
 
     @Override
     protected ViewDataBinding onCreateContentView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mBinding = FragmentInfoEventBinding.inflate(inflater, container, true);
-        mEventViewModel.getEvent().observe(getViewLifecycleOwner(), eventStatusWrapper -> mBinding.setEvent(eventStatusWrapper.getValue()));
+        mEventViewModel.getEvent().observe(getViewLifecycleOwner(), eventStatusWrapper -> {
+            mBinding.setEvent(eventStatusWrapper.getValue());
+            mBinding.setLoading(eventStatusWrapper.getCode() == StatusWrapper.STATUS_PRELOADED);
+        });
+        mBinding.setColor(getColor());
         return mBinding;
     }
 

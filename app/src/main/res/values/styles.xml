@@ -6,11 +6,16 @@
         <item name="fabSize">mini</item>
     </style>
     <style name="Widget.App.Button" parent="Widget.MaterialComponents.Button.TextButton">
-        <item name="android:insetLeft">@dimen/mtrl_btn_inset</item>
-        <item name="android:insetRight">@dimen/mtrl_btn_inset</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
         <item name="android:textColor">@color/button_text</item>
-        <item name="cornerRadius">20dp</item>
+        <item name="android:paddingTop">4dp</item>
+        <item name="android:paddingBottom">4dp</item>
+        <item name="cornerRadius">8dp</item>
         <item name="rippleColor">#20000000</item>
+    </style>
+    <style name="Widget.App.Button.Small">
+        <item name="android:minHeight">36dp</item>
     </style>
     <style name="Widget.App.Message" parent="">
         <item name="android:colorBackground">?colorSurface</item>
@@ -31,21 +36,10 @@
         <item name="android:layout_height">?android:dividerHeight</item>
         <item name="android:layout_width">match_parent</item>
     </style>
-    <style name="Widget.App.TextView.SpinnerItem" parent="Widget.AppCompat.TextView.SpinnerItem">
-        <item name="android:textColor">?android:textColorPrimaryDisableOnly</item>
-    </style>
 
     <!-- TextAppearance -->
-    <style name="TextAppearance.App" parent="android:TextAppearance.Material.Body1"/>
     <style name="TextAppearance.App.Button" parent="android:TextAppearance.Material.Button">
         <item name="android:textColor">?colorSecondary</item>
-    </style>
-    <style name="TextAppearance.App.ListItem" parent="android:TextAppearance.Material.Subhead"/>
-    <style name="TextAppearance.App.ListItemSecondary" parent="TextAppearance.App.ListItem">
-        <item name="android:textStyle">bold</item>
-    </style>
-    <style name="TextAppearance.App.ListItemSmall" parent="android:TextAppearance.Material.Body1">
-        <item name="android:textColor">?android:attr/textColorSecondary</item>
     </style>
 
     <style name="TextAppearance.App.Message" parent="android:TextAppearance.Material.Body1"/>

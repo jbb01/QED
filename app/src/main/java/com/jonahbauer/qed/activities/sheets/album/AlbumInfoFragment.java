@@ -12,6 +12,7 @@ import androidx.appcompat.content.res.AppCompatResources;
 import androidx.databinding.BindingAdapter;
 import androidx.databinding.ViewDataBinding;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelStoreOwner;
 
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.sheets.AbstractInfoFragment;
@@ -41,13 +42,19 @@ public class AlbumInfoFragment extends AbstractInfoFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mAlbumViewModel = new ViewModelProvider(requireActivity()).get(AlbumViewModel.class);
+        ViewModelStoreOwner owner = getParentFragment();
+        if (owner == null) owner = requireActivity();
+        mAlbumViewModel = new ViewModelProvider(owner).get(AlbumViewModel.class);
     }
 
     @Override
     protected ViewDataBinding onCreateContentView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mBinding = FragmentInfoAlbumBinding.inflate(inflater, container, true);
-        mAlbumViewModel.getAlbum().observe(getViewLifecycleOwner(), albumStatusWrapper -> mBinding.setAlbum(albumStatusWrapper.getValue()));
+        mAlbumViewModel.getAlbum().observe(getViewLifecycleOwner(), albumStatusWrapper -> {
+            mBinding.setAlbum(albumStatusWrapper.getValue());
+            mBinding.setLoading(albumStatusWrapper.getCode() == StatusWrapper.STATUS_PRELOADED);
+        });
+        mBinding.setColor(getColor());
         return mBinding;
     }
 

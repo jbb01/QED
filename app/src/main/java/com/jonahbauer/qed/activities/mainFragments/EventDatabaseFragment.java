@@ -2,32 +2,29 @@ package com.jonahbauer.qed.activities.mainFragments;
 
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
+import android.widget.AdapterView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StyleRes;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.sheets.event.EventInfoBottomSheet;
+import com.jonahbauer.qed.databinding.FragmentEventsDatabaseBinding;
 import com.jonahbauer.qed.model.Event;
 import com.jonahbauer.qed.model.adapter.EventAdapter;
-import com.jonahbauer.qed.networking.QEDDBPages;
+import com.jonahbauer.qed.model.viewmodel.EventListViewModel;
 import com.jonahbauer.qed.networking.Reason;
-import com.jonahbauer.qed.networking.async.QEDPageReceiver;
+import com.jonahbauer.qed.util.StatusWrapper;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
-public class EventDatabaseFragment extends QEDFragment implements QEDPageReceiver<List<Event>> {
+public class EventDatabaseFragment extends QEDFragment implements AdapterView.OnItemClickListener {
     private EventAdapter mEventAdapter;
+    private FragmentEventsDatabaseBinding mBinding;
 
-    private ListView mEventListView;
-    private ProgressBar mSearchProgress;
-    private TextView mErrorLabel;
+    private EventListViewModel mEventListViewModel;
 
     @NonNull
     public static EventDatabaseFragment newInstance(@StyleRes int themeId) {
@@ -44,69 +41,42 @@ public class EventDatabaseFragment extends QEDFragment implements QEDPageReceive
     @Override
     public void onStart() {
         super.onStart();
-
-        mSearchProgress.setVisibility(View.VISIBLE);
-        mErrorLabel.setVisibility(View.GONE);
-        mEventListView.setVisibility(View.GONE);
-        QEDDBPages.getEventList(this);
+        mEventListViewModel.load();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        mEventListView = view.findViewById(R.id.event_list_view);
-        mSearchProgress = view.findViewById(R.id.search_progress);
-        mErrorLabel = view.findViewById(R.id.label_error);
+        mBinding = FragmentEventsDatabaseBinding.bind(view);
+        mEventListViewModel = new ViewModelProvider(this).get(EventListViewModel.class);
 
         mEventAdapter = new EventAdapter(getContext(), new ArrayList<>());
-        mEventListView.setAdapter(mEventAdapter);
-        mEventListView.setOnItemClickListener((parent, view1, position, id)
-                -> showBottomSheetDialogFragment(Objects.requireNonNull(mEventAdapter.getItem((int) id))));
+        mBinding.list.setOnItemClickListener(this);
+        mBinding.list.setAdapter(mEventAdapter);
+
+        mEventListViewModel.getEvents().observe(getViewLifecycleOwner(), events -> {
+            mBinding.setStatus(events.getCode());
+
+            mEventAdapter.clear();
+            if (events.getCode() == StatusWrapper.STATUS_LOADED) {
+                mEventAdapter.addAll(events.getValue());
+            } else if (events.getCode() == StatusWrapper.STATUS_ERROR) {
+                Reason reason = events.getReason();
+                mBinding.setError(getString(reason == Reason.EMPTY ? R.string.database_empty : reason.getStringRes()));
+            }
+            mEventAdapter.notifyDataSetChanged();
+        });
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Event event = mEventAdapter.getItem(position);
+        if (event != null) {
+            showBottomSheetDialogFragment(event);
+        }
     }
 
     private void showBottomSheetDialogFragment(@NonNull Event event) {
         EventInfoBottomSheet sheet = EventInfoBottomSheet.newInstance(event);
         sheet.show(getParentFragmentManager(), sheet.getTag());
-    }
-
-    @Override
-    public void onPageReceived(@NonNull List<Event> events) {
-        mEventAdapter.clear();
-        mEventAdapter.addAll(events);
-        mEventAdapter.notifyDataSetChanged();
-
-        if (events.size() == 0) {
-            setError(getString(R.string.database_empty));
-        } else {
-            mSearchProgress.setVisibility(View.GONE);
-            mEventListView.setVisibility(View.VISIBLE);
-        }
-    }
-
-    @Override
-    public void onError(List<Event> events, String reason, Throwable cause) {
-        QEDPageReceiver.super.onError(events, reason, cause);
-
-        final String errorString;
-
-        if (Reason.NETWORK.equals(reason)) {
-            errorString = getString(R.string.database_offline);
-        } else {
-            errorString = getString(R.string.error_unknown);
-        }
-
-        setError(errorString);
-    }
-
-    private void setError(String error) {
-        mHandler.post(() -> {
-            if (error == null) {
-                mErrorLabel.setVisibility(View.GONE);
-            } else {
-                mErrorLabel.setText(error);
-                mErrorLabel.setVisibility(View.VISIBLE);
-                mSearchProgress.setVisibility(View.GONE);
-                mEventListView.setVisibility(View.GONE);
-            }
-        });
     }
 }

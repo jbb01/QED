@@ -12,7 +12,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -22,19 +21,20 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.FileProvider;
+import androidx.lifecycle.LiveData;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.ImageInfoActivity;
-import com.jonahbauer.qed.database.GalleryDatabase;
+import com.jonahbauer.qed.databinding.ActivityImageBinding;
 import com.jonahbauer.qed.model.Image;
-import com.jonahbauer.qed.networking.QEDGalleryPages;
 import com.jonahbauer.qed.util.Preferences;
+import com.jonahbauer.qed.util.StatusWrapper;
 
 import java.io.File;
-import java.lang.ref.WeakReference;
+import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -43,18 +43,14 @@ import java.util.Map;
 
 import static com.jonahbauer.qed.DeepLinkingActivity.QEDIntent;
 
-public class ImageActivity extends AppCompatActivity implements ImageStatus.Listener {
+public class ImageActivity extends AppCompatActivity {
     public static final String GALLERY_IMAGE_KEY = "galleryImage";
     public static final String GALLERY_IMAGES_KEY = "galleryImages";
 
     private Image mImage;
-
-    private TextView mImageName;
-    private TextView mImageError;
+    private ActivityImageBinding mBinding;
 
     private ActionBar mActionBar;
-    private View mOverlayTop;
-    private View mOverlayBottom;
 
     private View mWindowDecor;
     private Window mWindow;
@@ -62,14 +58,13 @@ public class ImageActivity extends AppCompatActivity implements ImageStatus.List
     private MenuItem mDownloadButton;
     private MenuItem mInfoButton;
 
-    private GalleryDatabase mGalleryDatabase;
-
     private boolean mExtended = false;
 
     private ImageAdapter mAdapter;
     private ViewPager2 mViewPager;
 
-    private ImageStatus mImageStatus;
+    private ImageViewHolder mImageViewHolder;
+    private LiveData<StatusWrapper<Image>> mImageStatus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,16 +77,14 @@ public class ImageActivity extends AppCompatActivity implements ImageStatus.List
         onNewIntent(intent);
         if (isFinishing()) return;
 
-        setContentView(R.layout.activity_image);
-        mGalleryDatabase = new GalleryDatabase();
-        mGalleryDatabase.init(this);
+        mBinding = ActivityImageBinding.inflate(getLayoutInflater());
+        setContentView(mBinding.getRoot());
 
         mWindow = getWindow();
         mWindowDecor = mWindow.getDecorView();
         mWindowDecor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
 
-        mOverlayTop = findViewById(R.id.gallery_image_overlay_top);
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        Toolbar toolbar = mBinding.toolbar;
         setSupportActionBar(toolbar);
         mActionBar = getSupportActionBar();
         assert mActionBar != null;
@@ -99,11 +92,7 @@ public class ImageActivity extends AppCompatActivity implements ImageStatus.List
         mActionBar.setTitle("");
         mActionBar.hide();
 
-        mOverlayBottom = findViewById(R.id.gallery_image_overlay_bottom);
-        mImageError = findViewById(R.id.gallery_image_error);
-        mImageName = findViewById(R.id.gallery_image_name);
-
-        mViewPager = findViewById(R.id.gallery_image_view_pager);
+        mViewPager = mBinding.galleryImageViewPager;
         mViewPager.setAdapter(mAdapter);
 
         int index = -1;
@@ -120,18 +109,28 @@ public class ImageActivity extends AppCompatActivity implements ImageStatus.List
             public void onPageSelected(int position) {
                 ImageViewHolder viewHolder = mAdapter.getViewHolderByPosition(position);
                 if (mImageStatus != null) {
-                    mImageStatus.removeListener(ImageActivity.this);
+                    mImageStatus.removeObservers(ImageActivity.this);
+                }
+                if (mImageViewHolder != null) {
+                    mImageViewHolder.onVisibilityChange(false);
                 }
 
                 if (viewHolder != null) {
-                    mImageStatus = viewHolder.getImageStatus();
-                    mImageStatus.addListener(ImageActivity.this);
-                } else {
-                    mImageStatus = new ImageStatus();
+                    mImageStatus = viewHolder.getStatus();
+                    mImageStatus.observe(ImageActivity.this, statusWrapper -> {
+                        mBinding.setStatus(statusWrapper);
+
+                        boolean ready = statusWrapper != null && statusWrapper.getCode() == StatusWrapper.STATUS_LOADED;
+                        if (mDownloadButton != null) mDownloadButton.setEnabled(ready);
+                        if (mInfoButton != null) mInfoButton.setEnabled(ready);
+                        if (mOpenWithButton != null) mOpenWithButton.setEnabled(ready);
+                    });
+
+                    mImageViewHolder = viewHolder;
+                    mImageViewHolder.onVisibilityChange(true);
                 }
 
                 mImage = mAdapter.getCurrentList().get(position);
-                invalidated();
             }
         };
 
@@ -172,12 +171,12 @@ public class ImageActivity extends AppCompatActivity implements ImageStatus.List
             }
 
             if (!mImage.isOriginal()) {
-                setMode(QEDGalleryPages.Mode.ORIGINAL);
+                downloadOriginal();
             } else {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setMessage(R.string.image_already_original);
-                builder.setPositiveButton(R.string.yes, (dialog, which) -> setMode(QEDGalleryPages.Mode.ORIGINAL));
-                builder.setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss());
+                builder.setPositiveButton(R.string.yes, (dialog, which) -> downloadOriginal());
+                builder.setNegativeButton(R.string.no, (dialog, which) -> {});
                 builder.show();
             }
             return true;
@@ -232,22 +231,20 @@ public class ImageActivity extends AppCompatActivity implements ImageStatus.List
         if (extended) {
             mWindowDecor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
             mActionBar.show();
-            mOverlayTop.setVisibility(View.VISIBLE);
-            mOverlayBottom.setVisibility(View.VISIBLE);
+            mBinding.setExtended(true);
         } else {
             mWindowDecor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
             mActionBar.hide();
-            mOverlayTop.setVisibility(View.GONE);
-            mOverlayBottom.setVisibility(View.GONE);
+            mBinding.setExtended(false);
         }
 
         mWindow.setStatusBarColor(Color.TRANSPARENT);
     }
 
-    private void setMode(@SuppressWarnings("SameParameterValue") QEDGalleryPages.Mode mode) {
+    private void downloadOriginal() {
         int currentPosition = mViewPager.getCurrentItem();
         ImageViewHolder viewHolder = mAdapter.getViewHolderByPosition(currentPosition);
-        viewHolder.setMode(mode);
+        viewHolder.downloadOriginal();
     }
 
     @Override
@@ -327,26 +324,24 @@ public class ImageActivity extends AppCompatActivity implements ImageStatus.List
      */
     static String getType(@NonNull Image image) {
         String type = "image";
-        if (image.getFormat() != null)
+        if (image.getFormat() != null) {
             type = image.getFormat().split("/")[0];
+        } else {
+            String suffix = image.getName();
+            suffix = suffix.substring(suffix.lastIndexOf('.') + 1);
+
+            if (Image.VIDEO_FILE_EXTENSIONS.contains(suffix)) {
+                type = "video";
+            } else if (Image.AUDIO_FILE_EXTENSIONS.contains(suffix)) {
+                type = "audio";
+            }
+        }
 
         return type;
     }
 
-    @Override
-    public void invalidated() {
-        mImageName.setText(mImageStatus.getImageName());
-        mImageError.setText(mImageStatus.getImageError());
-        mImageError.setVisibility(mImageStatus.getImageError() == null ? View.GONE : View.VISIBLE);
-
-        boolean ready = mImageStatus.isReady();
-        if (mDownloadButton != null) mDownloadButton.setEnabled(ready);
-        if (mInfoButton != null) mInfoButton.setEnabled(ready);
-        if (mOpenWithButton != null) mOpenWithButton.setEnabled(ready);
-    }
-
     private class ImageAdapter extends ListAdapter<Image, ImageViewHolder> {
-        private final HashMap<Integer, WeakReference<ImageViewHolder>> holderByPosition = new HashMap<>();
+        private final HashMap<Integer, SoftReference<ImageViewHolder>> mViewHolderCache = new HashMap<>();
 
         protected ImageAdapter() {
             super(new DiffUtil.ItemCallback<Image>() {
@@ -365,7 +360,7 @@ public class ImageActivity extends AppCompatActivity implements ImageStatus.List
         @NonNull
         @Override
         public ImageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            ImageViewHolder viewHolder = new ImageViewHolder(LayoutInflater.from(parent.getContext()), mGalleryDatabase);
+            ImageViewHolder viewHolder = new ImageViewHolder(LayoutInflater.from(parent.getContext()));
             viewHolder.setOnClickListener(v -> changeExtended());
             return viewHolder;
         }
@@ -374,16 +369,16 @@ public class ImageActivity extends AppCompatActivity implements ImageStatus.List
         public void onBindViewHolder(@NonNull ImageViewHolder holder, int position) {
             Image image = getItem(position);
             holder.reset(image);
-            holderByPosition.put(position, new WeakReference<>(holder));
+            mViewHolderCache.put(position, new SoftReference<>(holder));
         }
 
         public ImageViewHolder getViewHolderByPosition(int position) {
-            WeakReference<ImageViewHolder> ref = holderByPosition.get(position);
+            SoftReference<ImageViewHolder> ref = mViewHolderCache.get(position);
             if (ref != null) {
                 if (ref.get() != null) {
                     return ref.get();
                 } else {
-                    holderByPosition.remove(position, ref);
+                    mViewHolderCache.remove(position, ref);
                 }
             }
 

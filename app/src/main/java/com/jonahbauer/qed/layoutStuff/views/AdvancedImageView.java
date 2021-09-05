@@ -7,7 +7,6 @@ import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -18,8 +17,6 @@ import android.view.animation.Interpolator;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
-import com.jonahbauer.qed.Application;
 
 
 /**
@@ -417,8 +414,6 @@ public class AdvancedImageView extends androidx.appcompat.widget.AppCompatImageV
 
         @Override
         public boolean onScale(@NonNull ScaleGestureDetector detector) {
-            Log.d(Application.LOG_TAG_DEBUG, "onTouchEvent: scaling: " + detector.getPreviousSpan());
-
             float scaleFactor = detector.getScaleFactor() / mOldScaleFactor;
             mOldScaleFactor = detector.getScaleFactor();
 

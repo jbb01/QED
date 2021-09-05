@@ -94,8 +94,8 @@ public class MathView extends LinearLayout {
         }
 
         mTextSize = typedArray.getDimension(R.styleable.MathView_android_textSize, mTextSize);
-        mTextColor = typedArray.getColor(R.styleable.MathView_android_textSize, mTextColor);
-        mTextStyle = typedArray.getInt(R.styleable.MathView_android_textSize, mTextStyle);
+        mTextColor = typedArray.getColor(R.styleable.MathView_android_textColor, mTextColor);
+        mTextStyle = typedArray.getInt(R.styleable.MathView_android_textStyle, mTextStyle);
         mText = typedArray.getString(R.styleable.MathView_android_text);
 
         typedArray.recycle();

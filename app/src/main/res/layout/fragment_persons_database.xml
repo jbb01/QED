@@ -1,98 +1,104 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:id="@+id/fragment"
-    tools:mContext=".activities.mainFragments.PersonDatabaseFragment">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <LinearLayout
-        android:id="@+id/database_search_filters"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
+    <data>
+        <import type="android.view.View" />
+        <import type="com.jonahbauer.qed.util.StatusWrapper" />
+
+        <variable name="status" type="int" />
+        <variable name="error" type="String" />
+        <variable name="hits" type="String" />
+    </data>
+
+    <RelativeLayout
+        android:id="@+id/fragment"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:clipToPadding="false"
-        android:paddingBottom="7dp">
+        android:clipChildren="false"
+        tools:context=".activities.mainFragments.PersonDatabaseFragment">
 
-        <RelativeLayout
+        <LinearLayout
+            android:id="@+id/database_search_filters"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
             android:background="?colorSurface"
-            android:elevation="5dp"
+            android:elevation="4dp"
+            android:orientation="vertical"
             tools:ignore="UselessParent">
+
             <TableLayout
                 android:id="@+id/expandable"
-                android:visibility="gone"
-                tools:visibility="visible"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentTop="true"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="8dp"
+                android:paddingTop="8dp"
+                android:visibility="gone"
+                tools:visibility="visible">
 
                 <TableRow
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="1dp"
-                    android:paddingEnd="1dp">
+                    android:layout_height="wrap_content">
+
                     <CheckBox
                         android:id="@+id/database_firstName_checkbox"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="5dp"
-                        android:layout_marginEnd="10dp"
-                        android:text="@string/persons_database_firstName_checkbox" />
+                        android:paddingEnd="8dp"
+                        android:text="@string/persons_database_firstName_checkbox"
+                        tools:ignore="RtlSymmetry" />
+
                     <EditText
                         android:id="@+id/database_firstName_editText"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:layout_marginEnd="6dp"
-                        android:textSize="16sp"
                         android:hint="@string/persons_database_firstName_hint"
+                        android:importantForAutofill="no"
                         android:inputType="text"
-                        android:importantForAutofill="no" />
+                        android:textSize="16sp" />
                 </TableRow>
 
                 <TableRow
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="1dp"
-                    android:paddingEnd="1dp">
+                    android:layout_height="wrap_content">
+
                     <CheckBox
                         android:id="@+id/database_lastName_checkbox"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="5dp"
-                        android:layout_marginEnd="10dp"
-                        android:text="@string/persons_database_lastName_checkbox" />
+                        android:paddingEnd="8dp"
+                        android:text="@string/persons_database_lastName_checkbox"
+                        tools:ignore="RtlSymmetry" />
+
                     <EditText
                         android:id="@+id/database_lastName_editText"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:layout_marginEnd="6dp"
-                        android:textSize="16sp"
                         android:hint="@string/persons_database_lastName_hint"
+                        android:importantForAutofill="no"
                         android:inputType="text"
-                        android:importantForAutofill="no" />
+                        android:textSize="16sp" />
                 </TableRow>
 
                 <TableRow
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="1dp"
-                    android:paddingEnd="1dp">
+                    android:layout_height="wrap_content">
+
                     <com.jonahbauer.qed.layoutStuff.views.CheckBoxTriStates
                         android:id="@+id/database_active_checkbox"
+                        style="?triCheckboxStyle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="5dp"
-                        android:layout_marginEnd="10dp"
-                        style="?triCheckboxStyle"
-                        android:text="@string/persons_database_active_checkbox" />
+                        android:paddingEnd="8dp"
+                        android:text="@string/persons_database_active_checkbox"
+                        tools:ignore="RtlSymmetry" />
+
                     <com.jonahbauer.qed.layoutStuff.views.CheckBoxTriStates
                         android:id="@+id/database_member_checkbox"
                         android:layout_width="wrap_content"
@@ -100,149 +106,138 @@
                         android:text="@string/persons_database_member_checkbox" />
                 </TableRow>
 
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="?android:attr/dividerHeight"
-                    android:src="?attr/divider"
-                    android:layout_marginTop="3dp"
-                    android:layout_marginBottom="3dp"
-                    tools:ignore="ContentDescription" />
+                <View style="?dividerStyle"/>
 
                 <TableRow
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="1dp"
-                    android:paddingEnd="1dp">
+                    android:layout_height="wrap_content">
+
                     <TextView
                         android:id="@+id/database_sort"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
-                        android:layout_marginEnd="10dp"
-                        android:gravity="center_vertical"
                         android:layout_gravity="center_vertical"
-                        android:text="@string/persons_database_sort"/>
+                        android:paddingHorizontal="8dp"
+                        android:gravity="center_vertical"
+                        android:textAppearance="?textAppearanceBody2"
+                        android:text="@string/persons_database_sort" />
+
                     <RadioGroup
                         android:id="@+id/database_sort_radio_group"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:layout_marginEnd="6dp"
-                        android:textSize="16sp"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        android:textSize="16sp">
+
                         <RadioButton
                             android:id="@+id/database_sort_first_name_radio_button"
-                            android:checked="true"
-                            android:textColor="?colorOnSurface"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/persons_database_sort_first_name"/>
+                            android:checked="true"
+                            android:text="@string/persons_database_sort_first_name"
+                            android:paddingEnd="8dp"
+                            android:textColor="?colorOnSurface"
+                            tools:ignore="RtlSymmetry" />
+
                         <RadioButton
                             android:id="@+id/database_sort_last_name_radio_button"
-                            android:textColor="?colorOnSurface"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="5dp"
-                            android:text="@string/persons_database_sort_last_name"/>
+                            android:text="@string/persons_database_sort_last_name"
+                            android:textColor="?colorOnSurface" />
                     </RadioGroup>
                 </TableRow>
             </TableLayout>
 
-            <Button
-                android:id="@+id/search_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_below="@id/expandable"
-                android:text="@string/database_search_button"/>
+            <View style="?dividerStyle"/>
 
-            <TextView
-                android:id="@+id/database_hits"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingStart="6dp"
-                android:paddingEnd="6dp"
-                android:layout_alignTop="@id/search_button"
-                android:layout_alignBottom="@id/search_button"
-                android:layout_toEndOf="@id/search_button"
-                android:layout_toStartOf="@id/expand_checkBox"
-                android:layout_below="@id/expandable"
-                android:gravity="center_vertical" />
+            <LinearLayout
+                android:padding="8dp"
+                android:layout_width="match_parent"
+                android:layout_height="54dp">
 
-            <CheckBox
-                android:id="@+id/expand_checkBox"
-                android:paddingEnd="10dp"
-                tools:ignore="RtlSymmetry"
-                android:layout_alignParentEnd="true"
-                android:layout_alignTop="@id/search_button"
-                android:layout_alignBottom="@id/search_button"
-                android:layout_below="@id/expandable"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:buttonTint="?colorSecondary"
-                android:button="@drawable/ic_arrow_down_accent_animation"/>
+                <Button
+                    android:id="@+id/search_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="@string/search"
+                    android:enabled="@{status == StatusWrapper.STATUS_LOADED}"
+                    style="@style/Widget.App.Button.Small" />
 
-        </RelativeLayout>
-    </LinearLayout>
+                <TextView
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:text="@{hits}"
+                    android:textAppearance="?textAppearanceCaption"
+                    android:paddingHorizontal="8dp"
+                    tools:text="10 Hits"/>
 
-    <ProgressBar
-        android:layout_below="@id/database_search_filters"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:paddingTop="15dp"
-        android:gravity="center_horizontal"
-        android:id="@+id/search_progress"
-        style="?android:attr/progressBarStyleLarge"
-        android:visibility="visible"
-        tools:visibility="gone"/>
+                <CheckBox
+                    android:id="@+id/expand_checkBox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:button="@drawable/ic_arrow_down_accent_animation"
+                    android:buttonTint="?colorSecondary"
+                    android:saveEnabled="false"
+                    tools:ignore="RtlSymmetry" />
+            </LinearLayout>
+        </LinearLayout>
 
-    <ListView
-        android:id="@+id/person_list_view"
-        android:layout_below="@id/database_search_filters"
-        android:layout_alignParentBottom="true"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:translationY="-7dp"
-        android:translationZ="-1dp"
-        android:layout_marginBottom="-6dp"
-        android:background="@android:color/transparent"
-        android:scrollbarStyle="outsideInset"
-        android:fastScrollAlwaysVisible="true"
-        android:fastScrollEnabled="true"
-        android:visibility="gone"
-        tools:listitem="@layout/list_item_person"
-        tools:visibility="visible"/>
+        <ProgressBar
+            android:id="@+id/search_progress"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/database_search_filters"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_horizontal"
+            android:paddingTop="15dp"
+            android:visibility="@{status == StatusWrapper.STATUS_PRELOADED ? View.VISIBLE : View.GONE}"
+            tools:visibility="visible" />
 
-    <TextView
-        android:id="@+id/label_error"
-        android:layout_below="@id/database_search_filters"
-        android:layout_alignParentBottom="true"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:translationY="-7dp"
-        android:translationZ="-1dp"
-        android:textAlignment="center"
-        android:textSize="16sp"
-        android:gravity="center"
-        android:text="@string/error_unknown"
-        android:visibility="gone"/>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@id/person_list_view"
-        android:layout_alignStart="@id/person_list_view"
-        android:layout_alignEnd="@id/person_list_view"
-        android:translationY="-7dp"
-        android:translationZ="-1dp">
-        <include layout="@layout/list_item_person"
-            android:id="@+id/fixed_header"
+        <ListView
+            android:id="@+id/list"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
+            android:layout_height="match_parent"
+            android:layout_below="@id/database_search_filters"
+            android:layout_alignParentBottom="true"
+            android:background="@android:color/transparent"
+            android:fastScrollAlwaysVisible="true"
+            android:fastScrollEnabled="true"
+            android:scrollbarStyle="outsideInset"
+            android:visibility="@{status == StatusWrapper.STATUS_LOADED ? View.VISIBLE : View.GONE}"
+            tools:listitem="@layout/list_item_person"
+            tools:visibility="visible" />
 
-</RelativeLayout>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/database_search_filters"
+            android:layout_alignParentBottom="true"
+            android:gravity="center"
+            android:text="@{error ?? @string/error_unknown}"
+            android:textAlignment="center"
+            android:textSize="16sp"
+            android:visibility="@{status == StatusWrapper.STATUS_ERROR ? View.VISIBLE : View.GONE}" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@id/list"
+            android:layout_alignTop="@id/list"
+            android:layout_alignEnd="@id/list">
+
+            <include
+                android:id="@+id/fixed_header"
+                layout="@layout/list_item_person"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+    </RelativeLayout>
+</layout>

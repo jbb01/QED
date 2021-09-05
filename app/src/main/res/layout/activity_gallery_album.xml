@@ -9,41 +9,33 @@
         <import type="com.jonahbauer.qed.util.StatusWrapper"/>
 
         <variable name="album" type="com.jonahbauer.qed.model.Album" />
+        <variable name="hits" type="String"/>
         <variable name="status" type="int" />
         <variable name="error" type="String" />
         <variable name="offline" type="boolean" />
+        <variable name="forcedOfflineMode" type="boolean" />
+        <variable name="onOfflineClick" type="android.view.View.OnClickListener" />
     </data>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        tools:mContext="com.jonahbauer.qed.activities.GalleryAlbumActivity">
+        android:clipToPadding="false"
+        android:clipChildren="false"
+        tools:context="com.jonahbauer.qed.activities.GalleryAlbumActivity">
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:title="@{album.name}"
-            style="?toolbarStyle"/>
-
-        <TextView
+        <include
+            layout="@layout/gallery_offline_label"
             android:id="@+id/label_offline"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/offline_mode"
-            android:textAlignment="center"
-            android:gravity="center"
-            android:textSize="16sp"
-            android:background="?colorSurface"
-            android:textColor="?colorOnSurface"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp"
-            android:visibility="@{offline ? View.VISIBLE : View.GONE}"
-            tools:visibility="visible"
             android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"
-            android:layout_below="@id/toolbar"/>
+            app:onClick="@{onOfflineClick}"
+            app:offline="@{offline}"
+            app:forcedOfflineMode="@{forcedOfflineMode}"/>
 
         <LinearLayout
             android:id="@+id/album_search_filters"
@@ -53,122 +45,118 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:visibility="@{offline ? View.GONE : View.VISIBLE}"
-            android:clipToPadding="false"
-            android:paddingBottom="7dp">
+            android:background="?colorSurface"
+            android:elevation="4dp"
+            android:orientation="vertical">
 
-            <RelativeLayout
+            <TableLayout
+                android:id="@+id/expandable"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="?colorSurface"
-                android:elevation="5dp"
-                tools:ignore="UselessParent">
-                <TableLayout
-                    android:id="@+id/expandable"
-                    android:visibility="gone"
-                    android:layout_alignParentStart="true"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentTop="true"
+                android:paddingHorizontal="8dp"
+                android:paddingTop="8dp"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <TableRow
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    tools:visibility="visible">
-
-                    <TableRow
-                        android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <RadioButton
+                        android:id="@+id/album_photographer_radio_button"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingStart="1dp"
-                        android:paddingEnd="1dp">
-                        <RadioButton
-                            android:id="@+id/album_photographer_radio_button"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="5dp"
-                            android:layout_marginEnd="10dp"
-                            android:text="@string/album_photographer_radio_button" />
-                        <Spinner
-                            android:id="@+id/album_photographer_spinner"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginEnd="6dp"
-                            android:spinnerMode="dialog"/>
-                    </TableRow>
-
-                    <TableRow
-                        android:layout_width="match_parent"
+                        android:paddingEnd="8dp"
+                        android:text="@string/album_photographer_radio_button"
+                        tools:ignore="RtlSymmetry" />
+                    <Spinner
+                        android:id="@+id/album_photographer_spinner"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:paddingStart="1dp"
-                        android:paddingEnd="1dp">
-                        <RadioButton
-                            android:id="@+id/album_date_radio_button"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="5dp"
-                            android:layout_marginEnd="10dp"
-                            android:text="@string/album_date_radio_button" />
-                        <Spinner
-                            android:id="@+id/album_date_spinner"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginEnd="6dp"
-                            android:spinnerMode="dialog" />
-                    </TableRow>
+                        android:layout_weight="1"
+                        android:spinnerMode="dialog"/>
+                </TableRow>
 
-                    <TableRow
-                        android:layout_width="match_parent"
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <RadioButton
+                        android:id="@+id/album_date_radio_button"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingStart="1dp"
-                        android:paddingEnd="1dp">
-                        <RadioButton
-                            android:id="@+id/album_category_radio_button"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="5dp"
-                            android:layout_marginEnd="10dp"
-                            android:text="@string/album_category_radio_button" />
-                        <Spinner
-                            android:id="@+id/album_category_spinner"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginEnd="6dp"
-                            android:spinnerMode="dialog"/>
-                    </TableRow>
-                </TableLayout>
+                        android:paddingEnd="8dp"
+                        android:text="@string/album_date_radio_button"
+                        tools:ignore="RtlSymmetry" />
+                    <Spinner
+                        android:id="@+id/album_date_spinner"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:spinnerMode="dialog" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <RadioButton
+                        android:id="@+id/album_category_radio_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingEnd="8dp"
+                        android:text="@string/album_category_radio_button"
+                        tools:ignore="RtlSymmetry" />
+                    <Spinner
+                        android:id="@+id/album_category_spinner"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:spinnerMode="dialog"/>
+                </TableRow>
+            </TableLayout>
+
+            <View style="?dividerStyle"/>
+
+            <LinearLayout
+                android:padding="8dp"
+                android:layout_width="match_parent"
+                android:layout_height="54dp">
 
                 <Button
                     android:id="@+id/search_button"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_below="@id/expandable"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="start"
                     android:enabled="@{status != StatusWrapper.STATUS_PRELOADED}"
-                    android:text="@string/database_search_button"/>
+                    android:text="@string/search"
+                    style="@style/Widget.App.Button.Small"/>
+
+
+                <TextView
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:text="@{hits}"
+                    android:textAppearance="?textAppearanceCaption"
+                    android:paddingHorizontal="8dp"
+                    tools:text="10 Hits"/>
 
                 <CheckBox
                     android:id="@+id/expand_checkBox"
-                    android:paddingEnd="10dp"
-                    tools:ignore="RtlSymmetry"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignTop="@id/search_button"
-                    android:layout_alignBottom="@id/search_button"
-                    android:layout_below="@id/expandable"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
+                    android:layout_height="match_parent"
+                    android:button="@drawable/ic_arrow_down_accent_animation"
                     android:buttonTint="?colorSecondary"
-                    android:button="@drawable/ic_arrow_down_accent_animation"/>
-
-            </RelativeLayout>
+                    android:saveEnabled="false"
+                    tools:ignore="RtlSymmetry" />
+            </LinearLayout>
         </LinearLayout>
 
         <ProgressBar
-            android:id="@+id/progress_bar"
-            android:layout_below="@id/album_search_filters"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentEnd="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@id/album_search_filters"
             android:layout_gravity="center_horizontal"
             android:paddingTop="15dp"
             android:gravity="center_horizontal"
@@ -176,37 +164,38 @@
             android:visibility="@{status == StatusWrapper.STATUS_PRELOADED ? View.VISIBLE : View.GONE}"
             tools:visibility="gone"/>
 
-        <GridView
-            android:id="@+id/image_container"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/album_search_filters"
-            android:numColumns="3"
-            android:translationY="-7dp"
-            android:translationZ="-1dp"
-            android:layout_marginBottom="-6dp"
-            android:paddingTop="5dp"
-            android:fastScrollEnabled="true"
-            android:fastScrollAlwaysVisible="true"
-            android:scrollbarStyle="outsideOverlay"
-            android:paddingEnd="?android:attr/scrollbarSize"
-            android:clipToPadding="false"
-            android:visibility="@{status == StatusWrapper.STATUS_LOADED ? View.VISIBLE : View.GONE}"
-            android:verticalSpacing="4dp"
-            android:horizontalSpacing="4dp"
-            tools:visibility="visible"
-            tools:listitem="@layout/list_item_image"
-            tools:ignore="RtlSymmetry" />
+            android:clipToPadding="true"
+            android:clipChildren="true">
+            <GridView
+                android:id="@+id/image_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:numColumns="3"
+                android:paddingTop="4dp"
+                android:clipToPadding="false"
+                android:fastScrollEnabled="true"
+                android:fastScrollAlwaysVisible="true"
+                android:scrollbarStyle="outsideOverlay"
+                android:paddingEnd="?android:attr/scrollbarSize"
+                android:visibility="@{status == StatusWrapper.STATUS_LOADED ? View.VISIBLE : View.GONE}"
+                android:verticalSpacing="4dp"
+                android:horizontalSpacing="4dp"
+                tools:visibility="visible"
+                tools:listitem="@layout/list_item_image"
+                tools:ignore="RtlSymmetry" />
+        </LinearLayout>
 
         <TextView
-            android:id="@+id/error_album"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
             android:layout_below="@id/album_search_filters"
-            android:layout_alignBottom="@id/image_container"
-            android:layout_alignTop="@id/image_container"
-            android:layout_alignStart="@id/image_container"
-            android:layout_alignEnd="@id/image_container"
             android:text="@{error}"
             android:visibility="@{status == StatusWrapper.STATUS_ERROR ? View.VISIBLE : View.GONE}"
             android:textSize="20sp"

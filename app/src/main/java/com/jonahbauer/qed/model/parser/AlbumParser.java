@@ -1,5 +1,7 @@
 package com.jonahbauer.qed.model.parser;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.jonahbauer.qed.model.Album;
@@ -13,11 +15,14 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.net.URLDecoder;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class AlbumParser extends HtmlParser<Album> {
+    private static final String LOG_TAG = AlbumParser.class.getName();
+    
     private static final Pattern IMAGE_ID = Pattern.compile("id=(\\d+)");
     private static final Pattern BY_OWNER = Pattern.compile("byowner=(\\d+)");
     private static final Pattern BY_DAY = Pattern.compile("byday=(\\d+-\\d+-\\d+)");
@@ -66,7 +71,7 @@ public final class AlbumParser extends HtmlParser<Album> {
         Element error = document.selectFirst(".error");
         if (error != null) {
             if (error.text().contains("AlbumNotFoundException")) {
-                throw new HtmlParseException(Reason.NOT_FOUND);
+                throw new HtmlParseException(Reason.NOT_FOUND.toString());
             } else {
                 throw new HtmlParseException();
             }
@@ -87,11 +92,14 @@ public final class AlbumParser extends HtmlParser<Album> {
             }
 
             image.setName(img.attr("alt"));
-            image.setAlbum(album);
+            image.setAlbumId(album.getId());
             image.setAlbumName(album.getName());
 
             return image;
-        }).forEach(album.getImages()::add);
+        }).forEach(img -> {
+            album.getImages().add(img);
+            img.setOrder(album.getImages().size());
+        });
     }
 
     private void parseFilters(Album album, Elements elements) {
@@ -100,62 +108,78 @@ public final class AlbumParser extends HtmlParser<Album> {
         album.getCategories().clear();
 
         elements.forEach(b -> {
-            String key = b.text();
-            Element value = b.nextElementSibling();
-            switch (key) {
-                case FILTER_KEY_OWNER: {
-                    value.select("a").forEach(a -> {
-                        Person person;
+            try {
+                String key = b.text();
+                Element value = b.nextElementSibling();
+                switch (key) {
+                    case FILTER_KEY_OWNER: {
+                        value.select("a").forEach(a -> {
+                            try {
+                                Person person;
 
-                        // extract id
-                        String href = a.attr("href");
-                        Matcher matcher = BY_OWNER.matcher(href);
-                        if (matcher.find()) {
-                            person = new Person(Long.parseLong(matcher.group(1)));
-                        } else {
-                            person = new Person(-1);
-                        }
+                                // extract id
+                                String href = a.attr("href");
+                                Matcher matcher = BY_OWNER.matcher(href);
+                                if (matcher.find()) {
+                                    person = new Person(Long.parseLong(matcher.group(1)));
+                                } else {
+                                    person = new Person(-1);
+                                }
 
-                        // extract name
-                        String name = a.text();
-                        if (name.startsWith(FILTER_OWNER_PREFIX)) {
-                            name = name.substring(FILTER_OWNER_PREFIX.length());
-                        }
-                        person.setFirstName(name);
+                                // extract name
+                                String name = a.text();
+                                if (name.startsWith(FILTER_OWNER_PREFIX)) {
+                                    name = name.substring(FILTER_OWNER_PREFIX.length());
+                                }
+                                person.setFirstName(name);
 
-                        album.getPersons().add(person);
-                    });
-                    break;
-                }
-                case FILTER_KEY_DATE: {
-                    value.select("a").forEach(a -> {
-                        // extract id
-                        String href = a.attr("href");
-                        Matcher matcher = BY_DAY.matcher(href);
-                        if (matcher.find()) {
-                            Date date = parseDate(matcher.group(1));
-                            if (date != null) {
-                                album.getDates().add(date);
+                                album.getPersons().add(person);
+                            } catch (Exception e) {
+                                Log.e(LOG_TAG, "Error parsing album.", e);
                             }
-                        }
-                    });
-                    break;
-                }
-                case FILTER_KEY_CATEGORY: {
-                    value.select("a").forEach(a -> {
-                        String href = a.attr("href");
-                        Matcher matcher = BY_CATEGORY.matcher(href);
-                        if (matcher.find()) {
-                            String category = matcher.group(1);
-                            if (category.isEmpty()) {
-                                album.getCategories().add("Sonstige");
-                            } else {
-                                album.getCategories().add(category);
+                        });
+                        break;
+                    }
+                    case FILTER_KEY_DATE: {
+                        value.select("a").forEach(a -> {
+                            try {
+                                // extract id
+                                String href = a.attr("href");
+                                Matcher matcher = BY_DAY.matcher(href);
+                                if (matcher.find()) {
+                                    Date date = parseDate(matcher.group(1));
+                                    if (date != null) {
+                                        album.getDates().add(date);
+                                    }
+                                }
+                            } catch (Exception e) {
+                                Log.e(LOG_TAG, "Error parsing album.", e);
                             }
-                        }
-                    });
-                    break;
+                        });
+                        break;
+                    }
+                    case FILTER_KEY_CATEGORY: {
+                        value.select("a").forEach(a -> {
+                            try {
+                                String href = a.attr("href");
+                                Matcher matcher = BY_CATEGORY.matcher(href);
+                                if (matcher.find()) {
+                                    String category = matcher.group(1);
+                                    if (category.isEmpty()) {
+                                        album.getCategories().add(Album.CATEGORY_ETC);
+                                    } else {
+                                        album.getCategories().add(URLDecoder.decode(category, "UTF-8"));
+                                    }
+                                }
+                            } catch (Exception e) {
+                                Log.e(LOG_TAG, "Error parsing album.", e);
+                            }
+                        });
+                        break;
+                    }
                 }
+            } catch (Exception e) {
+                Log.e(LOG_TAG, "Error parsing album.", e);
             }
         });
     }

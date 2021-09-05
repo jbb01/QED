@@ -4,7 +4,6 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.model.Person;
 import com.jonahbauer.qed.networking.parser.HtmlParser;
 
@@ -16,6 +15,8 @@ import java.util.List;
 import java.util.Objects;
 
 public final class PersonListParser extends HtmlParser<List<Person>> {
+    private static final String LOG_TAG = PersonListParser.class.getName();
+    
     public static final PersonListParser INSTANCE = new PersonListParser();
 
     private PersonListParser() {}
@@ -47,7 +48,7 @@ public final class PersonListParser extends HtmlParser<List<Person>> {
 
                         return person;
                     } catch (Exception e) {
-                        Log.e(Application.LOG_TAG_ERROR, "Error parsing person list.", e);
+                        Log.e(LOG_TAG, "Error parsing person list.", e);
                         return null;
                     }
                 })

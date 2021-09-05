@@ -21,15 +21,13 @@
         <item name="triCheckboxStyle">?checkboxStyle</item>
         <item name="dividerStyle">@style/Widget.App.Divider</item>
         <item name="textInputStyle">@style/Widget.Design.TextInputLayout</item>
-        <item name="android:spinnerItemStyle">@style/Widget.App.TextView.SpinnerItem</item>
 
         <!-- Text Appearances -->
-        <item name="android:textAppearance">@style/TextAppearance.App</item>
         <item name="textAppearanceButton">@style/TextAppearance.App.Button</item>
-        <item name="textAppearanceListItem">@style/TextAppearance.App.ListItem</item>
-        <item name="textAppearanceListItemSecondary">@style/TextAppearance.App.ListItemSecondary</item>
-        <item name="textAppearanceListItemSmall">@style/TextAppearance.App.ListItemSmall</item>
-        <item name="android:textAppearanceListItemSmall">?textAppearanceListItemSmall</item>
+
+        <item name="android:textColorPrimary">@color/text_color_primary</item>
+        <item name="android:colorControlNormal">?android:textColorPrimary</item>
+        <item name="android:textColorHint">@color/text_color_hint</item>
 
         <item name="divider">@drawable/divider</item>
         <item name="dividerHorizontal">?divider</item>
@@ -58,7 +56,7 @@
 
         <item name="android:colorBackground">@color/colorBackground</item>
         <item name="colorOnBackground">@android:color/black</item>
-        <item name="colorOnBackgroundVariant">#383838</item>
+        <item name="colorOnBackgroundVariant">#808080</item>
 
         <item name="colorSurface">@color/colorSurface</item>
         <item name="colorOnSurface">@android:color/black</item>
@@ -78,52 +76,41 @@
         <item name="accentColor8">@color/accentColor8</item>
         <item name="accentColor9">@color/accentColor9</item>
         <item name="colorOnAccentColor">@color/colorOnAccentColor</item>
+    </style>
 
-        <item name="android:textColorPrimary">?colorOnBackground</item>
-        <item name="android:textColorSecondary">?colorOnSurface</item>
-        <item name="android:textColorTertiary">?colorOnSurfaceVariant</item>
-        <item name="android:textColorHint">?colorOnSurfaceVariant</item>
+    <style name="Theme.App.Dark">
+        <item name="android:colorBackground">@color/colorBackground</item>
+        <item name="colorOnBackground">@android:color/white</item>
+        <item name="colorOnBackgroundVariant">@android:color/darker_gray</item>
+
+        <item name="colorSurface">@color/colorSurface</item>
+        <item name="colorOnSurface">@android:color/white</item>
+        <item name="colorOnSurfaceVariant">@android:color/darker_gray</item>
+
+        <item name="android:textColorPrimary">@color/text_color_primary</item>
+        <item name="android:colorControlNormal">?android:textColorPrimary</item>
+        <item name="android:textColorHint">#80FFFFFF</item>
+
+        <item name="actionBarPopupTheme">@style/ThemeOverlay.MaterialComponents.Dark</item>
+        <item name="popupTheme">@style/ThemeOverlay.MaterialComponents.Dark</item>
+        <item name="android:popupTheme">@style/ThemeOverlay.MaterialComponents.Dark</item>
 
         <!-- Dialog Themes -->
-        <item name="android:dialogTheme">@style/ThemeOverlay.App.Dialog</item>
-        <item name="android:alertDialogTheme">@style/ThemeOverlay.App.Dialog.Alert</item>
-        <item name="android:datePickerDialogTheme">@style/ThemeOverlay.App.Dialog</item>
-        <item name="android:timePickerDialogTheme">@style/ThemeOverlay.App.Dialog</item>
-        <item name="bottomSheetDialogTheme">@style/ThemeOverlay.App.BottomSheetDialog</item>
+        <item name="android:dialogTheme">@style/ThemeOverlay.App.Dialog.Dark</item>
+        <item name="android:alertDialogTheme">@style/ThemeOverlay.App.Dialog.Alert.Dark</item>
+        <item name="android:datePickerDialogTheme">@style/ThemeOverlay.App.Dialog.Dark</item>
+        <item name="android:timePickerDialogTheme">@style/ThemeOverlay.App.Dialog.Dark</item>
         <item name="dialogTheme">?android:dialogTheme</item>
         <item name="alertDialogTheme">?android:alertDialogTheme</item>
         <item name="materialAlertDialogTheme">?android:alertDialogTheme</item>
-
-        <!-- Styles -->
-        <item name="materialButtonStyle">@style/Widget.App.Button</item>
-        <item name="floatingActionButtonStyle">@style/Widget.App.FloatingActionButton</item>
-        <item name="toolbarStyle">@style/Widget.MaterialComponents.Toolbar.Primary</item>
-        <item name="messageStyle">@style/Widget.App.Message</item>
-        <item name="triCheckboxStyle">?checkboxStyle</item>
-        <item name="dividerStyle">@style/Widget.App.Divider</item>
-        <item name="textInputStyle">@style/Widget.Design.TextInputLayout</item>
-        <item name="android:spinnerItemStyle">@style/Widget.App.TextView.SpinnerItem</item>
-
-        <!-- Text Appearances -->
-        <item name="android:textAppearance">@style/TextAppearance.App</item>
-        <item name="textAppearanceButton">@style/TextAppearance.App.Button</item>
-        <item name="textAppearanceListItem">@style/TextAppearance.App.ListItem</item>
-        <item name="textAppearanceListItemSecondary">@style/TextAppearance.App.ListItemSecondary</item>
-        <item name="textAppearanceListItemSmall">@style/TextAppearance.App.ListItemSmall</item>
-        <item name="android:textAppearanceListItemSmall">?textAppearanceListItemSmall</item>
-
-        <item name="divider">@drawable/divider</item>
-        <item name="dividerHorizontal">?divider</item>
-        <item name="dividerVertical">@drawable/divider_vertical</item>
-        <item name="android:listDivider">?divider</item>
-        <item name="android:divider">?divider</item>
-        <item name="android:dividerHeight">1dp</item>
-
-        <item name="windowNoTitle">false</item>
-        <item name="windowActionBar">true</item>
     </style>
 
     <style name="Theme.App.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.App.Dark.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
@@ -145,12 +132,18 @@
     <style name="ThemeOverlay.App.Dialog" parent="ThemeOverlay.MaterialComponents.Dialog">
         <item name="buttonStyle">@style/Widget.App.Button</item>
         <item name="buttonBarButtonStyle">@style/Widget.App.Button</item>
-        <item name="android:colorBackground">@color/colorBackground</item>
+        <item name="android:colorBackground">@color/colorSurface</item>
     </style>
     <style name="ThemeOverlay.App.Dialog.Alert" parent="ThemeOverlay.MaterialComponents.Dialog.Alert">
         <item name="buttonStyle">@style/Widget.App.Button</item>
         <item name="buttonBarButtonStyle">@style/Widget.App.Button</item>
-        <item name="android:colorBackground">@color/colorBackground</item>
+        <item name="android:colorBackground">@color/colorSurface</item>
+    </style>
+    <style name="ThemeOverlay.App.Dialog.Dark">
+        <item name="android:colorBackground">#2F3136</item>
+    </style>
+    <style name="ThemeOverlay.App.Dialog.Alert.Dark">
+        <item name="android:colorBackground">#2F3136</item>
     </style>
     <style name="ThemeOverlay.App.BottomSheetDialog" parent="@style/ThemeOverlay.MaterialComponents.BottomSheetDialog">
         <item name="android:windowIsFloating">false</item>

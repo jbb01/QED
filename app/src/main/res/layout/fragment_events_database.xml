@@ -1,50 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:id="@+id/fragment"
-    tools:mContext=".activities.mainFragments.EventDatabaseFragment">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <ProgressBar
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:paddingTop="15dp"
-        android:gravity="center_horizontal"
-        android:id="@+id/search_progress"
-        style="?android:attr/progressBarStyleLarge"
-        android:visibility="visible" />
+    <data>
+        <import type="android.view.View" />
+        <import type="com.jonahbauer.qed.util.StatusWrapper" />
 
-    <ListView
-        android:id="@+id/event_list_view"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
+        <variable name="status" type="int" />
+        <variable name="error" type="String" />
+    </data>
+
+    <RelativeLayout
+        android:id="@+id/fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/transparent"
-        android:scrollbarStyle="outsideInset"
-        android:fastScrollAlwaysVisible="true"
-        android:fastScrollEnabled="true"
-        android:visibility="gone"
-        tools:listitem="@layout/list_item_event" />
+        tools:context=".activities.mainFragments.EventDatabaseFragment">
 
-    <TextView
-        android:id="@+id/label_error"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:textAlignment="center"
-        android:textSize="16sp"
-        android:gravity="center"
-        android:text="@string/error_unknown"
-        android:visibility="gone"/>
-</RelativeLayout>
+        <ProgressBar
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_horizontal"
+            android:paddingTop="15dp"
+            android:visibility="@{status == StatusWrapper.STATUS_PRELOADED ? View.VISIBLE : View.GONE}" />
+
+        <ListView
+            android:id="@+id/list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:background="@android:color/transparent"
+            android:fastScrollAlwaysVisible="true"
+            android:fastScrollEnabled="true"
+            android:scrollbarStyle="outsideInset"
+            android:visibility="@{status == StatusWrapper.STATUS_LOADED ? View.VISIBLE : View.GONE}"
+            tools:listitem="@layout/list_item_event" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:gravity="center"
+            android:text="@{error ?? @string/error_unknown}"
+            android:textAlignment="center"
+            android:textSize="16sp"
+            android:visibility="@{status == StatusWrapper.STATUS_ERROR ? View.VISIBLE : View.GONE}" />
+    </RelativeLayout>
+</layout>

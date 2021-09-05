@@ -7,6 +7,21 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.SENDTO"/>
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW"/>
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.INSERT"/>
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.DIAL"/>
+        </intent>
+    </queries>
+
     <application
         android:name=".Application"
         android:allowBackup="true"
@@ -143,7 +158,7 @@
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_album"
             android:parentActivityName=".activities.MainActivity"
-            android:theme="@style/Theme.App.NoActionBar">
+            android:theme="@style/Theme.App">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activities.MainActivity" />
@@ -152,12 +167,12 @@
             android:name=".activities.imageActivity.ImageActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_image"
-            android:theme="@style/Theme.App.NoActionBar" />
+            android:theme="@style/Theme.App.Dark.NoActionBar" />
         <activity
             android:name=".activities.ImageInfoActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_image_info"
-            android:theme="@style/Theme.App.NoActionBar" />
+            android:theme="@style/Theme.App.Dark.NoActionBar" />
 
         <!-- Info Activities -->
         <activity
@@ -177,15 +192,6 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/provider_paths" />
         </provider>
-
-        <receiver
-            android:name=".networking.downloadManager.DownloadBroadcastReceiver"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.DOWNLOAD_COMPLETE" />
-                <action android:name="android.intent.action.DOWNLOAD_NOTIFICATION_CLICKED" />
-            </intent-filter>
-        </receiver>
     </application>
 
 </manifest>

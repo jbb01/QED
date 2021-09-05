@@ -4,7 +4,6 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.model.Event;
 import com.jonahbauer.qed.networking.parser.HtmlParser;
 
@@ -18,6 +17,7 @@ import java.util.Locale;
 import java.util.Objects;
 
 public final class EventListParser extends HtmlParser<List<Event>> {
+    private static final String LOG_TAG = EventListParser.class.getName();
     public static final EventListParser INSTANCE = new EventListParser();
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd", Locale.GERMANY);
@@ -53,7 +53,7 @@ public final class EventListParser extends HtmlParser<List<Event>> {
 
                         return event;
                     } catch (Exception e) {
-                        Log.e(Application.LOG_TAG_ERROR, "Error parsing event list.", e);
+                        Log.e(LOG_TAG, "Error parsing event list.", e);
                         return null;
                     }
                 })

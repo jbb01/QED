@@ -115,7 +115,6 @@ public class Debug {
         album.setCreationDate("01.01.2000");
         album.setPrivate_(true);
         album.setImageListDownloaded(true);
-        album.setLoaded(true);
         album.getCategories().add("Kategorie 1");
         album.getCategories().add("Kategorie 2");
         album.getCategories().add("Kategorie 3");

@@ -5,8 +5,8 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.networking.Feature;
+import com.jonahbauer.qed.networking.NetworkUtils;
 import com.jonahbauer.qed.networking.Reason;
 import com.jonahbauer.qed.networking.exceptions.InvalidCredentialsException;
 import com.jonahbauer.qed.networking.login.QEDLogin;
@@ -14,12 +14,13 @@ import com.jonahbauer.qed.networking.login.QEDLogin;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
 import java.net.URL;
 
 import javax.net.ssl.HttpsURLConnection;
 
 public final class AsyncLoadQEDPageToStream<T> extends AsyncTask<Void, Long, Boolean> {
+    private static final String LOG_TAG = AsyncLoadQEDPageToStream.class.getName();
+
     private InputStream mIn;
 
     private final Feature mFeature;
@@ -27,6 +28,8 @@ public final class AsyncLoadQEDPageToStream<T> extends AsyncTask<Void, Long, Boo
     private final QEDPageStreamReceiver<T> mReceiver;
     private final OutputStream mOutputStream;
     private final T mHolder;
+
+    private Exception mException;
 
 
     /**
@@ -42,6 +45,7 @@ public final class AsyncLoadQEDPageToStream<T> extends AsyncTask<Void, Long, Boo
                              @NonNull T holder,
                              @NonNull QEDPageStreamReceiver<T> receiver,
                              @NonNull OutputStream outputStream) {
+        Log.d(LOG_TAG, "Loading Page " + url + " with feature " + feature);
         if (feature == Feature.DATABASE) throw new Feature.FeatureNotSupportedException();
 
         this.mFeature = feature;
@@ -61,7 +65,7 @@ public final class AsyncLoadQEDPageToStream<T> extends AsyncTask<Void, Long, Boo
             httpsURLConnection.connect();
 
             // check for login error
-            if (isLoginError(mFeature, httpsURLConnection)) {
+            if (NetworkUtils.isLoginError(mFeature, httpsURLConnection)) {
                 httpsURLConnection.disconnect();
 
                 // login
@@ -74,7 +78,7 @@ public final class AsyncLoadQEDPageToStream<T> extends AsyncTask<Void, Long, Boo
 
                 // check for login error once more
                 // if authentication failed after successful login -> throw exception
-                if (isLoginError(mFeature, httpsURLConnection)) {
+                if (NetworkUtils.isLoginError(mFeature, httpsURLConnection)) {
                     throw new InvalidCredentialsException(new AssertionError("request not authenticated after login"));
                 }
             }
@@ -84,8 +88,9 @@ public final class AsyncLoadQEDPageToStream<T> extends AsyncTask<Void, Long, Boo
             try {
                 copyStream(mIn, mOutputStream, httpsURLConnection.getContentLength());
             } catch (IOException e) {
-                mReceiver.onError(mHolder, Reason.UNKNOWN, e);
-                return false;
+                Log.e(LOG_TAG, e.getMessage(), e);
+                mException = e;
+                return null;
             }
             mIn.close();
             mOutputStream.close();
@@ -93,25 +98,20 @@ public final class AsyncLoadQEDPageToStream<T> extends AsyncTask<Void, Long, Boo
             httpsURLConnection.disconnect();
 
             return true;
-        } catch (IOException e) {
-            Log.e(Application.LOG_TAG_ERROR, e.getMessage(), e);
-            mReceiver.onError(mHolder, Reason.NETWORK, e);
-            return false;
-        } catch (InvalidCredentialsException e) {
-            Log.e(Application.LOG_TAG_ERROR, e.getMessage(), e);
-            mReceiver.onError(mHolder, Reason.UNABLE_TO_LOG_IN, e);
-            return false;
         } catch (Exception e) {
-            Log.e(Application.LOG_TAG_ERROR, e.getMessage(), e);
-            mReceiver.onError(mHolder, Reason.UNKNOWN, null);
+            Log.e(LOG_TAG, e.getMessage(), e);
+            mException = e;
             return null;
         }
     }
 
     @Override
     protected void onPostExecute(Boolean b) {
-        if (b != null && b)
+        if (b != null && b) {
             mReceiver.onPageReceived(mHolder);
+        } else if (mException != null) {
+            mReceiver.onError(mHolder, Reason.guess(mException), mException);
+        }
     }
 
     @Override
@@ -144,6 +144,7 @@ public final class AsyncLoadQEDPageToStream<T> extends AsyncTask<Void, Long, Boo
                 publishProgress(count, contentLength);
             }
         }
+        publishProgress(count, contentLength);
     }
 
     @Override
@@ -154,21 +155,7 @@ public final class AsyncLoadQEDPageToStream<T> extends AsyncTask<Void, Long, Boo
             if (mIn != null)
                 mIn.close();
         } catch (IOException e) {
-            Log.e(Application.LOG_TAG_ERROR, e.getMessage(), e);
-        }
-    }
-
-    private boolean isLoginError(Feature feature, HttpURLConnection connection) {
-        String location = connection.getHeaderField("Location");
-
-        switch (feature) {
-            case CHAT:
-            case GALLERY:
-                return location != null && location.startsWith("account");
-            case DATABASE:
-                return location != null && location.contains("login");
-            default:
-                throw new IllegalArgumentException("unknown feature " + feature);
+            Log.e(LOG_TAG, e.getMessage(), e);
         }
     }
 }

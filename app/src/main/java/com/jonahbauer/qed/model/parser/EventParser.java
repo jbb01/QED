@@ -4,7 +4,6 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.model.Event;
 import com.jonahbauer.qed.model.Registration;
 import com.jonahbauer.qed.networking.parser.HtmlParser;
@@ -17,6 +16,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class EventParser extends HtmlParser<Event> {
+    private static final String LOG_TAG = EventParser.class.getName();
+    
     private static final Pattern COST_PATTERN = Pattern.compile("(\\d+(?:,\\d+))\\s*€");
     private static final Pattern NUMBER_PATTERN = Pattern.compile("\\d+");
 
@@ -109,7 +110,7 @@ public final class EventParser extends HtmlParser<Event> {
                            }
                        }
                    } catch (Exception e) {
-                       Log.e(Application.LOG_TAG_ERROR, "Error parsing event " + event.getId() + ".", e);
+                       Log.e(LOG_TAG, "Error parsing event " + event.getId() + ".", e);
                    }
                });
     }
@@ -144,7 +145,7 @@ public final class EventParser extends HtmlParser<Event> {
 
                                event.getParticipants().put(participant, registration);
                            } catch (Exception e) {
-                               Log.e(Application.LOG_TAG_ERROR, "Error parsing event " + event.getId() + ".", e);
+                               Log.e(LOG_TAG, "Error parsing event " + event.getId() + ".", e);
                            }
                        });
                    }

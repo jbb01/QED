@@ -19,7 +19,6 @@ import com.jonahbauer.qed.crypt.MyEncryptedSharedPreferences;
 import com.jonahbauer.qed.crypt.PasswordStorage;
 import com.jonahbauer.qed.networking.NetworkListener;
 import com.jonahbauer.qed.networking.cookies.QEDCookieHandler;
-import com.jonahbauer.qed.networking.downloadManager.Download;
 import com.jonahbauer.qed.util.Preferences;
 
 import org.jetbrains.annotations.Contract;
@@ -31,10 +30,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Application extends android.app.Application implements android.app.Application.ActivityLifecycleCallbacks {
-    public static final String LOG_TAG_ERROR = "com.jonahbauer.qed::error";
-
-    @SuppressWarnings("unused")
-    public static final String LOG_TAG_DEBUG = "com.jonahbauer.qed::debug";
 
     @SuppressWarnings("unused")
     public static final String KEY_FCM_DEVICE_TOKEN = "fcmDeviceToken";
@@ -84,9 +79,6 @@ public class Application extends android.app.Application implements android.app.
         } else {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         }
-
-        // Initialize Download
-        Download.init(this);
 
         mConnectionStateMonitor = new ConnectionStateMonitor(this);
         sOnline = false;

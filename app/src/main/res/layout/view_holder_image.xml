@@ -1,70 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools">
+<layout>
+    <data>
+        <import type="android.view.View"/>
 
-    <com.jonahbauer.qed.layoutStuff.views.AdvancedImageView
-        android:id="@+id/gallery_image"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:scaleType="matrix"
-        android:visibility="gone"
-        tools:visibility="visible"
-        tools:src="@tools:sample/backgrounds/scenic"
-        tools:ignore="ContentDescription" />
+        <variable name="drawable" type="android.graphics.drawable.Drawable" />
+        <variable name="progressText" type="java.lang.String" />
+        <variable name="progress" type="java.lang.Integer"/>
+    </data>
 
-    <ProgressBar
-        android:id="@+id/progress_bar_indeterminate"
+    <merge xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_gravity="center_horizontal"
-        android:gravity="center_horizontal"
-        android:padding="100dp"
-        style="?android:attr/progressBarStyleLarge"
-        android:visibility="visible" />
+        android:layout_height="match_parent">
 
-    <ProgressBar
-        android:id="@+id/progress_bar"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_gravity="center_horizontal"
-        android:gravity="center_horizontal"
-        android:padding="100dp"
-        android:progressDrawable="@drawable/circular_progress_bar"
-        android:secondaryProgress="100"
-        android:progressTint="@color/colorSecondary"
-        android:secondaryProgressTint="#333"
-        android:progress="10"
-        android:max="100"
-        android:visibility="gone"/>
+        <com.jonahbauer.qed.layoutStuff.views.AdvancedImageView
+            android:id="@+id/gallery_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:scaleType="matrix"
+            android:visibility="@{drawable != null ? View.VISIBLE : View.GONE}"
+            android:src="@{drawable}"
+            tools:ignore="ContentDescription"
+            tools:src="@tools:sample/backgrounds/scenic"
+            tools:visibility="visible" />
 
-    <TextView
-        android:id="@+id/progress_text"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:textColor="@android:color/white"
-        android:textSize="18sp"
-        android:visibility="gone"
-        tools:visibility="visible"
-        tools:text="50%"/>
-</merge>
+        <ProgressBar
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_horizontal"
+            android:padding="100dp"
+            android:visibility="@{(drawable == null &amp;&amp; progress == null) ? View.VISIBLE : View.GONE}"/>
+
+        <ProgressBar
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_horizontal"
+            android:max="100"
+            android:padding="100dp"
+            android:progress="@{progress ?? 0}"
+            android:progressDrawable="@drawable/circular_progress_bar"
+            android:progressTint="@color/colorSecondary"
+            android:secondaryProgress="100"
+            android:secondaryProgressTint="#333"
+            android:visibility="@{(drawable == null &amp;&amp; progress != null) ? View.VISIBLE : View.GONE}"/>
+
+        <TextView
+            android:id="@+id/progress_text"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            android:text="@{progressText}"
+            android:visibility="@{(drawable == null &amp;&amp; progressText != null) ? View.VISIBLE : View.GONE}"
+            tools:text="50%"
+            tools:visibility="visible" />
+    </merge>
+</layout>

@@ -43,7 +43,7 @@ public class PersonInfoBottomSheet extends AbstractInfoBottomSheet {
             return;
         }
 
-        mPersonViewModel = new ViewModelProvider(requireActivity()).get(PersonViewModel.class);
+        mPersonViewModel = new ViewModelProvider(this).get(PersonViewModel.class);
         mPersonViewModel.load(person);
     }
 

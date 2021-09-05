@@ -29,7 +29,6 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.navigation.NavigationView;
-import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.BuildConfig;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.mainFragments.ChatDatabaseFragment;
@@ -52,6 +51,7 @@ import lombok.Getter;
 import static com.jonahbauer.qed.DeepLinkingActivity.QEDIntent;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, NetworkListener, DrawerLayout.DrawerListener {
+    private static final String LOG_TAG = MainActivity.class.getName();
     private static final String FRAGMENT_TAG = "com.jonahbauer.qed.activities.QEDFragment";
 
     private final SparseArray<QEDFragment> mCachedFragments = new SparseArray<>();
@@ -155,7 +155,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onBackPressed() {
         if (mWaitForDropResult) {
-            if (BuildConfig.DEBUG) Log.d(Application.LOG_TAG_DEBUG, "onBackPressed() invoked while waiting for onDrop result");
+            if (BuildConfig.DEBUG) Log.d(LOG_TAG, "onBackPressed() invoked while waiting for onDrop result");
             return;
         }
 
@@ -208,7 +208,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
         } else {
-            if (BuildConfig.DEBUG) Log.d(Application.LOG_TAG_DEBUG, "dropResult() invoked while not waiting for onDrop result.");
+            if (BuildConfig.DEBUG) Log.d(LOG_TAG, "dropResult() invoked while not waiting for onDrop result.");
         }
 
         disposeFragmentTransaction();
@@ -237,7 +237,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else if (itemId == R.id.nav_logout) {
             QEDLogout.logoutAsync().thenAccept(success -> {
                 if (!success) {
-                    Log.e(Application.LOG_TAG_ERROR, "An error occured during logout.");
+                    Log.e(LOG_TAG, "An error occured during logout.");
                 }
             });
 
@@ -297,7 +297,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      */
     private void reloadFragment(boolean titleOnly) {
         if (mWaitForDropResult) {
-            if (BuildConfig.DEBUG) Log.d(Application.LOG_TAG_DEBUG, "reloadFragment() invoked while waiting for onDrop result");
+            if (BuildConfig.DEBUG) Log.d(LOG_TAG, "reloadFragment() invoked while waiting for onDrop result");
             return;
         }
         mFragmentTransaction = null;

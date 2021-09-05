@@ -1,22 +1,46 @@
 package com.jonahbauer.qed.networking;
 
-import androidx.annotation.StringDef;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import androidx.annotation.StringRes;
+import androidx.room.rxjava3.EmptyResultSetException;
 
-import static com.jonahbauer.qed.networking.Reason.NETWORK;
-import static com.jonahbauer.qed.networking.Reason.NOT_FOUND;
-import static com.jonahbauer.qed.networking.Reason.UNABLE_TO_LOG_IN;
-import static com.jonahbauer.qed.networking.Reason.UNKNOWN;
-import static com.jonahbauer.qed.networking.Reason.USER;
+import com.jonahbauer.qed.R;
+import com.jonahbauer.qed.networking.exceptions.InvalidCredentialsException;
 
-@Retention(RetentionPolicy.SOURCE)
-@StringDef({UNKNOWN, NETWORK, NOT_FOUND, UNABLE_TO_LOG_IN, USER})
-public @interface Reason {
-    String UNKNOWN = "unknown error";
-    String NETWORK = "network error";
-    String UNABLE_TO_LOG_IN = "unable to log in";
-    String NOT_FOUND = "not found";
-    String USER = "user";
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+public enum Reason {
+    UNKNOWN(R.string.error_unknown),
+    NETWORK(R.string.error_network),
+    UNABLE_TO_LOG_IN(R.string.error_login),
+    EMPTY(R.string.error_empty),
+    NOT_FOUND(R.string.error_404),
+    USER(R.string.error_user);
+
+    @StringRes
+    private final int stringRes;
+
+    Reason(int res) {
+        this.stringRes = res;
+    }
+
+    public static Reason guess(Throwable throwable) {
+        if (throwable instanceof InvalidCredentialsException) {
+            return UNABLE_TO_LOG_IN;
+        } else if (throwable instanceof FileNotFoundException) {
+            return NOT_FOUND;
+        } else if (throwable instanceof IOException) {
+            return NETWORK;
+        } else if (throwable instanceof NullPointerException || throwable instanceof EmptyResultSetException) {
+            return EMPTY;
+        } else {
+            return UNKNOWN;
+        }
+    }
+
+    @StringRes
+    public int getStringRes() {
+        return stringRes;
+    }
 }

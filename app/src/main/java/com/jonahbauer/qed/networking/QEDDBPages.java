@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.jonahbauer.qed.model.Event;
 import com.jonahbauer.qed.model.Person;
@@ -24,7 +23,6 @@ import lombok.experimental.UtilityClass;
 @SuppressWarnings("UnusedReturnValue")
 public class QEDDBPages {
     //<editor-fold desc="Event">
-    @Nullable
     public static AsyncTask<?,?,?> getEvent(@NonNull Event event, QEDPageReceiver<Event> eventReceiver) {
         @SuppressLint("StringFormatMatches")
         AsyncLoadQEDPage<Event> async = new AsyncLoadQEDPage<>(
@@ -40,7 +38,6 @@ public class QEDDBPages {
         return async;
     }
 
-    @Nullable
     public static AsyncTask<?,?,?> getEventList(QEDPageReceiver<List<Event>> eventListReceiver) {
         AsyncLoadQEDPage<List<Event>> async = new AsyncLoadQEDPage<>(
                 Feature.DATABASE,
@@ -57,7 +54,6 @@ public class QEDDBPages {
     //</editor-fold>
 
     //<editor-fold desc="Person">
-    @Nullable
     public static AsyncTask<?,?,?> getPerson(@NonNull Person person, QEDPageReceiver<Person> personReceiver) {
         @SuppressLint("StringFormatMatches")
         AsyncLoadQEDPage<Person> async = new AsyncLoadQEDPage<>(
@@ -74,7 +70,6 @@ public class QEDDBPages {
         return async;
     }
 
-    @Nullable
     public static AsyncTask<?,?,?> getPersonList(QEDPageReceiver<List<Person>> personListReceiver) {
         AsyncLoadQEDPage<List<Person>> async = new AsyncLoadQEDPage<>(
                 Feature.DATABASE,

@@ -8,7 +8,7 @@
         <attr name="android:textColor" format="color"/>
     </declare-styleable>
     <declare-styleable name="Histogram">
-        <attr name="android:src"/>
+        <attr name="android:bitmap"/>
         <attr name="mode" format="flags">
             <flag name="red" value="1"/>
             <flag name="green" value="2"/>
@@ -76,7 +76,7 @@
 
     <attr name="colorPrimaryLight" format="color"/>
     <attr name="colorOnSurfaceVariant" format="color"/>
-    <attr name="colorOnBackgroundVariant" formate="color"/>
+    <attr name="colorOnBackgroundVariant" format="color"/>
 
     <attr name="accentColor0" format="color"/>
     <attr name="accentColor1" format="color"/>

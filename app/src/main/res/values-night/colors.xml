@@ -17,16 +17,4 @@
 
     <color name="dateBannerBackground">@color/colorSurface</color>
 
-    <!-- Progressbar -->
-    <color name="progressbar_background_start">@color/colorBackground</color>
-    <color name="progressbar_background_center">@color/colorBackground</color>
-    <color name="progressbar_background_end">@color/colorBackground</color>
-    <color name="progressbar_progress_start">#CC3366</color>
-    <color name="progressbar_progress_center">#FF4080</color>
-    <color name="progressbar_progress_end">#99264D</color>
-
-    <!-- Album -->
-    <color name="album_info_headers">@android:color/black</color>
-    <color name="image_info_headers">@android:color/black</color>
-
 </resources>

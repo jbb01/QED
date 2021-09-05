@@ -43,7 +43,7 @@ public class EventInfoBottomSheet extends AbstractInfoBottomSheet {
             return;
         }
 
-        mEventViewModel = new ViewModelProvider(requireActivity()).get(EventViewModel.class);
+        mEventViewModel = new ViewModelProvider(this).get(EventViewModel.class);
         mEventViewModel.load(event);
     }
 

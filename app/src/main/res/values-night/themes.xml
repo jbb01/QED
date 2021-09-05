@@ -35,11 +35,6 @@
         <item name="accentColor9">@color/accentColor9</item>
         <item name="colorOnAccentColor">@color/colorOnAccentColor</item>
 
-        <item name="android:textColorPrimary">?colorOnSurface</item>
-        <item name="android:textColorSecondary">?colorOnSurface</item>
-        <item name="android:textColorTertiary">?colorOnSurfaceVariant</item>
-        <item name="android:textColorHint">?colorOnSurfaceVariant</item>
-
         <item name="elevationOverlayEnabled">false</item>
     </style>
 

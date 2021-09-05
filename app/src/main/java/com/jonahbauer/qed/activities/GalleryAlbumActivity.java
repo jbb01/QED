@@ -15,29 +15,33 @@ import android.widget.CompoundButton;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.util.Pair;
+import androidx.lifecycle.ViewModelProvider;
 
-import com.jonahbauer.qed.Application;
+import com.google.android.material.snackbar.Snackbar;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.imageActivity.ImageActivity;
 import com.jonahbauer.qed.activities.sheets.album.AlbumInfoBottomSheet;
-import com.jonahbauer.qed.database.GalleryDatabase;
-import com.jonahbauer.qed.database.GalleryDatabaseReceiver;
 import com.jonahbauer.qed.databinding.ActivityGalleryAlbumBinding;
 import com.jonahbauer.qed.model.Album;
 import com.jonahbauer.qed.model.Image;
 import com.jonahbauer.qed.model.Person;
 import com.jonahbauer.qed.model.adapter.ImageAdapter;
-import com.jonahbauer.qed.networking.QEDGalleryPages;
+import com.jonahbauer.qed.model.viewmodel.AlbumViewModel;
 import com.jonahbauer.qed.networking.QEDGalleryPages.Filter;
 import com.jonahbauer.qed.networking.Reason;
-import com.jonahbauer.qed.networking.async.QEDPageReceiver;
 import com.jonahbauer.qed.util.Preferences;
 import com.jonahbauer.qed.util.StatusWrapper;
+import com.jonahbauer.qed.util.ViewUtils;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,13 +53,11 @@ import java.util.stream.Collectors;
 
 import static com.jonahbauer.qed.DeepLinkingActivity.QEDIntent;
 
-public class GalleryAlbumActivity extends AppCompatActivity implements QEDPageReceiver<Album>, CompoundButton.OnCheckedChangeListener, View.OnClickListener, GalleryDatabaseReceiver, AdapterView.OnItemClickListener {
+public class GalleryAlbumActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener, View.OnClickListener, AdapterView.OnItemClickListener {
+    private static final String LOG_TAG = GalleryAlbumActivity.class.getName();
     public static final String GALLERY_ALBUM_KEY = "galleryAlbum";
-    private static final int IMAGE_ACTIVITY_REQUEST_CODE = 314;
 
-    private GalleryDatabase mGalleryDatabase;
-
-    private Album mAlbum;
+    private AlbumViewModel mAlbumViewModel;
     private ActivityGalleryAlbumBinding mBinding;
 
     private ImageAdapter mImageAdapter;
@@ -69,37 +71,32 @@ public class GalleryAlbumActivity extends AppCompatActivity implements QEDPageRe
     // 2: category
     private int mActiveRadioButton = -1;
 
-    private boolean mOnline;
+    private ActivityResultLauncher<Intent> mImageLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         Intent intent = getIntent();
-        if (!handleIntent(intent, this)) {
+        Album album = intent.getParcelableExtra(GALLERY_ALBUM_KEY);
+        if (album == null) {
             super.finish();
             Toast.makeText(this, R.string.error, Toast.LENGTH_SHORT).show();
             return;
         }
 
-        mGalleryDatabase = new GalleryDatabase();
-        mGalleryDatabase.init(this);
+        mAlbumViewModel = new ViewModelProvider(this).get(AlbumViewModel.class);
+        mAlbumViewModel.init(album);
 
         mBinding = ActivityGalleryAlbumBinding.inflate(getLayoutInflater());
         setContentView(mBinding.getRoot());
 
-        mOnline = false;
-        if (!Preferences.gallery().isOfflineMode())
-            mBinding.labelOffline.setOnClickListener(v -> switchToOnlineMode());
-
         // setup toolbar
-        setSupportActionBar(mBinding.toolbar);
         ActionBar actionbar = getSupportActionBar();
         assert actionbar != null;
         actionbar.setDisplayHomeAsUpEnabled(true);
 
-
-        mImageAdapter = new ImageAdapter(this, new ArrayList<>(), false);
+        mImageAdapter = new ImageAdapter(this, new ArrayList<>());
         mBinding.imageContainer.setAdapter(mImageAdapter);
         mBinding.imageContainer.setOnItemClickListener(this);
 
@@ -112,23 +109,59 @@ public class GalleryAlbumActivity extends AppCompatActivity implements QEDPageRe
         mBinding.albumCategoryRadioButton.setOnClickListener(this);
 
         mAdapterCategory = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, new ArrayList<>());
-        mAdapterCategory.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mAdapterCategory.setDropDownViewResource(android.R.layout.simple_list_item_single_choice);
         mBinding.albumCategorySpinner.setAdapter(mAdapterCategory);
         mBinding.albumCategorySpinner.setEnabled(false);
 
         mAdapterPhotographer = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, new ArrayList<>());
-        mAdapterPhotographer.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mAdapterPhotographer.setDropDownViewResource(android.R.layout.simple_list_item_single_choice);
         mBinding.albumPhotographerSpinner.setAdapter(mAdapterPhotographer);
         mBinding.albumPhotographerSpinner.setEnabled(false);
 
         mAdapterDate = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, new ArrayList<>());
-        mAdapterDate.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mAdapterDate.setDropDownViewResource(android.R.layout.simple_list_item_single_choice);
         mBinding.albumDateSpinner.setAdapter(mAdapterDate);
         mBinding.albumDateSpinner.setEnabled(false);
 
         mBinding.searchButton.setOnClickListener(view -> search());
 
+        mBinding.setOnOfflineClick(v -> {
+            if (Preferences.gallery().isOfflineMode()) {
+                Preferences.gallery().edit().setOfflineMode(false).apply();
+            }
+            mAlbumViewModel.load();
+        });
+
         adjustColumnCount(getResources().getConfiguration());
+
+        mAlbumViewModel.getFilteredAlbum().observe(this, this::updateView);
+        mAlbumViewModel.getOffline().observe(this, offline -> {
+            mBinding.setOffline(offline);
+            mBinding.setForcedOfflineMode(Preferences.gallery().isOfflineMode());
+        });
+
+        mImageLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    Intent data = result.getData();
+                    if (data != null) {
+                        Image image = data.getParcelableExtra(ImageActivity.GALLERY_IMAGE_KEY);
+                        int index = mImageAdapter.getImages().indexOf(image);
+                        if (index != -1) {
+                            mBinding.imageContainer.smoothScrollToPosition(index);
+                        }
+                    }
+                }
+        );
+    }
+
+    @NonNull
+    private Album getAlbum() {
+        StatusWrapper<Album> wrapper = mAlbumViewModel.getAlbum().getValue();
+        assert wrapper != null : "StatusWrapper should not be null";
+        Album album = wrapper.getValue();
+        assert album != null : "Album should not be null";
+        return album;
     }
 
     private void search() {
@@ -137,6 +170,9 @@ public class GalleryAlbumActivity extends AppCompatActivity implements QEDPageRe
         if (mBinding.albumCategoryRadioButton.isChecked()) {
             String category = (String) mBinding.albumCategorySpinner.getSelectedItem();
             if (Album.CATEGORY_ETC.equals(category)) category = "";
+            try {
+                category = URLEncoder.encode(category, "UTF-8");
+            } catch (UnsupportedEncodingException ignored) {}
             filterData.put(Filter.BY_CATEGORY, category);
         }
         if (mBinding.albumDateRadioButton.isChecked()) {
@@ -144,25 +180,30 @@ public class GalleryAlbumActivity extends AppCompatActivity implements QEDPageRe
             try {
                 filterData.put(Filter.BY_DATE, parts[2] + "-" + parts[1] + "-" + parts[0]);
             } catch (ArrayIndexOutOfBoundsException e) {
-                Log.e(Application.LOG_TAG_ERROR, e.getMessage(), e);
+                Log.e(LOG_TAG, e.getMessage(), e);
             }
         }
         if (mBinding.albumPhotographerRadioButton.isChecked()) {
             String personName = (String) mBinding.albumPhotographerSpinner.getSelectedItem();
-            Optional<Person> personOptional = mAlbum.getPersons().stream().filter(person -> person.getFirstName().equals(personName)).findFirst();
+            Optional<Person> personOptional = getAlbum().getPersons().stream().filter(person -> person.getFirstName().equals(personName)).findFirst();
             personOptional.ifPresent(person -> filterData.put(Filter.BY_PERSON, String.valueOf(person.getId())));
         }
 
-        QEDGalleryPages.getAlbum(mAlbum, filterData, this);
+        mAlbumViewModel.filter(filterData);
     }
 
-    private void updateView(StatusWrapper<Album> albumStatusWrapper) {
-        mBinding.setAlbum(albumStatusWrapper.getValue());
-        mBinding.setStatus(albumStatusWrapper.getCode());
-        mBinding.setError(albumStatusWrapper.getMessage());
+    private void updateView(StatusWrapper<Pair<Album, List<Image>>> albumStatusWrapper) {
+        Pair<Album, List<Image>> pair = albumStatusWrapper.getValue();
+        Album album = pair.first;
+        List<Image> images = pair.second;
 
-        Album album = albumStatusWrapper.getValue();
-        if (album != null) {
+        mBinding.setAlbum(album);
+        mBinding.setStatus(albumStatusWrapper.getCode());
+        mBinding.setError(getString(albumStatusWrapper.getErrorMessage()));
+
+        if (albumStatusWrapper.getCode() == StatusWrapper.STATUS_LOADED) {
+            Objects.requireNonNull(getSupportActionBar()).setTitle(album.getName());
+
             mAdapterCategory.clear();
             mAdapterCategory.addAll(album.getCategories());
             mAdapterCategory.notifyDataSetChanged();
@@ -176,54 +217,26 @@ public class GalleryAlbumActivity extends AppCompatActivity implements QEDPageRe
             mAdapterDate.notifyDataSetChanged();
 
             mImageAdapter.clear();
-//            mImageAdapter.setOfflineMode(!mOnline);
-            if (!album.getImages().isEmpty()) {
-                mImageAdapter.addAll(album.getImages());
-                mImageAdapter.notifyDataSetChanged();
-            } else {
-                mBinding.setStatus(StatusWrapper.STATUS_ERROR);
-                mBinding.setError(getString(R.string.album_empty));
-            }
+            mImageAdapter.addAll(images);
+            mImageAdapter.notifyDataSetChanged();
+        } else if (albumStatusWrapper.getCode() == StatusWrapper.STATUS_ERROR) {
+            Reason reason = albumStatusWrapper.getReason();
+            mBinding.setError(getString(reason == Reason.EMPTY ? R.string.album_empty : reason.getStringRes()));
         }
 
-        if (albumStatusWrapper.getCode() == StatusWrapper.STATUS_ERROR) {
-            if (Reason.NOT_FOUND.equals(albumStatusWrapper.getMessage())) {
-                mBinding.setError(getString(R.string.album_invalid));
-            } else if (Reason.UNABLE_TO_LOG_IN.equals(albumStatusWrapper.getMessage())) {
-                mBinding.setError(getString(R.string.gallery_login_failed));
-            } else if (Reason.NETWORK.equals(albumStatusWrapper.getMessage())) {
-                mBinding.setError(getString(R.string.error_network));
-                switchToOfflineMode();
-            } else {
-                mBinding.setError(getString(R.string.error_unknown));
-            }
+        int hits = mImageAdapter.getImages().size();
+        if (hits > 0) {
+            mBinding.setHits(getString(R.string.hits, hits));
+        } else {
+            mBinding.setHits("");
         }
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onStart() {
+        super.onStart();
 
-        if (!Preferences.gallery().isOfflineMode())
-            switchToOnlineMode();
-        else
-            switchToOfflineMode();
-    }
-
-
-    @Override
-    public void onPageReceived(@NonNull Album album) {
-        mOnline = true;
-        mImageAdapter.setOfflineMode(false);
-
-        updateView(StatusWrapper.wrap(album, StatusWrapper.STATUS_LOADED));
-    }
-
-    @Override
-    public void onError(Album album, String reason, Throwable cause) {
-        QEDPageReceiver.super.onError(album, reason, cause);
-
-        updateView(StatusWrapper.wrap(album, StatusWrapper.STATUS_ERROR, reason));
+        mAlbumViewModel.load();
     }
 
     @Override
@@ -246,7 +259,7 @@ public class GalleryAlbumActivity extends AppCompatActivity implements QEDPageRe
             finish();
             return true;
         } else if (id == R.id.album_info) {
-            AlbumInfoBottomSheet albumInfoBottomSheet = AlbumInfoBottomSheet.newInstance(mAlbum);
+            AlbumInfoBottomSheet albumInfoBottomSheet = AlbumInfoBottomSheet.newInstance(getAlbum());
             albumInfoBottomSheet.show(getSupportFragmentManager(), albumInfoBottomSheet.getTag());
             return true;
         }
@@ -303,11 +316,11 @@ public class GalleryAlbumActivity extends AppCompatActivity implements QEDPageRe
             if (isChecked) {
                 buttonView.setButtonDrawable(R.drawable.ic_arrow_up_accent_animation);
                 ((Animatable) Objects.requireNonNull(buttonView.getButtonDrawable())).start();
-                expand(mBinding.expandable);
+                ViewUtils.expand(mBinding.expandable);
             } else {
                 buttonView.setButtonDrawable(R.drawable.ic_arrow_down_accent_animation);
                 ((Animatable) Objects.requireNonNull(buttonView.getButtonDrawable())).start();
-                collapse(mBinding.expandable);
+                ViewUtils.collapse(mBinding.expandable);
             }
         } else if (id == R.id.album_photographer_radio_button) {
             if (isChecked) {
@@ -330,73 +343,21 @@ public class GalleryAlbumActivity extends AppCompatActivity implements QEDPageRe
         }
     }
 
-    private static void expand(final View v) {
-        v.setVisibility(View.VISIBLE);
-    }
-
-    private static void collapse(final View v) {
-        v.setVisibility(View.GONE);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mGalleryDatabase.close();
-        mImageAdapter.clearCache();
-    }
-
-    @Override
-    public void onInsertAllUpdate(int done, int total) {}
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Image image = mImageAdapter.getItem(position);
-        if (image == null || (!mOnline && !image.isAvailable())) {
-            Toast.makeText(this, getString(R.string.image_not_downloaded), Toast.LENGTH_SHORT).show();
+
+        if (image == null) {
+            Snackbar.make(mBinding.getRoot(), R.string.image_not_downloaded, Snackbar.LENGTH_SHORT).show();
             return;
         }
 
         Intent intent = new Intent(this, ImageActivity.class);
         intent.putExtra(ImageActivity.GALLERY_IMAGE_KEY, image);
-        intent.putParcelableArrayListExtra(ImageActivity.GALLERY_IMAGES_KEY, new ArrayList<>(mAlbum.getImages()));
-        startActivityForResult(intent, IMAGE_ACTIVITY_REQUEST_CODE);
+        intent.putParcelableArrayListExtra(ImageActivity.GALLERY_IMAGES_KEY, new ArrayList<>(mImageAdapter.getImages()));
+        mImageLauncher.launch(intent);
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == IMAGE_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK) {
-            if (data != null) {
-                Image image = data.getParcelableExtra(ImageActivity.GALLERY_IMAGE_KEY);
-                int index = mImageAdapter.getImages().indexOf(image);
-                if (index != -1) {
-                    mBinding.imageContainer.smoothScrollToPosition(index);
-                }
-            }
-        }
-    }
-
-    public void switchToOfflineMode() {
-        mOnline = false;
-        mBinding.setOffline(true);
-        mImageAdapter.setOfflineMode(true);
-
-        if (mGalleryDatabase.getAlbumData(mAlbum)) {
-            List<Image> images = mGalleryDatabase.getImageList(mAlbum);
-            mAlbum.getImages().clear();
-            mAlbum.getImages().addAll(images);
-            updateView(StatusWrapper.wrap(mAlbum, StatusWrapper.STATUS_LOADED));
-        } else {
-            updateView(StatusWrapper.wrap(mAlbum, StatusWrapper.STATUS_ERROR, Reason.NOT_FOUND));
-        }
-    }
-
-    private void switchToOnlineMode() {
-        mOnline = true;
-        mBinding.setOffline(false);
-
-        QEDGalleryPages.getAlbum(mAlbum, null, this);
     }
 
     @Override
@@ -412,7 +373,7 @@ public class GalleryAlbumActivity extends AppCompatActivity implements QEDPageRe
     public static boolean handleIntent(@NonNull Intent intent, @Nullable GalleryAlbumActivity activity) {
         Object obj = intent.getParcelableExtra(GALLERY_ALBUM_KEY);
         if (obj instanceof Album) {
-            if (activity != null) activity.mAlbum = (Album) obj;
+//            if (activity != null) activity.mAlbum = (Album) obj;
             return true;
         }
 
@@ -438,10 +399,10 @@ public class GalleryAlbumActivity extends AppCompatActivity implements QEDPageRe
                         String albumIdStr = queries.getOrDefault("albumid", null);
                         if (albumIdStr != null && albumIdStr.matches("\\d*")) {
                             try {
-                                int id = Integer.parseInt(albumIdStr);
-                                if (activity != null) {
-                                    activity.mAlbum = new Album(id);
-                                }
+//                                int id = Integer.parseInt(albumIdStr);
+//                                if (activity != null) {
+//                                    activity.mAlbum = new Album(id);
+//                                }
                                 return true;
                             } catch (NumberFormatException ignored) {}
                         }

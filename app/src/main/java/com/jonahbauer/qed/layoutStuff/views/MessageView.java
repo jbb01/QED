@@ -41,11 +41,17 @@ import androidx.annotation.StyleRes;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.model.Message;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 @SuppressWarnings({"unused"})
 public class MessageView extends RelativeLayout {
     private static final String TRIM = "(^[\\s\\u200B]*|[\\s\\u200B]*$)";
     private static final String TRIM_END = "[\\s\\u200B]*$";
     private static float dp = 0;
+
+    private final DateFormat DATE_FORMAT = SimpleDateFormat.getTimeInstance();
+    private final DateFormat DATE_FORMAT_EXTENDED = SimpleDateFormat.getDateTimeInstance();
 
     private TextView mNameTextView;
     private TextView mMessageTextView;
@@ -576,10 +582,9 @@ public class MessageView extends RelativeLayout {
         }
 
         if (mExtended) {
-            mDate = message.getDate();
+            mDate = DATE_FORMAT_EXTENDED.format(message.getDate());
         } else {
-            String[] dates = message.getDate().split("(:|\\s)");
-            mDate = dates[1] + ":" + dates[2];
+            mDate = DATE_FORMAT.format(message.getDate());
         }
 
         if (mName != null && !mName.matches("[\\s\\n\\r]*")) {

@@ -31,7 +31,6 @@ import com.jonahbauer.qed.R;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.ref.WeakReference;
-import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -48,39 +47,40 @@ public class Histogram extends AppCompatImageView {
     private static final int HISTOGRAM_MODE_LUMINOSITY = 1 << 3;
 
     private final Handler mHandler = new Handler(Looper.getMainLooper());
-    private final Context mContext;
 
     @HistogramMode
     private int mMode = HISTOGRAM_MODE_RED | HISTOGRAM_MODE_GREEN | HISTOGRAM_MODE_BLUE;
 
-    private Drawable mDrawable;
+    private Bitmap mBitmap;
 
     public Histogram(Context context) {
         super(context);
         setup(context, null, 0, 0);
-        this.mContext = context;
     }
 
     public Histogram(Context context, AttributeSet attrs) {
         super(context, attrs);
         setup(context, attrs, 0, 0);
-        this.mContext = context;
     }
 
     public Histogram(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         setup(context, attrs, defStyleAttr, 0);
-        this.mContext = context;
     }
 
     @Override
     public void invalidate() {
         super.invalidate();
+    }
 
-        Drawable drawable = getDrawable();
-        if (!Objects.equals(drawable, this.mDrawable)) {
-            setup(mContext, null, 0, 0);
-            this.mDrawable = drawable;
+    public void setBitmap(Bitmap bitmap) {
+        if (this.mBitmap != bitmap && !(this.mBitmap != null && this.mBitmap.sameAs(bitmap))) {
+            this.mBitmap = bitmap;
+            setImageDrawable(null);
+            if (this.mBitmap != null) {
+                HistogramTask task = new HistogramTask(bitmap, this, mHandler, mMode);
+                task.executeOnExecutor(HISTOGRAM_EXECUTOR);
+            }
         }
     }
 
@@ -91,20 +91,17 @@ public class Histogram extends AppCompatImageView {
 
             mMode = typedArray.getInt(R.styleable.Histogram_mode, 7);
 
+            Drawable drawable = typedArray.getDrawable(R.styleable.Histogram_android_bitmap);
+            if (drawable instanceof BitmapDrawable) {
+                mBitmap = ((BitmapDrawable) drawable).getBitmap();
+            } else if (drawable != null) {
+                throw new IllegalArgumentException("Only BitmapDrawables are supported.");
+            }
+
             typedArray.recycle();
         }
 
-        Drawable drawable = getDrawable();
-        if (drawable instanceof BitmapDrawable) {
-            Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
-            if (bitmap != null) {
-                setImageDrawable(null);
-                HistogramTask task = new HistogramTask(bitmap, this, mHandler, mMode);
-                task.executeOnExecutor(HISTOGRAM_EXECUTOR);
-            }
-        } else if (drawable != null && !(drawable instanceof HistogramDrawable)) {
-            setImageDrawable(null);
-        }
+        setBitmap(mBitmap);
     }
 
     /**

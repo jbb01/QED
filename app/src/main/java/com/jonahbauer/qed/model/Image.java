@@ -1,9 +1,17 @@
 package com.jonahbauer.qed.model;
 
+import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+import androidx.room.TypeConverters;
+
+import com.jonahbauer.qed.model.room.Converters;
 
 import java.util.Collections;
 import java.util.Date;
@@ -18,9 +26,28 @@ import java.util.stream.Collectors;
 import lombok.Data;
 
 @Data
+@Entity
+@TypeConverters(Converters.class)
 public class Image implements Parcelable {
     public static final Set<String> VIDEO_FILE_EXTENSIONS;
     public static final Set<String> AUDIO_FILE_EXTENSIONS;
+
+    public static final String DATA_KEY_ALBUM = "album";
+    public static final String DATA_KEY_OWNER = "owner";
+    public static final String DATA_KEY_FORMAT = "format";
+    public static final String DATA_KEY_UPLOAD_DATE = "uploaded";
+    public static final String DATA_KEY_CREATION_DATE = "created";
+    public static final String DATA_KEY_ORIENTATION = "orientation";
+    public static final String DATA_KEY_MANUFACTURER = "manufacturer";
+    public static final String DATA_KEY_MODEL = "model";
+    public static final String DATA_KEY_FOCAL_LENGTH = "focal length";
+    public static final String DATA_KEY_FOCAL_RATIO = "focal ration";
+    public static final String DATA_KEY_EXPOSURE_TIME = "exposure time";
+    public static final String DATA_KEY_ISO = "iso";
+    public static final String DATA_KEY_POSITION = "position";
+    public static final String DATA_KEY_FLASH = "flash";
+    public static final String DATA_KEY_VISITS = "visits";
+    public static final String DATA_KEY_RESOLUTION = "resolution";
 
     static {
         HashSet<String> videoFileExtensions = new HashSet<>();
@@ -31,6 +58,7 @@ public class Image implements Parcelable {
         videoFileExtensions.add("avi");
         videoFileExtensions.add("wmv");
         videoFileExtensions.add("mpeg");
+        videoFileExtensions.add("webm");
         VIDEO_FILE_EXTENSIONS = Collections.unmodifiableSet(videoFileExtensions);
 
         HashSet<String> audioFileExtensions = new HashSet<>();
@@ -43,19 +71,65 @@ public class Image implements Parcelable {
         AUDIO_FILE_EXTENSIONS = Collections.unmodifiableSet(audioFileExtensions);
     }
 
+    @PrimaryKey
     private final long id;
-    private transient Album album;
-    private String albumName;
-    private String format;
-    private String path;
-    private String name;
-    private String owner;
-    private Date uploadDate;
-    private Date creationDate;
-    private boolean original;
-    private boolean available = true;
 
-    private final Map<String, String> data = new HashMap<>();
+    @ColumnInfo(name = "album_id")
+    private long albumId;
+
+    @ColumnInfo(name = "order")
+    private long order;
+
+    @ColumnInfo(name = "album_name")
+    private String albumName;
+
+    @ColumnInfo(name = "format")
+    private String format;
+
+    @ColumnInfo(name = "path")
+    private String path;
+
+    @ColumnInfo(name = "name")
+    private String name;
+
+    @ColumnInfo(name = "owner")
+    private String owner;
+
+    @ColumnInfo(name = "upload_date")
+    private Date uploadDate;
+
+    @ColumnInfo(name = "creation_date")
+    private Date creationDate;
+
+    @ColumnInfo(name = "original")
+    private boolean original;
+
+    @ColumnInfo(name = "thumbnail")
+    private Bitmap thumbnail;
+
+    @ColumnInfo(name = "data")
+    private Map<String, String> data = new HashMap<>();
+
+    @ColumnInfo(name = "loaded")
+    private boolean loaded;
+
+    @Ignore
+    private boolean databaseLoaded;
+
+    public void set(Image image) {
+        this.setAlbumId(image.getAlbumId());
+        this.setAlbumName(image.getAlbumName());
+        this.setFormat(image.getFormat());
+        this.setPath(image.getPath());
+        this.setName(image.getName());
+        this.setOwner(image.getOwner());
+        this.setUploadDate(image.getUploadDate());
+        this.setCreationDate(image.getCreationDate());
+        this.setOriginal(image.isOriginal());
+        this.setLoaded(image.isLoaded());
+        this.setThumbnail(image.getThumbnail());
+        this.setData(image.getData());
+    }
 
     @Override
     @NonNull
@@ -69,10 +143,10 @@ public class Image implements Parcelable {
         if (uploadDate != null) entries.add("\"uploadDate\":" + uploadDate.getTime());
         if (creationDate != null) entries.add("\"creationDate\":" + creationDate.getTime());
         entries.add("\"original\":" + original);
-        entries.add("\"available\":" + available);
+        entries.add("\"loaded\":" + loaded);
         if (!data.isEmpty()) entries.add(data.entrySet().stream().map(e -> "\"" + e.getKey() + "\":\"" + e.getValue() + "\"").collect(Collectors.joining(",")));
         if (albumName != null) entries.add("\"albumName\":\"" + albumName + "\"");
-        if (album != null) entries.add("\"album\":" + album);
+        if (albumId != -1) entries.add("\"albumId\":" + albumId);
         return entries.stream().collect(Collectors.joining(", ", "{", "}"));
     }
 
@@ -101,9 +175,10 @@ public class Image implements Parcelable {
         dest.writeString(format);
         dest.writeString(path);
         dest.writeString(owner);
-        dest.writeLong(uploadDate != null ? uploadDate.getTime() : -1);
-        dest.writeLong(creationDate != null ? creationDate.getTime() : -1);
-        dest.writeInt((original ? 2 : 0) + (available ? 1 : 0));
+        dest.writeSerializable(uploadDate);
+        dest.writeSerializable(creationDate);
+        dest.writeInt((original ? 1 : 0));
+        dest.writeInt((loaded ? 1 : 0));
         dest.writeMap(data);
     }
 
@@ -116,16 +191,10 @@ public class Image implements Parcelable {
             image.format = source.readString();
             image.path = source.readString();
             image.owner = source.readString();
-
-            long uploadDate = source.readLong();
-            if (uploadDate != -1) image.uploadDate = new Date(uploadDate);
-
-            long creationDate = source.readLong();
-            if (creationDate != -1) image.creationDate = new Date(creationDate);
-
-            int originalAvailable = source.readInt();
-            image.original = originalAvailable / 2 == 1;
-            image.available = originalAvailable % 2 == 1;
+            image.uploadDate = (Date) source.readSerializable();
+            image.creationDate = (Date) source.readSerializable();
+            image.original = source.readInt() != 0;
+            image.loaded = source.readInt() != 0;
 
             source.readMap(image.data, Image.class.getClassLoader());
 

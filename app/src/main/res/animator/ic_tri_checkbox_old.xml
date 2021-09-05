@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <set xmlns:android="http://schemas.android.com/apk/res/android">
     <objectAnimator
-        android:duration="@integer/checkbox_change_1"
+        android:duration="@android:integer/config_shortAnimTime"
         android:propertyName="scaleX"
         android:valueFrom="7.5"
         android:valueTo="0"/>
     <objectAnimator
-        android:duration="@integer/checkbox_change_1"
+        android:duration="@android:integer/config_shortAnimTime"
         android:propertyName="scaleY"
         android:valueFrom="7.5"
         android:valueTo="0"/>

@@ -5,6 +5,7 @@
     <data>
         <import type="com.jonahbauer.qed.util.Themes"/>
         <import type="java.text.MessageFormat"/>
+        <import type="android.view.View"/>
 
         <variable name="person" type="com.jonahbauer.qed.model.Person" />
         <variable name="invertedInitials" type="boolean"/>
@@ -14,20 +15,19 @@
         android:id="@+id/person"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingHorizontal="@dimen/person_padding_horizontal"
-        android:paddingVertical="@dimen/person_padding_vertical"
-        android:clipToPadding="false"
-        android:layout_gravity="center"
+        android:paddingVertical="12dp"
+        android:paddingHorizontal="16dp"
         android:descendantFocusability="blocksDescendants">
 
         <TextView
             android:id="@+id/header"
             android:layout_width="30dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_alignParentStart="true"
             android:layout_alignTop="@id/person_name"
             android:layout_alignBottom="@id/person_email"
             android:gravity="center"
+            android:textAppearance="?textAppearanceListItemSecondary"
             android:textColor="?colorOnBackground"
             tools:text="M"/>
 
@@ -43,7 +43,8 @@
             android:src="@drawable/person_initials_circle"
             android:adjustViewBounds="true"
             android:layout_gravity="center"
-            android:contentDescription="@string/content_description_icon"
+            android:importantForAccessibility="no"
+            android:visibility="@{person != null ? View.VISIBLE : View.INVISIBLE}"
             app:tint="@{Themes.colorful(person.id)}"
             tools:tint="@android:color/holo_green_dark"/>
 
@@ -58,6 +59,7 @@
             android:gravity="center"
             android:textStyle="bold"
             android:textColor="?colorOnAccentColor"
+            android:visibility="@{person != null ? View.VISIBLE : View.INVISIBLE}"
             android:text="@{person.getInitials(invertedInitials)}"
             tools:text="MM"/>
 
@@ -68,7 +70,9 @@
             android:layout_toEndOf="@id/person_initials_circle"
             android:layout_alignParentTop="true"
             android:text="@{person.getFullName(invertedInitials)}"
-            style="?attr/textAppearanceListItemSecondary"
+            android:textAppearance="?textAppearanceListItem"
+            android:textStyle="bold"
+            android:visibility="@{person != null ? View.VISIBLE : View.INVISIBLE}"
             tools:text="Max Mustermann"/>
 
         <TextView
@@ -82,7 +86,8 @@
             android:paddingStart="5dp"
             android:paddingEnd="0dp"
             android:text="@{!person.active ? @string/persons_database_inactive : !person.member ? @string/persons_database_non_member : ``}"
-            style="?attr/textAppearanceListItemSmall"
+            android:textAppearance="?textAppearanceListItemSmall"
+            android:visibility="@{person != null ? View.VISIBLE : View.INVISIBLE}"
             tools:text="(inaktiv)"/>
 
         <TextView
@@ -93,7 +98,8 @@
             android:layout_alignParentEnd="true"
             android:layout_below="@id/person_name"
             android:text="@{person.email ?? @string/persons_database_no_email}"
-            style="?attr/textAppearanceListItemSmall"
+            android:textAppearance="?textAppearanceListItemSecondary"
+            android:visibility="@{person != null ? View.VISIBLE : View.INVISIBLE}"
             tools:text="max.mustermann@email.com"/>
     </RelativeLayout>
 </layout>

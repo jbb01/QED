@@ -24,9 +24,9 @@ public class LoginActivity extends AppCompatActivity implements NetworkListener,
     public static final String EXTRA_DONT_START_MAIN = "dontStartMain";
     public static final String EXTRA_FEATURE = "feature";
 
-    private UserLoginTask authTask = null;
+    private UserLoginTask mAuthTask = null;
 
-    private ActivityLoginBinding binding;
+    private ActivityLoginBinding mBinding;
 
     private boolean mDoubleBackToExitPressedOnce = false;
     private boolean mDontStartMain;
@@ -43,15 +43,15 @@ public class LoginActivity extends AppCompatActivity implements NetworkListener,
             mFeature = Feature.CHAT;
         }
 
-        binding = ActivityLoginBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        mBinding = ActivityLoginBinding.inflate(getLayoutInflater());
+        setContentView(mBinding.getRoot());
 
-        binding.rememberMeCheckbox.setChecked(Preferences.general().isRememberMe());
-        binding.rememberMeCheckbox.setOnCheckedChangeListener(
+        mBinding.rememberMeCheckbox.setChecked(Preferences.general().isRememberMe());
+        mBinding.rememberMeCheckbox.setOnCheckedChangeListener(
                 (buttonView, isChecked) -> Preferences.general().edit().setRememberMe(isChecked).apply()
         );
 
-        binding.password.setOnEditorActionListener((textView, id, keyEvent) -> {
+        mBinding.password.setOnEditorActionListener((textView, id, keyEvent) -> {
             if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
                 attemptLogin();
                 return true;
@@ -59,10 +59,10 @@ public class LoginActivity extends AppCompatActivity implements NetworkListener,
             return false;
         });
 
-        binding.usernameLayout.setErrorEnabled(true);
-        binding.passwordLayout.setErrorEnabled(true);
+        mBinding.usernameLayout.setErrorEnabled(true);
+        mBinding.passwordLayout.setErrorEnabled(true);
 
-        binding.signInButton.setOnClickListener(view -> attemptLogin());
+        mBinding.signInButton.setOnClickListener(view -> attemptLogin());
 
         mDontStartMain = getIntent().getBooleanExtra(EXTRA_DONT_START_MAIN, false);
         String errorMessage = getIntent().getStringExtra(EXTRA_ERROR_MESSAGE);
@@ -72,27 +72,27 @@ public class LoginActivity extends AppCompatActivity implements NetworkListener,
     }
 
     private void attemptLogin() {
-        if (authTask != null) {
+        if (mAuthTask != null) {
             return;
         }
 
-        binding.usernameLayout.setError(null);
-        binding.passwordLayout.setError(null);
-        binding.username.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
-        binding.password.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+        mBinding.usernameLayout.setError(null);
+        mBinding.passwordLayout.setError(null);
+        mBinding.username.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+        mBinding.password.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
 
-        String username = binding.username.getText().toString();
-        char[] password = new char[binding.password.getText().length()];
-        binding.password.getText().getChars(0, password.length, password, 0);
+        String username = mBinding.username.getText().toString();
+        char[] password = new char[mBinding.password.getText().length()];
+        mBinding.password.getText().getChars(0, password.length, password, 0);
 
         showProgress(true);
-        authTask = new UserLoginTask(username, password, mFeature, this);
-        authTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        mAuthTask = new UserLoginTask(username, password, mFeature, this);
+        mAuthTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     private void showProgress(final boolean show) {
-        binding.loginForm.setVisibility(show ? View.GONE : View.VISIBLE);
-        binding.loginProgress.setVisibility(show ? View.VISIBLE : View.GONE);
+        mBinding.loginForm.setVisibility(show ? View.GONE : View.VISIBLE);
+        mBinding.loginProgress.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -110,17 +110,17 @@ public class LoginActivity extends AppCompatActivity implements NetworkListener,
 
     @Override
     public void onConnectionFail() {
-        binding.passwordLayout.post(() -> setError(getString(R.string.cant_connect)));
+        mBinding.passwordLayout.post(() -> setError(getString(R.string.cant_connect)));
     }
 
     @Override
     public void onConnectionRegain() {
-        binding.passwordLayout.post(() -> setError(null));
+        mBinding.passwordLayout.post(() -> setError(null));
     }
 
     @Override
     public void onResult(Boolean success) {
-        authTask = null;
+        mAuthTask = null;
         showProgress(false);
 
         if (success == null) {
@@ -139,18 +139,18 @@ public class LoginActivity extends AppCompatActivity implements NetworkListener,
 
     @Override
     public void onCancelled() {
-        authTask = null;
+        mAuthTask = null;
         showProgress(false);
     }
 
     private void setError(String string) {
-        binding.passwordLayout.setError(string);
+        mBinding.passwordLayout.setError(string);
 
         if (string != null) {
-            binding.password.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_error, 0);
-            binding.password.requestFocus();
+            mBinding.password.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_error, 0);
+            mBinding.password.requestFocus();
         } else {
-            binding.password.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+            mBinding.password.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
         }
     }
 }

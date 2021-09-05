@@ -115,7 +115,7 @@ public class MessageAdapter extends ArrayAdapter<Message> {
         view.setMessage(message);
         view.setFocusable(false);
         view.setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
-        view.setDateBanner(mDateBannerPositions.contains(position) ? message.getDateNoTime() : null);
+        view.setDateBanner(mDateBannerPositions.contains(position) ? message.getBannerDate() : null);
         view.setLinkify(mLinkify);
         view.setColorful(mColorful);
 
@@ -155,12 +155,12 @@ public class MessageAdapter extends ArrayAdapter<Message> {
         mDateBannerPositions.add(0);
 
         Iterator<Message> iterator = mMessageList.iterator();
-        String lastDate = iterator.next().getDateNoTime();
+        String lastDate = iterator.next().getBannerDate();
         String dateNoTime;
 
         int i = 1;
         while (iterator.hasNext()) {
-            dateNoTime = iterator.next().getDateNoTime();
+            dateNoTime = iterator.next().getBannerDate();
 
             //noinspection StringEquality dateNoTime values are created with String.intern()
             if (lastDate != dateNoTime) {
@@ -177,8 +177,8 @@ public class MessageAdapter extends ArrayAdapter<Message> {
 
         if (size < 2) return;
 
-        String lastDateNoTime = mMessageList.get(size - 2).getDateNoTime();
-        String dateNoTime = mMessageList.get(size - 1).getDateNoTime();
+        String lastDateNoTime = mMessageList.get(size - 2).getBannerDate();
+        String dateNoTime = mMessageList.get(size - 1).getBannerDate();
 
         //noinspection StringEquality dateNoTime values are created with String.intern()
         if (lastDateNoTime != dateNoTime) {

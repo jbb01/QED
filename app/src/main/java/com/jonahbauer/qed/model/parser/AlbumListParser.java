@@ -4,7 +4,6 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.model.Album;
 import com.jonahbauer.qed.networking.parser.HtmlParser;
 
@@ -16,6 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class AlbumListParser extends HtmlParser<List<Album>> {
+    private static final String LOG_TAG = AlbumListParser.class.getName();
     private static final Pattern ALBUM_ID = Pattern.compile("id=(\\d+)");
 
     public static final AlbumListParser INSTANCE = new AlbumListParser();
@@ -44,7 +44,7 @@ public final class AlbumListParser extends HtmlParser<List<Album>> {
                         album.setName(a.text());
                         return album;
                     } catch (Exception e) {
-                        Log.e(Application.LOG_TAG_ERROR, "Error parsing album list.", e);
+                        Log.e(LOG_TAG, "Error parsing album list.", e);
                         return null;
                     }
                 })

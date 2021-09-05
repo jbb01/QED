@@ -2,7 +2,6 @@ package com.jonahbauer.qed.model.parser;
 
 import androidx.annotation.NonNull;
 
-import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.model.Image;
 import com.jonahbauer.qed.networking.parser.HtmlParser;
 
@@ -47,53 +46,53 @@ public final class ImageParser extends HtmlParser<Image> {
             switch (key) {
                 case INFO_KEY_ALBUM:
                     image.setAlbumName(value);
-                    image.getData().put(String.valueOf(R.string.image_info_album), value);
+                    image.getData().put(Image.DATA_KEY_ALBUM, value);
                     break;
                 case INFO_KEY_OWNER:
                     image.setOwner(value);
-                    image.getData().put(String.valueOf(R.string.image_info_owner), value);
+                    image.getData().put(Image.DATA_KEY_OWNER, value);
                     break;
                 case INFO_KEY_FORMAT:
                     image.setFormat(value);
-                    image.getData().put(String.valueOf(R.string.image_info_format), value);
+                    image.getData().put(Image.DATA_KEY_FORMAT, value);
                     break;
                 case INFO_KEY_UPLOAD_DATE:
                     image.setUploadDate(parseDate(value));
-                    image.getData().put(String.valueOf(R.string.image_info_upload_date), value);
+                    image.getData().put(Image.DATA_KEY_UPLOAD_DATE, value);
                     break;
                 case INFO_KEY_CREATION_DATE:
                     image.setCreationDate(parseDate(value));
-                    image.getData().put(String.valueOf(R.string.image_info_creation_date), value);
+                    image.getData().put(Image.DATA_KEY_CREATION_DATE, value);
                     break;
                 case INFO_KEY_ORIENTATION:
-                    image.getData().put(String.valueOf(R.string.image_info_orientation), value);
+                    image.getData().put(Image.DATA_KEY_ORIENTATION, value);
                     break;
                 case INFO_KEY_MANUFACTURER:
-                    image.getData().put(String.valueOf(R.string.image_info_camera_manufacturer), value);
+                    image.getData().put(Image.DATA_KEY_MANUFACTURER, value);
                     break;
                 case INFO_KEY_MODEL:
-                    image.getData().put(String.valueOf(R.string.image_info_camera_model), value);
+                    image.getData().put(Image.DATA_KEY_MODEL, value);
                     break;
                 case INFO_KEY_FOCAL_LENGTH:
-                    image.getData().put(String.valueOf(R.string.image_info_focal_length), value);
+                    image.getData().put(Image.DATA_KEY_FOCAL_LENGTH, value);
                     break;
                 case INFO_KEY_FOCAL_RATIO:
-                    image.getData().put(String.valueOf(R.string.image_info_focal_ratio), value);
+                    image.getData().put(Image.DATA_KEY_FOCAL_RATIO, value);
                     break;
                 case INFO_KEY_EXPOSURE_TIME:
-                    image.getData().put(String.valueOf(R.string.image_info_exposure_time), value);
+                    image.getData().put(Image.DATA_KEY_EXPOSURE_TIME, value);
                     break;
                 case INFO_KEY_ISO:
-                    image.getData().put(String.valueOf(R.string.image_info_iso), value);
+                    image.getData().put(Image.DATA_KEY_ISO, value);
                     break;
                 case INFO_KEY_POSITION:
-                    image.getData().put(String.valueOf(R.string.image_info_position), value);
+                    image.getData().put(Image.DATA_KEY_POSITION, value);
                     break;
                 case INFO_KEY_FLASH:
-                    image.getData().put(String.valueOf(R.string.image_info_flash), value);
+                    image.getData().put(Image.DATA_KEY_FLASH, value);
                     break;
                 case INFO_KEY_VISITS:
-                    image.getData().put(String.valueOf(R.string.image_info_number_of_calls), value);
+                    image.getData().put(Image.DATA_KEY_VISITS, value);
                     break;
             }
         });

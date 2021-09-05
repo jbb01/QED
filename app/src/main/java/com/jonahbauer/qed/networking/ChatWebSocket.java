@@ -4,7 +4,6 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.BuildConfig;
 import com.jonahbauer.qed.model.Message;
 import com.jonahbauer.qed.networking.cookies.QEDCookieHandler;
@@ -32,11 +31,13 @@ import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
 
 public class ChatWebSocket extends WebSocketListener {
+    private static final String LOG_TAG = ChatWebSocket.class.getName();
+    
     private final ChatWebSocketListener mListener;
 
     private WebSocket mWebSocket;
 
-    private int mPosition = -100;
+    private long mPosition = -100;
     private boolean mSending;
 
     private int mRetryCount;
@@ -92,7 +93,7 @@ public class ChatWebSocket extends WebSocketListener {
             return mWebSocket.send(json.toString());
         } catch (JSONException e) {
             mSending = false;
-            Log.e(Application.LOG_TAG_ERROR, "Chat WebSocket: Unable to create JSON message!", e);
+            Log.e(LOG_TAG, "Chat WebSocket: Unable to create JSON message!", e);
             return false;
         }
         return false;
@@ -103,7 +104,7 @@ public class ChatWebSocket extends WebSocketListener {
 
     @Override
     public void onMessage(@NonNull WebSocket webSocket, @NonNull String text) {
-        if (BuildConfig.DEBUG) Log.d(Application.LOG_TAG_DEBUG, text);
+        if (BuildConfig.DEBUG) Log.d(LOG_TAG, text);
         try {
             JSONObject json = new JSONObject(text);
             switch (json.getString("type")) {
@@ -116,27 +117,17 @@ public class ChatWebSocket extends WebSocketListener {
                     mSending = false;
                     break;
                 case "post":
-                    int id = json.getInt("id");
-                    if (id < mPosition) break;
-                    mPosition = id + 1;
-                    String name = json.getString("name");
-                    String messageStr = json.getString("message");
-                    String username = json.getString("username");
-                    String color = json.getString("color");
-                    String date = json.getString("date");
-                    String channel = json.getString("channel");
-                    int userid = json.optInt("user_id", -1);
-                    int bot = json.getInt("bottag");
-                    name = name.trim();
-                    if ("null".equals(username)) username = null;
+                    Message message = Message.interpretJSONMessage(text);
+                    if (message == null) break;
 
-                    Message message = new Message(name, messageStr, date, userid, username, color, id, bot, channel);
+                    if (message.getId() < mPosition) break;
+                    mPosition = message.getId() + 1;
 
                     if (mListener != null) mListener.onMessage(message);
                     break;
             }
         } catch (JSONException e) {
-            Log.e(Application.LOG_TAG_ERROR, "Chat WebSocket: Unable to parse message!", e);
+            Log.e(LOG_TAG, "Chat WebSocket: Unable to parse message!", e);
         }
     }
 
@@ -156,10 +147,10 @@ public class ChatWebSocket extends WebSocketListener {
                     throw new InvalidCredentialsException();
                 }
             } catch (InvalidCredentialsException e) {
-                Log.e(Application.LOG_TAG_ERROR, e.getMessage(), e);
+                Log.e(LOG_TAG, e.getMessage(), e);
                 if (mListener != null) mListener.onError(ChatWebSocketListener.REASON_INVALID_CREDENTIALS, e);
             } catch (NetworkException e) {
-                Log.e(Application.LOG_TAG_ERROR, e.getMessage(), e);
+                Log.e(LOG_TAG, e.getMessage(), e);
                 if (mListener != null) mListener.onError(ChatWebSocketListener.REASON_NETWORK, e);
             }
         }
@@ -171,10 +162,10 @@ public class ChatWebSocket extends WebSocketListener {
             mSending = false;
             throw (Exception) t;
         } catch (UnknownHostException | SSLException e) {
-            Log.e(Application.LOG_TAG_DEBUG, "Chat WebSocket " + webSocket.toString() + " no network!", e);
+            Log.e(LOG_TAG, "Chat WebSocket " + webSocket.toString() + " no network!", e);
             if (mListener != null) mListener.onError(ChatWebSocketListener.REASON_NETWORK, t);
         } catch (Exception e) {
-            Log.e(Application.LOG_TAG_DEBUG, "Chat WebSocket failed! " + e.getClass().toString(), e);
+            Log.e(LOG_TAG, "Chat WebSocket failed! " + e.getClass().toString(), e);
             if (mListener != null) mListener.onError(null, t);
         }
     }

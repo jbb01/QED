@@ -5,7 +5,6 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.core.util.Pair;
 
-import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.model.Person;
 import com.jonahbauer.qed.model.Registration;
 import com.jonahbauer.qed.networking.parser.HtmlParser;
@@ -14,6 +13,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 public final class PersonParser extends HtmlParser<Person> {
+    private static final String LOG_TAG = PersonParser.class.getName();
+    
     public static final PersonParser INSTANCE = new PersonParser();
 
     private PersonParser() {}
@@ -80,7 +81,7 @@ public final class PersonParser extends HtmlParser<Person> {
                            }
                        }
                    } catch (Exception e) {
-                       Log.e(Application.LOG_TAG_ERROR, "Error parsing person " + person.getId() + ".", e);
+                       Log.e(LOG_TAG, "Error parsing person " + person.getId() + ".", e);
                    }
                });
     }
@@ -113,7 +114,7 @@ public final class PersonParser extends HtmlParser<Person> {
                            }
                        }
                    } catch (Exception e) {
-                       Log.e(Application.LOG_TAG_ERROR, "Error parsing person " + person.getId() + ".", e);
+                       Log.e(LOG_TAG, "Error parsing person " + person.getId() + ".", e);
                    }
                });
     }
@@ -147,7 +148,7 @@ public final class PersonParser extends HtmlParser<Person> {
                                value.text()
                        ));
                    } catch (Exception e) {
-                       Log.e(Application.LOG_TAG_ERROR, "Error parsing person " + person.getId() + ".", e);
+                       Log.e(LOG_TAG, "Error parsing person " + person.getId() + ".", e);
                    }
                });
     }
@@ -179,7 +180,7 @@ public final class PersonParser extends HtmlParser<Person> {
 
                 person.getEvents().put(event, registration);
             } catch (Exception e) {
-                Log.e(Application.LOG_TAG_ERROR, "Error parsing person " + person.getId() + ".", e);
+                Log.e(LOG_TAG, "Error parsing person " + person.getId() + ".", e);
             }
         });
     }

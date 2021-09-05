@@ -3,48 +3,34 @@ package com.jonahbauer.qed.activities.mainFragments;
 import android.graphics.drawable.Animatable;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
-import android.widget.CheckBox;
+import android.widget.AdapterView;
 import android.widget.CompoundButton;
-import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.RadioButton;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StyleRes;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.sheets.person.PersonInfoBottomSheet;
+import com.jonahbauer.qed.databinding.FragmentPersonsDatabaseBinding;
 import com.jonahbauer.qed.layoutStuff.views.CheckBoxTriStates;
 import com.jonahbauer.qed.model.Person;
 import com.jonahbauer.qed.model.adapter.PersonAdapter;
-import com.jonahbauer.qed.networking.QEDDBPages;
+import com.jonahbauer.qed.model.viewmodel.PersonListViewModel;
 import com.jonahbauer.qed.networking.Reason;
-import com.jonahbauer.qed.networking.async.QEDPageReceiver;
+import com.jonahbauer.qed.util.StatusWrapper;
+import com.jonahbauer.qed.util.ViewUtils;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
-public class PersonDatabaseFragment extends QEDFragment implements CompoundButton.OnCheckedChangeListener, QEDPageReceiver<List<Person>> {
+public class PersonDatabaseFragment extends QEDFragment implements CompoundButton.OnCheckedChangeListener, AdapterView.OnItemClickListener {
     private PersonAdapter mPersonAdapter;
+    private FragmentPersonsDatabaseBinding mBinding;
 
-    private ListView mPersonListView;
-    private ArrayList<Person> mPersons;
-    private View mExpand;
-    private ProgressBar mSearchProgress;
-    private CheckBox mFirstNameCheckBox;
-    private CheckBox mLastNameCheckBox;
-    private CheckBoxTriStates mMemberCheckBox;
-    private CheckBoxTriStates mActiveCheckBox;
-    private EditText mFirstNameEditText;
-    private EditText mLastNameEditText;
-    private TextView mHitsView;
-    private TextView mErrorLabel;
-    private Button mSearchButton;
+    private PersonListViewModel mPersonListViewModel;
 
     private boolean mSortLastName = false;
 
@@ -60,61 +46,54 @@ public class PersonDatabaseFragment extends QEDFragment implements CompoundButto
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        mPersons = new ArrayList<>();
-    }
-
-    @Override
     public void onStart() {
         super.onStart();
-
-        mSearchProgress.setVisibility(View.VISIBLE);
-        mErrorLabel.setVisibility(View.GONE);
-        mPersonListView.setVisibility(View.GONE);
-        mSearchButton.setEnabled(false);
-        QEDDBPages.getPersonList(this);
+        mPersonListViewModel.load();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        CheckBox expandCheckBox = view.findViewById(R.id.expand_checkBox);
-        mPersonListView = view.findViewById(R.id.person_list_view);
-        mExpand = view.findViewById(R.id.expandable);
-        mSearchButton = view.findViewById(R.id.search_button);
-        mSearchProgress = view.findViewById(R.id.search_progress);
-        mFirstNameCheckBox = view.findViewById(R.id.database_firstName_checkbox);
-        mLastNameCheckBox = view.findViewById(R.id.database_lastName_checkbox);
-        mMemberCheckBox = view.findViewById(R.id.database_member_checkbox);
-        mActiveCheckBox = view.findViewById(R.id.database_active_checkbox);
-        mFirstNameEditText = view.findViewById(R.id.database_firstName_editText);
-        mLastNameEditText = view.findViewById(R.id.database_lastName_editText);
-        mHitsView = view.findViewById(R.id.database_hits);
-        mErrorLabel = view.findViewById(R.id.label_error);
-        RadioButton sortByFirstNameRadioButton = view.findViewById(R.id.database_sort_first_name_radio_button);
-        RadioButton sortByLastNameRadioButton = view.findViewById(R.id.database_sort_last_name_radio_button);
+        mBinding = FragmentPersonsDatabaseBinding.bind(view);
+        mPersonListViewModel = new ViewModelProvider(this).get(PersonListViewModel.class);
 
-        mPersonAdapter = new PersonAdapter(getContext(), new ArrayList<>(), PersonAdapter.SortMode.FIRST_NAME, view.findViewById(R.id.fixed_header));
-        mPersonListView.setAdapter(mPersonAdapter);
-        mPersonListView.setOnScrollListener(mPersonAdapter);
-        mPersonListView.setOnItemClickListener((parent, view1, position, id) -> showBottomSheetDialogFragment(mPersonAdapter.getItem((int) id)));
+        mPersonAdapter = new PersonAdapter(getContext(), new ArrayList<>(), PersonAdapter.SortMode.FIRST_NAME, mBinding.fixedHeader.getRoot());
+        mBinding.list.setOnItemClickListener(this);
+        mBinding.list.setOnScrollListener(mPersonAdapter);
+        mBinding.list.setAdapter(mPersonAdapter);
 
-        mSearchButton.setOnClickListener(a -> search());
-        sortByFirstNameRadioButton.setOnClickListener(this::onRadioButtonClicked);
-        sortByLastNameRadioButton.setOnClickListener(this::onRadioButtonClicked);
+        mPersonListViewModel.getPersons().observe(getViewLifecycleOwner(), persons -> {
+            mBinding.setStatus(persons.getCode());
 
-        expandCheckBox.setOnCheckedChangeListener(this);
+            mPersonAdapter.clear();
+            if (persons.getCode() == StatusWrapper.STATUS_LOADED) {
+                mPersonAdapter.addAll(persons.getValue());
+            } else if (persons.getCode() == StatusWrapper.STATUS_ERROR) {
+                Reason reason = persons.getReason();
+                mBinding.setError(getString(reason == Reason.EMPTY ? R.string.database_empty : reason.getStringRes()));
+            }
+            mPersonAdapter.notifyDataSetChanged();
 
-        mFirstNameCheckBox.setOnCheckedChangeListener(this);
-        mLastNameCheckBox.setOnCheckedChangeListener(this);
-        mMemberCheckBox.setOnCheckedChangeListener(this);
-        mActiveCheckBox.setOnCheckedChangeListener(this);
+            int hits = mPersonAdapter.getItemList().size();
+            if (hits > 0) {
+                mBinding.setHits(getString(R.string.hits, hits));
+            } else {
+                mBinding.setHits("");
+            }
+        });
 
-        onCheckedChanged(mFirstNameCheckBox, mFirstNameCheckBox.isChecked());
-        onCheckedChanged(mLastNameCheckBox, mLastNameCheckBox.isChecked());
-        onCheckedChanged(mMemberCheckBox, mMemberCheckBox.isChecked());
-        onCheckedChanged(mActiveCheckBox, mActiveCheckBox.isChecked());
+        mBinding.searchButton.setOnClickListener(v -> search());
+        mBinding.databaseSortFirstNameRadioButton.setOnClickListener(this::onRadioButtonClicked);
+        mBinding.databaseSortLastNameRadioButton.setOnClickListener(this::onRadioButtonClicked);
+
+        mBinding.expandCheckBox.setOnCheckedChangeListener(this);
+
+        mBinding.databaseFirstNameCheckbox.setOnCheckedChangeListener(this);
+        mBinding.databaseLastNameCheckbox.setOnCheckedChangeListener(this);
+        mBinding.databaseActiveCheckbox.setOnCheckedChangeListener(this);
+        mBinding.databaseMemberCheckbox.setOnCheckedChangeListener(this);
+
+        onCheckedChanged(mBinding.databaseFirstNameCheckbox, mBinding.databaseFirstNameCheckbox.isChecked());
+        onCheckedChanged(mBinding.databaseLastNameCheckbox, mBinding.databaseLastNameCheckbox.isChecked());
     }
 
     @Override
@@ -124,18 +103,18 @@ public class PersonDatabaseFragment extends QEDFragment implements CompoundButto
             if (isChecked) {
                 buttonView.setButtonDrawable(R.drawable.ic_arrow_up_accent_animation);
                 ((Animatable) Objects.requireNonNull(buttonView.getButtonDrawable())).start();
-                expand(mExpand);
+                ViewUtils.expand(mBinding.expandable);
             } else {
                 buttonView.setButtonDrawable(R.drawable.ic_arrow_down_accent_animation);
                 ((Animatable) Objects.requireNonNull(buttonView.getButtonDrawable())).start();
-                collapse(mExpand);
+                ViewUtils.collapse(mBinding.expandable);
             }
         } else if (id == R.id.database_firstName_checkbox) {
-            mFirstNameEditText.setEnabled(isChecked);
-            if (isChecked) mFirstNameEditText.requestFocus();
+            mBinding.databaseFirstNameEditText.setEnabled(isChecked);
+            if (isChecked) mBinding.databaseFirstNameEditText.requestFocus();
         } else if (id == R.id.database_lastName_checkbox) {
-            mLastNameEditText.setEnabled(isChecked);
-            if (isChecked) mLastNameEditText.requestFocus();
+            mBinding.databaseLastNameEditText.setEnabled(isChecked);
+            if (isChecked) mBinding.databaseLastNameEditText.requestFocus();
         }
     }
 
@@ -150,84 +129,48 @@ public class PersonDatabaseFragment extends QEDFragment implements CompoundButto
         }
     }
 
-    private static void expand(@NonNull final View v) {
-        v.setVisibility(View.VISIBLE);
-    }
-
-    private static void collapse(@NonNull final View v) {
-        v.setVisibility(View.GONE);
-    }
-
     private void search() {
-        List<Person> result = new ArrayList<>();
+        String firstName = null;
+        String lastName = null;
+        Boolean member = null;
+        Boolean active = null;
 
-        for (Person person : mPersons) {
-            if (mFirstNameCheckBox.isChecked() && !person.getFirstName().contains(mFirstNameEditText.getText().toString().trim())) continue;
-            if (mLastNameCheckBox.isChecked() && !person.getLastName().contains(mLastNameEditText.getText().toString().trim())) continue;
-            if (mMemberCheckBox.getState() == CheckBoxTriStates.UNCHECKED && person.isMember()) continue;
-            else if (mMemberCheckBox.getState() == CheckBoxTriStates.CHECKED && !person.isMember()) continue;
-            if (mActiveCheckBox.getState() == CheckBoxTriStates.UNCHECKED && person.isActive()) continue;
-            else if (mActiveCheckBox.getState() == CheckBoxTriStates.CHECKED && !person.isActive()) continue;
-            result.add(person);
+        if (mBinding.databaseFirstNameCheckbox.isChecked()) {
+            firstName = mBinding.databaseFirstNameEditText.getText().toString().trim();
         }
 
-        if (mSortLastName) mPersonAdapter.setSortMode(PersonAdapter.SortMode.LAST_NAME);
-        else mPersonAdapter.setSortMode(PersonAdapter.SortMode.FIRST_NAME);
+        if (mBinding.databaseLastNameCheckbox.isChecked()) {
+            lastName = mBinding.databaseLastNameEditText.getText().toString().trim();
+        }
 
-        mPersonAdapter.removeAll(mPersons);
-        mPersonAdapter.addAll(result);
+        int memberCheckbox = mBinding.databaseMemberCheckbox.getState();
+        if (memberCheckbox == CheckBoxTriStates.CHECKED) {
+            member = true;
+        } else if (memberCheckbox == CheckBoxTriStates.UNCHECKED) {
+            member = false;
+        }
 
-        String hits = result.size() + " " + getString(R.string.database_hits);
-        mHitsView.post(() -> mHitsView.setText(hits));
+        int activeCheckbox = mBinding.databaseActiveCheckbox.getState();
+        if (activeCheckbox == CheckBoxTriStates.CHECKED) {
+            active = true;
+        } else if (activeCheckbox == CheckBoxTriStates.UNCHECKED) {
+            active = false;
+        }
+
+        mPersonAdapter.setSortMode(mSortLastName ? PersonAdapter.SortMode.LAST_NAME : PersonAdapter.SortMode.FIRST_NAME);
+        mPersonListViewModel.filter(firstName, lastName, member, active);
     }
 
     @Override
-    public void onPageReceived(@NonNull List<Person> persons) {
-        this.mPersons.clear();
-        mPersonAdapter.clear();
-
-        this.mPersons.addAll(persons);
-        mPersonAdapter.addAll(persons);
-
-        if (persons.size() == 0) {
-            setError(getString(R.string.database_empty));
-        } else {
-            mSearchProgress.setVisibility(View.GONE);
-            mPersonListView.setVisibility(View.VISIBLE);
-            mSearchButton.setEnabled(true);
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Person person = mPersonAdapter.getItem(position);
+        if (person != null) {
+            showBottomSheetDialogFragment(person);
         }
-    }
-
-    @Override
-    public void onError(List<Person> persons, String reason, Throwable cause) {
-        QEDPageReceiver.super.onError(persons, reason, cause);
-
-        final String errorString;
-
-        if (Reason.NETWORK.equals(reason)) {
-            errorString = getString(R.string.database_offline);
-        } else {
-            errorString = getString(R.string.error_unknown);
-        }
-
-        setError(errorString);
     }
 
     private void showBottomSheetDialogFragment(@NonNull Person person) {
         PersonInfoBottomSheet sheet = PersonInfoBottomSheet.newInstance(person);
         sheet.show(getParentFragmentManager(), sheet.getTag());
-    }
-
-    private void setError(String error) {
-        mHandler.post(() -> {
-            if (error == null) {
-                mErrorLabel.setVisibility(View.GONE);
-            } else {
-                mErrorLabel.setText(error);
-                mErrorLabel.setVisibility(View.VISIBLE);
-                mSearchProgress.setVisibility(View.GONE);
-                mPersonListView.setVisibility(View.GONE);
-            }
-        });
     }
 }

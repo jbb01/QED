@@ -4,6 +4,13 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+import androidx.room.TypeConverters;
+
+import com.jonahbauer.qed.model.room.Converters;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -14,20 +21,49 @@ import java.util.stream.Collectors;
 import lombok.Data;
 
 @Data
+@Entity
+@TypeConverters(Converters.class)
 public class Album implements Parcelable {
     public static final String CATEGORY_ETC = "Sonstige";
 
+    @PrimaryKey
     private final long id;
+
+    @ColumnInfo(name = "name")
     private String name;
+
+    @ColumnInfo(name = "owner")
     private String owner;
+
+    @ColumnInfo(name = "creation_date")
     private String creationDate;
+
+    @ColumnInfo(name = "private")
     private boolean private_;
-    private final List<Person> persons = new ArrayList<>();
-    private final List<Date> dates = new ArrayList<>();
-    private final List<String> categories = new ArrayList<>();
+
+    @ColumnInfo(name = "persons")
+    private List<Person> persons = new ArrayList<>();
+
+    @ColumnInfo(name = "dates")
+    private List<Date> dates = new ArrayList<>();
+
+    @ColumnInfo(name = "categories")
+    private List<String> categories = new ArrayList<>();
+
+    @Ignore
     private final List<Image> images = new ArrayList<>();
+
+    /**
+     * This flag indicates whether the image list for this album was downloaded and stored in the
+     * database. If this flag is not set the album cannot be viewed in offline mode.
+     */
+    @ColumnInfo(name = "image_list_downloaded")
     private boolean imageListDownloaded;
 
+    /**
+     * This flag indicates whether the album has been completely loaded from the website.
+     */
+    @Ignore
     private boolean loaded;
 
     @NonNull
@@ -39,11 +75,10 @@ public class Album implements Parcelable {
         if (owner != null) entries.add("\"owner\":\"" + owner + "\"");
         if (creationDate != null) entries.add("\"creationDate\":\"" + creationDate + "\"");
         entries.add("\"private\": " + private_);
+        entries.add("\"imageListDownloaded\": " + imageListDownloaded);
         if (!persons.isEmpty()) entries.add("\"persons\":" + persons);
         if (!dates.isEmpty()) entries.add("\"dates\":" + dates);
         if (!categories.isEmpty()) entries.add("\"categories\":" + categories);
-//        if (!images.isEmpty()) entries.add("\"images\":" + images);
-        entries.add("\"imageListDownloaded\":" + imageListDownloaded);
         return entries.stream().collect(Collectors.joining(", ", "{", "}"));
     }
 
@@ -62,7 +97,7 @@ public class Album implements Parcelable {
         dest.writeTypedList(persons);
         dest.writeInt(dates.size());
         for (Date date : dates) {
-            dest.writeLong(date.getTime());
+            dest.writeSerializable(date);
         }
         dest.writeStringList(categories);
         dest.writeTypedList(images);
@@ -82,7 +117,7 @@ public class Album implements Parcelable {
 
             int dateSize = source.readInt();
             for (int i = 0; i < dateSize; i++) {
-                album.dates.add(new Date(source.readLong()));
+                album.dates.add((Date) source.readSerializable());
             }
 
             source.readStringList(album.categories);

@@ -41,8 +41,4 @@ public class AlbumAdapter extends ArrayAdapter<Album> {
         binding.setAlbum(album);
         return binding.getRoot();
     }
-
-    public void add(int index, Album album) {
-        mAlbumList.add(index, album);
-    }
 }

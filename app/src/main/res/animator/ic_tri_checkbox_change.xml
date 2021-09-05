@@ -2,24 +2,24 @@
 <set xmlns:android="http://schemas.android.com/apk/res/android">
     <set android:ordering="sequentially">
         <objectAnimator
-            android:duration="@integer/checkbox_change_1"
+            android:duration="@android:integer/config_shortAnimTime"
             android:propertyName="scaleX"
             android:valueFrom="0.2"
             android:valueTo="0.18" />
         <objectAnimator
-            android:duration="@integer/checkbox_change_2"
+            android:duration="@android:integer/config_shortAnimTime"
             android:propertyName="scaleX"
             android:valueFrom="0.18"
             android:valueTo="0.2" />
     </set>
     <set android:ordering="sequentially">
         <objectAnimator
-            android:duration="@integer/checkbox_change_1"
+            android:duration="@android:integer/config_shortAnimTime"
             android:propertyName="scaleY"
             android:valueFrom="0.2"
             android:valueTo="0.18" />
         <objectAnimator
-            android:duration="@integer/checkbox_change_2"
+            android:duration="@android:integer/config_shortAnimTime"
             android:propertyName="scaleY"
             android:valueFrom="0.18"
             android:valueTo="0.2" />

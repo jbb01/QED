@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <set xmlns:android="http://schemas.android.com/apk/res/android">
     <objectAnimator
-        android:duration="@integer/expand_time"
+        android:duration="@android:integer/config_mediumAnimTime"
         android:propertyName="rotation"
         android:valueFrom="180"
         android:valueTo="0"/>

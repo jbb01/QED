@@ -1,142 +1,89 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/root"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:mContext=".activities.ImageActivity"
-    android:background="@android:color/black">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <import type="android.view.View"/>
+        <import type="com.jonahbauer.qed.util.StatusWrapper"/>
+        <import type="com.jonahbauer.qed.model.Image"/>
 
-    <View
-        android:id="@+id/gallery_image_overlay_top"
-        android:layout_width="match_parent"
-        android:layout_height="24dp"
-        android:visibility="gone"
-        android:background="#88000000"
-        android:elevation="2dp"
-        tools:visibility="visible"/>
+        <variable name="status" type="StatusWrapper&lt;Image>" />
+        <variable name="extended" type="boolean" />
+    </data>
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:layout_below="@id/gallery_image_overlay_top"
-        android:background="#88000000"
-        android:elevation="2dp" />
-
-    <!--
     <RelativeLayout
-        android:id="@+id/gallery_image_overlay_top"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:paddingTop="48dp"
-        android:paddingBottom="24dp"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:background="#88000000"
-        android:elevation="2dp"
-        android:visibility="gone"
-        tools:visibility="visible">
-        <ImageButton
-            android:id="@android:id/home"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:background="#0000"
-            android:src="@drawable/ic_arrow_back"
-            tools:ignore="ContentDescription" />
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true">
-
-            <com.jonahbauer.qed.layoutStuff.views.VisibilityChangingImageButton
-                android:id="@+id/image_download"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="#0000"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
-                android:src="@drawable/ic_menu_download"
-                tools:ignore="ContentDescription" />
-            <com.jonahbauer.qed.layoutStuff.views.VisibilityChangingImageButton
-                android:id="@+id/image_launch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="#0000"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
-                android:src="@drawable/ic_menu_launch"
-                tools:ignore="ContentDescription" />
-            <com.jonahbauer.qed.layoutStuff.views.VisibilityChangingImageButton
-                android:id="@+id/image_info"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="#0000"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
-                android:src="@drawable/ic_menu_info"
-                tools:ignore="ContentDescription" />
-        </LinearLayout>
-    </RelativeLayout>
-    -->
-
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/gallery_image_view_pager"
+        android:id="@+id/root"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"/>
+        tools:context=".activities.ImageActivity"
+        android:background="@android:color/black">
 
-    <RelativeLayout
-        android:id="@+id/gallery_image_overlay_bottom"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:paddingTop="24dp"
-        android:paddingBottom="24dp"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:background="#88000000"
-        android:elevation="2dp"
-        android:visibility="gone"
-        tools:visibility="visible">
-        <TextView
-            android:id="@+id/gallery_image_error"
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/gallery_image_view_pager"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_alignParentStart="true"
-            android:layout_alignParentEnd="true"
             android:layout_alignParentTop="true"
-            android:textAlignment="center"
-            android:textColor="@android:color/holo_red_dark"
-            android:textSize="16sp"
-            android:background="#0000"
-            android:text="@string/cant_connect"
-            android:visibility="gone"
-            tools:visibility="visible"/>
-        <TextView
-            android:id="@+id/gallery_image_name"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="3dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginEnd="-3dp"
+            android:layout_marginBottom="0dp" />
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:paddingTop="24dp"
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_alignParentTop="true"
+            android:visibility="@{extended ? View.VISIBLE : View.GONE}"
+            android:elevation="0dp"
+            android:background="#88000000" />
+
+        <RelativeLayout
+            android:id="@+id/gallery_image_overlay_bottom"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
             android:layout_alignParentStart="true"
             android:layout_alignParentEnd="true"
-            android:layout_below="@id/gallery_image_error"
-            android:textAlignment="center"
-            android:textColor="@android:color/white"
-            android:textSize="16sp"
-            android:background="#0000"
-            tools:text="IMG_20190831_091714.jpg" />
-    </RelativeLayout>
+            android:paddingTop="24dp"
+            android:paddingBottom="24dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:background="#88000000"
+            android:elevation="2dp"
+            android:visibility="@{extended ? View.VISIBLE : View.GONE}"
+            tools:visibility="visible">
+            <TextView
+                android:id="@+id/gallery_image_error"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentTop="true"
+                android:textAlignment="center"
+                android:textColor="@android:color/holo_red_dark"
+                android:textSize="16sp"
+                android:background="#0000"
+                android:text="@{status != null ? status.errorMessage : com.jonahbauer.qed.R.string.empty}"
+                android:visibility="@{status.code == StatusWrapper.STATUS_ERROR ? View.VISIBLE : View.GONE}"
+                tools:text="Error"
+                tools:visibility="visible"/>
+            <TextView
+                android:id="@+id/gallery_image_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentEnd="true"
+                android:layout_below="@id/gallery_image_error"
+                android:textAlignment="center"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                android:background="#0000"
+                android:text="@{status.value.name}"
+                tools:text="IMG_20190831_091714.jpg" />
+        </RelativeLayout>
 
-</RelativeLayout>
+    </RelativeLayout>
+</layout>

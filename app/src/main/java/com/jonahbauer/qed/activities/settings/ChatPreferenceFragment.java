@@ -13,10 +13,14 @@ import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 import androidx.preference.SwitchPreference;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.jonahbauer.qed.R;
-import com.jonahbauer.qed.database.ChatDatabase;
 import com.jonahbauer.qed.layoutStuff.SeekBarPreference;
+import com.jonahbauer.qed.model.room.Database;
 import com.jonahbauer.qed.util.Preferences;
+
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class ChatPreferenceFragment extends PreferenceFragmentCompat implements PreferenceFragment, Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
     private Preference deleteDatabase;
@@ -32,15 +36,19 @@ public class ChatPreferenceFragment extends PreferenceFragmentCompat implements 
         setHasOptionsMenu(true);
 
         katex = findPreference(Preferences.chat().keys().katex());
+        assert katex != null;
         katex.setOnPreferenceChangeListener(this);
 
         links = findPreference(Preferences.chat().keys().linkify());
+        assert links != null;
         links.setOnPreferenceChangeListener(this);
 
         deleteDatabase = findPreference(Preferences.chat().keys().dbClear());
+        assert deleteDatabase != null;
         deleteDatabase.setOnPreferenceClickListener(this);
 
         SeekBarPreference maxShownRows = findPreference(Preferences.chat().keys().dbMaxResults());
+        assert maxShownRows != null;
         maxShownRows.setExternalValues(maxShownRowsValues, maxShownRowsStringValues);
     }
 
@@ -64,10 +72,13 @@ public class ChatPreferenceFragment extends PreferenceFragmentCompat implements 
             alertDialog.setMessage(R.string.preferences_chat_confirm_delete_db);
             alertDialog.setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss());
             alertDialog.setPositiveButton(R.string.delete, (dialog, which) -> {
-                ChatDatabase db = new ChatDatabase();
-                db.init(getContext(), null);
-                db.clear();
-                db.close();
+                Database.getInstance(requireContext()).messageDao().clear()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                                () -> Snackbar.make(requireView(), R.string.deleted, Snackbar.LENGTH_SHORT).show(),
+                                (e) -> Snackbar.make(requireView(), R.string.delete_error, Snackbar.LENGTH_SHORT).show()
+                        );
             });
             alertDialog.show();
             return true;

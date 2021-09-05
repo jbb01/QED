@@ -1,55 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:id="@+id/fragment"
-    tools:mContext=".activities.mainFragments.ChatDatabaseFragment">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <LinearLayout
-        android:id="@+id/database_search_filters"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
+    <data>
+        <import type="android.view.View"/>
+        <import type="com.jonahbauer.qed.util.StatusWrapper"/>
+
+        <variable name="status" type="int" />
+        <variable name="hits" type="String" />
+    </data>
+
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:id="@+id/fragment"
         android:clipToPadding="false"
-        android:paddingBottom="7dp">
+        android:clipChildren="false"
+        tools:context=".activities.mainFragments.ChatDatabaseFragment">
 
-        <RelativeLayout
+        <LinearLayout
+            android:id="@+id/database_search_filters"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?colorSurface"
-            android:elevation="5dp"
-            tools:ignore="UselessParent">
+            android:orientation="vertical"
+            android:elevation="4dp">
+
             <TableLayout
                 android:id="@+id/expandable"
                 android:visibility="gone"
-                tools:visibility="visible"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentTop="true"
+                android:paddingHorizontal="8dp"
+                android:paddingTop="8dp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                tools:visibility="visible">
 
                 <TableRow
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="1dp"
-                    android:paddingEnd="1dp">
+                    android:layout_height="wrap_content">
                     <CheckBox
                         android:id="@+id/database_channel_checkbox"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="5dp"
-                        android:layout_marginEnd="10dp"
-                        android:text="@string/chat_database_channel_checkbox" />
+                        android:paddingEnd="8dp"
+                        android:text="@string/chat_database_channel_checkbox"
+                        tools:ignore="RtlSymmetry" />
                     <EditText
                         android:id="@+id/database_channel_editText"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:layout_marginEnd="6dp"
                         android:textSize="16sp"
                         android:hint="@string/chat_database_channel_hint"
                         android:inputType="text"
@@ -58,22 +61,19 @@
 
                 <TableRow
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="1dp"
-                    android:paddingEnd="1dp">
+                    android:layout_height="wrap_content">
                     <CheckBox
                         android:id="@+id/database_message_checkbox"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="5dp"
-                        android:layout_marginEnd="10dp"
-                        android:text="@string/chat_database_message_checkbox" />
+                        android:paddingEnd="8dp"
+                        android:text="@string/chat_database_message_checkbox"
+                        tools:ignore="RtlSymmetry" />
                     <EditText
                         android:id="@+id/database_message_editText"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:layout_marginEnd="6dp"
                         android:textSize="16sp"
                         android:hint="@string/chat_database_message_hint"
                         android:inputType="text"
@@ -82,22 +82,19 @@
 
                 <TableRow
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="1dp"
-                    android:paddingEnd="1dp">
+                    android:layout_height="wrap_content">
                     <CheckBox
                         android:id="@+id/database_name_checkbox"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="5dp"
-                        android:layout_marginEnd="10dp"
-                        android:text="@string/chat_database_name_checkbox" />
+                        android:paddingEnd="8dp"
+                        android:text="@string/chat_database_name_checkbox"
+                        tools:ignore="RtlSymmetry" />
                     <EditText
                         android:id="@+id/database_name_editText"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:layout_marginEnd="6dp"
                         android:textSize="16sp"
                         android:hint="@string/chat_database_name_hint"
                         android:inputType="text"
@@ -106,144 +103,156 @@
 
                 <TableRow
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="1dp"
-                    android:paddingEnd="1dp">
+                    android:layout_height="wrap_content">
                     <CheckBox
                         android:id="@+id/database_dateFrom_checkbox"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="5dp"
-                        android:layout_marginEnd="10dp"
-                        android:text="@string/chat_database_dateFrom_checkbox" />
+                        android:paddingEnd="8dp"
+                        android:text="@string/chat_database_dateFrom_checkbox"
+                        tools:ignore="RtlSymmetry" />
                     <EditText
                         android:id="@+id/database_dateFrom_editText"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:layout_marginEnd="6dp"
                         android:textSize="16sp"
+                        android:focusable="false"
                         android:hint="@string/chat_database_dateFrom_hint"
-                        android:inputType="datetime"
+                        android:inputType="date"
+                        android:importantForAutofill="no" />
+                    <EditText
+                        android:id="@+id/database_timeFrom_editText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="16sp"
+                        android:focusable="false"
+                        android:hint="@string/chat_database_timeFrom_hint"
+                        android:inputType="time"
                         android:importantForAutofill="no" />
                 </TableRow>
 
                 <TableRow
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="1dp"
-                    android:paddingEnd="1dp">
+                    android:layout_height="wrap_content">
                     <CheckBox
                         android:id="@+id/database_dateTo_checkbox"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="5dp"
-                        android:layout_marginEnd="10dp"
-                        android:text="@string/chat_database_dateTo_checkbox" />
+                        android:paddingEnd="8dp"
+                        android:text="@string/chat_database_dateTo_checkbox"
+                        tools:ignore="RtlSymmetry" />
                     <EditText
                         android:id="@+id/database_dateTo_editText"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:layout_marginEnd="6dp"
                         android:textSize="16sp"
+                        android:focusable="false"
                         android:hint="@string/chat_database_dateTo_hint"
                         android:inputType="datetime"
+                        android:importantForAutofill="no" />
+                    <EditText
+                        android:id="@+id/database_timeTo_editText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="16sp"
+                        android:focusable="false"
+                        android:hint="@string/chat_database_timeTo_hint"
+                        android:inputType="time"
                         android:importantForAutofill="no" />
                 </TableRow>
 
                 <TableRow
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="1dp"
-                    android:paddingEnd="1dp">
+                    android:layout_height="wrap_content">
                     <CheckBox
                         android:id="@+id/database_id_checkbox"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="5dp"
-                        android:layout_marginEnd="10dp"
-                        android:text="@string/chat_database_id_checkbox" />
+                        android:paddingEnd="8dp"
+                        android:text="@string/chat_database_id_checkbox"
+                        tools:ignore="RtlSymmetry" />
                     <EditText
                         android:id="@+id/database_id_editText"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:layout_marginEnd="6dp"
                         android:textSize="16sp"
                         android:hint="@string/chat_database_id_hint"
-                        android:inputType="text"
+                        android:inputType="number"
+                        android:digits="0123456789-"
+                        android:imeActionId="6"
                         android:importantForAutofill="no" />
                 </TableRow>
             </TableLayout>
 
-            <Button
-                android:id="@+id/search_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_below="@id/expandable"
-                android:text="@string/database_search_button"/>
+            <View style="?dividerStyle"/>
 
-            <TextView
-                android:id="@+id/database_hits"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingStart="6dp"
-                android:paddingEnd="6dp"
-                android:layout_alignTop="@id/search_button"
-                android:layout_alignBottom="@id/search_button"
-                android:layout_toEndOf="@id/search_button"
-                android:layout_toStartOf="@id/expand_checkBox"
-                android:layout_below="@id/expandable"
-                android:gravity="center_vertical" />
+            <LinearLayout
+                android:padding="8dp"
+                android:layout_width="match_parent"
+                android:layout_height="54dp">
 
-            <CheckBox
-                android:id="@+id/expand_checkBox"
-                android:paddingEnd="10dp"
-                tools:ignore="RtlSymmetry"
-                android:layout_alignParentEnd="true"
-                android:layout_alignTop="@id/search_button"
-                android:layout_alignBottom="@id/search_button"
-                android:layout_below="@id/expandable"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:button="@drawable/ic_arrow_down_accent_animation"/>
+                <Button
+                    android:id="@+id/search_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="@string/search"
+                    android:enabled="@{status != StatusWrapper.STATUS_PRELOADED}"
+                    style="@style/Widget.App.Button.Small"/>
 
-        </RelativeLayout>
-    </LinearLayout>
+                <TextView
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:text="@{hits}"
+                    android:textAppearance="?textAppearanceCaption"
+                    android:paddingHorizontal="8dp"
+                    tools:text="10 Hits"/>
 
-    <ProgressBar
-        android:layout_below="@id/database_search_filters"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:paddingTop="15dp"
-        android:gravity="center_horizontal"
-        android:id="@+id/search_progress"
-        style="?android:attr/progressBarStyleLarge"
-        android:visibility="gone" />
+                <CheckBox
+                    android:id="@+id/expand_checkBox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:button="@drawable/ic_arrow_down_accent_animation"
+                    android:buttonTint="?colorSecondary"
+                    android:saveEnabled="false"
+                    tools:ignore="RtlSymmetry" />
+            </LinearLayout>
+        </LinearLayout>
 
-    <ListView
-        android:id="@+id/message_list_view"
-        android:layout_below="@id/database_search_filters"
-        android:layout_alignParentBottom="true"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:translationY="-7dp"
-        android:translationZ="-1dp"
-        android:choiceMode="singleChoice"
-        android:listSelector="#0000"
-        android:layout_marginBottom="-6dp"
-        android:background="@android:color/transparent"
-        android:divider="#00ffffff"
-        android:dividerHeight="0dp"
-        android:scrollbarStyle="outsideInset"
-        android:fastScrollAlwaysVisible="true"
-        android:fastScrollEnabled="true"
-        android:visibility="gone" />
+        <ProgressBar
+            android:layout_below="@id/database_search_filters"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:paddingTop="15dp"
+            android:gravity="center_horizontal"
+            android:id="@+id/search_progress"
+            style="?android:attr/progressBarStyleLarge"
+            android:visibility="@{status == StatusWrapper.STATUS_PRELOADED ? View.VISIBLE : View.GONE}" />
 
-</RelativeLayout>
+        <ListView
+            android:id="@+id/message_list_view"
+            android:layout_below="@id/database_search_filters"
+            android:layout_alignParentBottom="true"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:choiceMode="singleChoice"
+            android:listSelector="#0000"
+            android:background="@android:color/transparent"
+            android:divider="#00ffffff"
+            android:dividerHeight="0dp"
+            android:scrollbarStyle="outsideInset"
+            android:fastScrollAlwaysVisible="true"
+            android:fastScrollEnabled="true"
+            android:visibility="@{status == StatusWrapper.STATUS_LOADED ? View.VISIBLE : View.GONE}" />
+
+    </RelativeLayout>
+</layout>

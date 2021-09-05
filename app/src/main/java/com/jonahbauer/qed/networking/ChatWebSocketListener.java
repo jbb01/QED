@@ -4,7 +4,6 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.model.Message;
 
 public interface ChatWebSocketListener {
@@ -14,6 +13,6 @@ public interface ChatWebSocketListener {
     void onMessage(@NonNull Message message);
 
     default void onError(String reason, Throwable cause) {
-        Log.e(Application.LOG_TAG_ERROR, reason != null ? reason : "", cause);
+        Log.e(getClass().getName(), reason != null ? reason : "", cause);
     }
 }

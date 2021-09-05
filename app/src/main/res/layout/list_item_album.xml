@@ -9,42 +9,18 @@
         <variable name="album" type="com.jonahbauer.qed.model.Album" />
     </data>
 
-    <RelativeLayout
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingHorizontal="@dimen/event_padding_horizontal"
-        android:paddingVertical="@dimen/event_padding_vertical"
-        android:clipToPadding="false"
-        android:layout_gravity="center"
-        android:descendantFocusability="blocksDescendants">
-
-        <ImageView
-            android:id="@+id/gallery_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignTop="@id/gallery_name"
-            android:layout_alignBottom="@id/gallery_name"
-            android:maxHeight="50sp"
-            android:padding="2dp"
-            android:layout_marginEnd="5dp"
-            android:src="@drawable/ic_gallery_icon"
-            android:adjustViewBounds="true"
-            android:layout_gravity="center"
-            android:contentDescription="@string/thumbnail"
-            app:tint="@{Themes.colorful(album.id)}"
-            tools:tint="@android:color/holo_green_dark"/>
-
-        <TextView
-            android:id="@+id/gallery_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toEndOf="@id/gallery_icon"
-            android:layout_alignParentTop="true"
-            style="?attr/textAppearanceListItemSecondary"
-            android:paddingTop="14sp"
-            android:paddingBottom="14sp"
-            android:text="@{album.name}"
-            tools:text="Akademie 2018"/>
-    </RelativeLayout>
+        android:paddingVertical="12dp"
+        android:paddingHorizontal="16dp"
+        android:gravity="center_vertical"
+        android:text="@{album.name}"
+        android:textStyle="bold"
+        android:textAppearance="?textAppearanceListItem"
+        android:drawablePadding="8dp"
+        app:drawableStartCompat="@drawable/ic_gallery_icon"
+        app:drawableTint="@{Themes.colorful(album.id)}"
+        tools:drawableTint="@android:color/holo_green_dark"
+        tools:text="Akademie 2018" />
 </layout>

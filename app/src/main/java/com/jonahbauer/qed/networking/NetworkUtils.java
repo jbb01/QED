@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import lombok.experimental.UtilityClass;
 
@@ -98,6 +99,30 @@ public class NetworkUtils {
     public static String readPage(@NonNull HttpURLConnection connection) throws IOException {
         try (InputStream in = connection.getInputStream()) {
             return new String(readAllBytes(in), StandardCharsets.UTF_8);
+        }
+    }
+
+
+    public static boolean isLoginError(Feature feature, HttpURLConnection connection) {
+        String location = connection.getHeaderField("Location");
+
+        switch (feature) {
+            case CHAT:
+                Map<String, List<String>> headers = connection.getHeaderFields();
+                if (headers.containsKey("Set-Cookie")) {
+                    List<String> setCookie = headers.get("Set-Cookie");
+                    for (String s : setCookie) {
+                        if (s.contains("userid=;") || s.contains("pwhash=;")) {
+                            return true;
+                        }
+                    }
+                }
+            case GALLERY:
+                return location != null && location.startsWith("account");
+            case DATABASE:
+                return location != null && location.contains("login");
+            default:
+                throw new IllegalArgumentException("unknown feature " + feature);
         }
     }
 }

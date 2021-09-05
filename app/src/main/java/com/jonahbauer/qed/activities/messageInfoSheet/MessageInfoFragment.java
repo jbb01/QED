@@ -26,11 +26,16 @@ import com.jonahbauer.qed.layoutStuff.views.MessageView;
 import com.jonahbauer.qed.model.Message;
 import com.jonahbauer.qed.util.Preferences;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 public class MessageInfoFragment extends Fragment implements View.OnScrollChangeListener {
     private static final String ARGUMENT_MESSAGE = "message";
 
     private static final int[] backgroundResId = {R.drawable.background_0, R.drawable.background_2, R.drawable.background_3, R.drawable.background_4,
                                                   R.drawable.background_5, R.drawable.background_6, R.drawable.background_7, R.drawable.background_7};
+
+    private final DateFormat DATE_FORMAT = SimpleDateFormat.getDateTimeInstance();
 
     private Message mMessage;
     private boolean mKatex;
@@ -176,7 +181,7 @@ public class MessageInfoFragment extends Fragment implements View.OnScrollChange
             // set values
             valueId.setText(String.valueOf(mMessage.getId()));
             valueName.setText(mMessage.getName());
-            valueTimestamp.setText(mMessage.getDate());
+            valueTimestamp.setText(DATE_FORMAT.format(mMessage.getDate()));
             valueBottag.setText(String.valueOf(mMessage.getBottag()));
             valueMessage.setText(mMessage.getMessage());
             valueChannel.setText(mMessage.getChannel().equals("") ? "(main)" : mMessage.getChannel());

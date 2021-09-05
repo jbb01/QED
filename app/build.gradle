@@ -85,12 +85,18 @@ dependencies {
     implementation 'org.jsoup:jsoup:1.13.1'
     implementation 'com.google.crypto.tink:tink-android:1.6.0'
 
+    implementation 'androidx.room:room-runtime:2.3.0'
+    implementation 'androidx.room:room-rxjava3:2.3.0'
+    implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
+
 
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
 
     //noinspection AnnotationProcessorOnCompilePath
     compileOnly 'org.projectlombok:lombok:1.18.20'
+
     annotationProcessor 'org.projectlombok:lombok:1.18.20'
+    annotationProcessor "androidx.room:room-compiler:2.3.0"
 
     withGoogleImplementation 'com.google.firebase:firebase-messaging:20.2.1'
 

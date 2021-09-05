@@ -1,99 +1,264 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <TextView
-        android:id="@+id/log_dialog_mode_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_alignBottom="@id/log_dialog_mode_spinner"
-        android:gravity="center"
-        android:padding="16dp"
-        android:text="@string/log_dialog_mode_label" />
+    <data>
 
-    <Spinner
-        android:id="@+id/log_dialog_mode_spinner"
+        <import type="android.view.View" />
+
+        <import type="com.jonahbauer.qed.model.viewmodel.LogViewModel.Mode" />
+
+        <variable
+            name="mode"
+            type="Mode" />
+    </data>
+
+    <TableLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_toEndOf="@id/log_dialog_mode_label"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:padding="16dp"
-        android:entries="@array/log_request_modes" />
+        android:orientation="vertical"
+        android:paddingHorizontal="24dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="8dp">
 
-    <include
-        android:id="@+id/log_fragment_postrecent"
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:layout_below="@id/log_dialog_mode_spinner"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:visibility="visible"
-        tools:visibility="visible"
-        layout="@layout/fragment_log_dialog_postrecent"/>
+        <TableRow>
 
-    <include
-        android:id="@+id/log_fragment_daterecent"
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:layout_below="@id/log_fragment_postrecent"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:visibility="gone"
-        tools:visibility="visible"
-        layout="@layout/fragment_log_dialog_daterecent"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:text="@string/log_dialog_mode_label"
+                android:textAppearance="?textAppearanceBody1" />
 
-    <include
-        android:id="@+id/log_fragment_dateinterval"
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:layout_below="@id/log_fragment_daterecent"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:visibility="gone"
-        tools:visibility="visible"
-        layout="@layout/fragment_log_dialog_dateinterval"/>
+            <Spinner
+                android:id="@+id/log_dialog_mode_spinner"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:minHeight="40dp"
+                android:entries="@array/log_request_modes"/>
+        </TableRow>
 
-    <include
-        android:id="@+id/log_fragment_file"
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:layout_below="@id/log_fragment_dateinterval"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:visibility="gone"
-        tools:visibility="visible"
-        layout="@layout/fragment_log_dialog_file"/>
+        <TableRow android:visibility="@{mode == Mode.POST_RECENT ? View.VISIBLE : View.GONE}">
 
-    <include
-        android:id="@+id/log_fragment_postinterval"
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:layout_below="@id/log_fragment_file"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:visibility="gone"
-        tools:visibility="visible"
-        layout="@layout/fragment_log_dialog_postinterval"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:labelFor="@id/log_dialog_postrecent"
+                android:text="@string/log_request_postrecent_before"
+                android:textAppearance="?textAppearanceBody1" />
 
-    <TextView
-        android:id="@+id/log_dialog_running_download"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@id/log_fragment_postinterval"
-        android:paddingStart="@dimen/activity_horizontal_margin"
-        android:paddingEnd="@dimen/activity_horizontal_margin"
-        android:paddingTop="@dimen/activity_vertical_margin"
-        android:text="@string/log_download_running_force_cancel"
-        android:textColor="#F00"
-        android:visibility="gone"
-        tools:visibility="visible" />
+            <EditText
+                android:id="@+id/log_dialog_postrecent"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginHorizontal="8dp"
+                android:layout_weight="1"
+                android:ems="10"
+                android:importantForAutofill="no"
+                android:inputType="number"
+                android:selectAllOnFocus="true" />
 
-</RelativeLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:text="@string/log_request_postrecent_after"
+                android:textAppearance="?textAppearanceBody1" />
+
+        </TableRow>
+
+
+        <TableRow android:visibility="@{mode == Mode.SINCE_OWN ? View.VISIBLE : View.GONE}">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:labelFor="@id/log_dialog_sinceown"
+                android:text="@string/log_request_sinceown_before"
+                android:textAppearance="?textAppearanceBody1" />
+
+            <EditText
+                android:id="@+id/log_dialog_sinceown"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginHorizontal="8dp"
+                android:layout_weight="1"
+                android:ems="10"
+                android:importantForAutofill="no"
+                android:inputType="number"
+                android:selectAllOnFocus="true" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:text="@string/log_request_sinceown_after"
+                android:textAppearance="?textAppearanceBody1" />
+
+        </TableRow>
+
+        <TableRow android:visibility="@{mode == Mode.DATE_RECENT ? View.VISIBLE : View.GONE}">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:labelFor="@id/log_dialog_daterecent"
+                android:text="@string/log_request_daterecent_before"
+                android:textAppearance="?textAppearanceBody1" />
+
+            <EditText
+                android:id="@+id/log_dialog_daterecent"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginHorizontal="8dp"
+                android:layout_weight="1"
+                android:ems="10"
+                android:importantForAutofill="no"
+                android:inputType="number"
+                android:selectAllOnFocus="true" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:text="@string/log_request_daterecent_after"
+                android:textAppearance="?textAppearanceBody1" />
+
+        </TableRow>
+
+        <TableRow android:visibility="@{mode == Mode.DATE_INTERVAL ? View.VISIBLE : View.GONE}">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:labelFor="@id/log_dialog_dateinterval_from"
+                android:text="@string/log_request_dateinterval_from"
+                android:textAppearance="?textAppearanceBody1" />
+
+            <EditText
+                android:id="@+id/log_dialog_dateinterval_from"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:ems="10"
+                android:focusable="false"
+                android:importantForAutofill="no"
+                android:inputType="date"
+                android:selectAllOnFocus="true" />
+        </TableRow>
+
+        <TableRow android:visibility="@{mode == Mode.DATE_INTERVAL ? View.VISIBLE : View.GONE}">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:labelFor="@id/log_dialog_dateinterval_to"
+                android:text="@string/log_request_dateinterval_to"
+                android:textAppearance="?textAppearanceBody1" />
+
+            <EditText
+                android:id="@+id/log_dialog_dateinterval_to"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:ems="10"
+                android:focusable="false"
+                android:importantForAutofill="no"
+                android:inputType="date"
+                android:selectAllOnFocus="true" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/log_fragment_file"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="@{mode == Mode.FILE ? View.VISIBLE : View.GONE}">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:labelFor="@id/log_dialog_file"
+                android:text="@string/log_request_file_title"
+                android:textAppearance="?textAppearanceBody1" />
+
+            <EditText
+                android:id="@+id/log_dialog_file"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:ems="10"
+                android:focusable="false"
+                android:importantForAutofill="no"
+                android:inputType="date"
+                android:selectAllOnFocus="true" />
+
+        </TableRow>
+
+        <TableRow android:visibility="@{mode == Mode.POST_INTERVAL ? View.VISIBLE : View.GONE}">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:labelFor="@id/log_dialog_postinterval_from"
+                android:text="@string/log_request_dateinterval_from"
+                android:textAppearance="?textAppearanceBody1" />
+
+            <EditText
+                android:id="@+id/log_dialog_postinterval_from"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:ems="10"
+                android:importantForAutofill="no"
+                android:inputType="number"
+                android:selectAllOnFocus="true" />
+        </TableRow>
+
+        <TableRow android:visibility="@{mode == Mode.POST_INTERVAL ? View.VISIBLE : View.GONE}">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:labelFor="@id/log_dialog_postinterval_to"
+                android:text="@string/log_request_dateinterval_to"
+                android:textAppearance="?textAppearanceBody1" />
+
+            <EditText
+                android:id="@+id/log_dialog_postinterval_to"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:ems="10"
+                android:importantForAutofill="no"
+                android:inputType="number"
+                android:selectAllOnFocus="true" />
+        </TableRow>
+
+        <TextView
+            android:id="@+id/log_dialog_running_download"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="16dp"
+            android:text="@string/log_download_running_force_cancel"
+            android:textAppearance="?textAppearanceBody1"
+            android:textColor="?colorError"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+    </TableLayout>
+</layout>

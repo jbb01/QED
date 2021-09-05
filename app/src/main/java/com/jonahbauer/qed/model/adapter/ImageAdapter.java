@@ -3,78 +3,56 @@ package com.jonahbauer.qed.model.adapter;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
-import android.util.LongSparseArray;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.content.res.AppCompatResources;
 
 import com.jonahbauer.qed.R;
-import com.jonahbauer.qed.activities.GalleryAlbumActivity;
-import com.jonahbauer.qed.database.GalleryDatabase;
+import com.jonahbauer.qed.databinding.ListItemImageBinding;
 import com.jonahbauer.qed.model.Image;
+import com.jonahbauer.qed.model.room.AlbumDao;
+import com.jonahbauer.qed.model.room.Database;
 import com.jonahbauer.qed.networking.QEDGalleryPages;
 import com.jonahbauer.qed.networking.QEDGalleryPages.Mode;
 import com.jonahbauer.qed.networking.Reason;
 import com.jonahbauer.qed.networking.async.QEDPageStreamReceiver;
-import com.jonahbauer.qed.util.Triple;
+import com.jonahbauer.qed.util.Preferences;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.lang.ref.SoftReference;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
-import java.util.Random;
-import java.util.Set;
+
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 import static com.jonahbauer.qed.model.Image.AUDIO_FILE_EXTENSIONS;
 import static com.jonahbauer.qed.model.Image.VIDEO_FILE_EXTENSIONS;
 
-public class ImageAdapter extends ArrayAdapter<Image> implements QEDPageStreamReceiver<String> {
-    private final GalleryAlbumActivity mContext;
+public class ImageAdapter extends ArrayAdapter<Image> implements QEDPageStreamReceiver<ListItemImageBinding> {
+    private static final String LOG_TAG = ImageAdapter.class.getName();
+
+    private final Context mContext;
+    private final AlbumDao mAlbumDao;
+
     private final List<Image> mImageList;
+    private final boolean mOfflineMode;
 
-    private final HashMap<String, AsyncTask<?,?,?>> mAsyncTasks;
-    private final HashMap<String, Triple<Image, ImageView, ProgressBar>> mByTag;
-    private final HashMap<View, String> mTagByView;
-    private final HashMap<Long, ByteArrayOutputStream> mBaosById;
-
-    private final LongSparseArray<SoftReference<Bitmap>> mCache;
-
-    private final Set<String> mInvalidatedTags;
-
-    private final GalleryDatabase mGalleryDatabase;
-
-    private boolean mOfflineMode;
-    public static boolean sReceivedError = false;
-
-    private final Random mRandom;
-
-    public ImageAdapter(GalleryAlbumActivity context, List<Image> imageList, boolean offlineMode) {
+    public ImageAdapter(Context context, List<Image> imageList) {
         super(context, R.layout.list_item_image, imageList);
+
         this.mContext = context;
+        this.mAlbumDao = Database.getInstance(context.getApplicationContext()).albumDao();
+
         this.mImageList = imageList;
-        this.mOfflineMode = offlineMode;
-
-        mRandom = new Random();
-
-        mGalleryDatabase = new GalleryDatabase();
-        mGalleryDatabase.init(context);
-
-        mAsyncTasks = new HashMap<>();
-        mByTag = new HashMap<>();
-        mTagByView = new HashMap<>();
-        mInvalidatedTags = new HashSet<>();
-        mCache = new LongSparseArray<>();
-        mBaosById = new HashMap<>();
+        this.mOfflineMode = Preferences.gallery().isOfflineMode();
     }
 
     @NonNull
@@ -82,184 +60,127 @@ public class ImageAdapter extends ArrayAdapter<Image> implements QEDPageStreamRe
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         final Image image = mImageList.get(position);
 
-        View view;
+        ListItemImageBinding binding;
         if (convertView != null) {
-            view = convertView;
-            String tag = mTagByView.getOrDefault(convertView, "");
-            mInvalidatedTags.add(tag);
-
-            AsyncTask<?,?,?> async = mAsyncTasks.get(tag);
-            if (async != null) async.cancel(false);
+            binding = (ListItemImageBinding) convertView.getTag();
         } else {
             LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            view = Objects.requireNonNull(inflater).inflate(R.layout.list_item_image, parent, false);
+            binding = ListItemImageBinding.inflate(inflater, parent, false);
+            binding.getRoot().setTag(binding);
         }
 
-        ImageView thumbnail = view.findViewById(R.id.thumbnail);
-        ProgressBar progressBar = view.findViewById(R.id.loading);
+        binding.setImage(image);
+        setThumbnail(image, binding);
 
-        ((TextView)view.findViewById(R.id.image_title)).setText(image.getName());
-        thumbnail.setVisibility(View.GONE);
-        progressBar.setVisibility(View.VISIBLE);
-
-        String tag = getClass().toString() + mRandom.nextLong();
-        mByTag.put(tag, new Triple<>(image, thumbnail, progressBar));
-
-        setThumbnail(tag, image, thumbnail, progressBar);
-
-        mTagByView.put(view, tag);
-
-        return view;
+        return binding.getRoot();
     }
 
-    public void add(int index, Image image) {
-        mImageList.add(index, image);
-    }
+    private void setThumbnail(Image image, ListItemImageBinding binding) {
+        Disposable disposable = binding.getDatabaseAccess();
+        if (disposable != null) disposable.dispose();
 
-    private void setThumbnail(String tag, @NonNull Image image, ImageView thumbnail, ProgressBar progressBar) {
-        // Cache
-        SoftReference<Bitmap> cachedBitmap = mCache.get(image.getId());
-        if (cachedBitmap != null) {
-            Bitmap bitmap = cachedBitmap.get();
-            if (bitmap != null) {
-                thumbnail.setImageBitmap(bitmap);
-                thumbnail.setVisibility(View.VISIBLE);
-                progressBar.setVisibility(View.GONE);
-                return;
-            }
-        }
-
-        // Database
-        Bitmap bitmap = mGalleryDatabase.getThumbnail(image);
-        if (bitmap != null) {
-            mCache.put(image.getId(), new SoftReference<>(bitmap));
-            thumbnail.setImageBitmap(bitmap);
-            thumbnail.setVisibility(View.VISIBLE);
-            progressBar.setVisibility(View.GONE);
-            image.setAvailable(true);
+        if (image.getThumbnail() != null) {
+            binding.setThumbnail(getThumbnail(image, false));
             return;
+        }
+
+        binding.setThumbnail(null);
+        Disposable databaseAccess = mAlbumDao.findImageById(image.getId())
+                                             .subscribeOn(Schedulers.io())
+                                             .observeOn(AndroidSchedulers.mainThread())
+                                             .subscribe(
+                                                     img -> {
+                                                         image.set(img);
+                                                         image.setDatabaseLoaded(true);
+
+                                                         if (binding.getImage() == image)
+                                                             if (image.getThumbnail() == null && !mOfflineMode) {
+                                                                 downloadThumbnail(image, binding);
+                                                             } else {
+                                                                 binding.setThumbnail(getThumbnail(image, false));
+                                                             }
+                                                     },
+                                                     err -> {
+                                                         if (!mOfflineMode) {
+                                                             downloadThumbnail(image, binding);
+                                                         } else {
+                                                             binding.setThumbnail(getThumbnail(image, true));
+                                                         }
+                                                     }
+                                             );
+        binding.setDatabaseAccess(databaseAccess);
+    }
+
+    private void downloadThumbnail(Image image, ListItemImageBinding binding) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        binding.setBaos(baos);
+
+        AsyncTask<?,?,?> task = QEDGalleryPages.getImage(binding, image, Mode.THUMBNAIL, baos, this);
+        binding.setDatabaseAccess(new Disposable() {
+            @Override
+            public void dispose() {
+                task.cancel(false);
+                binding.setBaos(null);
+            }
+
+            @Override
+            public boolean isDisposed() {
+                return task.isCancelled();
+            }
+        });
+    }
+
+    private Drawable getThumbnail(Image image, boolean error) {
+        Bitmap thumbnail = image.getThumbnail();
+
+        if (thumbnail != null) {
+            return new BitmapDrawable(mContext.getResources(), thumbnail);
         }
 
         String fileExtension = null;
         if (image.getName() != null) {
-            String[] tmp = image.getName().split("\\.");
-            fileExtension = tmp[tmp.length - 1];
+            fileExtension = image.getName();
+            fileExtension = fileExtension.substring(fileExtension.lastIndexOf('.') + 1);
         }
 
-        if (mOfflineMode) {
-            if (image.getPath() == null) image.setPath(mGalleryDatabase.getImagePath(image));
-            image.setAvailable(image.getPath() != null && new File(image.getPath()).exists());
+        boolean available = (!error && !mOfflineMode) || image.getPath() != null;
+        int resource;
 
-            int drawableId;
-            if (image.isAvailable()) {
-                drawableId = R.drawable.ic_gallery_image;
-                if (VIDEO_FILE_EXTENSIONS.contains(fileExtension)) {
-                    drawableId = R.drawable.ic_gallery_video;
-                } else if (AUDIO_FILE_EXTENSIONS.contains(fileExtension)) {
-                    drawableId = R.drawable.ic_gallery_audio;
-                }
-            } else {
-                drawableId = R.drawable.ic_gallery_empty_image;
-                if (VIDEO_FILE_EXTENSIONS.contains(fileExtension)) {
-                    drawableId = R.drawable.ic_gallery_empty_video;
-                } else if (AUDIO_FILE_EXTENSIONS.contains(fileExtension)) {
-                    drawableId = R.drawable.ic_gallery_empty_audio;
-                }
-            }
-
-            thumbnail.setImageDrawable(getContext().getDrawable(drawableId));
-            thumbnail.setVisibility(View.VISIBLE);
-            progressBar.setVisibility(View.GONE);
-            return;
+        if (VIDEO_FILE_EXTENSIONS.contains(fileExtension)) {
+            resource = available ? R.drawable.ic_gallery_video : R.drawable.ic_gallery_empty_video;
+        } else if (AUDIO_FILE_EXTENSIONS.contains(fileExtension)) {
+            resource = available ? R.drawable.ic_gallery_audio : R.drawable.ic_gallery_empty_audio;
         } else {
-            if (VIDEO_FILE_EXTENSIONS.contains(fileExtension)) {
-                thumbnail.setImageDrawable(getContext().getDrawable(R.drawable.ic_gallery_video));
-                thumbnail.setVisibility(View.VISIBLE);
-                progressBar.setVisibility(View.GONE);
-                image.setAvailable(true);
-                return;
-            }
-
-            if (AUDIO_FILE_EXTENSIONS.contains(fileExtension)) {
-                thumbnail.setImageDrawable(getContext().getDrawable(R.drawable.ic_gallery_audio));
-                thumbnail.setVisibility(View.VISIBLE);
-                progressBar.setVisibility(View.GONE);
-                image.setAvailable(true);
-                return;
-            }
+            resource = available ? R.drawable.ic_gallery_image : R.drawable.ic_gallery_empty_image;
         }
 
-        thumbnail.setVisibility(View.GONE);
-        progressBar.setVisibility(View.VISIBLE);
-
-        // Download
-        downloadImage(tag, image);
-    }
-
-    private void downloadImage(String tag, @NonNull Image image) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        mBaosById.put(image.getId(), baos);
-
-        AsyncTask<?,?,?> async = QEDGalleryPages.getImage(tag, image, Mode.THUMBNAIL, baos, this);
-
-        mAsyncTasks.put(tag, async);
+        return AppCompatResources.getDrawable(mContext, resource);
     }
 
     @Override
-    public void onPageReceived(@NonNull String tag) {
-        Triple<Image, ImageView, ProgressBar> triple = mByTag.get(tag);
-        assert triple != null;
-
-        Image image = triple.first;
-        ImageView thumbnail = triple.second;
-        ProgressBar progressBar = triple.third;
-
-        ByteArrayOutputStream baos = mBaosById.get(image.getId());
-        if (baos == null) return;
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    public void onPageReceived(@NonNull ListItemImageBinding binding) {
+        ByteArrayOutputStream baos = binding.getBaos();
+        Image image = binding.getImage();
 
         byte[] encodedBitmap = baos.toByteArray();
         Bitmap bitmap = BitmapFactory.decodeByteArray(encodedBitmap, 0, encodedBitmap.length);
-        if (bitmap != null) {
-            mGalleryDatabase.insertThumbnail(image, bitmap);
-            mCache.put(image.getId(), new SoftReference<>(bitmap));
-        }
+        image.setThumbnail(bitmap);
 
-        mBaosById.remove(image.getId());
-        mByTag.remove(tag);
+        binding.setThumbnail(getThumbnail(image, false));
+        binding.setBaos(null);
 
-        if (mInvalidatedTags.contains(tag)) return;
-
-        if (thumbnail != null && progressBar != null) {
-            if (bitmap == null) {
-                thumbnail.setImageResource(R.drawable.ic_gallery_empty_image);
-            } else {
-                thumbnail.setImageBitmap(bitmap);
-            }
-
-            thumbnail.setVisibility(View.VISIBLE);
-            progressBar.setVisibility(View.GONE);
-        }
+        mAlbumDao.insertThumbnail(image.getId(), bitmap)
+                 .subscribeOn(Schedulers.io())
+                 .observeOn(AndroidSchedulers.mainThread())
+                 .subscribe(() -> {}, err -> Log.e(LOG_TAG, "Could not save thumbnail to database.", err));
     }
 
     @Override
-    public void onProgressUpdate(String tag, long done, long total) {}
+    public void onError(ListItemImageBinding binding, @NonNull Reason reason, Throwable cause) {
+        QEDPageStreamReceiver.super.onError(binding, reason, cause);
 
-    public void setOfflineMode(boolean offlineMode) {
-        this.mOfflineMode = offlineMode;
-    }
-
-    public void clearCache() {
-        this.mCache.clear();
-    }
-
-    @Override
-    public void onError(String tag, @Reason String reason, Throwable cause) {
-        QEDPageStreamReceiver.super.onError(tag, reason, cause);
-
-        if (!sReceivedError) {
-            sReceivedError = true;
-            mContext.switchToOfflineMode();
-        }
+        binding.setThumbnail(getThumbnail(binding.getImage(), true));
     }
 
     public List<Image> getImages() {

@@ -12,8 +12,9 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.jonahbauer.qed.R;
-import com.jonahbauer.qed.database.GalleryDatabase;
+import com.jonahbauer.qed.model.room.Database;
 import com.jonahbauer.qed.util.Preferences;
 
 import org.apache.commons.io.FileUtils;
@@ -21,6 +22,12 @@ import org.apache.commons.io.FileUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.functions.Action;
+import io.reactivex.rxjava3.functions.Consumer;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class GalleryPreferenceFragment extends PreferenceFragmentCompat implements PreferenceFragment, Preference.OnPreferenceClickListener {
     private Preference deleteThumbnails;
@@ -33,15 +40,19 @@ public class GalleryPreferenceFragment extends PreferenceFragmentCompat implemen
         setPreferencesFromResource(R.xml.preferences_gallery, rootKey);
 
         deleteThumbnails = findPreference(Preferences.gallery().keys().deleteThumbnails());
+        assert deleteThumbnails != null;
         deleteThumbnails.setOnPreferenceClickListener(this);
 
         deleteImages = findPreference(Preferences.gallery().keys().deleteImages());
+        assert deleteImages != null;
         deleteImages.setOnPreferenceClickListener(this);
 
         showDir = findPreference(Preferences.gallery().keys().showDir());
+        assert showDir != null;
         showDir.setOnPreferenceClickListener(this);
 
         deleteDatabase = findPreference(Preferences.gallery().keys().deleteDatabase());
+        assert deleteDatabase != null;
         deleteDatabase.setOnPreferenceClickListener(this);
     }
 
@@ -70,10 +81,13 @@ public class GalleryPreferenceFragment extends PreferenceFragmentCompat implemen
             alertDialog.setMessage(R.string.preferences_gallery_confirm_delete_thumbnails);
             alertDialog.setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss());
             alertDialog.setPositiveButton(R.string.delete, (dialog, which) -> {
-                try (GalleryDatabase galleryDatabase = new GalleryDatabase()) {
-                    galleryDatabase.init(requireContext());
-                    galleryDatabase.clearThumbnails();
-                }
+                Database.getInstance(requireContext()).albumDao().clearThumbnails()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                                () -> Snackbar.make(requireView(), R.string.deleted, Snackbar.LENGTH_SHORT).show(),
+                                (e) -> Snackbar.make(requireView(), R.string.delete_error, Snackbar.LENGTH_SHORT).show()
+                        );
             });
             alertDialog.show();
             return true;
@@ -107,10 +121,30 @@ public class GalleryPreferenceFragment extends PreferenceFragmentCompat implemen
             alertDialog.setMessage(R.string.preferences_gallery_confirm_delete_gallery_database);
             alertDialog.setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss());
             alertDialog.setPositiveButton(R.string.delete, (dialog, which) -> {
-                GalleryDatabase db = new GalleryDatabase();
-                db.init(getContext());
-                db.clear();
-                db.close();
+                AtomicBoolean done = new AtomicBoolean(false);
+                AtomicBoolean error = new AtomicBoolean(false);
+
+                Action action = () -> {
+                    if (done.getAndSet(true)) {
+                        Snackbar.make(requireView(), R.string.deleted, Snackbar.LENGTH_SHORT).show();
+                    }
+                };
+
+                Consumer<Throwable> errorHandler = (e) -> {
+                    if (!error.getAndSet(true)) {
+                        Snackbar.make(requireView(), R.string.delete_error, Snackbar.LENGTH_SHORT).show();
+                    }
+                };
+
+                Database.getInstance(requireContext()).albumDao().clearImages()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(action, errorHandler);
+
+                Database.getInstance(requireContext()).albumDao().clearAlbums()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(action, errorHandler);
             });
             alertDialog.show();
             return true;

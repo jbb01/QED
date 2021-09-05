@@ -19,18 +19,12 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.ThreadPoolExecutor;
 
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
 @SuppressWarnings("UnusedReturnValue")
 public class QEDGalleryPages {
-    private static final ThreadPoolExecutor imageTpe = (ThreadPoolExecutor) Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-
-    @Nullable
     public static AsyncTask<?,?,?> getAlbumList(QEDPageReceiver<List<Album>> albumListReceiver) {
         AsyncLoadQEDPage<List<Album>> async = new AsyncLoadQEDPage<>(
                 Feature.GALLERY,
@@ -45,7 +39,6 @@ public class QEDGalleryPages {
         return async;
     }
 
-    @Nullable
     public static AsyncTask<?,?,?> getAlbum(@NonNull Album album, @Nullable Map<Filter, String> filters, QEDPageReceiver<Album> albumReceiver) {
         StringBuilder filterStringBuilder = new StringBuilder();
         if (filters != null) {
@@ -67,7 +60,6 @@ public class QEDGalleryPages {
         return albumPage;
     }
 
-    @Nullable
     public static AsyncTask<?,?,?> getImageInfo(@NonNull Image image, QEDPageReceiver<Image> imageInfoReceiver) {
         AsyncLoadQEDPage<Image> info = new AsyncLoadQEDPage<>(
                 Feature.GALLERY,
@@ -81,8 +73,7 @@ public class QEDGalleryPages {
         return info;
     }
 
-    @Nullable
-    public static <T> AsyncTask<?,?,?> getImage(T tag, @NonNull Image image, @NonNull Mode mode, @NonNull OutputStream outputStream, QEDPageStreamReceiver<T> imageReceiver) {
+    public static <T> AsyncTask<?,?,?> getImage(@NonNull T tag, @NonNull Image image, @NonNull Mode mode, @NonNull OutputStream outputStream, QEDPageStreamReceiver<T> imageReceiver) {
         AsyncLoadQEDPageToStream<T> async = new AsyncLoadQEDPageToStream<>(
                 Feature.GALLERY,
                 String.format(NetworkConstants.GALLERY_SERVER_IMAGE, mode.mQuery, image.getId()),
@@ -91,12 +82,7 @@ public class QEDGalleryPages {
                 outputStream
         );
 
-        try {
-            async.executeOnExecutor(imageTpe);
-        } catch (RejectedExecutionException e) {
-            imageReceiver.onError(tag, Reason.UNKNOWN, e);
-            return null;
-        }
+        async.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         return async;
     }
 

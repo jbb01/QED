@@ -9,6 +9,7 @@ import android.content.res.Resources;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,9 +32,9 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.MainActivity;
 import com.jonahbauer.qed.activities.messageInfoSheet.MessageInfoBottomSheet;
-import com.jonahbauer.qed.database.ChatDatabase;
 import com.jonahbauer.qed.model.Message;
 import com.jonahbauer.qed.model.adapter.MessageAdapter;
+import com.jonahbauer.qed.model.room.Database;
 import com.jonahbauer.qed.networking.ChatWebSocket;
 import com.jonahbauer.qed.networking.ChatWebSocketListener;
 import com.jonahbauer.qed.networking.NetworkListener;
@@ -43,12 +44,14 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import io.reactivex.rxjava3.schedulers.Schedulers;
+
 public class ChatFragment extends QEDFragment implements NetworkListener, AbsListView.OnScrollListener, ChatWebSocketListener {
+    private static final String LOG_TAG = ChatFragment.class.getName();
+
     private Resources mRes;
-    private ChatDatabase mDatabase;
 
     private final Object mSocketLock = new Object();
     private ChatWebSocket mWebSocket = null;
@@ -192,9 +195,6 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
 
         mScrollDownButton.setOnClickListener(a -> scrollDown());
 
-        mDatabase = new ChatDatabase();
-        mDatabase.init(getContext(), null);
-
         setHasOptionsMenu(true);
     }
 
@@ -286,7 +286,6 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
     public void onDestroy() {
         super.onDestroy();
 
-        if (mDatabase != null) mDatabase.close();
         if (mWebSocket != null) mWebSocket.closeSocket();
     }
 
@@ -332,18 +331,28 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
     private void addPost(@NonNull Message message, boolean notify) {
         if (getContext() == null) return;
 
+        // insert recent messages in bulk
         if (Message.PONG.equals(message)) {
-            mInitDone = true;
-            mHandler.post(() -> {
-                mMessageAdapter.clear();
-                mMessageAdapter.addAll(mInitMessages);
-                mDatabase.insertAll(mInitMessages);
-                mMessageAdapter.notifyDataSetChanged();
-                mMessageListView.setSelection(mInitMessages.size() - 1);
+            if (!mInitDone) {
+                mInitDone = true;
+                mHandler.post(() -> {
+                    mMessageAdapter.clear();
+                    mMessageAdapter.addAll(mInitMessages);
+                    mMessageAdapter.notifyDataSetChanged();
 
-                mProgressBar.setVisibility(View.GONE);
-                mMessageListView.setVisibility(View.VISIBLE);
-            });
+                    mMessageListView.setSelection(mInitMessages.size() - 1);
+
+                    Database.getInstance(requireContext()).messageDao().insert(mInitMessages)
+                            .doFinally(() -> mInitMessages.clear())
+                            .subscribeOn(Schedulers.io())
+                            .subscribe(() -> {
+                            }, e -> Log.e(LOG_TAG, "Error inserting messages into database.", e));
+
+                    mProgressBar.setVisibility(View.GONE);
+                    mMessageListView.setVisibility(View.VISIBLE);
+                });
+            }
+
             return;
         }
 
@@ -352,7 +361,9 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
             return;
         }
 
-        mDatabase.insert(message);
+        Database.getInstance(requireContext()).messageDao().insert(message)
+                .subscribeOn(Schedulers.io())
+                .subscribe(() -> {}, e -> Log.e(LOG_TAG, "Error inserting message into database.", e));
 
         if (message.getId() < mTopPosition) mTopPosition = message.getId();
         if (message.getBottag() == 1 && Preferences.chat().isSense()) return;
@@ -468,12 +479,8 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
     private void error(String message) {
         if (mWebSocket != null) mWebSocket.closeSocket();
         mInitDone = true;
-        Calendar cal = Calendar.getInstance();
 
-        Locale locale = mRes.getConfiguration().getLocales().get(0);
-
-        String date = String.format(locale, "%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS", cal);
-        addPost(new Message("Error", message, date,503,"Error","220000", Integer.MAX_VALUE, 0, ""), true);
+        addPost(new Message(Integer.MAX_VALUE, "Error", message, Calendar.getInstance().getTime(),503,"Error","220000", 0, ""), true);
         mHandler.post(() -> {
             mMessageEditText.setEnabled(false);
             mSendButton.setEnabled(false);

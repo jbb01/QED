@@ -16,6 +16,7 @@ import androidx.core.util.Pair;
 import androidx.databinding.BindingAdapter;
 import androidx.databinding.ViewDataBinding;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelStoreOwner;
 
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.sheets.AbstractInfoFragment;
@@ -45,14 +46,20 @@ public class PersonInfoFragment extends AbstractInfoFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mPersonViewModel = new ViewModelProvider(requireActivity()).get(PersonViewModel.class);
+        ViewModelStoreOwner owner = getParentFragment();
+        if (owner == null) owner = requireActivity();
+        mPersonViewModel = new ViewModelProvider(owner).get(PersonViewModel.class);
     }
 
     @Nullable
     @Override
     public ViewDataBinding onCreateContentView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mBinding = FragmentInfoPersonBinding.inflate(inflater, container, true);
-        mPersonViewModel.getPerson().observe(getViewLifecycleOwner(), eventStatusWrapper -> mBinding.setPerson(eventStatusWrapper.getValue()));
+        mPersonViewModel.getPerson().observe(getViewLifecycleOwner(), personStatusWrapper -> {
+            mBinding.setPerson(personStatusWrapper.getValue());
+            mBinding.setLoading(personStatusWrapper.getCode() == StatusWrapper.STATUS_PRELOADED);
+        });
+        mBinding.setColor(getColor());
         return mBinding;
     }
 

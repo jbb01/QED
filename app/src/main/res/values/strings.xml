@@ -12,28 +12,34 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="delete">Delete</string>
+    <string name="deleted">Deleted</string>
+    <string name="delete_error">Deletion failed</string>
+    <string name="save">Save</string>
+    <string name="saved">Saved</string>
+    <string name="save_error">Saving failed</string>
+    <string name="search">Search</string>
+    <string name="retry">Retry</string>
+    <string name="hits">%,d Hits</string>
+    <string name="empty" translatable="false"/>
 
     <string name="no_internet">Something went wrong. Please check your network connection.</string>
     <string name="notQED">This app is not related to the Quod Erat Demonstrandum e.V. in any official way.</string>
-    <string name="content_description_icon">Icon</string>
 
     <string name="error">Error!</string>
     <string name="error_unknown">An unknown error occurred.</string>
     <string name="error_login">Unable to log in.</string>
     <string name="error_network">A network error occurred.</string>
     <string name="error_404">Requested resource could not be found.</string>
+    <string name="error_empty">Empty</string>
     <string name="error_user">Error in Layer 8</string>
 
     <string name="info">Details</string>
     <string name="offline_mode">Offline-Mode</string>
     <string name="offline_mode_not_available">Not available in offline mode.</string>
-    <string name="thumbnail">thumbnail</string>
     <string name="double_back_to_exit_toast">Press again to exit</string>
-    <string name="login_failed_switching_to_offline">Login failed.</string>
     <string name="cant_connect">No Internet Connection.</string>
     <string name="coming_soon">Coming soon</string>
     <string name="no_file_explorer">No file explorer was found.</string>
-    <string name="content_description_divider">Divider</string>
     <string name="master_key_error">Password could not be saved.</string>
     <string name="download_notification_title">QED</string>
     <string name="download_notification_log_description">Chatlog</string>
@@ -46,7 +52,6 @@
     <string name="title_fragment_chat">Chat</string>
     <string name="chat_button_send">Send</string>
     <string name="chat_empty_message">You are about to send an empty message. Do you wish to continue?</string>
-    <string name="chat_login_failed">Chat login failed</string>
     <string name="chat_message_hint">Write a message</string>
     <string name="chat_refresh">Refresh</string>
     <string name="chat_scroll_down_button_content_description">Scroll Down</string>
@@ -74,10 +79,6 @@
     <!-- Database -->
     <string name="database_offline">No internet connection.\nThe Database if not available when offline</string>
     <string name="database_empty">Database seems to be empty.\nDid you pay your membership fee?</string>
-    <string name="database_hits">Hits</string>
-    <string name="database_login_failed">Database login failed</string>
-    <string name="database_save_done">Saved</string>
-    <string name="database_search_button">Search</string>
     <!-- Chat Database Fragment -->
     <string name="title_fragment_chat_database">Database</string>
     <string name="chat_database_channel_checkbox">Channel</string>
@@ -87,9 +88,11 @@
     <string name="chat_database_name_checkbox">Name</string>
     <string name="chat_database_name_hint">Name</string>
     <string name="chat_database_dateFrom_checkbox">from</string>
-    <string name="chat_database_dateFrom_hint">yyyy-mm-dd hh:mm:ss</string>
+    <string name="chat_database_dateFrom_hint">yyyy-mm-dd</string>
+    <string name="chat_database_timeFrom_hint">HH:MM</string>
     <string name="chat_database_dateTo_checkbox">until</string>
-    <string name="chat_database_dateTo_hint">yyyy-mm-dd hh:mm:ss</string>
+    <string name="chat_database_dateTo_hint">yyyy-mm-dd</string>
+    <string name="chat_database_timeTo_hint">HH:MM</string>
     <string name="chat_database_id_checkbox">ID</string>
     <string name="chat_database_id_hint">from</string>
     <string-array name="chat_database_max_entries_value_strings">
@@ -273,12 +276,12 @@
     <string name="log_wait_for_save">Please wait until saving is done.</string>
 
     <string name="log_status_download_pending">Download pending…</string>
-    <string name="log_status_downloading">Downloading… %s</string>
+    <string name="log_status_downloading">Downloading… %.2f MiB</string>
     <string name="log_status_download_paused">Download paused… %s</string>
     <string name="log_status_download_successful">Download successful. %s</string>
     <string name="log_status_download_failed">Download failed. %s</string>
     <string name="log_status_parse_pending">JSON Parsing pending…</string>
-    <string name="log_status_parsing">Parsing JSON… %s</string>
+    <string name="log_status_parsing">Parsing JSON… %d / %d</string>
     <string name="log_status_parse_failed">JSON Parsing failed. %s</string>
 
     <string name="log_confirm_exit">A log download is running. Do you really want to leave?</string>
@@ -293,6 +296,8 @@
     <string name="log_dialog_mode_label">Mode</string>
     <string name="log_request_postrecent_before">Last</string>
     <string name="log_request_postrecent_after">Posts</string>
+    <string name="log_request_sinceown_before">Skip</string>
+    <string name="log_request_sinceown_after">Posts</string>
     <string name="log_request_daterecent_before">Last</string>
     <string name="log_request_daterecent_after">Hours</string>
     <string name="log_request_dateinterval_from">From</string>
@@ -302,12 +307,14 @@
     <string name="log_request_mode_daterecent">daterecent</string>
     <string name="log_request_mode_dateinterval">dateinterval</string>
     <string name="log_request_mode_postinterval">postinterval</string>
+    <string name="log_request_mode_sinceown">fromownpost</string>
     <string name="log_request_mode_file">file</string>
     <string-array name="log_request_modes">
         <item>@string/log_request_mode_postrecent</item>
         <item>@string/log_request_mode_postinterval</item>
         <item>@string/log_request_mode_daterecent</item>
         <item>@string/log_request_mode_dateinterval</item>
+        <item>@string/log_request_mode_sinceown</item>
         <item>@string/log_request_mode_file</item>
     </string-array>
 
@@ -315,7 +322,10 @@
     <string name="gallery_folder_images" translatable="false">gallery/images</string>
 
     <string name="title_fragment_gallery">Gallery</string>
-    <string name="gallery_login_failed">Gallery Login failed</string>
+    <string name="gallery_empty">Gallery seems to be empty.</string>
+    <string name="gallery_offline_mode">You have lost connection to the internet. This app is offline.</string>
+    <string name="gallery_forced_offline_mode">Offline mode is enabled.</string>
+    <string name="gallery_disable_offline_mode">Disable</string>
 
     <!-- Album Activity -->
     <string name="album_photographer_radio_button">Photographer</string>
@@ -323,15 +333,12 @@
     <string name="album_category_radio_button">Category</string>
 
     <string name="title_activity_album">Album</string>
-    <string name="album_empty">This album is empty</string>
+    <string name="album_empty">This album seems to be empty</string>
     <string name="album_invalid">This album does not exist.</string>
     <string name="album_not_downloaded">This album is not downloaded</string>
     <string name="album_overwrite_offline_mode">You are in offline mode. Do you want to download the album nevertheless?</string>
 
     <string name="album_info">@string/info</string>
-    <string name="album_info_creator">Album Creator</string>
-    <string name="album_info_creation_date">Created on</string>
-    <string name="album_info_creation_dates">Taken on</string>
 
     <!-- Image Activity -->
     <string name="title_activity_image">Picture</string>
@@ -367,7 +374,6 @@
 
     <string name="image_info_other_details">Others</string>
     <string name="image_info_path">Path</string>
-    <string name="image_info_thumbnail_path">Thumbnail-Path</string>
 
     <string name="image_info_qed_details">QED</string>
     <string name="image_info_album">Album</string>

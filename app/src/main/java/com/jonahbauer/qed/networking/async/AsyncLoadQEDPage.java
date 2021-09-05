@@ -5,7 +5,6 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.networking.Feature;
 import com.jonahbauer.qed.networking.NetworkUtils;
 import com.jonahbauer.qed.networking.Reason;
@@ -16,8 +15,6 @@ import com.jonahbauer.qed.networking.parser.Parser;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.lang.ref.SoftReference;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.function.BiFunction;
 
@@ -29,8 +26,9 @@ import javax.net.ssl.HttpsURLConnection;
  * @param <T> callback return value type
  */
 public final class AsyncLoadQEDPage<T> extends AsyncTask<Void, Void, String> {
+    private static final String LOG_TAG = AsyncLoadQEDPage.class.getName();
+
     private final Feature mFeature;
-    private final Application mApplication;
     private final String mUrl;
     private final QEDPageReceiver<T> mReceiver;
     private final BiFunction<T, String, T> mParser;
@@ -51,30 +49,23 @@ public final class AsyncLoadQEDPage<T> extends AsyncTask<Void, Void, String> {
                      @NonNull T holder,
                      @NonNull Parser<T> parser,
                      @NonNull QEDPageReceiver<T> receiver) {
+        Log.d(LOG_TAG, "Loading Page " + url + " with feature " + feature);
         this.mFeature = feature;
         this.mUrl = url;
         this.mReceiver = receiver;
         this.mHolder = holder;
         this.mParser = parser;
-
-        SoftReference<Application> applicationReference = Application.getApplicationReference();
-        mApplication = applicationReference.get();
     }
 
     @Override
     protected String doInBackground(Void... voids) {
-        if (mApplication == null) {
-            Log.e(Application.LOG_TAG_ERROR, "", new NullPointerException("Application is null!"));
-            return null;
-        }
-
         try {
             // try to connect
             HttpsURLConnection httpsURLConnection = createConnection();
             httpsURLConnection.connect();
 
             // check for login error
-            if (isLoginError(mFeature, httpsURLConnection)) {
+            if (NetworkUtils.isLoginError(mFeature, httpsURLConnection)) {
                 httpsURLConnection.disconnect();
 
                 // login
@@ -86,7 +77,7 @@ public final class AsyncLoadQEDPage<T> extends AsyncTask<Void, Void, String> {
 
                 // check for login error once more
                 // if authentication failed after successful login -> throw exception
-                if (isLoginError(mFeature, httpsURLConnection)) {
+                if (NetworkUtils.isLoginError(mFeature, httpsURLConnection)) {
                     throw new InvalidCredentialsException(new AssertionError("request not authenticated after login"));
                 }
             }
@@ -96,7 +87,7 @@ public final class AsyncLoadQEDPage<T> extends AsyncTask<Void, Void, String> {
 
             return out;
         } catch (Exception e) {
-            Log.e(Application.LOG_TAG_ERROR, e.getMessage(), e);
+            Log.e(LOG_TAG, e.getMessage(), e);
             mException = e;
             return null;
         }
@@ -110,20 +101,14 @@ public final class AsyncLoadQEDPage<T> extends AsyncTask<Void, Void, String> {
             try {
                 out = mParser.apply(mHolder, s);
             } catch (Exception e) {
-                Log.e(Application.LOG_TAG_ERROR, e.getMessage(), e);
-                mReceiver.onError(mHolder, e.getMessage(), null);
+                Log.e(LOG_TAG, e.getMessage(), e);
+                mReceiver.onError(mHolder, Reason.guess(mException), null);
                 return;
             }
 
             mReceiver.onPageReceived(out);
         } else if (mException != null) {
-            if (mException instanceof IOException) {
-                mReceiver.onError(mHolder, Reason.NETWORK, mException);
-            } else if (mException instanceof InvalidCredentialsException) {
-                mReceiver.onError(mHolder, Reason.UNABLE_TO_LOG_IN, mException);
-            } else {
-                mReceiver.onError(mHolder, mException.getMessage(), mException);
-            }
+            mReceiver.onError(mHolder, Reason.guess(mException), mException);
         }
     }
 
@@ -135,19 +120,5 @@ public final class AsyncLoadQEDPage<T> extends AsyncTask<Void, Void, String> {
         httpsURLConnection.setUseCaches(false);
 
         return httpsURLConnection;
-    }
-
-    private boolean isLoginError(Feature feature, HttpURLConnection connection) {
-        String location = connection.getHeaderField("Location");
-
-        switch (feature) {
-            case CHAT:
-            case GALLERY:
-                return location != null && location.startsWith("account");
-            case DATABASE:
-                return location != null && location.contains("login");
-            default:
-                throw new IllegalArgumentException("unknown feature " + feature);
-        }
     }
 }
