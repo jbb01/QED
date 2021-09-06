@@ -26,7 +26,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.snackbar.Snackbar;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.MainActivity;
-import com.jonahbauer.qed.activities.messageInfoSheet.MessageInfoBottomSheet;
+import com.jonahbauer.qed.activities.sheets.message.MessageInfoBottomSheet;
 import com.jonahbauer.qed.databinding.AlertDialogLogModeBinding;
 import com.jonahbauer.qed.databinding.FragmentLogBinding;
 import com.jonahbauer.qed.model.Message;

@@ -15,7 +15,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.MainActivity;
-import com.jonahbauer.qed.activities.messageInfoSheet.MessageInfoBottomSheet;
+import com.jonahbauer.qed.activities.sheets.message.MessageInfoBottomSheet;
 import com.jonahbauer.qed.databinding.FragmentChatDatabaseBinding;
 import com.jonahbauer.qed.model.Message;
 import com.jonahbauer.qed.model.adapter.MessageAdapter;

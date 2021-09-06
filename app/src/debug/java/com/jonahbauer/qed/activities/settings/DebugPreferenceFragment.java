@@ -9,6 +9,7 @@ import androidx.preference.PreferenceFragmentCompat;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.sheets.album.AlbumInfoBottomSheet;
 import com.jonahbauer.qed.activities.sheets.event.EventInfoBottomSheet;
+import com.jonahbauer.qed.activities.sheets.message.MessageInfoBottomSheet;
 import com.jonahbauer.qed.activities.sheets.person.PersonInfoBottomSheet;
 import com.jonahbauer.qed.util.Debug;
 
@@ -16,6 +17,7 @@ public class DebugPreferenceFragment extends PreferenceFragmentCompat implements
     private Preference mPersonInfoSheet;
     private Preference mEventInfoSheet;
     private Preference mAlbumInfoSheet;
+    private Preference mMessageInfoSheet;
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -32,6 +34,10 @@ public class DebugPreferenceFragment extends PreferenceFragmentCompat implements
         mAlbumInfoSheet = findPreference("albumInfoSheet");
         assert mAlbumInfoSheet != null;
         mAlbumInfoSheet.setOnPreferenceClickListener(this);
+
+        mMessageInfoSheet = findPreference("messageInfoSheet");
+        assert mMessageInfoSheet != null;
+        mMessageInfoSheet.setOnPreferenceClickListener(this);
     }
 
     @Override
@@ -48,6 +54,10 @@ public class DebugPreferenceFragment extends PreferenceFragmentCompat implements
             AlbumInfoBottomSheet sheet = AlbumInfoBottomSheet.newInstance(Debug.dummyAlbum());
             sheet.show(getChildFragmentManager(), sheet.getTag());
             return true;
+        } else if (preference == mMessageInfoSheet) {
+            MessageInfoBottomSheet sheet = MessageInfoBottomSheet.newInstance(Debug.dummyMessage());
+            sheet.show(getChildFragmentManager(), sheet.getTag());
+            return true;
         }
 
         return false;
@@ -55,6 +65,6 @@ public class DebugPreferenceFragment extends PreferenceFragmentCompat implements
 
     @Override
     public int getTitle() {
-        return R.string.preferences_header_general;
+        return R.string.preferences_header_debug;
     }
 }

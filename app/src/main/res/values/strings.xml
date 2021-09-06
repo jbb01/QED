@@ -19,6 +19,7 @@
     <string name="save_error">Saving failed</string>
     <string name="search">Search</string>
     <string name="retry">Retry</string>
+    <string name="copied">Copied</string>
     <string name="hits">%,d Hits</string>
     <string name="empty" translatable="false"/>
 
@@ -57,7 +58,7 @@
     <string name="chat_scroll_down_button_content_description">Scroll Down</string>
 
     <string name="message_info">@string/info</string>
-    <string name="message_reply">Reply</string>
+    <string name="message_copy">Copy</string>
 
     <!-- Message Info Sheet -->
     <string name="message_info_title_id">ID</string>
@@ -175,6 +176,19 @@
     <string name="album_subtitle_image_count">Image Count</string>
     <string name="album_title_private">Private Album</string>
 
+    <!-- Message Bottom Sheet -->
+    <string name="message_section_metadata">Metadata</string>
+    <string name="message_section_message">Message</string>
+    <string name="message_subtitle_id">ID</string>
+    <string name="message_subtitle_name">Name</string>
+    <string name="message_title_username">{0} ({1})</string>
+    <string name="message_subtitle_username">Username</string>
+    <string name="message_subtitle_channel">Channel</string>
+    <string name="message_title_channel_main">(main)</string>
+    <string name="message_subtitle_timestamp">Timestamp</string>
+    <string name="message_title_timestamp">{0, date} {0, time}</string>
+    <string name="message_subtitle_bottag">Bottag</string>
+
     <!-- Registration -->
     <string name="registration_orga">Organizer</string>
     <string name="registration_status_participated">participated</string>
@@ -213,6 +227,7 @@
     <string name="preferences_header_chat">Chat</string>
     <string name="preferences_header_gallery">Gallery</string>
     <string name="preferences_header_general">General</string>
+    <string name="preferences_header_debug">Debug</string>
 
     <string name="preferences_general_group_appearance">Appearance</string>
     <string name="preferences_general_bug_report_title">Bug Report</string>

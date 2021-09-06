@@ -18,7 +18,7 @@
         <item name="android:minHeight">36dp</item>
     </style>
     <style name="Widget.App.Message" parent="">
-        <item name="android:colorBackground">?colorSurface</item>
+        <item name="android:colorBackground">@color/message_background</item>
         <item name="android:colorPressedHighlight">@color/message_highlight</item>
 
         <item name="nameTextAppearance">@style/TextAppearance.App.Message.Name</item>

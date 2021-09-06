@@ -27,6 +27,14 @@
             android:singleLine="true"
             android:title="Album Info Sheet"
             android:icon="@drawable/ic_settings_debug_album_sheet" />
+
+        <Preference
+            android:defaultValue="false"
+            android:key="messageInfoSheet"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Message Info Sheet"
+            android:icon="@drawable/ic_settings_debug_message_sheet" />
     </PreferenceCategory>
 
 </androidx.preference.PreferenceScreen>

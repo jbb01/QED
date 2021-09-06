@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <import type="android.view.View"/>
+        <import type="com.jonahbauer.qed.util.Intents"/>
+        <import type="java.text.MessageFormat"/>
+
+        <variable name="color" type="int" />
+        <variable name="message" type="com.jonahbauer.qed.model.Message" />
+    </data>
+
+    <!--suppress AndroidDomInspection -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?colorSurface"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:paddingVertical="@dimen/activity_vertical_margin"
+                android:paddingHorizontal="@dimen/activity_horizontal_margin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAllCaps="true"
+                android:textStyle="bold"
+                android:textColor="?colorOnSurface"
+                android:text="@string/message_section_metadata"/>
+
+            <include layout="@layout/list_item"
+                app:icon="@{@drawable/ic_message_id}"
+                app:title="@{String.valueOf(message.id)}"
+                app:subtitle="@{@string/message_subtitle_id}"/>
+
+            <include layout="@layout/list_item"
+                app:icon="@{@drawable/ic_message_name}"
+                app:title="@{message.name}"
+                app:subtitle="@{@string/message_subtitle_name}"/>
+
+            <include layout="@layout/list_item"
+                android:visibility="@{message.userId != -1 ? View.VISIBLE : View.GONE}"
+                app:icon="@{@drawable/ic_message_username}"
+                app:title="@{MessageFormat.format(@string/message_title_username, message.userName, message.userId)}"
+                app:subtitle="@{@string/message_subtitle_username}"/>
+
+            <include layout="@layout/list_item"
+                app:icon="@{@drawable/ic_message_channel}"
+                app:title="@{message.channel.empty ? @string/message_title_channel_main : message.channel}"
+                app:subtitle="@{@string/message_subtitle_channel}"/>
+
+            <include layout="@layout/list_item"
+                app:icon="@{@drawable/ic_message_timestamp}"
+                app:title="@{MessageFormat.format(@string/message_title_timestamp, message.date)}"
+                app:subtitle="@{@string/message_subtitle_timestamp}"/>
+
+            <include layout="@layout/list_item"
+                app:icon="@{@drawable/ic_message_bottag}"
+                app:title="@{String.valueOf(message.bottag)}"
+                app:subtitle="@{@string/message_subtitle_bottag}"/>
+        </LinearLayout>
+
+        <View style="?dividerStyle"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:paddingVertical="@dimen/activity_vertical_margin"
+                android:paddingHorizontal="@dimen/activity_horizontal_margin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAllCaps="true"
+                android:textStyle="bold"
+                android:textColor="?colorOnSurface"
+                android:text="@string/message_section_message"/>
+
+            <com.jonahbauer.qed.layoutStuff.views.MathView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@{message.message}"
+                android:paddingHorizontal="16dp"
+                android:paddingBottom="8dp"
+                tools:text="@tools:sample/lorem"/>
+        </LinearLayout>
+
+        <View style="?dividerStyle"/>
+    </LinearLayout>
+</layout>

@@ -3,9 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/message_reply"
-            android:icon="@drawable/ic_menu_reply"
-            android:title="@string/message_reply"
+            android:id="@+id/message_copy"
+            android:icon="@drawable/ic_menu_copy"
+            android:title="@string/message_copy"
             app:showAsAction="ifRoom"/>
         <item
             android:id="@+id/message_info"

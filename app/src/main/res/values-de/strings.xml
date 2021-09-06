@@ -15,6 +15,7 @@
     <string name="search">Suchen</string>
     <string name="retry">Erneut versuchen</string>
     <string name="hits">%,d Treffer</string>
+    <string name="copied">Kopiert</string>
 
 
     <string name="cant_connect">Keine Verbindung zum Internet möglich</string>
@@ -161,7 +162,7 @@
 
     <string name="message_info">@string/info</string>
     <string name="album_info">@string/info</string>
-    <string name="message_reply">Antworten</string>
+    <string name="message_copy">Kopieren</string>
 
     <string-array name="chat_database_max_entries_value_strings">
         <item>10.000</item>
@@ -210,6 +211,19 @@
     <string name="album_subtitle_dates">Zeitraum</string>
     <string name="album_subtitle_image_count">Anzahl der Bilder</string>
     <string name="album_title_private">Privates Album</string>
+
+    <!-- Message Bottom Sheet -->
+    <string name="message_section_metadata">Metadaten</string>
+    <string name="message_section_message">Nachricht</string>
+    <string name="message_subtitle_id">ID</string>
+    <string name="message_subtitle_name">Name</string>
+    <string name="message_title_username">{0} ({1})</string>
+    <string name="message_subtitle_username">Benutzername</string>
+    <string name="message_subtitle_channel">Channel</string>
+    <string name="message_title_channel_main">(main)</string>
+    <string name="message_subtitle_timestamp">Zeitstempel</string>
+    <string name="message_title_timestamp">{0, date} {0, time}</string>
+    <string name="message_subtitle_bottag">Bottag</string>
 
     <!-- Person Bottom Sheet -->
     <string name="person_section_personal">Personendaten</string>
@@ -281,6 +295,7 @@
     <string name="preferences_header_chat">Chat</string>
     <string name="preferences_header_gallery">Galerie</string>
     <string name="preferences_header_general">Allgemein</string>
+    <string name="preferences_header_debug">Debug</string>
 
     <string name="preferences_general_group_appearance">Darstellung</string>
     <string name="preferences_general_bug_report_title">Fehler melden</string>

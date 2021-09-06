@@ -5,6 +5,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
@@ -80,6 +81,7 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
     private final int bottag;
 
     @Ignore
+    @ColorInt
     private final int transformedColor;
 
     @Ignore
@@ -158,10 +160,12 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
         return null;
     }
 
+    @ColorInt
     private int transformColor(String color) {
         return transformColor(Color.parseColor("#" + color));
     }
 
+    @ColorInt
     private int transformColor(int color) {
         if (Preferences.general().isNightMode()) {
             return color;
