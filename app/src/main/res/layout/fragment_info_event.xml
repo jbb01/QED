@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <import type="android.view.View"/>
-        <import type="com.jonahbauer.qed.util.Intents"/>
+        <import type="com.jonahbauer.qed.util.Actions"/>
         <import type="java.text.MessageFormat"/>
 
         <variable name="loading" type="boolean" />
@@ -62,7 +62,7 @@
                 android:text="@string/event_section_information"/>
 
             <include layout="@layout/list_item"
-                app:onClick="@{(view) -> Intents.recordToCalendar(view.context, event)}"
+                app:onClick="@{(view) -> Actions.recordToCalendar(view.context, event)}"
                 app:icon="@{@drawable/ic_event_time}"
                 app:title="@{(event.start != null &amp;&amp; event.end != null) ? MessageFormat.format(@string/event_title_time, event.start, event.end) : event.startString + ` - ` + event.endString }"
                 app:subtitle="@{@string/event_subtitle_time}"/>
@@ -81,7 +81,7 @@
 
             <include layout="@layout/list_item"
                 android:visibility="@{event.hotelAddress != null ? View.VISIBLE : View.GONE}"
-                app:onClick="@{(view) -> Intents.showOnMap(view.context, event.hotelAddress)}"
+                app:onClick="@{(view) -> Actions.showOnMap(view.context, event.hotelAddress)}"
                 app:icon="@{@drawable/ic_event_hotel_address}"
                 app:title="@{event.hotelAddress}"
                 app:subtitle="@{@string/event_subtitle_hotel_address}" />
@@ -125,7 +125,7 @@
 
             <include layout="@layout/list_item"
                 android:visibility="@{event.emailOrga != null ? View.VISIBLE : View.GONE}"
-                app:onClick="@{(view) -> Intents.sendTo(view.context, event.emailOrga)}"
+                app:onClick="@{(view) -> Actions.sendTo(view.context, event.emailOrga)}"
                 app:icon="@{@drawable/ic_event_mail}"
                 app:title="@{event.emailOrga}"
                 app:subtitle="@{@string/event_subtitle_mail_organizers}"/>
@@ -157,7 +157,7 @@
 
             <include layout="@layout/list_item"
                 android:visibility="@{event.emailAll != null ? View.VISIBLE : View.GONE}"
-                app:onClick="@{(view) -> Intents.sendTo(view.context, event.emailAll)}"
+                app:onClick="@{(view) -> Actions.sendTo(view.context, event.emailAll)}"
                 app:icon="@{@drawable/ic_event_mail}"
                 app:title="@{event.emailAll}"
                 app:subtitle="@{@string/event_subtitle_mail_participants}"/>

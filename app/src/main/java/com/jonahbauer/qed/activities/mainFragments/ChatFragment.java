@@ -4,8 +4,6 @@ import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.drawable.Animatable;
@@ -27,19 +25,17 @@ import android.widget.ProgressBar;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StyleRes;
-import androidx.appcompat.widget.Toolbar;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.MainActivity;
-import com.jonahbauer.qed.activities.sheets.message.MessageInfoBottomSheet;
 import com.jonahbauer.qed.model.Message;
 import com.jonahbauer.qed.model.adapter.MessageAdapter;
 import com.jonahbauer.qed.model.room.Database;
 import com.jonahbauer.qed.networking.ChatWebSocket;
 import com.jonahbauer.qed.networking.ChatWebSocketListener;
 import com.jonahbauer.qed.networking.NetworkListener;
+import com.jonahbauer.qed.util.MessageUtils;
 import com.jonahbauer.qed.util.Preferences;
 
 import java.util.ArrayList;
@@ -49,8 +45,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.reactivex.rxjava3.schedulers.Schedulers;
-
-import static android.content.Context.CLIPBOARD_SERVICE;
 
 public class ChatFragment extends QEDFragment implements NetworkListener, AbsListView.OnScrollListener, ChatWebSocketListener {
     private static final String LOG_TAG = ChatFragment.class.getName();
@@ -231,40 +225,7 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
      * @param value if the item is checked or not
      */
     private void setChecked(int position, boolean value) {
-        mMessageListView.setItemChecked(position, value);
-
-        Activity activity = getActivity();
-        if (activity instanceof MainActivity) {
-            MainActivity mainActivity = (MainActivity) activity;
-
-            if (value) {
-                Message msg = mMessageAdapter.getItem(position);
-                if (msg == null) return;
-
-                Toolbar toolbar = mainActivity.borrowAltToolbar();
-                toolbar.setNavigationOnClickListener(v -> setChecked(position, false));
-
-                toolbar.inflateMenu(R.menu.menu_chat_message);
-                toolbar.setOnMenuItemClickListener(item -> {
-                    if (item.getItemId() == R.id.message_info) {
-                        MessageInfoBottomSheet sheet = MessageInfoBottomSheet.newInstance(msg);
-                        sheet.show(getChildFragmentManager(), sheet.getTag());
-                    } else if (item.getItemId() == R.id.message_copy) {
-                        ClipboardManager clipboard = (ClipboardManager) requireContext().getSystemService(CLIPBOARD_SERVICE);
-                        ClipData clip = ClipData.newPlainText(msg.getName(), msg.getMessage());
-                        clipboard.setPrimaryClip(clip);
-
-                        Snackbar.make(requireView(), R.string.copied, Snackbar.LENGTH_SHORT).show();
-                    }
-
-                    return false;
-                });
-
-                toolbar.setTitle(msg.getName());
-            } else {
-                mainActivity.returnAltToolbar();
-            }
-        }
+        MessageUtils.setChecked(this, mMessageListView, mMessageAdapter, position, value);
     }
 
     @Override

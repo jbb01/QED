@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <import type="android.view.View"/>
-        <import type="com.jonahbauer.qed.util.Intents"/>
+        <import type="com.jonahbauer.qed.util.Actions"/>
         <import type="java.text.MessageFormat"/>
 
         <variable name="loading" type="boolean" />
@@ -64,7 +64,7 @@
 
             <include layout="@layout/list_item"
                 android:visibility="@{person.email != null ? View.VISIBLE : View.GONE}"
-                app:onClick="@{(view) -> Intents.sendTo(view.context, person.email)}"
+                app:onClick="@{(view) -> Actions.sendTo(view.context, person.email)}"
                 app:icon="@{@drawable/ic_person_mail}"
                 app:title="@{person.email}"
                 app:subtitle="@{@string/person_subtitle_mail}"/>
@@ -163,13 +163,13 @@
                 android:text="@string/person_section_addresses"/>
 
             <include layout="@layout/list_item"
-                app:onClick="@{(view) -> Intents.showOnMap(view.context, person.addresses[0])}"
+                app:onClick="@{(view) -> Actions.showOnMap(view.context, person.addresses[0])}"
                 app:icon="@{@drawable/ic_person_location}"
                 app:title="@{person.addresses[0]}"/>
 
             <include layout="@layout/list_item"
                 android:visibility="@{person.addresses.size() > 1 ? View.VISIBLE : View.GONE}"
-                app:onClick="@{(view) -> Intents.showOnMap(view.context, person.addresses[1])}"
+                app:onClick="@{(view) -> Actions.showOnMap(view.context, person.addresses[1])}"
                 app:icon="@{@drawable/ic_person_location}"
                 app:title="@{person.addresses[1]}"/>
         </LinearLayout>

@@ -25,7 +25,7 @@ import com.jonahbauer.qed.databinding.ListItemBinding;
 import com.jonahbauer.qed.model.Person;
 import com.jonahbauer.qed.model.Registration;
 import com.jonahbauer.qed.model.viewmodel.PersonViewModel;
-import com.jonahbauer.qed.util.Intents;
+import com.jonahbauer.qed.util.Actions;
 import com.jonahbauer.qed.util.StatusWrapper;
 import com.jonahbauer.qed.util.Themes;
 
@@ -127,7 +127,7 @@ public class PersonInfoFragment extends AbstractInfoFragment {
             item.setIcon(AppCompatResources.getDrawable(context, R.drawable.ic_person_contact));
             item.setTitle(contact.second);
             item.setSubtitle(contact.first);
-            item.setOnClick(v -> Intents.dial(context, contact.second));
+            item.setOnClick(v -> Actions.dial(context, contact.second));
         });
     }
 

@@ -1,17 +1,27 @@
 package com.jonahbauer.qed.util;
 
+import static android.content.Context.CLIPBOARD_SERVICE;
+
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.provider.CalendarContract;
+import android.view.View;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import com.google.android.material.snackbar.Snackbar;
+import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.model.Event;
 
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
-public class Intents {
-    public static boolean sendTo(Context context, String...emails) {
+public class Actions {
+    public static boolean sendTo(@NonNull Context context, String...emails) {
         Intent intent = new Intent(Intent.ACTION_SENDTO);
         intent.setType("*/*");
         intent.putExtra(Intent.EXTRA_EMAIL, emails);
@@ -24,7 +34,7 @@ public class Intents {
         }
     }
 
-    public static boolean showOnMap(Context context, String location) {
+    public static boolean showOnMap(@NonNull Context context, String location) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(Uri.parse("geo:0,0?q=" + location));
 
@@ -36,7 +46,7 @@ public class Intents {
         }
     }
 
-    public static boolean recordToCalendar(Context context, Event event) {
+    public static boolean recordToCalendar(@NonNull Context context, @NonNull Event event) {
         Intent intent = new Intent(Intent.ACTION_INSERT)
                 .setData(CalendarContract.Events.CONTENT_URI)
                 .putExtra(CalendarContract.Events.TITLE, event.getTitle())
@@ -54,7 +64,7 @@ public class Intents {
         }
     }
 
-    public static boolean dial(Context context, String phoneNumber) {
+    public static boolean dial(@NonNull Context context, String phoneNumber) {
         Intent intent = new Intent(Intent.ACTION_DIAL);
         intent.setData(Uri.parse("tel:" + phoneNumber));
 
@@ -63,6 +73,16 @@ public class Intents {
             return true;
         } else {
             return false;
+        }
+    }
+
+    public static void copy(@NonNull Context context, @Nullable View view, String label, String text) {
+        ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText(label, text);
+        clipboard.setPrimaryClip(clip);
+
+        if (view != null) {
+            Snackbar.make(view, R.string.copied, Snackbar.LENGTH_SHORT).show();
         }
     }
 }

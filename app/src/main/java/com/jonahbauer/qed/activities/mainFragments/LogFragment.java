@@ -13,7 +13,6 @@ import static com.jonahbauer.qed.model.viewmodel.LogViewModel.PostIntervalLogReq
 import static com.jonahbauer.qed.model.viewmodel.LogViewModel.PostRecentLogRequest;
 import static com.jonahbauer.qed.model.viewmodel.LogViewModel.SinceOwnLogRequest;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.net.Uri;
@@ -31,23 +30,20 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StyleRes;
-import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.jonahbauer.qed.R;
-import com.jonahbauer.qed.activities.MainActivity;
-import com.jonahbauer.qed.activities.sheets.message.MessageInfoBottomSheet;
 import com.jonahbauer.qed.databinding.AlertDialogLogModeBinding;
 import com.jonahbauer.qed.databinding.FragmentLogBinding;
-import com.jonahbauer.qed.model.Message;
 import com.jonahbauer.qed.model.adapter.MessageAdapter;
 import com.jonahbauer.qed.model.room.Database;
 import com.jonahbauer.qed.model.viewmodel.LogViewModel;
 import com.jonahbauer.qed.model.viewmodel.LogViewModel.LogRequest;
 import com.jonahbauer.qed.networking.Reason;
+import com.jonahbauer.qed.util.MessageUtils;
 import com.jonahbauer.qed.util.Preferences;
 import com.jonahbauer.qed.util.StatusWrapper;
 import com.jonahbauer.qed.util.ViewUtils;
@@ -189,33 +185,7 @@ public class LogFragment extends QEDFragment {
      * @param value if the item is checked or not
      */
     private void setChecked(int position, boolean value) {
-        mBinding.list.setItemChecked(position, value);
-
-        Activity activity = getActivity();
-        if (activity instanceof MainActivity) {
-            MainActivity mainActivity = (MainActivity) activity;
-
-            if (value) {
-                Message msg = mMessageAdapter.getItem(position);
-
-                Toolbar toolbar = mainActivity.borrowAltToolbar();
-                toolbar.setNavigationOnClickListener(v -> setChecked(position, false));
-
-                toolbar.inflateMenu(R.menu.menu_message);
-                toolbar.setOnMenuItemClickListener(item -> {
-                    if (item.getItemId() == R.id.message_info) {
-                        MessageInfoBottomSheet sheet = MessageInfoBottomSheet.newInstance(msg);
-                        sheet.show(getChildFragmentManager(), sheet.getTag());
-                    }
-
-                    return false;
-                });
-
-                if (msg != null) toolbar.setTitle(msg.getName());
-            } else {
-                mainActivity.returnAltToolbar();
-            }
-        }
+        MessageUtils.setChecked(this, mBinding.list, mMessageAdapter, position, value);
     }
 
     @Override
