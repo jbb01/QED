@@ -1,5 +1,8 @@
 package com.jonahbauer.qed.model.viewmodel;
 
+import static com.jonahbauer.qed.util.StatusWrapper.STATUS_LOADED;
+import static com.jonahbauer.qed.util.StatusWrapper.STATUS_PRELOADED;
+
 import android.app.Application;
 import android.util.Log;
 
@@ -27,10 +30,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
-import lombok.var;
-
-import static com.jonahbauer.qed.util.StatusWrapper.STATUS_LOADED;
-import static com.jonahbauer.qed.util.StatusWrapper.STATUS_PRELOADED;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class AlbumViewModel extends AndroidViewModel implements QEDPageReceiver<Album> {
@@ -105,7 +104,7 @@ public class AlbumViewModel extends AndroidViewModel implements QEDPageReceiver<
         if (album == null || !album.isLoaded()) throw new IllegalStateException();
 
         this.mFilteredAlbum.setValue(StatusWrapper.wrap(Pair.create(album, Collections.emptyList()), STATUS_PRELOADED));
-        QEDGalleryPages.getAlbum(new Album(album.getId()), filters, new QEDPageReceiver<Album>() {
+        QEDGalleryPages.getAlbum(new Album(album.getId()), filters, new QEDPageReceiver<>() {
             @Override
             public void onPageReceived(@NonNull Album out) {
                 if (out.getImages().size() > 0) {

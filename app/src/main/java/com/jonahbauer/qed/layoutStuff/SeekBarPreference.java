@@ -39,8 +39,6 @@ import androidx.preference.PreferenceViewHolder;
 
 import com.jonahbauer.qed.R;
 
-import org.apache.commons.lang3.ArrayUtils;
-
 /**
  * Preference based on android.preference.SeekBarPreference but uses support preference as a base
  * . It contains a title and a {@link SeekBar} and an optional SeekBar value {@link TextView}.
@@ -85,7 +83,7 @@ public class SeekBarPreference extends Preference {
     /**
      * Listener reacting to the {@link SeekBar} changing value by the user
      */
-    private OnSeekBarChangeListener mSeekBarChangeListener = new OnSeekBarChangeListener() {
+    private final OnSeekBarChangeListener mSeekBarChangeListener = new OnSeekBarChangeListener() {
         @Override
         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
             if (fromUser && (mUpdatesContinuously || !mTrackingTouch)) {
@@ -115,7 +113,7 @@ public class SeekBarPreference extends Preference {
      * adjustable} attribute is set to true; it transfers the key presses to the {@link SeekBar}
      * to be handled accordingly.
      */
-    private View.OnKeyListener mSeekBarKeyListener = new View.OnKeyListener() {
+    private final View.OnKeyListener mSeekBarKeyListener = new View.OnKeyListener() {
         @Override
         public boolean onKey(View v, int keyCode, KeyEvent event) {
             if (event.getAction() != KeyEvent.ACTION_DOWN) {
@@ -292,7 +290,14 @@ public class SeekBarPreference extends Preference {
         int externalValue = getPersistedInt((Integer) defaultValue);
 
         if (mExternalValues != null) {
-            int index = ArrayUtils.indexOf(mExternalValues, externalValue);
+            int index = -1;
+            for (int j = 0; j < mExternalValues.length; j++) {
+                if (mExternalValues[j] == externalValue) {
+                    index = j;
+                    break;
+                }
+            }
+
             if (index == -1) index = 0;
 
             setValue(index);
@@ -562,7 +567,7 @@ public class SeekBarPreference extends Preference {
      */
     private static class SavedState extends BaseSavedState {
         public static final Parcelable.Creator<SavedState> CREATOR =
-                new Parcelable.Creator<SavedState>() {
+                new Parcelable.Creator<>() {
                     @Override
                     public SavedState createFromParcel(Parcel in) {
                         return new SavedState(in);

@@ -28,46 +28,52 @@ import org.jetbrains.annotations.Contract;
 
 import java.io.File;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
+
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMaps;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 
 public class ImageInfoActivity extends AppCompatActivity {
     public static final String EXTRA_IMAGE = "image";
-    private static final Map<String, Integer> INFO_PRIORITY = new HashMap<>();
-    private static final Map<String, Integer> INFO_NAMES = new HashMap<>();
+    private static final Object2IntMap<String> INFO_PRIORITY;
+    private static final Object2IntMap<String> INFO_NAMES;
 
     static {
-        INFO_PRIORITY.put(Image.DATA_KEY_CREATION_DATE, 0);
-        INFO_PRIORITY.put(Image.DATA_KEY_FORMAT, 1);
-        INFO_PRIORITY.put(Image.DATA_KEY_RESOLUTION, 2);
-        INFO_PRIORITY.put(Image.DATA_KEY_ORIENTATION, 3);
-        INFO_PRIORITY.put(Image.DATA_KEY_MANUFACTURER, 4);
-        INFO_PRIORITY.put(Image.DATA_KEY_MODEL, 5);
-        INFO_PRIORITY.put(Image.DATA_KEY_FLASH, 6);
-        INFO_PRIORITY.put(Image.DATA_KEY_FOCAL_LENGTH, 7);
-        INFO_PRIORITY.put(Image.DATA_KEY_FOCAL_RATIO, 8);
-        INFO_PRIORITY.put(Image.DATA_KEY_EXPOSURE_TIME, 9);
-        INFO_PRIORITY.put(Image.DATA_KEY_ISO, 10);
-        INFO_PRIORITY.put(Image.DATA_KEY_ALBUM, 11);
-        INFO_PRIORITY.put(Image.DATA_KEY_OWNER, 12);
-        INFO_PRIORITY.put(Image.DATA_KEY_UPLOAD_DATE, 13);
-        INFO_PRIORITY.put(Image.DATA_KEY_VISITS, 14);
+        Object2IntMap<String> priority = new Object2IntOpenHashMap<>();
+        priority.put(Image.DATA_KEY_CREATION_DATE, 0);
+        priority.put(Image.DATA_KEY_FORMAT, 1);
+        priority.put(Image.DATA_KEY_RESOLUTION, 2);
+        priority.put(Image.DATA_KEY_ORIENTATION, 3);
+        priority.put(Image.DATA_KEY_MANUFACTURER, 4);
+        priority.put(Image.DATA_KEY_MODEL, 5);
+        priority.put(Image.DATA_KEY_FLASH, 6);
+        priority.put(Image.DATA_KEY_FOCAL_LENGTH, 7);
+        priority.put(Image.DATA_KEY_FOCAL_RATIO, 8);
+        priority.put(Image.DATA_KEY_EXPOSURE_TIME, 9);
+        priority.put(Image.DATA_KEY_ISO, 10);
+        priority.put(Image.DATA_KEY_ALBUM, 11);
+        priority.put(Image.DATA_KEY_OWNER, 12);
+        priority.put(Image.DATA_KEY_UPLOAD_DATE, 13);
+        priority.put(Image.DATA_KEY_VISITS, 14);
+        INFO_PRIORITY = Object2IntMaps.unmodifiable(priority);
 
-        INFO_NAMES.put(Image.DATA_KEY_CREATION_DATE, R.string.image_info_creation_date);
-        INFO_NAMES.put(Image.DATA_KEY_FORMAT, R.string.image_info_format);
-        INFO_NAMES.put(Image.DATA_KEY_RESOLUTION, R.string.image_info_resolution);
-        INFO_NAMES.put(Image.DATA_KEY_ORIENTATION, R.string.image_info_orientation);
-        INFO_NAMES.put(Image.DATA_KEY_MANUFACTURER, R.string.image_info_camera_manufacturer);
-        INFO_NAMES.put(Image.DATA_KEY_MODEL, R.string.image_info_camera_model);
-        INFO_NAMES.put(Image.DATA_KEY_FLASH, R.string.image_info_flash);
-        INFO_NAMES.put(Image.DATA_KEY_FOCAL_LENGTH, R.string.image_info_focal_length);
-        INFO_NAMES.put(Image.DATA_KEY_FOCAL_RATIO, R.string.image_info_focal_ratio);
-        INFO_NAMES.put(Image.DATA_KEY_EXPOSURE_TIME, R.string.image_info_exposure_time);
-        INFO_NAMES.put(Image.DATA_KEY_ISO, R.string.image_info_iso);
-        INFO_NAMES.put(Image.DATA_KEY_ALBUM, R.string.image_info_album);
-        INFO_NAMES.put(Image.DATA_KEY_OWNER, R.string.image_info_owner);
-        INFO_NAMES.put(Image.DATA_KEY_UPLOAD_DATE, R.string.image_info_upload_date);
-        INFO_NAMES.put(Image.DATA_KEY_VISITS, R.string.image_info_number_of_calls);
+        Object2IntMap<String> names = new Object2IntOpenHashMap<>();
+        names.put(Image.DATA_KEY_CREATION_DATE, R.string.image_info_creation_date);
+        names.put(Image.DATA_KEY_FORMAT, R.string.image_info_format);
+        names.put(Image.DATA_KEY_RESOLUTION, R.string.image_info_resolution);
+        names.put(Image.DATA_KEY_ORIENTATION, R.string.image_info_orientation);
+        names.put(Image.DATA_KEY_MANUFACTURER, R.string.image_info_camera_manufacturer);
+        names.put(Image.DATA_KEY_MODEL, R.string.image_info_camera_model);
+        names.put(Image.DATA_KEY_FLASH, R.string.image_info_flash);
+        names.put(Image.DATA_KEY_FOCAL_LENGTH, R.string.image_info_focal_length);
+        names.put(Image.DATA_KEY_FOCAL_RATIO, R.string.image_info_focal_ratio);
+        names.put(Image.DATA_KEY_EXPOSURE_TIME, R.string.image_info_exposure_time);
+        names.put(Image.DATA_KEY_ISO, R.string.image_info_iso);
+        names.put(Image.DATA_KEY_ALBUM, R.string.image_info_album);
+        names.put(Image.DATA_KEY_OWNER, R.string.image_info_owner);
+        names.put(Image.DATA_KEY_UPLOAD_DATE, R.string.image_info_upload_date);
+        names.put(Image.DATA_KEY_VISITS, R.string.image_info_number_of_calls);
+        INFO_NAMES = Object2IntMaps.unmodifiable(names);
     }
 
     private LinearLayout mDetailContainer;
@@ -202,7 +208,7 @@ public class ImageInfoActivity extends AppCompatActivity {
                  }
 
                  if (INFO_NAMES.containsKey(key)) {
-                     addLine(INFO_NAMES.get(key), value, container);
+                     addLine(INFO_NAMES.getInt(key), value, container);
                  } else {
                      addLine(key, value, container);
                  }

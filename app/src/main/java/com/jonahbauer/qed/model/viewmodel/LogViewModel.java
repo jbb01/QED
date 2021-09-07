@@ -1,5 +1,12 @@
 package com.jonahbauer.qed.model.viewmodel;
 
+import static com.jonahbauer.qed.model.viewmodel.LogViewModel.Mode.DATE_INTERVAL;
+import static com.jonahbauer.qed.model.viewmodel.LogViewModel.Mode.DATE_RECENT;
+import static com.jonahbauer.qed.model.viewmodel.LogViewModel.Mode.FILE;
+import static com.jonahbauer.qed.model.viewmodel.LogViewModel.Mode.POST_INTERVAL;
+import static com.jonahbauer.qed.model.viewmodel.LogViewModel.Mode.POST_RECENT;
+import static com.jonahbauer.qed.model.viewmodel.LogViewModel.Mode.SINCE_OWN;
+
 import android.app.Application;
 import android.content.res.Resources;
 import android.net.Uri;
@@ -7,7 +14,6 @@ import android.os.AsyncTask;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.util.Pair;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -30,20 +36,14 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+import it.unimi.dsi.fastutil.longs.LongLongImmutablePair;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
-import static com.jonahbauer.qed.model.viewmodel.LogViewModel.Mode.DATE_INTERVAL;
-import static com.jonahbauer.qed.model.viewmodel.LogViewModel.Mode.DATE_RECENT;
-import static com.jonahbauer.qed.model.viewmodel.LogViewModel.Mode.FILE;
-import static com.jonahbauer.qed.model.viewmodel.LogViewModel.Mode.POST_INTERVAL;
-import static com.jonahbauer.qed.model.viewmodel.LogViewModel.Mode.POST_RECENT;
-import static com.jonahbauer.qed.model.viewmodel.LogViewModel.Mode.SINCE_OWN;
-
 public class LogViewModel extends AndroidViewModel {
     private final MutableLiveData<StatusWrapper<List<Message>>> mMessages = new MutableLiveData<>();
-    private final MutableLiveData<Pair<Long, Long>> mDownloadStatus = new MutableLiveData<>();
-    private final MutableLiveData<Pair<Long, Long>> mParseStatus = new MutableLiveData<>();
+    private final MutableLiveData<LongLongImmutablePair> mDownloadStatus = new MutableLiveData<>();
+    private final MutableLiveData<LongLongImmutablePair> mParseStatus = new MutableLiveData<>();
 
     private AsyncTask<?,?,?> mRunningTask;
 
@@ -80,11 +80,11 @@ public class LogViewModel extends AndroidViewModel {
         return mMessages;
     }
 
-    public LiveData<Pair<Long, Long>> getDownloadStatus() {
+    public LiveData<LongLongImmutablePair> getDownloadStatus() {
         return mDownloadStatus;
     }
 
-    public LiveData<Pair<Long, Long>> getParseStatus() {
+    public LiveData<LongLongImmutablePair> getParseStatus() {
         return mParseStatus;
     }
 
@@ -122,7 +122,7 @@ public class LogViewModel extends AndroidViewModel {
 
         @Override
         public void onProgressUpdate(Uri obj, long done, long total) {
-            mDownloadStatus.setValue(Pair.create(done, total));
+            mDownloadStatus.setValue(LongLongImmutablePair.of(done, total));
         }
     }
 
@@ -145,7 +145,7 @@ public class LogViewModel extends AndroidViewModel {
 
         @Override
         public void onProgressUpdate(List<Message> obj, long done, long total) {
-            mParseStatus.setValue(Pair.create(done, total));
+            mParseStatus.setValue(LongLongImmutablePair.of(done, total));
         }
     }
 

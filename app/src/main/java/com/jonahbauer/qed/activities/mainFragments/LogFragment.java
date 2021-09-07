@@ -1,5 +1,18 @@
 package com.jonahbauer.qed.activities.mainFragments;
 
+import static com.jonahbauer.qed.model.viewmodel.LogViewModel.DateIntervalLogRequest;
+import static com.jonahbauer.qed.model.viewmodel.LogViewModel.DateRecentLogRequest;
+import static com.jonahbauer.qed.model.viewmodel.LogViewModel.Mode.DATE_INTERVAL;
+import static com.jonahbauer.qed.model.viewmodel.LogViewModel.Mode.DATE_RECENT;
+import static com.jonahbauer.qed.model.viewmodel.LogViewModel.Mode.FILE;
+import static com.jonahbauer.qed.model.viewmodel.LogViewModel.Mode.POST_INTERVAL;
+import static com.jonahbauer.qed.model.viewmodel.LogViewModel.Mode.POST_RECENT;
+import static com.jonahbauer.qed.model.viewmodel.LogViewModel.Mode.SINCE_OWN;
+import static com.jonahbauer.qed.model.viewmodel.LogViewModel.OnlineLogRequest;
+import static com.jonahbauer.qed.model.viewmodel.LogViewModel.PostIntervalLogRequest;
+import static com.jonahbauer.qed.model.viewmodel.LogViewModel.PostRecentLogRequest;
+import static com.jonahbauer.qed.model.viewmodel.LogViewModel.SinceOwnLogRequest;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -45,19 +58,6 @@ import java.util.concurrent.TimeUnit;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
-
-import static com.jonahbauer.qed.model.viewmodel.LogViewModel.DateIntervalLogRequest;
-import static com.jonahbauer.qed.model.viewmodel.LogViewModel.DateRecentLogRequest;
-import static com.jonahbauer.qed.model.viewmodel.LogViewModel.Mode.DATE_INTERVAL;
-import static com.jonahbauer.qed.model.viewmodel.LogViewModel.Mode.DATE_RECENT;
-import static com.jonahbauer.qed.model.viewmodel.LogViewModel.Mode.FILE;
-import static com.jonahbauer.qed.model.viewmodel.LogViewModel.Mode.POST_INTERVAL;
-import static com.jonahbauer.qed.model.viewmodel.LogViewModel.Mode.POST_RECENT;
-import static com.jonahbauer.qed.model.viewmodel.LogViewModel.Mode.SINCE_OWN;
-import static com.jonahbauer.qed.model.viewmodel.LogViewModel.OnlineLogRequest;
-import static com.jonahbauer.qed.model.viewmodel.LogViewModel.PostIntervalLogRequest;
-import static com.jonahbauer.qed.model.viewmodel.LogViewModel.PostRecentLogRequest;
-import static com.jonahbauer.qed.model.viewmodel.LogViewModel.SinceOwnLogRequest;
 
 public class LogFragment extends QEDFragment {
     private static final String ARGUMENT_LOG_REQUEST = "logRequest";
@@ -127,7 +127,7 @@ public class LogFragment extends QEDFragment {
                 mBinding.setDownloadStatus(0);
                 mBinding.setDownloadText(getString(R.string.log_status_download_pending));
             } else {
-                double done = pair.first / 1048576d;
+                double done = pair.leftLong() / 1048576d;
                 mBinding.setDownloadStatus(1);
                 mBinding.setDownloadText(getString(R.string.log_status_downloading, done));
             }
@@ -139,8 +139,8 @@ public class LogFragment extends QEDFragment {
                 mBinding.setParseStatus(0);
                 mBinding.setParseText(getString(R.string.log_status_parse_pending));
             } else {
-                long done = pair.first;
-                long total = pair.second;
+                long done = pair.leftLong();
+                long total = pair.rightLong();
                 if (done == total) {
                     mBinding.setParseStatus(2);
                 } else {

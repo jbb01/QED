@@ -1,5 +1,7 @@
 package com.jonahbauer.qed.activities.imageActivity;
 
+import static com.jonahbauer.qed.DeepLinkingActivity.QEDIntent;
+
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -41,7 +43,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.jonahbauer.qed.DeepLinkingActivity.QEDIntent;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 public class ImageActivity extends AppCompatActivity {
     public static final String GALLERY_IMAGE_KEY = "galleryImage";
@@ -341,10 +344,10 @@ public class ImageActivity extends AppCompatActivity {
     }
 
     private class ImageAdapter extends ListAdapter<Image, ImageViewHolder> {
-        private final HashMap<Integer, SoftReference<ImageViewHolder>> mViewHolderCache = new HashMap<>();
+        private final Int2ObjectMap<SoftReference<ImageViewHolder>> mViewHolderCache = new Int2ObjectOpenHashMap<>();
 
         protected ImageAdapter() {
-            super(new DiffUtil.ItemCallback<Image>() {
+            super(new DiffUtil.ItemCallback<>() {
                 @Override
                 public boolean areItemsTheSame(@NonNull Image oldItem, @NonNull Image newItem) {
                     return oldItem.getId() == newItem.getId();

@@ -4,8 +4,6 @@ package com.jonahbauer.qed.layoutStuff.views;
 import android.content.Context;
 import android.util.AttributeSet;
 
-import org.apache.commons.lang3.NotImplementedException;
-
 /**
  * An {@code ImageButton} with its visibility bound to its enabled state.
  *
@@ -36,6 +34,6 @@ public class VisibilityChangingImageButton extends androidx.appcompat.widget.App
 
     @Override
     public void setVisibility(int visibility) {
-        throw new NotImplementedException("Visibility is bound to enabled state.");
+        throw new UnsupportedOperationException("Visibility is bound to enabled state.");
     }
 }

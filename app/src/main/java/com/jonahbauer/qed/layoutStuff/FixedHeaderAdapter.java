@@ -22,6 +22,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
+
 /**
  * Needs to be set as ListAdapter AND as OnScrollListener to work properly
  *
@@ -43,7 +48,7 @@ public abstract class FixedHeaderAdapter<C, H> extends ArrayAdapter<C> implement
     private int[] mSectionForPosition;
     private int[] mPositionForSection;
 
-    private final Set<Integer> mHeaderPositions;
+    private final IntSet mHeaderPositions;
 
     private boolean mNotifyOnChange;
 
@@ -82,25 +87,24 @@ public abstract class FixedHeaderAdapter<C, H> extends ArrayAdapter<C> implement
         this.mItemList = itemList;
         setComparator(comparator);
         this.mHeaderMap = headerMap;
-        mHeaderPositions = new HashSet<>();
-        mInvisibleViews = new HashSet<>();
-        mLayoutInflater = LayoutInflater.from(context);
+        this.mHeaderPositions = new IntOpenHashSet();
+        this.mInvisibleViews = new HashSet<>();
+        this.mLayoutInflater = LayoutInflater.from(context);
         this.mFixedHeader = fixedHeader;
-        mNotifyOnChange = true;
+        this.mNotifyOnChange = true;
 
         if (itemList.size() > 0) prepareHeaders();
     }
 
     @NonNull
     @Override
-    @SuppressWarnings("unchecked")
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         C item = getItem(position);
 
         assert item != null;
 
         boolean isHeader = mHeaderPositions.contains(position);
-        H header = isHeader ? (H) getSections()[getSectionForPosition(position)] : null;
+        H header = isHeader ? getSections()[getSectionForPosition(position)] : null;
 
         View view = getItemView(item, convertView, parent, mLayoutInflater);
         if (isHeader) setHeader(view, header);
@@ -176,9 +180,9 @@ public abstract class FixedHeaderAdapter<C, H> extends ArrayAdapter<C> implement
         this.mItemList.sort(this.mComparator);
 
         this.mHeaderPositions.clear();
-        List<Object> sectionsList = new LinkedList<>();
+        List<H> sectionsList = new LinkedList<>();
         this.mSections = null;
-        List<Integer> positionForSectionList = new LinkedList<>();
+        IntList positionForSectionList = new IntArrayList();
         this.mPositionForSection = null;
         this.mSectionForPosition = new int[size];
 
@@ -204,19 +208,18 @@ public abstract class FixedHeaderAdapter<C, H> extends ArrayAdapter<C> implement
 
         //noinspection unchecked
         this.mSections = (H[]) sectionsList.toArray();
-        this.mPositionForSection = positionForSectionList.stream().mapToInt(i -> i).toArray();
+        this.mPositionForSection = positionForSectionList.intStream().toArray();
     }
 
     @Override
     public void onScrollStateChanged(AbsListView view, int scrollState) {}
 
     @Override
-    @SuppressWarnings("unchecked")
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
         if (totalItemCount > 0) {
             View firstView = getViewByPosition(firstVisibleItem, view);
 
-            setHeader(mFixedHeader, (H) getSections()[getSectionForPosition(firstVisibleItem)]);
+            setHeader(mFixedHeader, getSections()[getSectionForPosition(firstVisibleItem)]);
 
             mInvisibleViews.forEach(invisibleView -> invisibleView.setVisibility(View.VISIBLE));
             if (firstView.getY() < 0) {
@@ -244,7 +247,7 @@ public abstract class FixedHeaderAdapter<C, H> extends ArrayAdapter<C> implement
     }
 
     @Override
-    public Object[] getSections() {
+    public H[] getSections() {
         return mSections;
     }
 

@@ -20,6 +20,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
 
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
+
 public class EventAdapter extends ArrayAdapter<Event> implements SectionIndexer {
     private final Context mContext;
     private final List<Event> mEventList;
@@ -77,7 +80,7 @@ public class EventAdapter extends ArrayAdapter<Event> implements SectionIndexer 
 
         List<String> sectionsList = new LinkedList<>();
         this.mSections = null;
-        List<Integer> positionForSectionList = new LinkedList<>();
+        IntList positionForSectionList = new IntArrayList();
         this.mPositionForSection = null;
         this.mSectionForPosition = new int[size];
 
@@ -101,7 +104,7 @@ public class EventAdapter extends ArrayAdapter<Event> implements SectionIndexer 
         }
 
         this.mSections = sectionsList.toArray(new String[0]);
-        this.mPositionForSection = positionForSectionList.stream().mapToInt(i -> i).toArray();
+        this.mPositionForSection = positionForSectionList.intStream().toArray();
     }
 
     @Override

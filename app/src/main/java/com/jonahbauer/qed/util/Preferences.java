@@ -10,12 +10,12 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class Preferences {
-    private boolean mInitialized;
-    private SharedPreferences mSharedPreferences;
+    private static boolean mInitialized;
+    private static SharedPreferences mSharedPreferences;
 
-    private General mGeneral;
-    private Chat mChat;
-    private Gallery mGallery;
+    private static General mGeneral;
+    private static Chat mChat;
+    private static Gallery mGallery;
 
     public static void init(SharedPreferences sharedPreferences, Resources resources) {
         if (mInitialized) throw new IllegalStateException("PasswordStorage is already initialized.");
@@ -43,7 +43,7 @@ public class Preferences {
         return mGallery;
     }
 
-    public class General {
+    public static class General {
         private final String KEY_DRAWER_SELECTION;
         private final String KEY_REMEMBER_ME;
 
@@ -122,7 +122,7 @@ public class Preferences {
         }
     }
 
-    public class Chat {
+    public static class Chat {
         private final String KEY_NAME;
         private final String KEY_CHANNEL;
         private final String KEY_SENSE;
@@ -272,7 +272,7 @@ public class Preferences {
         }
     }
 
-    public class Gallery {
+    public static class Gallery {
         private final String KEY_OFFLINE_MODE;
 
         private final String KEY_DELETE_THUMBNAILS;
