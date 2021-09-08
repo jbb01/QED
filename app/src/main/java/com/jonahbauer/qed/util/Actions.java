@@ -20,30 +20,19 @@ import com.jonahbauer.qed.model.Event;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
+@SuppressWarnings("UnusedReturnValue")
 public class Actions {
     public static boolean sendTo(@NonNull Context context, String...emails) {
         Intent intent = new Intent(Intent.ACTION_SENDTO);
         intent.setType("*/*");
         intent.putExtra(Intent.EXTRA_EMAIL, emails);
-
-        if (intent.resolveActivity(context.getPackageManager()) != null) {
-            context.startActivity(intent);
-            return true;
-        } else {
-            return false;
-        }
+        return tryStartActivity(context, intent);
     }
 
     public static boolean showOnMap(@NonNull Context context, String location) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(Uri.parse("geo:0,0?q=" + location));
-
-        if (intent.resolveActivity(context.getPackageManager()) != null) {
-            context.startActivity(intent);
-            return true;
-        } else {
-            return false;
-        }
+        return tryStartActivity(context, intent);
     }
 
     public static boolean recordToCalendar(@NonNull Context context, @NonNull Event event) {
@@ -56,24 +45,13 @@ public class Actions {
                 .putExtra(CalendarContract.Events.EVENT_LOCATION, event.getHotelAddress())
                 .putExtra(Intent.EXTRA_EMAIL, event.getEmailOrga());
 
-        if (intent.resolveActivity(context.getPackageManager()) != null) {
-            context.startActivity(intent);
-            return true;
-        } else {
-            return false;
-        }
+        return tryStartActivity(context, intent);
     }
 
     public static boolean dial(@NonNull Context context, String phoneNumber) {
         Intent intent = new Intent(Intent.ACTION_DIAL);
         intent.setData(Uri.parse("tel:" + phoneNumber));
-
-        if (intent.resolveActivity(context.getPackageManager()) != null) {
-            context.startActivity(intent);
-            return true;
-        } else {
-            return false;
-        }
+        return tryStartActivity(context, intent);
     }
 
     public static void copy(@NonNull Context context, @Nullable View view, String label, String text) {
@@ -83,6 +61,66 @@ public class Actions {
 
         if (view != null) {
             Snackbar.make(view, R.string.copied, Snackbar.LENGTH_SHORT).show();
+        }
+    }
+
+    public static boolean open(@NonNull Context context, String url) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(url));
+        return tryStartActivity(context, intent);
+    }
+
+    public static boolean openFacebook(@NonNull Context context, String username) {
+        username = (username.startsWith("@") ? username.substring(1) : username);
+        String uri = String.format("https://www.facebook.com/%s/", username);
+        return open(context, uri);
+    }
+
+    public static boolean openGithub(@NonNull Context context, String username) {
+        String uri = String.format("https://github.com/%s/", username);
+        return open(context, uri);
+    }
+
+    public static boolean openInstagram(@NonNull Context context, String username) {
+        username = (username.startsWith("@") ? username.substring(1) : username);
+        String uri = String.format("https://www.instagram.com/%s", username);
+        return open(context, uri);
+    }
+
+    public static boolean openSkype(@NonNull Context context, String username) {
+        String uri = String.format("skype:%s?chat", username);
+        return open(context, uri);
+    }
+
+    public static boolean openTelegram(@NonNull Context context, String username) {
+        username = (username.startsWith("@") ? username.substring(1) : username);
+        String uri = String.format("https://t.me/%s", username);
+        return open(context, uri);
+    }
+
+    public static boolean openTwitter(@NonNull Context context, String username) {
+        username = (username.startsWith("@") ? username.substring(1) : username);
+        String uri = String.format("https://twitter.com/%s", username);
+        return open(context, uri);
+    }
+
+    public static boolean openWhatsapp(@NonNull Context context, String number) {
+        number = number.replaceAll("[^0-9]", "");
+        String uri = String.format("https://wa.me/%s", number);
+        return open(context, uri);
+    }
+
+    public static boolean openXmpp(@NonNull Context context, String username) {
+        String uri = String.format("xmpp:%s", username);
+        return open(context, uri);
+    }
+
+    private static boolean tryStartActivity(@NonNull Context context, Intent intent) {
+        if (intent.resolveActivity(context.getPackageManager()) != null) {
+            context.startActivity(intent);
+            return true;
+        } else {
+            return false;
         }
     }
 }

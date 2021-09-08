@@ -10,11 +10,13 @@
         <variable name="subtitle" type="java.lang.String" />
         <variable name="icon" type="android.graphics.drawable.Drawable" />
         <variable name="onClick" type="android.view.View.OnClickListener" />
+        <variable name="onLongClick" type="android.view.View.OnLongClickListener" />
     </data>
 
     <LinearLayout
         android:background="?selectableItemBackground"
         android:onClick="@{onClick::onClick}"
+        android:onLongClick="@{onLongClick::onLongClick}"
         android:clickable="true"
         android:focusable="true"
         android:layout_width="match_parent"

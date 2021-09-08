@@ -31,10 +31,65 @@ import com.jonahbauer.qed.util.Themes;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
+
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMaps;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMaps;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 public class PersonInfoFragment extends AbstractInfoFragment {
     private PersonViewModel mPersonViewModel;
     private FragmentInfoPersonBinding mBinding;
+
+    private static final Object2IntMap<String> CONTACT_ICONS;
+    private static final Object2ObjectMap<String, BiConsumer<Context, String>> CONTACT_ACTIONS;
+
+    static {
+        Object2IntOpenHashMap<String> icons = new Object2IntOpenHashMap<>();
+        icons.put("daheim", R.drawable.ic_person_contact_phone);
+        icons.put("discord", R.drawable.ic_person_contact_discord);
+        icons.put("email", R.drawable.ic_person_contact_mail);
+        icons.put("facebook", R.drawable.ic_person_contact_facebook);
+        icons.put("github", R.drawable.ic_person_contact_github);
+        icons.put("gpg", R.drawable.ic_person_contact_gpg);
+        icons.put("icq", R.drawable.ic_person_contact_icq);
+        icons.put("instagram", R.drawable.ic_person_contact_instagram);
+        icons.put("irc", R.drawable.ic_person_contact_irc);
+        icons.put("jabber", R.drawable.ic_person_contact_jabber);
+        icons.put("matrix", R.drawable.ic_person_contact_matrix);
+        icons.put("mobil", R.drawable.ic_person_contact_phone);
+        icons.put("mumble", R.drawable.ic_person_contact_mumble);
+        icons.put("signal", R.drawable.ic_person_contact_signal);
+        icons.put("skype", R.drawable.ic_person_contact_skype);
+        icons.put("teamspeak", R.drawable.ic_person_contact_teamspeak);
+        icons.put("telegram", R.drawable.ic_person_contact_telegram);
+        icons.put("telefon", R.drawable.ic_person_contact_phone);
+        icons.put("twitter", R.drawable.ic_person_contact_twitter);
+        icons.put("whatsapp", R.drawable.ic_person_contact_whatsapp);
+        icons.put("youtube", R.drawable.ic_person_contact_youtube);
+        icons.put("xmpp", R.drawable.ic_person_contact_xmpp);
+        icons.defaultReturnValue(R.drawable.ic_person_contact);
+        CONTACT_ICONS = Object2IntMaps.unmodifiable(icons);
+
+        Object2ObjectOpenHashMap<String, BiConsumer<Context, String>> actions = new Object2ObjectOpenHashMap<>();
+        actions.put("daheim", Actions::dial);
+        actions.put("email", Actions::sendTo);
+        actions.put("facebook", Actions::openFacebook);
+        actions.put("github", Actions::openGithub);
+        actions.put("instagram", Actions::openInstagram);
+        actions.put("jabber", Actions::openXmpp);
+        actions.put("mobil", Actions::dial);
+        actions.put("skype", Actions::openSkype);
+        actions.put("telegram", Actions::openTelegram);
+        actions.put("telefon", Actions::dial);
+        actions.put("twitter", Actions::openTwitter);
+        actions.put("whatsapp", Actions::openWhatsapp);
+        actions.put("xmpp", Actions::openXmpp);
+        CONTACT_ACTIONS = Object2ObjectMaps.unmodifiable(actions);
+    }
 
     public static PersonInfoFragment newInstance() {
         return new PersonInfoFragment();
@@ -124,10 +179,20 @@ public class PersonInfoFragment extends AbstractInfoFragment {
         parent.removeAllViews();
         contacts.forEach((contact) -> {
             ListItemBinding item = ListItemBinding.inflate(LayoutInflater.from(context), parent, true);
-            item.setIcon(AppCompatResources.getDrawable(context, R.drawable.ic_person_contact));
+            int icon = CONTACT_ICONS.getInt(contact.first.toLowerCase());
+            item.setIcon(AppCompatResources.getDrawable(context, icon));
             item.setTitle(contact.second);
             item.setSubtitle(contact.first);
-            item.setOnClick(v -> Actions.dial(context, contact.second));
+
+            BiConsumer<Context, String> action = CONTACT_ACTIONS.get(contact.first.toLowerCase());
+            if (action != null) {
+                item.setOnClick(v -> action.accept(context, contact.second));
+            }
+
+            item.setOnLongClick(v -> {
+                Actions.copy(context, parent.getRootView(), contact.first, contact.second);
+                return true;
+            });
         });
     }
 
