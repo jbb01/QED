@@ -184,20 +184,20 @@ public class ImageActivity extends AppCompatActivity {
             }
             return true;
         } else if (itemId == R.id.image_open_with) {
-            Intent intent2 = new Intent();
-            intent2.setAction(Intent.ACTION_VIEW);
-            intent2.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
             Uri uri = FileProvider.getUriForFile(this, "com.jonahbauer.qed.fileprovider", new File(mImage.getPath()));
 
-            List<ResolveInfo> resInfoList = getPackageManager().queryIntentActivities(intent2, PackageManager.MATCH_DEFAULT_ONLY);
+            Intent intent = new Intent();
+            intent.setAction(Intent.ACTION_VIEW);
+            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            intent.setDataAndType(uri, mImage.getFormat());
+
+            List<ResolveInfo> resInfoList = getPackageManager().queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
             for (ResolveInfo resolveInfo : resInfoList) {
                 String packageName = resolveInfo.activityInfo.packageName;
                 grantUriPermission(packageName, uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
             }
 
-            intent2.setDataAndType(uri, mImage.getFormat());
-            startActivity(intent2);
+            startActivity(intent);
             return true;
         } else if (itemId == R.id.image_info) {
             Intent intent = new Intent(this, ImageInfoActivity.class);
