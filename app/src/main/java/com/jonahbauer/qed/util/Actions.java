@@ -87,6 +87,15 @@ public class Actions {
         return open(context, uri);
     }
 
+    public static boolean openMatrix(@NonNull Context context, String username) {
+        if (username.matches("@.+:(?:[^.]+\\.)+[^.]+")) {
+            String uri = String.format("https://matrix.to/#/%s", username);
+            return open(context, uri);
+        } else {
+            return false;
+        }
+    }
+
     public static boolean openSkype(@NonNull Context context, String username) {
         String uri = String.format("skype:%s?chat", username);
         return open(context, uri);

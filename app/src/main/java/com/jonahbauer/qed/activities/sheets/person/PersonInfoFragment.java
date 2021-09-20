@@ -81,6 +81,7 @@ public class PersonInfoFragment extends AbstractInfoFragment {
         actions.put("github", Actions::openGithub);
         actions.put("instagram", Actions::openInstagram);
         actions.put("jabber", Actions::openXmpp);
+        actions.put("matrix", Actions::openMatrix);
         actions.put("mobil", Actions::dial);
         actions.put("skype", Actions::openSkype);
         actions.put("telegram", Actions::openTelegram);
