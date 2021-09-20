@@ -12,6 +12,8 @@ import com.jonahbauer.qed.crypt.PasswordUtils;
 import com.jonahbauer.qed.networking.Feature;
 import com.jonahbauer.qed.networking.NetworkConstants;
 import com.jonahbauer.qed.networking.NetworkUtils;
+import com.jonahbauer.qed.networking.async.QEDPageReceiver;
+import com.jonahbauer.qed.networking.cookies.QEDCookieHandler;
 import com.jonahbauer.qed.networking.exceptions.InvalidCredentialsException;
 import com.jonahbauer.qed.networking.exceptions.NetworkException;
 import com.jonahbauer.qed.util.Preferences;
@@ -27,11 +29,19 @@ import java.util.List;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Single;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public final class QEDLogin {
 
+    /**
+     * Performs a login to the chat using stored username and password.
+     * The authentication cookie will be handled by the {@link QEDCookieHandler}.
+     */
     private static void loginChat() throws InvalidCredentialsException, NetworkException {
         Pair<String, char[]> credentials = loadUsernameAndPassword();
 
@@ -40,6 +50,10 @@ public final class QEDLogin {
         PasswordUtils.wipe(credentials.second);
     }
 
+    /**
+     * Performs a login to the database using stored username and password.
+     * The authentication cookie will be handled by the {@link QEDCookieHandler}.
+     */
     private static void loginDatabase() throws InvalidCredentialsException, NetworkException {
         Pair<String, char[]> credentials = loadUsernameAndPassword();
 
@@ -48,6 +62,10 @@ public final class QEDLogin {
         PasswordUtils.wipe(credentials.second);
     }
 
+    /**
+     * Performs a login to the gallery using stored username and password.
+     * The authentication cookie will be handled by the {@link QEDCookieHandler}.
+     */
     private static void loginGallery() throws NetworkException, InvalidCredentialsException {
         Pair<String, char[]> credentials = loadUsernameAndPassword();
 
@@ -56,7 +74,11 @@ public final class QEDLogin {
         PasswordUtils.wipe(credentials.second);
     }
 
-    static void loginChat(String username, char[] password) throws InvalidCredentialsException, NetworkException {
+    /**
+     * Performs a login to the chat using the specified username and password.
+     * The authentication cookie will be handled by the {@link QEDCookieHandler}.
+     */
+    private static void loginChat(String username, char[] password) throws InvalidCredentialsException, NetworkException {
         String version = NetworkConstants.CHAT_VERSION;
 
         byte[] passwordBytes = PasswordUtils.toBytes(password);
@@ -108,7 +130,11 @@ public final class QEDLogin {
         }
     }
 
-    static void loginDatabase(String username, char[] password) throws InvalidCredentialsException, NetworkException {
+    /**
+     * Performs a login to the database using the specified username and password.
+     * The authentication cookie will be handled by the {@link QEDCookieHandler}.
+     */
+    private static void loginDatabase(String username, char[] password) throws InvalidCredentialsException, NetworkException {
         byte[] data = null;
         try {
             HttpsURLConnection httpsURLConnection = (HttpsURLConnection) new URL(NetworkConstants.DATABASE_SERVER_LOGIN).openConnection();
@@ -156,7 +182,11 @@ public final class QEDLogin {
         }
     }
 
-    static void loginGallery(String username, char[] password) throws InvalidCredentialsException, NetworkException {
+    /**
+     * Performs a login to the gallery using the specified username and password.
+     * The authentication cookie will be handled by the {@link QEDCookieHandler}.
+     */
+    private static void loginGallery(String username, char[] password) throws InvalidCredentialsException, NetworkException {
         byte[] passwordBytes = PasswordUtils.toBytes(password);
         byte[] data = PasswordUtils.combine(
                 String.format("username=%s&login=Einloggen&password=", username).getBytes(StandardCharsets.UTF_8),
@@ -207,6 +237,51 @@ public final class QEDLogin {
     }
 
     /**
+     * Performs a login to the specified feature using the specified username and password.
+     * The authentication cookie will be handled by the {@link QEDCookieHandler}.
+     */
+    private static void login(String username, char[] password, Feature feature) throws InvalidCredentialsException, NetworkException {
+        switch (feature) {
+            default:
+            case CHAT:
+                loginChat(username, password);
+                break;
+            case GALLERY:
+                loginGallery(username, password);
+                break;
+            case DATABASE:
+                loginDatabase(username, password);
+                break;
+        }
+    }
+
+    /**
+     * Asynchronously performs a login to the specified feature using the specified username and password.
+     * The authentication cookie will be handled by the {@link QEDCookieHandler}.
+     */
+    public static Disposable loginAsync(String username, char[] password, Feature feature, QEDPageReceiver<Boolean> listener) {
+        var observable = Single.fromCallable(() -> {
+            try {
+                login(username, password, feature);
+
+                if (Preferences.general().isRememberMe()) {
+                    PasswordStorage.saveUsernameAndPassword(username, password);
+                }
+            } finally {
+                PasswordUtils.wipe(password);
+            }
+            return true;
+        });
+
+        return observable.subscribeOn(Schedulers.io())
+                         .observeOn(AndroidSchedulers.mainThread())
+                         .subscribe(
+                                 listener::onPageReceived,
+                                 err -> listener.onError(false, err)
+                         );
+    }
+
+    /**
      * @see #login(Feature, boolean)
      */
     public static void login(@NonNull Feature feature) throws InvalidCredentialsException, NetworkException {
@@ -215,7 +290,7 @@ public final class QEDLogin {
 
     /**
      * Tries to login to the specified {@code Feature} using stored username and password.
-     * The {@link com.jonahbauer.qed.networking.cookies.QEDCookieHandler} will take care of
+     * The {@link QEDCookieHandler} will take care of
      * storing session cookies and adding the to following requests.
      *
      * @param feature a feature

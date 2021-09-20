@@ -111,7 +111,7 @@ public class NetworkUtils {
                 Map<String, List<String>> headers = connection.getHeaderFields();
                 if (headers.containsKey("Set-Cookie")) {
                     List<String> setCookie = headers.get("Set-Cookie");
-                    for (String s : setCookie) {
+                    if (setCookie != null) for (String s : setCookie) {
                         if (s.contains("userid=;") || s.contains("pwhash=;")) {
                             return true;
                         }

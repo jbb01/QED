@@ -10,17 +10,13 @@ import com.jonahbauer.qed.networking.parser.HtmlParser;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 
 public final class EventListParser extends HtmlParser<List<Event>> {
     private static final String LOG_TAG = EventListParser.class.getName();
     public static final EventListParser INSTANCE = new EventListParser();
-
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd", Locale.GERMANY);
 
     private EventListParser() {}
 

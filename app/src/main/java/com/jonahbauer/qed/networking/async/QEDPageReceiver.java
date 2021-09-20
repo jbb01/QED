@@ -19,4 +19,9 @@ public interface QEDPageReceiver<T> {
     default void onError(T out, @NonNull Reason reason, @Nullable Throwable cause) {
         Log.e(getClass().getName(), out + ":" + reason, cause);
     }
+
+    @MainThread
+    default void onError(T out, @Nullable Throwable cause) {
+        onError(out, Reason.guess(cause), cause);
+    }
 }

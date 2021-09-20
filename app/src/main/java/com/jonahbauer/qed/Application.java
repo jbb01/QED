@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.security.keystore.KeyGenParameterSpec;
 import android.widget.Toast;
 
+import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.preference.PreferenceManager;
@@ -137,14 +138,16 @@ public class Application extends android.app.Application implements android.app.
      * Sets the online status of the app and calls all {@code NetworkListener}.
      * @param online the new online status
      */
+    @MainThread
     public void setOnline(boolean online) {
-        if (!Application.sOnline && online) {
-            if (mActivity !=null&&(mActivity instanceof NetworkListener)) ((NetworkListener) mActivity).onConnectionRegain();
-        } else if (Application.sOnline && !online) {
-            if (mActivity !=null&&(mActivity instanceof NetworkListener)) ((NetworkListener) mActivity).onConnectionFail();
-        } else if (!Application.sOnline) {
-            if (mActivity !=null&&(mActivity instanceof NetworkListener)) ((NetworkListener) mActivity).onConnectionFail();
+        if (mActivity instanceof NetworkListener) {
+            NetworkListener listener = (NetworkListener) mActivity;
+
+            if (!Application.sOnline && online) listener.onConnectionRegain();
+            else if (Application.sOnline && !online) listener.onConnectionFail();
+            else if (!Application.sOnline) listener.onConnectionFail();
         }
+
         Application.sOnline = online;
     }
 

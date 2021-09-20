@@ -40,10 +40,15 @@ import lombok.EqualsAndHashCode;
 @TypeConverters(Converters.class)
 public class Message implements Parcelable, Comparable<Message>, Serializable {
     private static final String LOG_TAG = Message.class.getName();
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.GERMANY);
-    static {
-        DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("CET"));
-    }
+    private static final ThreadLocal<SimpleDateFormat> DATE_FORMAT = new ThreadLocal<>() {
+        @NonNull
+        @Override
+        protected SimpleDateFormat initialValue() {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.GERMANY);
+            sdf.setTimeZone(TimeZone.getTimeZone("CET"));
+            return sdf;
+        }
+    };
 
     public static final Message PONG = new Message(0, "PONG", "PONG", new Date(0), 0, "PONG", "000000", 0, "PONG");
 
@@ -145,7 +150,8 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
 
             Date date;
             try {
-                date = DATE_FORMAT.parse(dateStr);
+                //noinspection ConstantConditions
+                date = DATE_FORMAT.get().parse(dateStr);
                 assert date != null;
             } catch (ParseException | NumberFormatException e) {
                 Log.w(LOG_TAG, "Message did not contain a valid date: " + jsonMessage);
@@ -198,7 +204,7 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
         dest.writeLong(id);
     }
 
-    public static final Parcelable.Creator<Message> CREATOR = new Parcelable.Creator<Message>() {
+    public static final Parcelable.Creator<Message> CREATOR = new Parcelable.Creator<>() {
 
         @Override
         public Message createFromParcel(Parcel source) {
@@ -212,7 +218,7 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
             int bottag = source.readInt();
             long id = source.readLong();
 
-            assert name != null & message != null & color != null & channel != null;
+            assert date != null && name != null & message != null & color != null & channel != null;
 
             return new Message(id, name, message, date, userId, userName, color, bottag, channel);
         }

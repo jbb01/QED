@@ -1,5 +1,7 @@
 package com.jonahbauer.qed.activities;
 
+import static com.jonahbauer.qed.DeepLinkingActivity.QEDIntent;
+
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.drawable.Animatable;
@@ -34,8 +36,8 @@ import com.jonahbauer.qed.model.Image;
 import com.jonahbauer.qed.model.Person;
 import com.jonahbauer.qed.model.adapter.ImageAdapter;
 import com.jonahbauer.qed.model.viewmodel.AlbumViewModel;
-import com.jonahbauer.qed.networking.QEDGalleryPages.Filter;
 import com.jonahbauer.qed.networking.Reason;
+import com.jonahbauer.qed.networking.pages.QEDGalleryPages.Filter;
 import com.jonahbauer.qed.util.Preferences;
 import com.jonahbauer.qed.util.StatusWrapper;
 import com.jonahbauer.qed.util.ViewUtils;
@@ -50,8 +52,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static com.jonahbauer.qed.DeepLinkingActivity.QEDIntent;
 
 public class GalleryAlbumActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener, View.OnClickListener, AdapterView.OnItemClickListener {
     private static final String LOG_TAG = GalleryAlbumActivity.class.getName();

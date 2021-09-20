@@ -10,7 +10,6 @@ import static com.jonahbauer.qed.model.viewmodel.LogViewModel.Mode.SINCE_OWN;
 import android.app.Application;
 import android.content.res.Resources;
 import android.net.Uri;
-import android.os.AsyncTask;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,9 +19,9 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.model.Message;
-import com.jonahbauer.qed.networking.QEDChatPages;
 import com.jonahbauer.qed.networking.Reason;
 import com.jonahbauer.qed.networking.async.QEDPageStreamReceiver;
+import com.jonahbauer.qed.networking.pages.QEDChatPages;
 import com.jonahbauer.qed.util.StatusWrapper;
 
 import java.io.File;
@@ -36,6 +35,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import it.unimi.dsi.fastutil.longs.LongLongImmutablePair;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -45,7 +45,7 @@ public class LogViewModel extends AndroidViewModel {
     private final MutableLiveData<LongLongImmutablePair> mDownloadStatus = new MutableLiveData<>();
     private final MutableLiveData<LongLongImmutablePair> mParseStatus = new MutableLiveData<>();
 
-    private AsyncTask<?,?,?> mRunningTask;
+    private final CompositeDisposable mDisposable = new CompositeDisposable();
 
     public LogViewModel(@NonNull Application application) {
         super(application);
@@ -55,11 +55,7 @@ public class LogViewModel extends AndroidViewModel {
         mMessages.setValue(StatusWrapper.wrap(Collections.emptyList(), StatusWrapper.STATUS_PRELOADED));
         mDownloadStatus.setValue(null);
         mParseStatus.setValue(null);
-
-        if (mRunningTask != null) {
-            mRunningTask.cancel(false);
-            mRunningTask = null;
-        }
+        mDisposable.clear();
 
         if (logRequest instanceof FileLogRequest) {
             parse(((FileLogRequest) logRequest).getFile());
@@ -69,7 +65,9 @@ public class LogViewModel extends AndroidViewModel {
                 File file = File.createTempFile("chat", ".log", tempDir);
                 file.deleteOnExit();
 
-                mRunningTask = QEDChatPages.getChatLog(getApplication(), logRequest, Uri.fromFile(file), new DownloadListener());
+                mDisposable.add(
+                        QEDChatPages.getChatLog(getApplication(), logRequest, Uri.fromFile(file), new DownloadListener())
+                );
             } catch (IOException e) {
                 onError(Reason.guess(e));
             }
@@ -89,11 +87,11 @@ public class LogViewModel extends AndroidViewModel {
     }
 
     private void parse(Uri file) {
-        if (mRunningTask != null) {
-            mRunningTask.cancel(false);
-        }
+        mDisposable.clear();
         mParseStatus.setValue(null);
-        mRunningTask = QEDChatPages.parseChatLog(getApplication(), file, new ParseListener());
+        mDisposable.add(
+                QEDChatPages.parseChatLog(getApplication(), file, new ParseListener())
+        );
     }
 
     private void onError(@NonNull Reason reason) {
@@ -102,9 +100,8 @@ public class LogViewModel extends AndroidViewModel {
 
     @Override
     protected void onCleared() {
-        if (mRunningTask != null) {
-            mRunningTask.cancel(false);
-        }
+        super.onCleared();
+        mDisposable.clear();
     }
 
     private class DownloadListener implements QEDPageStreamReceiver<Uri> {

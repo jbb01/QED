@@ -5,6 +5,7 @@ import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.net.NetworkRequest;
+import android.os.Handler;
 
 import androidx.annotation.NonNull;
 
@@ -16,10 +17,12 @@ import androidx.annotation.NonNull;
 public class ConnectionStateMonitor extends ConnectivityManager.NetworkCallback {
     private final Application mApplication;
     private final NetworkRequest mNetworkRequest;
+    private final Handler mHandler;
 
     ConnectionStateMonitor(Application application) {
         mNetworkRequest = new NetworkRequest.Builder().addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR).addTransportType(NetworkCapabilities.TRANSPORT_WIFI).build();
-        this.mApplication = application;
+        mApplication = application;
+        mHandler = new Handler(mApplication.getMainLooper());
     }
 
     void enable() {
@@ -29,7 +32,7 @@ public class ConnectionStateMonitor extends ConnectivityManager.NetworkCallback 
         }
     }
 
-    public void disable() {
+    void disable() {
         ConnectivityManager connectivityManager = (ConnectivityManager) mApplication.getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connectivityManager != null) {
             connectivityManager.unregisterNetworkCallback(this);
@@ -38,16 +41,16 @@ public class ConnectionStateMonitor extends ConnectivityManager.NetworkCallback 
 
     @Override
     public void onAvailable(@NonNull Network network) {
-        mApplication.setOnline(true);
+        mHandler.post(() -> mApplication.setOnline(true));
     }
 
     @Override
     public void onLost(@NonNull Network network) {
-        mApplication.setOnline(false);
+        mHandler.post(() -> mApplication.setOnline(false));
     }
 
     @Override
     public void onUnavailable() {
-        mApplication.setOnline(false);
+        mHandler.post(() -> mApplication.setOnline(false));
     }
 }

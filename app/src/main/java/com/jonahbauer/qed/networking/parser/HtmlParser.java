@@ -10,9 +10,18 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 public abstract class HtmlParser<T> implements Parser<T> {
-    private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd", Locale.GERMANY);
+    private static final ThreadLocal<SimpleDateFormat> DATE_FORMAT = new ThreadLocal<>() {
+        @NonNull
+        @Override
+        protected SimpleDateFormat initialValue() {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.GERMANY);
+            sdf.setTimeZone(TimeZone.getTimeZone("CET"));
+            return sdf;
+        }
+    };
 
     @Override
     public final T apply(T obj, String s) {
@@ -21,12 +30,13 @@ public abstract class HtmlParser<T> implements Parser<T> {
     }
 
     @NonNull
-    @Contract("!null, _ -> param1")
+    @Contract("_, _ -> param1")
     protected abstract T parse(@NonNull T obj, Document document) throws HtmlParseException;
 
     protected Date parseDate(String date) {
         try {
-            return SIMPLE_DATE_FORMAT.parse(date);
+            //noinspection ConstantConditions
+            return DATE_FORMAT.get().parse(date);
         } catch (ParseException e) {
             return null;
         }

@@ -1,36 +1,43 @@
 package com.jonahbauer.qed.activities;
 
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.databinding.ActivityLoginBinding;
 import com.jonahbauer.qed.networking.Feature;
 import com.jonahbauer.qed.networking.NetworkListener;
-import com.jonahbauer.qed.networking.login.UserLoginTask;
+import com.jonahbauer.qed.networking.Reason;
+import com.jonahbauer.qed.networking.async.QEDPageReceiver;
+import com.jonahbauer.qed.networking.exceptions.InvalidCredentialsException;
+import com.jonahbauer.qed.networking.login.QEDLogin;
 import com.jonahbauer.qed.util.Preferences;
+import com.jonahbauer.qed.util.ViewUtils;
 
 import java.io.Serializable;
 
-public class LoginActivity extends AppCompatActivity implements NetworkListener, UserLoginTask.LoginCallback {
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+
+public class LoginActivity extends AppCompatActivity implements NetworkListener, QEDPageReceiver<Boolean> {
     public static final String EXTRA_ERROR_MESSAGE = "errorMessage";
     public static final String EXTRA_DONT_START_MAIN = "dontStartMain";
     public static final String EXTRA_FEATURE = "feature";
-
-    private UserLoginTask mAuthTask = null;
 
     private ActivityLoginBinding mBinding;
 
     private boolean mDoubleBackToExitPressedOnce = false;
     private boolean mDontStartMain;
     private Feature mFeature;
+
+    private final CompositeDisposable mDisposable = new CompositeDisposable();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,10 +79,6 @@ public class LoginActivity extends AppCompatActivity implements NetworkListener,
     }
 
     private void attemptLogin() {
-        if (mAuthTask != null) {
-            return;
-        }
-
         mBinding.usernameLayout.setError(null);
         mBinding.passwordLayout.setError(null);
         mBinding.username.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
@@ -86,11 +89,12 @@ public class LoginActivity extends AppCompatActivity implements NetworkListener,
         mBinding.password.getText().getChars(0, password.length, password, 0);
 
         showProgress(true);
-        mAuthTask = new UserLoginTask(username, password, mFeature, this);
-        mAuthTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        mDisposable.add(
+                QEDLogin.loginAsync(username, password, mFeature, this)
+        );
     }
 
-    private void showProgress(final boolean show) {
+    private void showProgress(boolean show) {
         mBinding.loginForm.setVisibility(show ? View.GONE : View.VISIBLE);
         mBinding.loginProgress.setVisibility(show ? View.VISIBLE : View.GONE);
     }
@@ -110,48 +114,43 @@ public class LoginActivity extends AppCompatActivity implements NetworkListener,
 
     @Override
     public void onConnectionFail() {
-        mBinding.passwordLayout.post(() -> setError(getString(R.string.cant_connect)));
+        setError(getString(R.string.cant_connect));
     }
 
     @Override
     public void onConnectionRegain() {
-        mBinding.passwordLayout.post(() -> setError(null));
+        setError(null);
     }
 
     @Override
-    public void onResult(Boolean success) {
-        mAuthTask = null;
-        showProgress(false);
+    public void onPageReceived(@NonNull Boolean out) {
+        assert out;
 
-        if (success == null) {
-            onConnectionFail();
-        } else if (success) {
-            if (!mDontStartMain) {
-                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                startActivity(intent);
-            }
-            LoginActivity.this.finish();
-            finish();
-        } else {
-            setError(getString(R.string.login_error_incorrect_data));
+        if (!mDontStartMain) {
+            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(intent);
         }
+
+        finish();
     }
 
     @Override
-    public void onCancelled() {
-        mAuthTask = null;
+    public void onError(Boolean out, @NonNull Reason reason, @Nullable Throwable cause) {
+        QEDPageReceiver.super.onError(out, reason, cause);
+
         showProgress(false);
+
+        if (cause instanceof InvalidCredentialsException) {
+            setError(getString(R.string.login_error_incorrect_data));
+        } else {
+            setError(getString(reason.getStringRes()));
+        }
     }
 
     private void setError(String string) {
         mBinding.passwordLayout.setError(string);
-
-        if (string != null) {
-            mBinding.password.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_error, 0);
-            mBinding.password.requestFocus();
-        } else {
-            mBinding.password.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
-        }
+        ViewUtils.setError(mBinding.password, string != null);
+        if (string != null) mBinding.password.requestFocus();
     }
 }
 

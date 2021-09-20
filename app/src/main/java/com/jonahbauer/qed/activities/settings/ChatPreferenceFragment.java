@@ -72,6 +72,7 @@ public class ChatPreferenceFragment extends PreferenceFragmentCompat implements 
             alertDialog.setMessage(R.string.preferences_chat_confirm_delete_db);
             alertDialog.setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss());
             alertDialog.setPositiveButton(R.string.delete, (dialog, which) -> {
+                //noinspection ResultOfMethodCallIgnored
                 Database.getInstance(requireContext()).messageDao().clear()
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())

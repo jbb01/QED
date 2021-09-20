@@ -312,6 +312,7 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
 
                     mMessageListView.setSelection(mInitMessages.size() - 1);
 
+                    //noinspection ResultOfMethodCallIgnored
                     Database.getInstance(requireContext()).messageDao().insert(mInitMessages)
                             .doFinally(() -> mInitMessages.clear())
                             .subscribeOn(Schedulers.io())
@@ -333,6 +334,7 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
             return;
         }
 
+        //noinspection ResultOfMethodCallIgnored
         Database.getInstance(requireContext()).messageDao().insert(message)
                 .subscribeOn(Schedulers.io())
                 .subscribe(() -> {}, e -> Log.e(LOG_TAG, "Error inserting message into database.", e));
@@ -351,13 +353,14 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
             mHandler.postDelayed(() -> mMessageListView.setSelection(mMessageAdapter.getCount() -1),100);
     }
 
+    @Override
     public void onConnectionFail() {
         onError(REASON_NETWORK, null);
     }
 
     @Override
     public void onConnectionRegain() {
-        mHandler.post(this::reload);
+        reload();
     }
 
     /**

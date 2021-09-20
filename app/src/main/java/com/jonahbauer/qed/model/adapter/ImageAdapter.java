@@ -1,11 +1,13 @@
 package com.jonahbauer.qed.model.adapter;
 
+import static com.jonahbauer.qed.model.Image.AUDIO_FILE_EXTENSIONS;
+import static com.jonahbauer.qed.model.Image.VIDEO_FILE_EXTENSIONS;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,21 +22,19 @@ import com.jonahbauer.qed.databinding.ListItemImageBinding;
 import com.jonahbauer.qed.model.Image;
 import com.jonahbauer.qed.model.room.AlbumDao;
 import com.jonahbauer.qed.model.room.Database;
-import com.jonahbauer.qed.networking.QEDGalleryPages;
-import com.jonahbauer.qed.networking.QEDGalleryPages.Mode;
 import com.jonahbauer.qed.networking.Reason;
 import com.jonahbauer.qed.networking.async.QEDPageStreamReceiver;
+import com.jonahbauer.qed.networking.pages.QEDGalleryPages;
+import com.jonahbauer.qed.networking.pages.QEDGalleryPages.Mode;
 import com.jonahbauer.qed.util.Preferences;
 
 import java.io.ByteArrayOutputStream;
 import java.util.List;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
-
-import static com.jonahbauer.qed.model.Image.AUDIO_FILE_EXTENSIONS;
-import static com.jonahbauer.qed.model.Image.VIDEO_FILE_EXTENSIONS;
 
 public class ImageAdapter extends ArrayAdapter<Image> implements QEDPageStreamReceiver<ListItemImageBinding> {
     private static final String LOG_TAG = ImageAdapter.class.getName();
@@ -66,6 +66,7 @@ public class ImageAdapter extends ArrayAdapter<Image> implements QEDPageStreamRe
         } else {
             LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             binding = ListItemImageBinding.inflate(inflater, parent, false);
+            binding.setDisposable(new CompositeDisposable());
             binding.getRoot().setTag(binding);
         }
 
@@ -76,8 +77,7 @@ public class ImageAdapter extends ArrayAdapter<Image> implements QEDPageStreamRe
     }
 
     private void setThumbnail(Image image, ListItemImageBinding binding) {
-        Disposable disposable = binding.getDatabaseAccess();
-        if (disposable != null) disposable.dispose();
+        binding.getDisposable().clear();
 
         if (image.getThumbnail() != null) {
             binding.setThumbnail(getThumbnail(image, false));
@@ -85,49 +85,40 @@ public class ImageAdapter extends ArrayAdapter<Image> implements QEDPageStreamRe
         }
 
         binding.setThumbnail(null);
-        Disposable databaseAccess = mAlbumDao.findImageById(image.getId())
-                                             .subscribeOn(Schedulers.io())
-                                             .observeOn(AndroidSchedulers.mainThread())
-                                             .subscribe(
-                                                     img -> {
-                                                         image.set(img);
-                                                         image.setDatabaseLoaded(true);
+        binding.getDisposable().add(
+                mAlbumDao.findImageById(image.getId())
+                         .subscribeOn(Schedulers.io())
+                         .observeOn(AndroidSchedulers.mainThread())
+                         .subscribe(
+                                 img -> {
+                                     image.set(img);
+                                     image.setDatabaseLoaded(true);
 
-                                                         if (binding.getImage() == image)
-                                                             if (image.getThumbnail() == null && !mOfflineMode) {
-                                                                 downloadThumbnail(image, binding);
-                                                             } else {
-                                                                 binding.setThumbnail(getThumbnail(image, false));
-                                                             }
-                                                     },
-                                                     err -> {
-                                                         if (!mOfflineMode) {
-                                                             downloadThumbnail(image, binding);
-                                                         } else {
-                                                             binding.setThumbnail(getThumbnail(image, true));
-                                                         }
-                                                     }
-                                             );
-        binding.setDatabaseAccess(databaseAccess);
+                                     if (binding.getImage() == image)
+                                         if (image.getThumbnail() == null && !mOfflineMode) {
+                                             downloadThumbnail(image, binding);
+                                         } else {
+                                             binding.setThumbnail(getThumbnail(image, false));
+                                         }
+                                 },
+                                 err -> {
+                                     if (!mOfflineMode) {
+                                         downloadThumbnail(image, binding);
+                                     } else {
+                                         binding.setThumbnail(getThumbnail(image, true));
+                                     }
+                                 }
+                         )
+        );
     }
 
     private void downloadThumbnail(Image image, ListItemImageBinding binding) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         binding.setBaos(baos);
-
-        AsyncTask<?,?,?> task = QEDGalleryPages.getImage(binding, image, Mode.THUMBNAIL, baos, this);
-        binding.setDatabaseAccess(new Disposable() {
-            @Override
-            public void dispose() {
-                task.cancel(false);
-                binding.setBaos(null);
-            }
-
-            @Override
-            public boolean isDisposed() {
-                return task.isCancelled();
-            }
-        });
+        binding.getDisposable().addAll(
+                QEDGalleryPages.getImage(binding, image, Mode.THUMBNAIL, baos, this),
+                Disposable.fromAutoCloseable(baos)
+        );
     }
 
     private Drawable getThumbnail(Image image, boolean error) {
@@ -158,7 +149,6 @@ public class ImageAdapter extends ArrayAdapter<Image> implements QEDPageStreamRe
     }
 
     @Override
-    @SuppressWarnings("ResultOfMethodCallIgnored")
     public void onPageReceived(@NonNull ListItemImageBinding binding) {
         ByteArrayOutputStream baos = binding.getBaos();
         Image image = binding.getImage();
@@ -170,6 +160,7 @@ public class ImageAdapter extends ArrayAdapter<Image> implements QEDPageStreamRe
         binding.setThumbnail(getThumbnail(image, false));
         binding.setBaos(null);
 
+        //noinspection ResultOfMethodCallIgnored
         mAlbumDao.insertThumbnail(image.getId(), bitmap)
                  .subscribeOn(Schedulers.io())
                  .observeOn(AndroidSchedulers.mainThread())

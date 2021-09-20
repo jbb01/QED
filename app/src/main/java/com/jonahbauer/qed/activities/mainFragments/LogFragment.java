@@ -199,6 +199,7 @@ public class LogFragment extends QEDFragment {
         if (item.getItemId() == R.id.log_save) {
             mBinding.setSaving(true);
             item.setEnabled(false);
+            //noinspection ResultOfMethodCallIgnored
             Database.getInstance(requireContext()).messageDao()
                     .insert(mMessageAdapter.getData())
                     .subscribeOn(Schedulers.io())

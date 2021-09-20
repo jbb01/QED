@@ -1,5 +1,7 @@
 package com.jonahbauer.qed.activities;
 
+import static com.jonahbauer.qed.DeepLinkingActivity.QEDIntent;
+
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
@@ -47,8 +49,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import lombok.Getter;
-
-import static com.jonahbauer.qed.DeepLinkingActivity.QEDIntent;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, NetworkListener, DrawerLayout.DrawerListener {
     private static final String LOG_TAG = MainActivity.class.getName();
@@ -235,7 +235,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             startActivity(intent);
             return true;
         } else if (itemId == R.id.nav_logout) {
-            QEDLogout.logoutAsync().thenAccept(success -> {
+            QEDLogout.logoutAsync(success -> {
                 if (!success) {
                     Log.e(LOG_TAG, "An error occured during logout.");
                 }

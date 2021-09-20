@@ -1,10 +1,12 @@
 package com.jonahbauer.qed.activities.imageActivity;
 
+import static com.jonahbauer.qed.networking.pages.QEDGalleryPages.Mode.NORMAL;
+import static com.jonahbauer.qed.networking.pages.QEDGalleryPages.Mode.ORIGINAL;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
-import android.os.AsyncTask;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +20,7 @@ import androidx.appcompat.content.res.AppCompatResources;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.room.rxjava3.EmptyResultSetException;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.jonahbauer.qed.R;
@@ -25,10 +28,11 @@ import com.jonahbauer.qed.databinding.ViewHolderImageBinding;
 import com.jonahbauer.qed.model.Image;
 import com.jonahbauer.qed.model.room.AlbumDao;
 import com.jonahbauer.qed.model.room.Database;
-import com.jonahbauer.qed.networking.QEDGalleryPages;
 import com.jonahbauer.qed.networking.Reason;
 import com.jonahbauer.qed.networking.async.QEDPageReceiver;
 import com.jonahbauer.qed.networking.async.QEDPageStreamReceiver;
+import com.jonahbauer.qed.networking.pages.QEDGalleryPages;
+import com.jonahbauer.qed.networking.pages.QEDGalleryPages.Mode;
 import com.jonahbauer.qed.util.Preferences;
 import com.jonahbauer.qed.util.StatusWrapper;
 
@@ -36,16 +40,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
-
-import static com.jonahbauer.qed.networking.QEDGalleryPages.Mode.NORMAL;
-import static com.jonahbauer.qed.networking.QEDGalleryPages.Mode.ORIGINAL;
 
 public class ImageViewHolder extends RecyclerView.ViewHolder implements QEDPageReceiver<Image>, QEDPageStreamReceiver<Image> {
     private static final String LOG_TAG = ImageViewHolder.class.getName();
@@ -56,7 +55,7 @@ public class ImageViewHolder extends RecyclerView.ViewHolder implements QEDPageR
     private final ViewHolderImageBinding mBinding;
     private final MutableLiveData<StatusWrapper<Image>> mStatus = new MutableLiveData<>();
 
-    private QEDGalleryPages.Mode mMode = NORMAL;
+    private Mode mMode = NORMAL;
 
     private File mTarget;
     private File mDownloadTmp;
@@ -64,7 +63,7 @@ public class ImageViewHolder extends RecyclerView.ViewHolder implements QEDPageR
     private boolean mVisible;
     private AlertDialog.Builder mPendingDialog;
 
-    private final List<Disposable> mDisposables = new ArrayList<>();
+    private final CompositeDisposable mDisposable = new CompositeDisposable();
 
     public ImageViewHolder(@NonNull LayoutInflater inflater) {
         super(createRoot(inflater));
@@ -108,10 +107,7 @@ public class ImageViewHolder extends RecyclerView.ViewHolder implements QEDPageR
     }
 
     private void cancel() {
-        for (Disposable disposable : mDisposables) {
-            disposable.dispose();
-        }
-        mDisposables.clear();
+        mDisposable.clear();
     }
 
     void reset(Image image) {
@@ -141,20 +137,27 @@ public class ImageViewHolder extends RecyclerView.ViewHolder implements QEDPageR
         this.mBinding.setDrawable(null);
 
         if (!image.isDatabaseLoaded()) {
-            Disposable disposable = mAlbumDao.findImageById(image.getId())
-                                             .subscribeOn(Schedulers.io())
-                                             .observeOn(AndroidSchedulers.mainThread())
-                                             .subscribe(
-                                                     img -> {
-                                                         image.set(img);
-                                                         image.setDatabaseLoaded(true);
-                                                         setImage(image);
-                                                     },
-                                                     err -> {
-                                                         onError(image, Reason.UNKNOWN, err);
-                                                     }
+            mDisposable.add(
+                    mAlbumDao.findImageById(image.getId())
+                             .subscribeOn(Schedulers.io())
+                             .observeOn(AndroidSchedulers.mainThread())
+                             .subscribe(
+                                     img -> {
+                                         image.set(img);
+                                         image.setDatabaseLoaded(true);
+                                         setImage(image);
+                                     },
+                                     err -> {
+                                         if (err instanceof EmptyResultSetException) {
+                                             mDisposable.add(
+                                                     QEDGalleryPages.getImageInfo(image, this)
                                              );
-            mDisposables.add(disposable);
+                                         } else {
+                                             onError(image, Reason.UNKNOWN, err);
+                                         }
+                                     }
+                             )
+            );
             return;
         }
 
@@ -231,18 +234,9 @@ public class ImageViewHolder extends RecyclerView.ViewHolder implements QEDPageR
 
         try {
             FileOutputStream fos = new FileOutputStream(mDownloadTmp);
-            AsyncTask<?, ?, ?> task = QEDGalleryPages.getImage(image, image, mMode, fos, this);
-            mDisposables.add(new Disposable() {
-                @Override
-                public void dispose() {
-                    task.cancel(false);
-                }
-
-                @Override
-                public boolean isDisposed() {
-                    return task.isCancelled();
-                }
-            });
+            mDisposable.add(
+                    QEDGalleryPages.getImage(image, image, mMode, fos, this)
+            );
         } catch (IOException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
         }

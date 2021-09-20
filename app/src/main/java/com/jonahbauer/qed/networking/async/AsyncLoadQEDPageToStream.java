@@ -1,13 +1,9 @@
 package com.jonahbauer.qed.networking.async;
 
-import android.os.AsyncTask;
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 
 import com.jonahbauer.qed.networking.Feature;
 import com.jonahbauer.qed.networking.NetworkUtils;
-import com.jonahbauer.qed.networking.Reason;
 import com.jonahbauer.qed.networking.exceptions.InvalidCredentialsException;
 import com.jonahbauer.qed.networking.login.QEDLogin;
 
@@ -18,50 +14,30 @@ import java.net.URL;
 
 import javax.net.ssl.HttpsURLConnection;
 
-public final class AsyncLoadQEDPageToStream<T> extends AsyncTask<Void, Long, Boolean> {
-    private static final String LOG_TAG = AsyncLoadQEDPageToStream.class.getName();
+import io.reactivex.rxjava3.core.ObservableEmitter;
+import io.reactivex.rxjava3.core.ObservableOnSubscribe;
+import it.unimi.dsi.fastutil.longs.LongLongPair;
 
-    private InputStream mIn;
+public final class AsyncLoadQEDPageToStream implements ObservableOnSubscribe<LongLongPair> {
 
     private final Feature mFeature;
     private final String mUrl;
-    private final QEDPageStreamReceiver<T> mReceiver;
     private final OutputStream mOutputStream;
-    private final T mHolder;
 
-    private Exception mException;
-
-
-    /**
-     * Loads the website from url to the provided {@code OutputStream}.
-     *
-     * @param feature the type of the qed website to be loaded, used to choose correct form of authentication
-     * @param url the url of the qed website
-     * @param receiver a receiver that will receive the relevant data collected by {@code postExecute} or an error message
-     * @param outputStream the target to which the page will be forwarded
-     */
-    public AsyncLoadQEDPageToStream(@NonNull Feature feature,
-                             @NonNull String url,
-                             @NonNull T holder,
-                             @NonNull QEDPageStreamReceiver<T> receiver,
-                             @NonNull OutputStream outputStream) {
-        Log.d(LOG_TAG, "Loading Page " + url + " with feature " + feature);
-        if (feature == Feature.DATABASE) throw new Feature.FeatureNotSupportedException();
-
-        this.mFeature = feature;
-        this.mUrl = url;
-        this.mReceiver = receiver;
-        this.mOutputStream = outputStream;
-        this.mHolder = holder;
+    public AsyncLoadQEDPageToStream(@NonNull Feature mFeature,
+                                    @NonNull String mUrl,
+                                    @NonNull OutputStream mOutputStream) {
+        this.mFeature = mFeature;
+        this.mUrl = mUrl;
+        this.mOutputStream = mOutputStream;
     }
 
-
     @Override
-    protected Boolean doInBackground(Void... voids) {
+    public void subscribe(@NonNull ObservableEmitter<LongLongPair> emitter) throws Throwable {
         try {
             // try to connect
             HttpsURLConnection httpsURLConnection = createConnection();
-            if (isCancelled()) return false;
+            if (emitter.isDisposed()) return;
             httpsURLConnection.connect();
 
             // check for login error
@@ -73,7 +49,7 @@ public final class AsyncLoadQEDPageToStream<T> extends AsyncTask<Void, Long, Boo
 
                 // retry connection
                 httpsURLConnection = createConnection();
-                if (isCancelled()) return false;
+                if (emitter.isDisposed()) return;
                 httpsURLConnection.connect();
 
                 // check for login error once more
@@ -84,39 +60,16 @@ public final class AsyncLoadQEDPageToStream<T> extends AsyncTask<Void, Long, Boo
             }
 
             // copy input stream to output stream
-            mIn = httpsURLConnection.getInputStream();
-            try {
-                copyStream(mIn, mOutputStream, httpsURLConnection.getContentLength());
-            } catch (IOException e) {
-                Log.e(LOG_TAG, e.getMessage(), e);
-                mException = e;
-                return null;
+            try (InputStream inputStream = httpsURLConnection.getInputStream(); mOutputStream) {
+                copyStream(inputStream, mOutputStream, httpsURLConnection.getContentLength(), emitter);
             }
-            mIn.close();
-            mOutputStream.close();
 
             httpsURLConnection.disconnect();
 
-            return true;
-        } catch (Exception e) {
-            Log.e(LOG_TAG, e.getMessage(), e);
-            mException = e;
-            return null;
+            emitter.onComplete();
+        } catch (Throwable t) {
+            emitter.tryOnError(t);
         }
-    }
-
-    @Override
-    protected void onPostExecute(Boolean b) {
-        if (b != null && b) {
-            mReceiver.onPageReceived(mHolder);
-        } else if (mException != null) {
-            mReceiver.onError(mHolder, Reason.guess(mException), mException);
-        }
-    }
-
-    @Override
-    protected void onProgressUpdate(Long... values) {
-        mReceiver.onProgressUpdate(mHolder, values[0], values[1]);
     }
 
     @NonNull
@@ -130,32 +83,23 @@ public final class AsyncLoadQEDPageToStream<T> extends AsyncTask<Void, Long, Boo
         return httpsURLConnection;
     }
 
-    private void copyStream(@NonNull InputStream in, @NonNull OutputStream out, long contentLength) throws IOException {
+    private void copyStream(@NonNull InputStream in,
+                            @NonNull OutputStream out,
+                            long contentLength,
+                            ObservableEmitter<LongLongPair> emitter) throws IOException {
         byte[] buffer = new byte[4 * 1024]; // 4 kilobyte
         long count = 0;
         int n;
         int i = 0;
-        while (-1 != (n = in.read(buffer)) && !isCancelled()) {
+        while (-1 != (n = in.read(buffer)) && !emitter.isDisposed()) {
             out.write(buffer, 0, n);
             count += n;
             i++;
             if (i == 64) { // 64*4 = 256 kilobyte
                 i = 0;
-                publishProgress(count, contentLength);
+                emitter.onNext(LongLongPair.of(count, contentLength));
             }
         }
-        publishProgress(count, contentLength);
-    }
-
-    @Override
-    protected void onCancelled() {
-        try {
-            if (mOutputStream != null)
-                mOutputStream.close();
-            if (mIn != null)
-                mIn.close();
-        } catch (IOException e) {
-            Log.e(LOG_TAG, e.getMessage(), e);
-        }
+        emitter.onNext(LongLongPair.of(count, contentLength));
     }
 }

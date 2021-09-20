@@ -17,9 +17,10 @@ import com.jonahbauer.qed.model.Album;
 import com.jonahbauer.qed.model.Image;
 import com.jonahbauer.qed.model.room.AlbumDao;
 import com.jonahbauer.qed.model.room.Database;
-import com.jonahbauer.qed.networking.QEDGalleryPages;
 import com.jonahbauer.qed.networking.Reason;
 import com.jonahbauer.qed.networking.async.QEDPageReceiver;
+import com.jonahbauer.qed.networking.pages.QEDGalleryPages;
+import com.jonahbauer.qed.networking.pages.QEDGalleryPages.Filter;
 import com.jonahbauer.qed.util.Preferences;
 import com.jonahbauer.qed.util.StatusWrapper;
 
@@ -29,9 +30,9 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
-@SuppressWarnings("ResultOfMethodCallIgnored")
 public class AlbumViewModel extends AndroidViewModel implements QEDPageReceiver<Album> {
     private static final String LOG_TAG = AlbumViewModel.class.getName();
 
@@ -40,6 +41,8 @@ public class AlbumViewModel extends AndroidViewModel implements QEDPageReceiver<
     private final MutableLiveData<Boolean> mOffline = new MutableLiveData<>(false);
     private final MutableLiveData<StatusWrapper<Pair<Album, List<Image>>>> mFilteredAlbum = new MutableLiveData<>();
     private final MutableLiveData<StatusWrapper<Album>> mAlbum = new MutableLiveData<>();
+
+    private final CompositeDisposable mDisposable = new CompositeDisposable();
 
     public AlbumViewModel(@NonNull Application application) {
         super(application);
@@ -93,7 +96,7 @@ public class AlbumViewModel extends AndroidViewModel implements QEDPageReceiver<
      * Applies the specified filters to the image list. The album is left untouched.
      * @throws IllegalStateException when in offline mode or {@link #load()} has not yet been called
      */
-    public void filter(@Nullable Map<QEDGalleryPages.Filter, String> filters) {
+    public void filter(@Nullable Map<Filter, String> filters) {
         var albumWrapper = mFilteredAlbum.getValue();
         if (albumWrapper == null) throw new IllegalStateException();
 
@@ -104,7 +107,8 @@ public class AlbumViewModel extends AndroidViewModel implements QEDPageReceiver<
         if (album == null || !album.isLoaded()) throw new IllegalStateException();
 
         this.mFilteredAlbum.setValue(StatusWrapper.wrap(Pair.create(album, Collections.emptyList()), STATUS_PRELOADED));
-        QEDGalleryPages.getAlbum(new Album(album.getId()), filters, new QEDPageReceiver<>() {
+
+        var receiver = new QEDPageReceiver<Album>() {
             @Override
             public void onPageReceived(@NonNull Album out) {
                 if (out.getImages().size() > 0) {
@@ -119,14 +123,20 @@ public class AlbumViewModel extends AndroidViewModel implements QEDPageReceiver<
                 QEDPageReceiver.super.onError(out, reason, cause);
                 AlbumViewModel.this.mFilteredAlbum.setValue(StatusWrapper.wrap(Pair.create(album, Collections.emptyList()), reason));
             }
-        });
+        };
+
+        mDisposable.add(
+                QEDGalleryPages.getAlbum(album, filters, receiver)
+        );
     }
 
     public void loadFromInternet(@NonNull Album album) {
         if (album.isLoaded()) {
-
+            // TODO
         }
-        QEDGalleryPages.getAlbum(album, null, this);
+        mDisposable.add(
+                QEDGalleryPages.getAlbum(album, null, this)
+        );
     }
 
     /**
@@ -144,44 +154,46 @@ public class AlbumViewModel extends AndroidViewModel implements QEDPageReceiver<
             }
         };
 
-        mAlbumDao.findById(album.getId())
-                 .subscribeOn(Schedulers.io())
-                 .observeOn(AndroidSchedulers.mainThread())
-                 .subscribe(
-                         (album0) -> {
-                             album.setName(album0.getName());
-                             album.setOwner(album0.getOwner());
-                             album.setCreationDate(album0.getCreationDate());
-                             album.setPersons(album0.getPersons());
-                             album.setCategories(album0.getCategories());
-                             album.setDates(album0.getDates());
-                             album.setPrivate_(album0.isPrivate_());
-                             album.setImageListDownloaded(album0.isImageListDownloaded());
+        mDisposable.addAll(
+            mAlbumDao.findById(album.getId())
+                     .subscribeOn(Schedulers.io())
+                     .observeOn(AndroidSchedulers.mainThread())
+                     .subscribe(
+                             (album0) -> {
+                                 album.setName(album0.getName());
+                                 album.setOwner(album0.getOwner());
+                                 album.setCreationDate(album0.getCreationDate());
+                                 album.setPersons(album0.getPersons());
+                                 album.setCategories(album0.getCategories());
+                                 album.setDates(album0.getDates());
+                                 album.setPrivate_(album0.isPrivate_());
+                                 album.setImageListDownloaded(album0.isImageListDownloaded());
 
-                             finish.run();
-                         },
-                         (e) -> {
-                             mFilteredAlbum.setValue(StatusWrapper.wrap(Pair.create(album, Collections.emptyList()), e));
-                         }
-                 );
+                                 finish.run();
+                             },
+                             (e) -> {
+                                 mFilteredAlbum.setValue(StatusWrapper.wrap(Pair.create(album, Collections.emptyList()), e));
+                             }
+                     ),
+            mAlbumDao.findImagesByAlbum(album.getId())
+                     .subscribeOn(Schedulers.io())
+                     .observeOn(AndroidSchedulers.mainThread())
+                     .subscribe(
+                             (images) -> {
+                                 album.getImages().clear();
+                                 album.getImages().addAll(images);
 
-        mAlbumDao.findImagesByAlbum(album.getId())
-                 .subscribeOn(Schedulers.io())
-                 .observeOn(AndroidSchedulers.mainThread())
-                 .subscribe(
-                         (images) -> {
-                             album.getImages().clear();
-                             album.getImages().addAll(images);
-
-                             finish.run();
-                         },
-                         (e) -> {
-                             mFilteredAlbum.setValue(StatusWrapper.wrap(Pair.create(album, Collections.emptyList()), e));
-                         }
-                 );
+                                 finish.run();
+                             },
+                             (e) -> {
+                                 mFilteredAlbum.setValue(StatusWrapper.wrap(Pair.create(album, Collections.emptyList()), e));
+                             }
+                     )
+        );
     }
 
     @Override
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public void onPageReceived(@NonNull Album out) {
         out.setImageListDownloaded(true);
         out.setLoaded(true);
@@ -223,5 +235,11 @@ public class AlbumViewModel extends AndroidViewModel implements QEDPageReceiver<
 
     public LiveData<Boolean> getOffline() {
         return mOffline;
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        mDisposable.clear();
     }
 }

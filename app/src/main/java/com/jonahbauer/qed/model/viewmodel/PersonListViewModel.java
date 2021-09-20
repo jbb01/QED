@@ -1,5 +1,8 @@
 package com.jonahbauer.qed.model.viewmodel;
 
+import static com.jonahbauer.qed.util.StatusWrapper.STATUS_LOADED;
+import static com.jonahbauer.qed.util.StatusWrapper.STATUS_PRELOADED;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
@@ -8,9 +11,9 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.jonahbauer.qed.model.Person;
-import com.jonahbauer.qed.networking.QEDDBPages;
 import com.jonahbauer.qed.networking.Reason;
 import com.jonahbauer.qed.networking.async.QEDPageReceiver;
+import com.jonahbauer.qed.networking.pages.QEDDBPages;
 import com.jonahbauer.qed.util.StatusWrapper;
 
 import java.util.Collections;
@@ -19,14 +22,15 @@ import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static com.jonahbauer.qed.util.StatusWrapper.STATUS_LOADED;
-import static com.jonahbauer.qed.util.StatusWrapper.STATUS_PRELOADED;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 
 public class PersonListViewModel extends ViewModel implements QEDPageReceiver<List<Person>> {
     private final MutableLiveData<StatusWrapper<List<Person>>> mPersons = new MutableLiveData<>();
     private final MutableLiveData<Predicate<Person>> mFilter = new MutableLiveData<>(obj -> true);
 
     private final MediatorLiveData<StatusWrapper<List<Person>>> mFilteredPersons = new MediatorLiveData<>();
+
+    private final CompositeDisposable mDisposable = new CompositeDisposable();
 
     public PersonListViewModel() {
         mPersons.setValue(StatusWrapper.wrap(Collections.emptyList(), STATUS_LOADED));
@@ -49,7 +53,9 @@ public class PersonListViewModel extends ViewModel implements QEDPageReceiver<Li
 
     public void load() {
         mPersons.setValue(StatusWrapper.wrap(Collections.emptyList(), STATUS_PRELOADED));
-        QEDDBPages.getPersonList(this);
+        mDisposable.add(
+                QEDDBPages.getPersonList(this)
+        );
     }
 
     public void filter(@Nullable String firstName,
@@ -83,5 +89,11 @@ public class PersonListViewModel extends ViewModel implements QEDPageReceiver<Li
     public void onError(List<Person> out, @NonNull Reason reason, @Nullable Throwable cause) {
         QEDPageReceiver.super.onError(out, reason, cause);
         this.mPersons.setValue(StatusWrapper.wrap(out, reason));
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        mDisposable.clear();
     }
 }

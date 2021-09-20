@@ -57,6 +57,7 @@ public class GalleryPreferenceFragment extends PreferenceFragmentCompat implemen
     }
 
     @Override
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public boolean onPreferenceClick(Preference preference) {
         Context context = getActivity();
         if (context == null) return false;
