@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
@@ -100,7 +101,7 @@ public class ImageInfoActivity extends AppCompatActivity {
         Intent intent = getIntent();
         Image image = intent.getParcelableExtra(EXTRA_IMAGE);
         if (image == null) {
-            // TODO show toast
+            Toast.makeText(this, R.string.error, Toast.LENGTH_SHORT).show();
             finish();
             return;
         }

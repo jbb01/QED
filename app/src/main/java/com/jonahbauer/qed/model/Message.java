@@ -51,6 +51,9 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
     };
 
     public static final Message PONG = new Message(0, "PONG", "PONG", new Date(0), 0, "PONG", "000000", 0, "PONG");
+    public static final Message PING = new Message(0, "PING", "PING", new Date(0), 0, "PING", "000000", 0, "PING");
+    public static final Message ACK = new Message(0, "ACK", "ACK", new Date(0), 0, "ACK", "000000", 0, "ACK");
+    public static final Message OK = new Message(0, "OK", "OK", new Date(0), 0, "OK", "000000", 0, "OK");
 
     @PrimaryKey
     private final long id;
@@ -121,49 +124,87 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
                 + "\"channel\":\"" + channel + "\"}";
     }
 
+    public Type getType() {
+        if (this == PING) {
+            return Type.PING;
+        } else if (this == PONG) {
+            return Type.PONG;
+        } else if (this == ACK) {
+            return Type.ACK;
+        } else if (this == OK) {
+            return Type.OK;
+        } else {
+            return Type.POST;
+        }
+    }
 
     public int compareTo(Message other) {
         return Long.compare(id,other.id);
     }
 
     /**
-     * Parses a string as obtained by the chat web socket to a message object
-     * @param jsonMessage a json formatted message string
-     * @return a message object representing the given message, null if an error occurred
+     * @see #interpretJSONMessage(JSONObject)
      */
+    @Nullable
     @Contract("null -> null")
     public static Message interpretJSONMessage(@Nullable String jsonMessage) {
         if (jsonMessage == null) return null;
+
         try {
             JSONObject json = new JSONObject(jsonMessage);
-            String name = json.getString("name").trim();
-            String message = json.getString("message");
-            String username = json.getString("username");
-            String color = json.getString("color");
-            String dateStr = json.getString("date");
-            String channel = json.getString("channel");
-            int userid = json.optInt("user_id", -1);
-            int id = json.getInt("id");
-            int bottag = json.getInt("bottag");
-
-            if ("null".equals(username)) username = null;
-
-            Date date;
-            try {
-                //noinspection ConstantConditions
-                date = DATE_FORMAT.get().parse(dateStr);
-                assert date != null;
-            } catch (ParseException | NumberFormatException e) {
-                Log.w(LOG_TAG, "Message did not contain a valid date: " + jsonMessage);
-                return null;
-            }
-
-            return new Message(id, name, message, date, userid, username, color, bottag, channel);
+            return interpretJSONMessage(json);
         } catch (JSONException e) {
-            if (!jsonMessage.contains("\"type\":\"ok\""))
-                Log.e(LOG_TAG, jsonMessage + ": " + e.getMessage(), e);
+            Log.e(LOG_TAG, "Could not parse message: " + jsonMessage, e);
+            return null;
         }
-        return null;
+    }
+
+    /**
+     * Parses a string as obtained by the chat web socket to a message object.
+     */
+    @Nullable
+    public static Message interpretJSONMessage(@NonNull JSONObject json) {
+        try {
+            String type = json.getString("type");
+            switch (type) {
+                case "ping":
+                    return PING;
+                case "pong":
+                    return PONG;
+                case "ack":
+                    return ACK;
+                case "ok":
+                    return OK;
+                case "post":
+                    String name = json.getString("name").trim();
+                    String message = json.getString("message");
+                    String username = json.isNull("username") ? null : json.getString("username");
+                    String color = json.getString("color");
+                    String dateStr = json.getString("date");
+                    String channel = json.getString("channel");
+                    int userid = json.optInt("user_id", -1);
+                    int id = json.getInt("id");
+                    int bottag = json.getInt("bottag");
+
+                    Date date;
+                    try {
+                        //noinspection ConstantConditions
+                        date = DATE_FORMAT.get().parse(dateStr);
+                        assert date != null;
+                    } catch (ParseException | NumberFormatException e) {
+                        Log.w(LOG_TAG, "Message did not contain a valid date: " + json);
+                        return null;
+                    }
+
+                    return new Message(id, name, message, date, userid, username, color, bottag, channel);
+                default:
+                    Log.e(LOG_TAG, "Unknown message type: \"" + type + "\"");
+                    return null;
+            }
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, "Could not parse message: " + json, e);
+            return null;
+        }
     }
 
     @ColorInt
@@ -228,4 +269,12 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
             return new Message[size];
         }
     };
+
+    public enum Type {
+        PING,
+        PONG,
+        ACK,
+        OK,
+        POST
+    }
 }

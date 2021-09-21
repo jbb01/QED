@@ -107,7 +107,7 @@ public class LogViewModel extends AndroidViewModel {
     private class DownloadListener implements QEDPageStreamReceiver<Uri> {
 
         @Override
-        public void onPageReceived(@NonNull Uri out) {
+        public void onResult(@NonNull Uri out) {
             parse(out);
         }
 
@@ -126,7 +126,7 @@ public class LogViewModel extends AndroidViewModel {
     private class ParseListener implements QEDPageStreamReceiver<List<Message>> {
 
         @Override
-        public void onPageReceived(@NonNull List<Message> out) {
+        public void onResult(@NonNull List<Message> out) {
             if (out.size() > 0) {
                 mMessages.setValue(StatusWrapper.wrap(out, StatusWrapper.STATUS_LOADED));
             } else {

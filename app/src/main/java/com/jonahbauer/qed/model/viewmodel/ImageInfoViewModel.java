@@ -52,7 +52,7 @@ public class ImageInfoViewModel extends AndroidViewModel implements QEDPageRecei
                                          image.setDatabaseLoaded(true);
 
                                          if (image.isLoaded()) {
-                                             onPageReceived(image);
+                                             onResult(image);
                                          } else {
                                              loadFromInternet(image);
                                          }
@@ -64,7 +64,7 @@ public class ImageInfoViewModel extends AndroidViewModel implements QEDPageRecei
                              )
             );
         } else {
-            onPageReceived(image);
+            onResult(image);
         }
     }
 
@@ -83,7 +83,7 @@ public class ImageInfoViewModel extends AndroidViewModel implements QEDPageRecei
     }
 
     @Override
-    public void onPageReceived(@NonNull Image out) {
+    public void onResult(@NonNull Image out) {
         if (!out.isLoaded()) {
             //noinspection ResultOfMethodCallIgnored
             this.mAlbumDao.insertOrUpdateImage(out)

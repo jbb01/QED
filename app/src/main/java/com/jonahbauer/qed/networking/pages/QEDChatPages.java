@@ -80,7 +80,7 @@ public class QEDChatPages extends QEDPages {
                             listener.onProgressUpdate(Collections.emptyList(), progress.firstLong(), progress.secondLong());
                         },
                         err -> listener.onError(Collections.emptyList(), err),
-                        () -> listener.onPageReceived(out)
+                        () -> listener.onResult(out)
                 );
     }
 }

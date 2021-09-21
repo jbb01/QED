@@ -1,10 +1,4 @@
 <resources>
-    <!-- Servers -->
-    <string name="github_project_issue_tracker" translatable="false">https://github.com/jbb01/QED/issues/new</string>
-
-    <string name="view_pager_bottom_sheet_behavior" translatable="false">com.jonahbauer.qed.layoutStuff.viewPagerBottomSheet.ViewPagerBottomSheetBehavior</string>
-    <string name="view_pager_side_sheet_behavior" translatable="false">com.jonahbauer.qed.layoutStuff.viewPagerSideSheet.ViewPagerSideSheetBehavior</string>
-
     <!-- General -->
     <string name="app_name">QED</string>
     <string name="ok">OK</string>
@@ -24,7 +18,7 @@
     <string name="empty" translatable="false"/>
 
     <string name="no_internet">Something went wrong. Please check your network connection.</string>
-    <string name="notQED">This app is not related to the Quod Erat Demonstrandum e.V. in any official way.</string>
+    <string name="not_official">This app is not related to the Quod Erat Demonstrandum e.V. in any official way.</string>
 
     <string name="error">Error!</string>
     <string name="error_unknown">An unknown error occurred.</string>
@@ -42,12 +36,6 @@
     <string name="coming_soon">Coming soon</string>
     <string name="no_file_explorer">No file explorer was found.</string>
     <string name="master_key_error">Password could not be saved.</string>
-    <string name="download_notification_title">QED</string>
-    <string name="download_notification_log_description">Chatlog</string>
-
-    <!-- Sonstiges -->
-    <string name="notification_channel_description">Stub!</string>
-    <string name="notification_channel_name">QED</string>
 
     <!-- Chat Fragment -->
     <string name="title_fragment_chat">Chat</string>
@@ -56,6 +44,11 @@
     <string name="chat_message_hint">Write a message</string>
     <string name="chat_refresh">Refresh</string>
     <string name="chat_scroll_down_button_content_description">Scroll Down</string>
+    <string name="chat_websocket_closed">Websocket closed</string>
+
+    <string name="chat_quick_settings_name">Quick Settings - Name</string>
+    <string name="chat_quick_settings_channel">Quick Settings - Channel</string>
+    <string name="chat_quick_settings">Quick Settings</string>
 
     <string name="message_info">@string/info</string>
     <string name="message_copy">Copy</string>

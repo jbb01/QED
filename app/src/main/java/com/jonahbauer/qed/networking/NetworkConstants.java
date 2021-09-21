@@ -27,4 +27,6 @@ public class NetworkConstants {
     public static final String GALLERY_SERVER_IMAGE_INFO = "https://qedgallery.qed-verein.de/image_view.php?imageid=";
     public static final String GALLERY_SERVER_IMAGE = "https://qedgallery.qed-verein.de/image.php?type=%s&imageid=%s";
 
+    public static final String GIT_HUB = "https://github.com/jbb01/QED";
+    public static final String GIT_HUB_ISSUE_TRACKER = "https://github.com/jbb01/QED/issues/new";
 }

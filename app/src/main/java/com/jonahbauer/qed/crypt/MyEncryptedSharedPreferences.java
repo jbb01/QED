@@ -16,6 +16,8 @@
 
 package com.jonahbauer.qed.crypt;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.ArraySet;
@@ -28,9 +30,10 @@ import com.google.crypto.tink.Aead;
 import com.google.crypto.tink.DeterministicAead;
 import com.google.crypto.tink.KeyTemplate;
 import com.google.crypto.tink.KeysetHandle;
+import com.google.crypto.tink.aead.AeadConfig;
 import com.google.crypto.tink.aead.AesGcmKeyManager;
-import com.google.crypto.tink.config.TinkConfig;
 import com.google.crypto.tink.daead.AesSivKeyManager;
+import com.google.crypto.tink.daead.DeterministicAeadConfig;
 import com.google.crypto.tink.integration.android.AndroidKeysetManager;
 import com.google.crypto.tink.subtle.Base64;
 
@@ -45,8 +48,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * An implementation of {@link SharedPreferences} that encrypts keys and values.
@@ -68,7 +69,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  *
  * Changes: Added support for storing binary data
  */
-public final class MyEncryptedSharedPreferences implements SharedPreferences {
+public final class MyEncryptedSharedPreferences implements EncryptedSharedPreferences {
 
     private static final String KEY_KEYSET_ALIAS =
             "__androidx_security_crypto_encrypted_prefs_key_keyset__";
@@ -108,13 +109,14 @@ public final class MyEncryptedSharedPreferences implements SharedPreferences {
      * @throws IOException              when fileName can not be used
      */
     @NonNull
-    public static MyEncryptedSharedPreferences create(@NonNull String fileName,
+    public static EncryptedSharedPreferences create(@NonNull String fileName,
                                                       @NonNull String masterKeyAlias,
                                                       @NonNull Context context,
                                                       @NonNull PrefKeyEncryptionScheme prefKeyEncryptionScheme,
                                                       @NonNull PrefValueEncryptionScheme prefValueEncryptionScheme)
             throws GeneralSecurityException, IOException {
-        TinkConfig.register();
+        DeterministicAeadConfig.register();
+        AeadConfig.register();
 
         KeysetHandle daeadKeysetHandle = new AndroidKeysetManager.Builder()
                 .withKeyTemplate(prefKeyEncryptionScheme.getKeyTemplate())
@@ -182,7 +184,7 @@ public final class MyEncryptedSharedPreferences implements SharedPreferences {
         }
     }
 
-    public static final class Editor implements SharedPreferences.Editor {
+    private static final class Editor implements EncryptedSharedPreferences.Editor {
         private final MyEncryptedSharedPreferences mEncryptedSharedPreferences;
         private final SharedPreferences.Editor mEditor;
         private final List<String> mKeysChanged;
@@ -215,7 +217,7 @@ public final class MyEncryptedSharedPreferences implements SharedPreferences {
         @Override
         @NonNull
         public Editor putStringSet(@Nullable String key,
-                                                     @Nullable Set<String> values) {
+                                   @Nullable Set<String> values) {
             if (values == null) {
                 values = new ArraySet<>();
                 values.add(NULL_VALUE);

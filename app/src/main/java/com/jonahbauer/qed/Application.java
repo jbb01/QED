@@ -1,11 +1,7 @@
 package com.jonahbauer.qed;
 
 import android.app.Activity;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 import android.security.keystore.KeyGenParameterSpec;
 import android.widget.Toast;
@@ -16,6 +12,7 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.preference.PreferenceManager;
 import androidx.security.crypto.MasterKeys;
 
+import com.jonahbauer.qed.crypt.EncryptedSharedPreferences;
 import com.jonahbauer.qed.crypt.MyEncryptedSharedPreferences;
 import com.jonahbauer.qed.crypt.PasswordStorage;
 import com.jonahbauer.qed.networking.NetworkListener;
@@ -31,23 +28,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Application extends android.app.Application implements android.app.Application.ActivityLifecycleCallbacks {
-
-    @SuppressWarnings("unused")
-    public static final String KEY_FCM_DEVICE_TOKEN = "fcmDeviceToken";
-    @SuppressWarnings("unused")
-    public static final String KEY_FCM_RSA_KEY = "fcmRsaKeyPair";
-
-    public static final String NOTIFICATION_CHANNEL_ID = "qednotification";
-
-
     private static final String COOKIE_SHARED_PREFERENCE_FILE = "com.jonahbauer.qed_cookies";
     private static final String ENCRYPTED_SHARED_PREFERENCE_FILE = "com.jonahbauer.qed_encrypted";
 
-
-    public static boolean sOnline;
-    private static boolean sForeground;
-
     private static SoftReference<Application> sContext;
+
+    private Boolean mOnline = null;
 
     private Activity mActivity;
     private final Set<Activity> mExistingActivities = new HashSet<>();
@@ -58,8 +44,6 @@ public class Application extends android.app.Application implements android.app.
         super.onCreate();
         registerActivityLifecycleCallbacks(this);
 
-        Pref.init(getResources());
-
         sContext = new SoftReference<>(this);
 
         // Setup cookie handler
@@ -67,7 +51,7 @@ public class Application extends android.app.Application implements android.app.
         QEDCookieHandler.init(cookieSharedPreferences);
 
         // Setup password storage
-        MyEncryptedSharedPreferences passwordSharedPreferences = getEncryptedSharedPreferences(ENCRYPTED_SHARED_PREFERENCE_FILE);
+        EncryptedSharedPreferences passwordSharedPreferences = getEncryptedSharedPreferences(ENCRYPTED_SHARED_PREFERENCE_FILE);
         PasswordStorage.init(passwordSharedPreferences);
 
         // Setup preferences
@@ -82,7 +66,6 @@ public class Application extends android.app.Application implements android.app.
         }
 
         mConnectionStateMonitor = new ConnectionStateMonitor(this);
-        sOnline = false;
         mConnectionStateMonitor.enable();
     }
 
@@ -97,7 +80,7 @@ public class Application extends android.app.Application implements android.app.
     @Override
     public void onActivityCreated(@NonNull Activity activity, Bundle savedInstanceState) {
         this.mActivity = activity;
-        mExistingActivities.add(activity);
+        this.mExistingActivities.add(activity);
     }
 
     @Override
@@ -108,13 +91,10 @@ public class Application extends android.app.Application implements android.app.
     @Override
     public void onActivityResumed(@NonNull Activity activity) {
         this.mActivity = activity;
-        setForeground(true);
     }
 
     @Override
-    public void onActivityPaused(@NonNull Activity activity) {
-        setForeground(false);
-    }
+    public void onActivityPaused(@NonNull Activity activity) {}
 
     @Override
     public void onActivityStopped(@NonNull Activity activity) {}
@@ -124,7 +104,7 @@ public class Application extends android.app.Application implements android.app.
 
     @Override
     public void onActivityDestroyed(@NonNull Activity activity) {
-        mExistingActivities.remove(activity);
+        this.mExistingActivities.remove(activity);
     }
     //</editor-fold>
 
@@ -143,12 +123,11 @@ public class Application extends android.app.Application implements android.app.
         if (mActivity instanceof NetworkListener) {
             NetworkListener listener = (NetworkListener) mActivity;
 
-            if (!Application.sOnline && online) listener.onConnectionRegain();
-            else if (Application.sOnline && !online) listener.onConnectionFail();
-            else if (!Application.sOnline) listener.onConnectionFail();
+            if (mOnline != null && !mOnline && online) listener.onConnectionRegain();
+            else if ((mOnline == null || mOnline) && !online) listener.onConnectionFail();
         }
 
-        Application.sOnline = online;
+        mOnline = online;
     }
 
     /**
@@ -163,42 +142,7 @@ public class Application extends android.app.Application implements android.app.
         for (Activity activity : mExistingActivities) activity.finish();
     }
 
-    /**
-     * Returns {@code true} if the app is in foreground.
-     * When switching activities for a short time it can happen that this method returns {@code false} even though the app is in foreground.
-     *
-     * @return true if the app is in foreground.
-     */
-    @Contract(pure = true)
-    public static boolean isForeground() {
-        return sForeground;
-    }
-
-    public static void setForeground(boolean foreground) {
-        if (Application.sForeground == foreground) return;
-
-        Application.sForeground = foreground;
-    }
-
-    /**
-     * Creates a notification channel for android versions greater than Oreo
-     */
-    public static void createNotificationChannel(@NonNull Context context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = context.getString(R.string.notification_channel_name);
-            String description = context.getString(R.string.notification_channel_description);
-            int importance = NotificationManager.IMPORTANCE_HIGH;
-
-            NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, name, importance);
-            channel.setDescription(description);
-
-            NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
-            if (notificationManager != null)
-                notificationManager.createNotificationChannel(channel);
-        }
-    }
-
-    private MyEncryptedSharedPreferences getEncryptedSharedPreferences(String name) {
+    private EncryptedSharedPreferences getEncryptedSharedPreferences(String name) {
         try {
             KeyGenParameterSpec keyGenParameterSpec = MasterKeys.AES256_GCM_SPEC;
             String masterKeyAlias = MasterKeys.getOrCreate(keyGenParameterSpec);

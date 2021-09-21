@@ -1,85 +1,63 @@
 package com.jonahbauer.qed.activities.mainFragments;
 
 import android.animation.ObjectAnimator;
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StyleRes;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.MainActivity;
+import com.jonahbauer.qed.databinding.FragmentChatBinding;
 import com.jonahbauer.qed.model.Message;
 import com.jonahbauer.qed.model.adapter.MessageAdapter;
 import com.jonahbauer.qed.model.room.Database;
 import com.jonahbauer.qed.networking.ChatWebSocket;
-import com.jonahbauer.qed.networking.ChatWebSocketListener;
 import com.jonahbauer.qed.networking.NetworkListener;
+import com.jonahbauer.qed.networking.Reason;
 import com.jonahbauer.qed.util.MessageUtils;
 import com.jonahbauer.qed.util.Preferences;
+import com.jonahbauer.qed.util.ViewUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
-public class ChatFragment extends QEDFragment implements NetworkListener, AbsListView.OnScrollListener, ChatWebSocketListener {
+public class ChatFragment extends QEDFragment implements NetworkListener, AbsListView.OnScrollListener {
     private static final String LOG_TAG = ChatFragment.class.getName();
 
-    private Resources mRes;
+    private FragmentChatBinding mBinding;
 
-    private final Object mSocketLock = new Object();
-    private ChatWebSocket mWebSocket = null;
-    private MessageAdapter mMessageAdapter;
+    private ChatWebSocket mWebSocket;
+    private final CompositeDisposable mDisposable = new CompositeDisposable();
 
     private boolean mInitDone = false;
     private List<Message> mInitMessages;
+    private MessageAdapter mMessageAdapter;
 
     private long mTopPosition = Long.MAX_VALUE;
     private long mLastPostId;
 
-    private FloatingActionButton mScrollDownButton;
-    private ListView mMessageListView;
-    private ProgressBar mProgressBar;
-    private EditText mMessageEditText;
-    private ImageButton mSendButton;
-
+    @Nullable
     private MenuItem mRefreshButton;
-
-    private boolean mShowQuickSettings = false;
-    private FloatingActionButton mQuickSettings;
-    private FloatingActionButton mQuickSettingsName;
-    private FloatingActionButton mQuickSettingsChannel;
-    private final Runnable mFabFade = () -> {
-        ObjectAnimator animation = ObjectAnimator.ofFloat(mQuickSettings, "alpha", 0.35f);
-        animation.setDuration(1000);
-        animation.start();
-    };
-
-    private final AtomicBoolean mNetworkError = new AtomicBoolean();
 
     @NonNull
     public static ChatFragment newInstance(@StyleRes int themeId) {
@@ -95,110 +73,89 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        LinearLayout mathPreload = view.findViewById(R.id.math_preload);
-        mScrollDownButton = view.findViewById(R.id.scroll_down_Button);
-        mMessageListView = view.findViewById(R.id.messageBox);
-        mProgressBar = view.findViewById(R.id.progress_bar);
-        mMessageEditText = view.findViewById(R.id.editText_message);
-        mSendButton = view.findViewById(R.id.button_send);
-        mQuickSettings = view.findViewById(R.id.quick_settings);
-        mQuickSettingsName = view.findViewById(R.id.quick_settings_name);
-        mQuickSettingsChannel = view.findViewById(R.id.quick_settings_channel);
+        mBinding = FragmentChatBinding.bind(view);
 
-        mRes = getResources();
+        mBinding.editTextMessage.setOnClickListener(v -> {
+            if (mBinding.messageBox.getLastVisiblePosition() >= mMessageAdapter.getCount() - 1) {
+                mHandler.postDelayed(() -> mBinding.messageBox.setSelection(mMessageAdapter.getCount() - 1), 100);
+            }
+        });
+        mBinding.buttonSend.setOnClickListener(v -> send());
 
-        mMessageEditText.setOnClickListener(a -> editTextClicked());
-        mSendButton.setOnClickListener(a -> send());
-
-        mQuickSettingsName.hide();
-        mQuickSettingsChannel.hide();
-        mQuickSettings.setAlpha(0.35f);
+        mBinding.quickSettingsName.hide();
+        mBinding.quickSettingsChannel.hide();
+        mBinding.quickSettings.setAlpha(0.35f);
 
         Context context = getContext();
-        mQuickSettingsName.setOnClickListener(a -> {
-            AlertDialog.Builder inputDialog = new AlertDialog.Builder(context);
-
-            inputDialog.setTitle(mRes.getString(R.string.preferences_chat_name_title));
-
-            @SuppressLint("InflateParams")
-            View editTextView = LayoutInflater.from(inputDialog.getContext()).inflate(R.layout.alert_dialog_edit_text, null);
-
-            EditText inputEditText = editTextView.findViewById(R.id.input);
-            inputEditText.setText(Preferences.chat().getName());
-
-            inputDialog.setView(editTextView);
-
-            inputDialog.setNegativeButton(mRes.getString(R.string.cancel), (dialog, which) -> dialog.cancel());
-
-            inputDialog.setPositiveButton(mRes.getString(R.string.ok), (dialog, which) -> {
-                Preferences.chat().edit().setName(inputEditText.getText().toString()).apply();
-                dialog.dismiss();
-            });
-
-            inputDialog.show();
+        // setup quick settings
+        mBinding.quickSettingsName.setOnClickListener(v -> {
+            ViewUtils.showPreferenceDialog(
+                    context,
+                    R.string.preferences_chat_name_title,
+                    () -> Preferences.chat().getName(),
+                    (str) -> Preferences.chat().edit().setName(str).apply()
+            );
         });
-
-        mQuickSettingsChannel.setOnClickListener(a -> {
-            AlertDialog.Builder inputDialog = new AlertDialog.Builder(context);
-
-            inputDialog.setTitle(mRes.getString(R.string.preferences_chat_channel_title));
-
-            @SuppressLint("InflateParams")
-            View editTextView = LayoutInflater.from(inputDialog.getContext()).inflate(R.layout.alert_dialog_edit_text, null);
-
-            EditText inputEditText = editTextView.findViewById(R.id.input);
-            inputEditText.setText(Preferences.chat().getChannel());
-
-            inputDialog.setView(editTextView);
-
-            inputDialog.setNegativeButton(mRes.getString(R.string.cancel), (dialog, which) -> dialog.cancel());
-
-            inputDialog.setPositiveButton(mRes.getString(R.string.ok), (dialog, which) -> {
-                Preferences.chat().edit().setChannel(inputEditText.getText().toString()).apply();
-                reload();
-                dialog.dismiss();
-            });
-
-            inputDialog.show();
+        mBinding.quickSettingsChannel.setOnClickListener(v -> {
+            ViewUtils.showPreferenceDialog(
+                    context,
+                    R.string.preferences_chat_channel_title,
+                    () -> Preferences.chat().getChannel(),
+                    (str) -> {
+                        Preferences.chat().edit().setChannel(str).apply();
+                        reload();
+                    }
+            );
         });
+        mBinding.quickSettings.setOnClickListener(new View.OnClickListener() {
+            private boolean mShowQuickSettings = false;
+            private final Runnable mFabFade = () -> {
+                ObjectAnimator animation = ObjectAnimator.ofFloat(mBinding.quickSettings, "alpha", 0.35f);
+                animation.setDuration(1000);
+                animation.start();
+            };
 
-        mQuickSettings.setOnClickListener(a -> {
-            if (mShowQuickSettings) {
-                mQuickSettingsName.postDelayed(mFabFade, 5000);
-                mQuickSettingsName.hide();
-                mQuickSettingsChannel.hide();
-            } else {
-                mQuickSettings.removeCallbacks(mFabFade);
-                mQuickSettings.setAlpha(1f);
-                mQuickSettingsName.show();
-                mQuickSettingsChannel.show();
+            @Override
+            public void onClick(View v) {
+                if (mShowQuickSettings) {
+                    mBinding.quickSettings.postDelayed(mFabFade, 5000);
+                    mBinding.quickSettingsName.hide();
+                    mBinding.quickSettingsChannel.hide();
+                } else {
+                    mBinding.quickSettings.removeCallbacks(mFabFade);
+                    mBinding.quickSettings.setAlpha(1f);
+                    mBinding.quickSettingsName.show();
+                    mBinding.quickSettingsChannel.show();
+                }
+                mShowQuickSettings = !mShowQuickSettings;
             }
-            mShowQuickSettings = !mShowQuickSettings;
         });
 
-        mMessageAdapter = new MessageAdapter(view.getContext(), new ArrayList<>(), mathPreload);
-        mMessageListView.setAdapter(mMessageAdapter);
-        mMessageListView.setOnScrollListener(this);
-        mMessageListView.setOnItemClickListener((adapterView, view1, i, l) -> setChecked(i, false));
-        mMessageListView.setOnItemLongClickListener((adapterView, view1, i, l) -> {
-            if (!mMessageListView.isItemChecked(i)) {
-                int checked = mMessageListView.getCheckedItemPosition();
+        var messageBox = mBinding.messageBox;
+        mMessageAdapter = new MessageAdapter(view.getContext(), new ArrayList<>(), mBinding.mathPreload);
+        messageBox.setAdapter(mMessageAdapter);
+        messageBox.setOnScrollListener(this);
+        messageBox.setOnItemClickListener((parent, v, position, id) -> setChecked(position, false));
+        messageBox.setOnItemLongClickListener((parent, v, position, id) -> {
+            if (!messageBox.isItemChecked(position)) {
+                int checked = messageBox.getCheckedItemPosition();
                 if (checked != -1) setChecked(checked, false);
 
-                setChecked(i, true);
+                setChecked(position, true);
                 return true;
-            } else return false;
+            } else {
+                return false;
+            }
         });
-        mInitMessages = new LinkedList<>();
+        mInitMessages = new ArrayList<>(100);
 
-        mScrollDownButton.setOnClickListener(a -> scrollDown());
-
-        setHasOptionsMenu(true);
+        mBinding.scrollDownButton.setOnClickListener(v -> scrollDown());
     }
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.menu_chat, menu);
+        mRefreshButton = menu.findItem(R.id.chat_refresh);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -219,47 +176,6 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
     }
 
     /**
-     * Sets the checked item in the {@link #mMessageListView} and shows an appropriate toolbar.
-     *
-     * @param position the position of the checked item in the {@link #mMessageAdapter}
-     * @param value if the item is checked or not
-     */
-    private void setChecked(int position, boolean value) {
-        MessageUtils.setChecked(this, mMessageListView, mMessageAdapter, position, value);
-    }
-
-    @Override
-    public void revokeAltToolbar() {
-        int checked = mMessageListView.getCheckedItemPosition();
-        if (checked != -1) setChecked(checked, false);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        reload();
-    }
-
-//    @Override
-//    public void onResume() {
-//        super.onResume();
-//        mMessageListView.setItemChecked(mMessageListView.getCheckedItemPosition(), false);
-//    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        if (mWebSocket != null) mWebSocket.closeSocket();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        if (mWebSocket != null) mWebSocket.closeSocket();
-    }
-
-    /**
      * Reconnects to the chat web socket
      */
     private void reload() {
@@ -269,31 +185,86 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
             mainActivity.returnAltToolbar();
         }
 
-        if (mWebSocket != null) mWebSocket.closeSocket();
-        mNetworkError.set(false);
+        mDisposable.clear();
 
-        assert getActivity() != null;
+        assert activity != null;
 
         mInitMessages.clear();
         mMessageAdapter.clear();
         mInitDone = false;
-        mProgressBar.setVisibility(View.VISIBLE);
-        mMessageListView.setVisibility(View.GONE);
+        mBinding.progressBar.setVisibility(View.VISIBLE);
+        mBinding.messageBox.setVisibility(View.GONE);
 
-        initSocket();
-        if (mMessageEditText != null) {
-            mMessageEditText.setEnabled(true);
-            mMessageEditText.post(() -> mMessageEditText.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0));
-        }
-        if (mSendButton != null) mSendButton.setEnabled(true);
+        mWebSocket = new ChatWebSocket(Preferences.chat().getChannel());
+        mDisposable.addAll(
+                Observable.create(mWebSocket)
+                          .subscribeOn(Schedulers.io())
+                          .observeOn(AndroidSchedulers.mainThread())
+                          .subscribe(
+                                  msg -> {
+                                      addPost(msg, mInitDone);
+                                      if (mLastPostId < msg.getId()) mLastPostId = msg.getId();
+                                  },
+                                  err -> error(getString(Reason.guess(err).getStringRes())),
+                                  () -> error(getString(R.string.chat_websocket_closed))
+                          ),
+                Disposable.fromRunnable(() -> mWebSocket = null)
+        );
+
+        mBinding.editTextMessage.setEnabled(true);
+        ViewUtils.setError(mBinding.editTextMessage, false);
+        mBinding.buttonSend.setEnabled(true);
 
         mMessageAdapter.notifyDataSetChanged();
 
-        if (mRefreshButton != null) mRefreshButton.setEnabled(true);
+        if (mRefreshButton != null) {
+            mRefreshButton.setEnabled(true);
+        }
+    }
+
+    private void send() {
+        send(false);
     }
 
     /**
-     * Appends the given message to the {@link #mMessageListView}. The post will also be written to the chat database
+     * Sends a chat post to the server
+     * The content of the post comes from the {@code EditText} and various preferences.
+     *
+     * @param force if this is false the user will be prompted before sending empty posts
+     */
+    private void send(boolean force) {
+        assert getContext() != null;
+
+        String message = mBinding.editTextMessage.getText().toString();
+
+        if (!force && message.trim().isEmpty()) {
+            AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getContext());
+            dialogBuilder.setMessage(R.string.chat_empty_message);
+            dialogBuilder.setPositiveButton(R.string.yes, (d, which) -> {
+                send(true);
+                d.dismiss();
+            });
+            dialogBuilder.setNegativeButton(R.string.no, (d, which) -> d.cancel());
+            dialogBuilder.show();
+            return;
+        }
+
+        boolean success = mWebSocket.send(
+                Preferences.chat().getName(),
+                message,
+                Preferences.chat().isPublicId()
+        );
+        if (success) {
+            ViewUtils.setError(mBinding.editTextMessage, false);
+            mBinding.editTextMessage.setText("");
+            mBinding.editTextMessage.requestFocus();
+        } else {
+            ViewUtils.setError(mBinding.editTextMessage, true);
+        }
+    }
+
+    /**
+     * Appends the given message to the list. The post will also be written to the chat database
      *
      * @param message the message to be appended
      * @param notify if {@link MessageAdapter#notifyDataSetChanged()} should be called
@@ -305,25 +276,24 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
         if (Message.PONG.equals(message)) {
             if (!mInitDone) {
                 mInitDone = true;
-                mHandler.post(() -> {
-                    mMessageAdapter.clear();
-                    mMessageAdapter.addAll(mInitMessages);
-                    mMessageAdapter.notifyDataSetChanged();
 
-                    mMessageListView.setSelection(mInitMessages.size() - 1);
+                mMessageAdapter.clear();
+                mMessageAdapter.addAll(mInitMessages);
+                mMessageAdapter.notifyDataSetChanged();
 
-                    //noinspection ResultOfMethodCallIgnored
-                    Database.getInstance(requireContext()).messageDao().insert(mInitMessages)
-                            .doFinally(() -> mInitMessages.clear())
-                            .subscribeOn(Schedulers.io())
-                            .subscribe(
-                                    () -> {},
-                                    e -> Log.e(LOG_TAG, "Error inserting messages into database.", e)
-                            );
+                mBinding.messageBox.setSelection(mInitMessages.size() - 1);
 
-                    mProgressBar.setVisibility(View.GONE);
-                    mMessageListView.setVisibility(View.VISIBLE);
-                });
+                //noinspection ResultOfMethodCallIgnored
+                Database.getInstance(requireContext()).messageDao().insert(mInitMessages)
+                        .doFinally(() -> mInitMessages.clear())
+                        .subscribeOn(Schedulers.io())
+                        .subscribe(
+                                () -> {},
+                                e -> Log.e(LOG_TAG, "Error inserting messages into database.", e)
+                        );
+
+                mBinding.progressBar.setVisibility(View.GONE);
+                mBinding.messageBox.setVisibility(View.VISIBLE);
             }
 
             return;
@@ -348,102 +318,72 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
         });
     }
 
-    private void editTextClicked() {
-        if (mMessageListView.getLastVisiblePosition() >= mMessageAdapter.getCount()-1)
-            mHandler.postDelayed(() -> mMessageListView.setSelection(mMessageAdapter.getCount() -1),100);
+    @Override
+    public void onScrollStateChanged(AbsListView view, int scrollState) {}
+
+    @Override
+    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+        if (totalItemCount - visibleItemCount - firstVisibleItem > 0) mBinding.scrollDownButton.show();
+        else mBinding.scrollDownButton.hide();
     }
 
     @Override
+    public void revokeAltToolbar() {
+        int checked = mBinding.messageBox.getCheckedItemPosition();
+        if (checked != -1) setChecked(checked, false);
+    }
+
+    //<editor-fold desc="Lifecycle" defaultstate="collapsed">
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        reload();
+    }
+
+    @Override
+    public void onStop() {
+        mDisposable.clear();
+        super.onStop();
+    }
+
+    @Override
+    public void onDestroy() {
+        mDisposable.clear();
+        super.onDestroy();
+    }
+    //</editor-fold>
+
+    //<editor-fold desc="Network Listener" defaultstate="collapsed">
+    @Override
     public void onConnectionFail() {
-        onError(REASON_NETWORK, null);
+        // network connection fails are already detected via websocket failure
     }
 
     @Override
     public void onConnectionRegain() {
         reload();
     }
+    //</editor-fold>
 
+    //<editor-fold desc="Utility Methods" defaultstate="collapsed">
     /**
-     * Opens a web socket connection to the chat server
-     */
-    private void initSocket() {
-        new Thread(() -> {
-            synchronized (mSocketLock) {
-                if (mWebSocket == null) mWebSocket = new ChatWebSocket(this);
-
-                mWebSocket.openSocket();
-            }
-        }).start();
-    }
-
-    private void send() {
-        send(false);
-    }
-
-    /**
-     * Sends a chat post to the server
-     * The content of the post comes from {@link #mMessageEditText} and various preferences.
+     * Sets the checked item in the message list and shows an appropriate toolbar.
      *
-     * @param force if this is false the user will be prompted before sending empty posts
+     * @param position the position of the checked item in the {@link #mMessageAdapter}
+     * @param value if the item is checked or not
      */
-    private void send(boolean force) {
-        assert getContext() != null;
-
-        String message = mMessageEditText.getText().toString();
-
-        if (!force && "".equals(message.trim())) {
-            AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getContext());
-            dialogBuilder.setMessage(mRes.getString(R.string.chat_empty_message));
-            dialogBuilder.setPositiveButton(R.string.yes, (dialogInterface, i) -> {
-                send(true);
-                dialogInterface.dismiss();
-            });
-            dialogBuilder.setNegativeButton(R.string.no, (dialogInterface, i) -> dialogInterface.dismiss());
-            dialogBuilder.show();
-            return;
-        }
-
-        if (mWebSocket.send(message)) {
-            mHandler.post(() -> mMessageEditText.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0));
-            mMessageEditText.setText("");
-            mMessageEditText.requestFocus();
-        } else {
-            mHandler.post(() -> mMessageEditText.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.ic_error,0));
-        }
-    }
-
-    @Override
-    public void onScrollStateChanged(AbsListView view, int scrollState) {}
-
-    @Override
-    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-        if (mScrollDownButton != null) if (totalItemCount-visibleItemCount-firstVisibleItem > 0) mScrollDownButton.show();
-        else mScrollDownButton.hide();
+    private void setChecked(int position, boolean value) {
+        MessageUtils.setChecked(this, mBinding.messageBox, mMessageAdapter, position, value);
     }
 
     private void scrollDown() {
-        mMessageListView.smoothScrollToPositionFromTop(mMessageAdapter.getCount(), 0, 250);
-    }
-
-    @Override
-    public void onMessage(@NonNull Message message) {
-        addPost(message, mInitDone);
-
-        if (mLastPostId < message.getId()) mLastPostId = message.getId();
-    }
-
-    @Override
-    public void onError(@Nullable String reason, @Nullable Throwable cause) {
-        ChatWebSocketListener.super.onError(reason, cause);
-
-        if (mNetworkError.getAndSet(true)) return;
-
-        if (REASON_NETWORK.equals(reason))
-            error(mRes.getString(R.string.cant_connect));
-        else
-            error(mRes.getString(R.string.error_unknown));
-
-        mHandler.postDelayed(() -> mNetworkError.set(false), 1000);
+        mBinding.messageBox.smoothScrollToPositionFromTop(mMessageAdapter.getCount(), 0, 250);
     }
 
     /**
@@ -452,16 +392,15 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
      * @param message a meaningful error message
      */
     private void error(String message) {
-        if (mWebSocket != null) mWebSocket.closeSocket();
+        mDisposable.clear();
         mInitDone = true;
 
         addPost(new Message(Integer.MAX_VALUE, "Error", message, Calendar.getInstance().getTime(),503,"Error","220000", 0, ""), true);
-        mHandler.post(() -> {
-            mMessageEditText.setEnabled(false);
-            mSendButton.setEnabled(false);
 
-            mProgressBar.setVisibility(View.GONE);
-            mMessageListView.setVisibility(View.VISIBLE);
-        });
+        mBinding.editTextMessage.setEnabled(false);
+        mBinding.buttonSend.setEnabled(false);
+        mBinding.progressBar.setVisibility(View.GONE);
+        mBinding.messageBox.setVisibility(View.VISIBLE);
     }
+    //</editor-fold>
 }

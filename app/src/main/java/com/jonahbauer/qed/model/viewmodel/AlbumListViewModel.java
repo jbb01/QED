@@ -89,7 +89,7 @@ public class AlbumListViewModel extends AndroidViewModel implements QEDPageRecei
     }
 
     @Override
-    public void onPageReceived(@NonNull List<Album> out) {
+    public void onResult(@NonNull List<Album> out) {
         if (out.size() > 0) {
             this.mAlbums.setValue(StatusWrapper.wrap(out, STATUS_LOADED));
 

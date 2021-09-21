@@ -1,11 +1,13 @@
 package com.jonahbauer.qed.activities.sheets.person;
 
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.sheets.AbstractInfoActivity;
 import com.jonahbauer.qed.activities.sheets.AbstractInfoFragment;
 import com.jonahbauer.qed.model.Person;
@@ -25,7 +27,7 @@ public class PersonInfoActivity extends AbstractInfoActivity {
 
         Person person = args.getParcelable(ARGUMENT_PERSON);
         if (person == null) {
-            // TODO show toast
+            Toast.makeText(this, R.string.error, Toast.LENGTH_SHORT).show();
             finish();
             return;
         }

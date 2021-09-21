@@ -1,11 +1,13 @@
 package com.jonahbauer.qed.activities.sheets.message;
 
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.sheets.AbstractInfoBottomSheet;
 import com.jonahbauer.qed.activities.sheets.AbstractInfoFragment;
 import com.jonahbauer.qed.model.Message;
@@ -37,7 +39,7 @@ public class MessageInfoBottomSheet extends AbstractInfoBottomSheet {
 
         Message message = args.getParcelable(ARGUMENT_MESSAGE);
         if (message == null) {
-            // TODO show toast
+            Toast.makeText(requireContext(), R.string.error, Toast.LENGTH_SHORT).show();
             dismiss();
             return;
         }

@@ -110,7 +110,7 @@ public class AlbumViewModel extends AndroidViewModel implements QEDPageReceiver<
 
         var receiver = new QEDPageReceiver<Album>() {
             @Override
-            public void onPageReceived(@NonNull Album out) {
+            public void onResult(@NonNull Album out) {
                 if (out.getImages().size() > 0) {
                     AlbumViewModel.this.mFilteredAlbum.setValue(StatusWrapper.wrap(Pair.create(album, out.getImages()), STATUS_LOADED));
                 } else {
@@ -194,7 +194,7 @@ public class AlbumViewModel extends AndroidViewModel implements QEDPageReceiver<
 
     @Override
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public void onPageReceived(@NonNull Album out) {
+    public void onResult(@NonNull Album out) {
         out.setImageListDownloaded(true);
         out.setLoaded(true);
         if (out.getImages().size() > 0) {

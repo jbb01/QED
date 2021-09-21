@@ -90,7 +90,7 @@ public class ChatPreferenceFragment extends PreferenceFragmentCompat implements 
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         if (preference == katex) {
-            if (!(newValue instanceof Boolean)) return true;
+            if (!(newValue instanceof Boolean)) return false;
             boolean value = (Boolean) newValue;
 
             if (links != null) {
@@ -107,7 +107,7 @@ public class ChatPreferenceFragment extends PreferenceFragmentCompat implements 
                 }
             }
         } else if (preference == links) {
-            if (!(newValue instanceof Boolean)) return true;
+            if (!(newValue instanceof Boolean)) return false;
             boolean value = (Boolean) newValue;
 
             if (katex != null) {

@@ -123,7 +123,7 @@ public class LoginActivity extends AppCompatActivity implements NetworkListener,
     }
 
     @Override
-    public void onPageReceived(@NonNull Boolean out) {
+    public void onResult(@NonNull Boolean out) {
         assert out;
 
         if (!mDontStartMain) {

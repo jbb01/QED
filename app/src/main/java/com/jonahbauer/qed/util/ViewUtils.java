@@ -1,18 +1,25 @@
 package com.jonahbauer.qed.util;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.EditText;
 
+import androidx.annotation.StringRes;
+
 import com.jonahbauer.qed.R;
+import com.jonahbauer.qed.databinding.AlertDialogEditTextBinding;
 
 import java.text.DateFormat;
 import java.util.Calendar;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import lombok.experimental.UtilityClass;
 
@@ -172,6 +179,22 @@ public class ViewUtils {
 
             dialog.show();
         });
+    }
+
+    public static void showPreferenceDialog(Context context, @StringRes int title, Supplier<String> getter, Consumer<String> setter) {
+        AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+        dialog.setTitle(title);
+
+        var binding = AlertDialogEditTextBinding.inflate(LayoutInflater.from(dialog.getContext()));
+        binding.input.setText(getter.get());
+
+        dialog.setView(binding.getRoot());
+        dialog.setPositiveButton(R.string.ok, (d, which) -> {
+            setter.accept(binding.input.getText().toString());
+            d.dismiss();
+        });
+        dialog.setNegativeButton(R.string.cancel, (d, which) -> d.cancel());
+        dialog.show();
     }
 
     public static void setError(EditText editText, boolean error) {

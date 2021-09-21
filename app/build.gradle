@@ -38,16 +38,6 @@ android {
     flavorDimensions "googleServices"
 
     productFlavors {
-        noGoogle {
-            dimension "googleServices"
-            buildConfigField("boolean", "USES_FCM", "false")
-        }
-
-        withGoogle {
-            dimension "googleServices"
-            buildConfigField("boolean", "USES_FCM", "true")
-            versionNameSuffix '-fcm'
-        }
     }
 
     compileOptions {
@@ -76,6 +66,7 @@ dependencies {
     implementation 'androidx.security:security-crypto:1.0.0'
     implementation 'androidx.viewpager2:viewpager2:1.0.0'
     implementation 'com.google.android.material:material:1.4.0'
+    //noinspection GradleDependency json-simple:1.1.1 contains a dependency to junit which causes conflicts
     implementation 'com.googlecode.json-simple:json-simple:1.1'
     implementation 'com.squareup.okhttp3:okhttp:4.9.1'
     implementation 'com.x5dev:chunk-templates:3.6.1'
@@ -86,8 +77,6 @@ dependencies {
     implementation 'androidx.room:room-runtime:2.3.0'
     implementation 'androidx.room:room-rxjava3:2.3.0'
     implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
-
-    withGoogleImplementation 'com.google.firebase:firebase-messaging:22.0.0'
 
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
 

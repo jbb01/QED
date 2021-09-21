@@ -12,7 +12,7 @@ import com.jonahbauer.qed.networking.Reason;
 @SuppressWarnings("unused")
 public interface QEDPageReceiver<T> {
     @MainThread
-    void onPageReceived(@NonNull T out);
+    void onResult(@NonNull T out);
 
     @CallSuper
     @MainThread

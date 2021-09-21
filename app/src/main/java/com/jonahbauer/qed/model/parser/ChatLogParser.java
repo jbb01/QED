@@ -1,5 +1,7 @@
 package com.jonahbauer.qed.model.parser;
 
+import android.util.Log;
+
 import com.jonahbauer.qed.model.Message;
 
 import java.io.BufferedReader;
@@ -15,6 +17,8 @@ import io.reactivex.rxjava3.functions.Supplier;
 import it.unimi.dsi.fastutil.longs.LongLongPair;
 
 public final class ChatLogParser implements ObservableOnSubscribe<LongLongPair> {
+    private static final String LOG_TAG = ChatLogParser.class.getName();
+
     private final Supplier<InputStream> mIn;
     private final Consumer<Message> mOut;
 
@@ -40,12 +44,14 @@ public final class ChatLogParser implements ObservableOnSubscribe<LongLongPair> 
                 long index = 0;
                 long lastUpdate = System.currentTimeMillis();
 
+                Message.Type lastType = null;
+
                 Iterator<String> lines = reader.lines().iterator();
                 while (lines.hasNext() && !emitter.isDisposed()) {
                     String line = lines.next();
                     Message msg = Message.interpretJSONMessage(line);
 
-                    if (msg != null) {
+                    if (msg != null && (lastType = msg.getType()) == Message.Type.POST) {
                         mOut.accept(msg);
                     }
 
@@ -58,6 +64,10 @@ public final class ChatLogParser implements ObservableOnSubscribe<LongLongPair> 
                             emitter.onNext(LongLongPair.of(index, lineCount));
                         }
                     }
+                }
+
+                if (lastType != Message.Type.OK) {
+                    Log.w(LOG_TAG, "Last message was of type " + lastType + " (expected OK).");
                 }
             }
             emitter.onNext(LongLongPair.of(lineCount, lineCount));

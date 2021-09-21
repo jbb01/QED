@@ -12,10 +12,10 @@ public class PasswordStorage {
     private static final String KEY_USERNAME = "username";
     private static final String KEY_PASSWORD = "password";
 
-    private MyEncryptedSharedPreferences mSharedPreferences;
+    private EncryptedSharedPreferences mSharedPreferences;
     private boolean mInitialized;
 
-    public void init(MyEncryptedSharedPreferences sharedPreferences) {
+    public void init(EncryptedSharedPreferences sharedPreferences) {
         if (mInitialized) throw new IllegalStateException("PasswordStorage is already initialized.");
         mSharedPreferences = sharedPreferences;
         mInitialized = true;

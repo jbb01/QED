@@ -29,7 +29,7 @@ public class PersonViewModel extends ViewModel implements QEDPageReceiver<Person
                     QEDDBPages.getPerson(person, this)
             );
         } else {
-            onPageReceived(person);
+            onResult(person);
         }
     }
 
@@ -38,7 +38,7 @@ public class PersonViewModel extends ViewModel implements QEDPageReceiver<Person
     }
 
     @Override
-    public void onPageReceived(@NonNull Person out) {
+    public void onResult(@NonNull Person out) {
         out.setLoaded(true);
         this.mPerson.setValue(StatusWrapper.wrap(out, STATUS_LOADED));
     }

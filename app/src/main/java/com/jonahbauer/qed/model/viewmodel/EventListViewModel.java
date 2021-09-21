@@ -40,7 +40,7 @@ public class EventListViewModel extends ViewModel implements QEDPageReceiver<Lis
     }
 
     @Override
-    public void onPageReceived(@NonNull List<Event> out) {
+    public void onResult(@NonNull List<Event> out) {
         if (out.size() > 0) {
             this.mEvents.setValue(StatusWrapper.wrap(out, STATUS_LOADED));
         } else {

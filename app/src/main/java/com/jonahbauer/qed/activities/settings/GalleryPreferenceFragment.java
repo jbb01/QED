@@ -22,11 +22,9 @@ import org.apache.commons.io.FileUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.functions.Action;
-import io.reactivex.rxjava3.functions.Consumer;
+import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class GalleryPreferenceFragment extends PreferenceFragmentCompat implements PreferenceFragment, Preference.OnPreferenceClickListener {
@@ -71,7 +69,9 @@ public class GalleryPreferenceFragment extends PreferenceFragmentCompat implemen
                 if (dir != null && dir.exists()) {
                     try {
                         FileUtils.cleanDirectory(dir);
+                        Snackbar.make(requireView(), R.string.deleted, Snackbar.LENGTH_SHORT).show();
                     } catch (IOException ignored) {
+                        Snackbar.make(requireView(), R.string.delete_error, Snackbar.LENGTH_SHORT).show();
                     }
                 }
             });
@@ -122,30 +122,17 @@ public class GalleryPreferenceFragment extends PreferenceFragmentCompat implemen
             alertDialog.setMessage(R.string.preferences_gallery_confirm_delete_gallery_database);
             alertDialog.setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss());
             alertDialog.setPositiveButton(R.string.delete, (dialog, which) -> {
-                AtomicBoolean done = new AtomicBoolean(false);
-                AtomicBoolean error = new AtomicBoolean(false);
+                var completable = Completable.mergeArrayDelayError(
+                        Database.getInstance(requireContext()).albumDao().clearImages(),
+                        Database.getInstance(requireContext()).albumDao().clearAlbums()
+                );
 
-                Action action = () -> {
-                    if (done.getAndSet(true)) {
-                        Snackbar.make(requireView(), R.string.deleted, Snackbar.LENGTH_SHORT).show();
-                    }
-                };
-
-                Consumer<Throwable> errorHandler = (e) -> {
-                    if (!error.getAndSet(true)) {
-                        Snackbar.make(requireView(), R.string.delete_error, Snackbar.LENGTH_SHORT).show();
-                    }
-                };
-
-                Database.getInstance(requireContext()).albumDao().clearImages()
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(action, errorHandler);
-
-                Database.getInstance(requireContext()).albumDao().clearAlbums()
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(action, errorHandler);
+                completable.subscribeOn(Schedulers.io())
+                           .observeOn(AndroidSchedulers.mainThread())
+                           .subscribe(
+                                   () -> Snackbar.make(requireView(), R.string.deleted, Snackbar.LENGTH_SHORT).show(),
+                                   (e) -> Snackbar.make(requireView(), R.string.delete_error, Snackbar.LENGTH_SHORT).show()
+                           );
             });
             alertDialog.show();
             return true;

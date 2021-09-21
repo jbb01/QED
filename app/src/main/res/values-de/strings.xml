@@ -19,7 +19,6 @@
 
 
     <string name="cant_connect">Keine Verbindung zum Internet möglich</string>
-    <string name="chat_button_send">Senden</string>
     <string name="chat_database_channel_checkbox">Channel</string>
     <string name="chat_database_channel_hint">Channel</string>
     <string name="chat_database_dateFrom_checkbox">von</string>
@@ -33,10 +32,6 @@
     <string name="chat_database_message_hint">Nachricht</string>
     <string name="chat_database_name_checkbox">Name</string>
     <string name="chat_database_name_hint">Name</string>
-    <string name="chat_empty_message">Du bist im Begriff eine leere Nachricht zu senden. Möchtest du fortfahren?</string>
-    <string name="chat_message_hint">Nachricht schreiben</string>
-    <string name="chat_refresh">Aktualisieren</string>
-    <string name="chat_scroll_down_button_content_description">Nach unten scrollen</string>
     <string name="coming_soon">Coming soon</string>
     <string name="database_offline">Keine Verbindung zum Internet möglich.\nDie Datenbank ist offline nicht verfügbar.</string>
     <string name="database_empty">Die Datenbank scheint leer zu sein.\nHast du den Mitgliedsbeitrag bezahlt?</string>
@@ -46,7 +41,6 @@
     <string name="chat_database_id_hint">vonID-bisID</string>
     <string name="title_activity_album">Album</string>
     <string name="title_activity_image">Foto</string>
-    <string name="title_fragment_chat">Chat</string>
     <string name="title_fragment_chat_database">Datenbank</string>
     <string name="title_fragment_events_database">Veranstaltungen</string>
     <string name="title_fragment_gallery">Galerie</string>
@@ -79,7 +73,7 @@
     <string name="log_wait_for_save">Bitte warte bis das Speichern abgeschlossen ist.</string>
     <string name="no_file_explorer">Es konnte kein Dateiexplorer gefunden werden.</string>
     <string name="no_internet">Etwas ist schief gelaufen. Bitte überprüfe deine Internetverbidung.</string>
-    <string name="notQED">Diese App steht in keiner offiziellen Verbindung zum Quod Erat Demonstrandum e.V.</string>
+    <string name="not_official">Diese App steht in keiner offiziellen Verbindung zum Quod Erat Demonstrandum e.V.</string>
     <string name="offline_mode">Offline-Modus</string>
     <string name="log_subtitle_date_interval">Posts vom {0,date,dd.MM.yyyy} bis zum {1,date,dd.MM.yyyy}</string>
     <string name="log_subtitle_date_recent">Posts der letzten {0,choice,1#|2#{0} }Stunde{0,choice,1#|2#n}</string>
@@ -95,8 +89,6 @@
     <string name="album_invalid">Dieses Album existiert nicht.</string>
     <string name="image_overwrite_offline_mode">Du befindest dich im Offline-Modus. Möchtest du das Bild trotzdem herunterladen?</string>
     <string name="album_overwrite_offline_mode">Du befindest dich im Offline-Modus. Möchtest du das Album trotzdem herunterladen?</string>
-    <string name="notification_channel_description">Stub!</string>
-    <string name="notification_channel_name">QED</string>
     <string name="log_status_download_pending">Download ausstehend…</string>
     <string name="log_status_download_paused">Download pausiert… %s</string>
     <string name="log_status_download_successful">Download erfolgreich. %s</string>
@@ -113,8 +105,6 @@
     <string name="log_confirm_exit_stay">Warten</string>
     <string name="log_confirm_exit_cancel">Abbrechen</string>
     <string name="master_key_error">Passwort konnte nicht gespeichert werden.</string>
-    <string name="download_notification_title">QED</string>
-    <string name="download_notification_log_description">Chatlog</string>
     <string name="log_subtitle_post_interval">Posts von #{0} bis #{1}</string>
     <string name="log_subtitle_since_own">Seit eigenem Post</string>
     <string name="log_subtitle_file">Datei</string>
@@ -122,6 +112,22 @@
     <string name="image_info">@string/info</string>
     <string name="image_open_with">Öffnen mit…</string>
     <string name="image_download_original">Original herunterladen</string>
+
+    <!-- Chat Fragment -->
+    <string name="title_fragment_chat">Chat</string>
+    <string name="chat_button_send">Senden</string>
+    <string name="chat_empty_message">Du bist im Begriff eine leere Nachricht zu senden. Möchtest du fortfahren?</string>
+    <string name="chat_message_hint">Nachricht schreiben</string>
+    <string name="chat_refresh">Aktualisieren</string>
+    <string name="chat_scroll_down_button_content_description">Nach unten scrollen</string>
+    <string name="chat_websocket_closed">Websocket geschlossen</string>
+
+    <string name="chat_quick_settings_name">Schnelleinstellungen - Name</string>
+    <string name="chat_quick_settings_channel">Schnelleinstellungen - Channel</string>
+    <string name="chat_quick_settings">Schnelleinstellungen</string>
+
+    <string name="message_info">@string/info</string>
+    <string name="message_copy">Copy</string>
 
     <!-- Login Activity -->
     <string name="title_activity_login">Anmelden</string>
@@ -160,9 +166,7 @@
     <string name="image_info_other_details">Sonstiges</string>
     <string name="image_info_path">Pfad</string>
 
-    <string name="message_info">@string/info</string>
     <string name="album_info">@string/info</string>
-    <string name="message_copy">Kopieren</string>
 
     <string-array name="chat_database_max_entries_value_strings">
         <item>10.000</item>

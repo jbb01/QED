@@ -2,15 +2,6 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory
         app:title="@string/preferences_header_general">
-        <!--
-        <Preference
-            android:defaultValue="false"
-            android:key="@string/preferences_general_clean_key"
-            android:selectAllOnFocus="true"
-            android:singleLine="true"
-            android:title="@string/preferences_general_clean_title"
-            android:icon="@drawable/ic_settings_delete_database" />
-            -->
 
         <Preference
             android:defaultValue="false"

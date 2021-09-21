@@ -149,7 +149,7 @@ public class ImageAdapter extends ArrayAdapter<Image> implements QEDPageStreamRe
     }
 
     @Override
-    public void onPageReceived(@NonNull ListItemImageBinding binding) {
+    public void onResult(@NonNull ListItemImageBinding binding) {
         ByteArrayOutputStream baos = binding.getBaos();
         Image image = binding.getImage();
 

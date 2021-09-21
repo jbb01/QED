@@ -77,7 +77,7 @@ public class PersonListViewModel extends ViewModel implements QEDPageReceiver<Li
     }
 
     @Override
-    public void onPageReceived(@NonNull List<Person> out) {
+    public void onResult(@NonNull List<Person> out) {
         if (out.size() > 0) {
             this.mPersons.setValue(StatusWrapper.wrap(out, STATUS_LOADED));
         } else {

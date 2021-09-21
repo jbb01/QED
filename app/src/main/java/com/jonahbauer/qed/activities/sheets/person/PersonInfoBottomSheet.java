@@ -1,11 +1,13 @@
 package com.jonahbauer.qed.activities.sheets.person;
 
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.sheets.AbstractInfoBottomSheet;
 import com.jonahbauer.qed.activities.sheets.AbstractInfoFragment;
 import com.jonahbauer.qed.model.Person;
@@ -38,7 +40,7 @@ public class PersonInfoBottomSheet extends AbstractInfoBottomSheet {
 
         Person person = args.getParcelable(ARGUMENT_PERSON);
         if (person == null) {
-            // TODO show toast
+            Toast.makeText(requireContext(), R.string.error, Toast.LENGTH_SHORT).show();
             dismiss();
             return;
         }

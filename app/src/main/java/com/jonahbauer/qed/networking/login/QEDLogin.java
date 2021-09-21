@@ -276,7 +276,7 @@ public final class QEDLogin {
         return observable.subscribeOn(Schedulers.io())
                          .observeOn(AndroidSchedulers.mainThread())
                          .subscribe(
-                                 listener::onPageReceived,
+                                 listener::onResult,
                                  err -> listener.onError(false, err)
                          );
     }

@@ -1,11 +1,13 @@
 package com.jonahbauer.qed.activities.sheets.album;
 
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.sheets.AbstractInfoActivity;
 import com.jonahbauer.qed.activities.sheets.AbstractInfoFragment;
 import com.jonahbauer.qed.model.Album;
@@ -25,7 +27,7 @@ public class AlbumInfoActivity extends AbstractInfoActivity {
 
         Album album = args.getParcelable(ARGUMENT_ALBUM);
         if (album == null) {
-            // TODO show toast
+            Toast.makeText(this, R.string.error, Toast.LENGTH_SHORT).show();
             finish();
             return;
         }

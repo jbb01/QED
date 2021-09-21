@@ -29,7 +29,7 @@ abstract class QEDPages {
                      .map(str -> parser.apply(object, str))
                      .observeOn(AndroidSchedulers.mainThread())
                      .subscribe(
-                             listener::onPageReceived,
+                             listener::onResult,
                              err -> listener.onError(object, err)
                      );
     }
@@ -45,7 +45,7 @@ abstract class QEDPages {
                          .subscribe(
                                  progress -> listener.onProgressUpdate(object, progress.firstLong(), progress.secondLong()),
                                  err -> listener.onError(object, err),
-                                 () -> listener.onPageReceived(object)
+                                 () -> listener.onResult(object)
                          );
     }
 }

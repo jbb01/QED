@@ -272,7 +272,7 @@ public class ImageViewHolder extends RecyclerView.ViewHolder implements QEDPageR
      * shows the image or a icon if a non image resource was downloaded
      */
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public void onPageReceived(@NonNull Image image) {
+    public void onResult(@NonNull Image image) {
         if (mDownloadTmp != null && mTarget != null && mDownloadTmp.exists()) {
             if (mTarget.exists()) mTarget.delete();
 

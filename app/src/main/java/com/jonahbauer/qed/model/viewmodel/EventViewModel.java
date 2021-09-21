@@ -29,7 +29,7 @@ public class EventViewModel extends ViewModel implements QEDPageReceiver<Event> 
                     QEDDBPages.getEvent(event, this)
             );
         } else {
-            onPageReceived(event);
+            onResult(event);
         }
     }
 
@@ -39,7 +39,7 @@ public class EventViewModel extends ViewModel implements QEDPageReceiver<Event> 
 
 
     @Override
-    public void onPageReceived(@NonNull Event out) {
+    public void onResult(@NonNull Event out) {
         out.setLoaded(true);
         this.mEvent.setValue(StatusWrapper.wrap(out, STATUS_LOADED));
     }
