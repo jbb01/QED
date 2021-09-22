@@ -6,6 +6,7 @@ import androidx.room.rxjava3.EmptyResultSetException;
 
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.networking.exceptions.InvalidCredentialsException;
+import com.jonahbauer.qed.networking.exceptions.LowMemoryException;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -16,6 +17,7 @@ public enum Reason {
     UNABLE_TO_LOG_IN(R.string.error_login),
     EMPTY(R.string.error_empty),
     NOT_FOUND(R.string.error_404),
+    OUT_OF_MEMORY(R.string.error_out_of_memory),
     USER(R.string.error_user);
 
     @StringRes
@@ -34,6 +36,8 @@ public enum Reason {
             return NETWORK;
         } else if (throwable instanceof NullPointerException || throwable instanceof EmptyResultSetException) {
             return EMPTY;
+        } else if (throwable instanceof OutOfMemoryError || throwable instanceof LowMemoryException) {
+            return OUT_OF_MEMORY;
         } else {
             return UNKNOWN;
         }

@@ -35,6 +35,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.databinding.AlertDialogLogModeBinding;
 import com.jonahbauer.qed.databinding.FragmentLogBinding;
@@ -57,6 +58,10 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class LogFragment extends QEDFragment {
     private static final String ARGUMENT_LOG_REQUEST = "logRequest";
+
+    private static final int STATUS_PENDING = 0;
+    private static final int STATUS_RUNNING = 1;
+    private static final int STATUS_DONE = 2;
 
     private MessageAdapter mMessageAdapter;
     private FragmentLogBinding mBinding;
@@ -93,6 +98,8 @@ public class LogFragment extends QEDFragment {
                 new ActivityResultContracts.OpenDocument(),
                 mFile::setValue
         );
+
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -116,31 +123,39 @@ public class LogFragment extends QEDFragment {
 
         mBinding.subtitle.setOnClickListener(v -> showDialog());
 
-        setHasOptionsMenu(true);
-
         mLogViewModel.getDownloadStatus().observe(getViewLifecycleOwner(), pair -> {
             if (pair == null) {
-                mBinding.setDownloadStatus(0);
+                mBinding.setDownloadStatus(STATUS_PENDING);
                 mBinding.setDownloadText(getString(R.string.log_status_download_pending));
             } else {
-                double done = pair.leftLong() / 1048576d;
-                mBinding.setDownloadStatus(1);
-                mBinding.setDownloadText(getString(R.string.log_status_downloading, done));
+                double done = pair.leftLong() / 1_048_576d;
+
+                if (done > Application.MEMORY_CLASS) {
+                    mBinding.setStatusText(getString(R.string.log_status_likely_oom));
+                }
+
+                if (pair.leftLong() == pair.rightLong()) {
+                    mBinding.setDownloadStatus(STATUS_DONE);
+                    mBinding.setDownloadText(getString(R.string.log_status_download_successful, done));
+                } else {
+                    mBinding.setDownloadStatus(STATUS_RUNNING);
+                    mBinding.setDownloadText(getString(R.string.log_status_downloading, done));
+                }
             }
         });
 
         mLogViewModel.getParseStatus().observe(getViewLifecycleOwner(), pair -> {
-            mBinding.setDownloadStatus(2);
             if (pair == null) {
-                mBinding.setParseStatus(0);
+                mBinding.setParseStatus(STATUS_PENDING);
                 mBinding.setParseText(getString(R.string.log_status_parse_pending));
             } else {
                 long done = pair.leftLong();
                 long total = pair.rightLong();
+
                 if (done == total) {
-                    mBinding.setParseStatus(2);
+                    mBinding.setParseStatus(STATUS_DONE);
                 } else {
-                    mBinding.setParseStatus(1);
+                    mBinding.setParseStatus(STATUS_RUNNING);
                 }
                 mBinding.setParseText(getString(R.string.log_status_parsing, done, total));
             }
@@ -175,6 +190,7 @@ public class LogFragment extends QEDFragment {
         }
 
         mBinding.setSubtitle(mLogRequest.getSubtitle(getResources()));
+        mBinding.setStatusText(null);
         mLogViewModel.load(mLogRequest);
     }
 
@@ -204,17 +220,13 @@ public class LogFragment extends QEDFragment {
                     .insert(mMessageAdapter.getData())
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
+                    .doFinally(() -> {
+                        mBinding.setSaving(false);
+                        item.setEnabled(true);
+                    })
                     .subscribe(
-                            () -> {
-                                Snackbar.make(requireView(), R.string.saved, Snackbar.LENGTH_SHORT).show();
-                                mBinding.setSaving(false);
-                                item.setEnabled(true);
-                            },
-                            (e) -> {
-                                Snackbar.make(requireView(), R.string.save_error, Snackbar.LENGTH_SHORT).show();
-                                mBinding.setSaving(false);
-                                item.setEnabled(true);
-                            }
+                            () -> Snackbar.make(requireView(), R.string.saved, Snackbar.LENGTH_SHORT).show(),
+                            (e) -> Snackbar.make(requireView(), R.string.save_error, Snackbar.LENGTH_SHORT).show()
                     );
             return true;
         }
@@ -351,18 +363,18 @@ public class LogFragment extends QEDFragment {
                         try {
                             long last = Long.parseLong(binding.logDialogPostrecent.getText().toString());
                             logRequest = new PostRecentLogRequest(channel, last);
-                            binding.logDialogPostrecent.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+                            ViewUtils.setError(binding.logDialogPostrecent, false);
                         } catch (NumberFormatException e) {
-                            binding.logDialogPostrecent.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_error, 0);
+                            ViewUtils.setError(binding.logDialogPostrecent, true);
                         }
                         break;
                     case DATE_RECENT:
                         try {
                             long last = Long.parseLong(binding.logDialogDaterecent.getText().toString());
                             logRequest = new DateRecentLogRequest(channel, last, TimeUnit.HOURS);
-                            binding.logDialogDaterecent.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+                            ViewUtils.setError(binding.logDialogDaterecent, false);
                         } catch (NumberFormatException e) {
-                            binding.logDialogDaterecent.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_error, 0);
+                            ViewUtils.setError(binding.logDialogDaterecent, true);
                         }
                         break;
                     case POST_INTERVAL:
@@ -370,16 +382,16 @@ public class LogFragment extends QEDFragment {
                         boolean error = false;
                         try {
                             from = Long.parseLong(binding.logDialogPostintervalFrom.getText().toString());
-                            binding.logDialogPostintervalFrom.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+                            ViewUtils.setError(binding.logDialogPostintervalFrom, false);
                         } catch (NumberFormatException e) {
-                            binding.logDialogPostintervalFrom.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_error, 0);
+                            ViewUtils.setError(binding.logDialogPostintervalFrom, true);
                             error = true;
                         }
                         try {
                             to = Long.parseLong(binding.logDialogPostintervalTo.getText().toString());
-                            binding.logDialogPostintervalTo.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+                            ViewUtils.setError(binding.logDialogPostintervalTo, false);
                         } catch (NumberFormatException e) {
-                            binding.logDialogPostintervalTo.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_error, 0);
+                            ViewUtils.setError(binding.logDialogPostintervalTo, true);
                             error = true;
                         }
 
@@ -393,19 +405,19 @@ public class LogFragment extends QEDFragment {
                     case FILE:
                         Uri uri = mFile.getValue();
                         if (uri == null) {
-                            binding.logDialogFile.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_error, 0);
+                            ViewUtils.setError(binding.logDialogFile, true);
                         } else {
                             logRequest = new LogViewModel.FileLogRequest(uri);
-                            binding.logDialogFile.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+                            ViewUtils.setError(binding.logDialogFile, false);
                         }
                         break;
                     case SINCE_OWN:
                         try {
                             long skip = Long.parseLong(binding.logDialogSinceown.getText().toString());
                             logRequest = new SinceOwnLogRequest(channel, skip);
-                            binding.logDialogSinceown.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+                            ViewUtils.setError(binding.logDialogSinceown, false);
                         } catch (NumberFormatException e) {
-                            binding.logDialogSinceown.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_error, 0);
+                            ViewUtils.setError(binding.logDialogSinceown, true);
                         }
                         break;
                 }

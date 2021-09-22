@@ -34,42 +34,38 @@ public final class AsyncLoadQEDPageToStream implements ObservableOnSubscribe<Lon
 
     @Override
     public void subscribe(@NonNull ObservableEmitter<LongLongPair> emitter) throws Throwable {
-        try {
-            // try to connect
-            HttpsURLConnection httpsURLConnection = createConnection();
+        // try to connect
+        HttpsURLConnection httpsURLConnection = createConnection();
+        if (emitter.isDisposed()) return;
+        httpsURLConnection.connect();
+
+        // check for login error
+        if (NetworkUtils.isLoginError(mFeature, httpsURLConnection)) {
+            httpsURLConnection.disconnect();
+
+            // login
+            QEDLogin.login(mFeature);
+
+            // retry connection
+            httpsURLConnection = createConnection();
             if (emitter.isDisposed()) return;
             httpsURLConnection.connect();
 
-            // check for login error
+            // check for login error once more
+            // if authentication failed after successful login -> throw exception
             if (NetworkUtils.isLoginError(mFeature, httpsURLConnection)) {
-                httpsURLConnection.disconnect();
-
-                // login
-                QEDLogin.login(mFeature);
-
-                // retry connection
-                httpsURLConnection = createConnection();
-                if (emitter.isDisposed()) return;
-                httpsURLConnection.connect();
-
-                // check for login error once more
-                // if authentication failed after successful login -> throw exception
-                if (NetworkUtils.isLoginError(mFeature, httpsURLConnection)) {
-                    throw new InvalidCredentialsException(new AssertionError("request not authenticated after login"));
-                }
+                throw new InvalidCredentialsException(new AssertionError("request not authenticated after login"));
             }
-
-            // copy input stream to output stream
-            try (InputStream inputStream = httpsURLConnection.getInputStream(); mOutputStream) {
-                copyStream(inputStream, mOutputStream, httpsURLConnection.getContentLength(), emitter);
-            }
-
-            httpsURLConnection.disconnect();
-
-            emitter.onComplete();
-        } catch (Throwable t) {
-            emitter.tryOnError(t);
         }
+
+        // copy input stream to output stream
+        try (InputStream inputStream = httpsURLConnection.getInputStream(); mOutputStream) {
+            copyStream(inputStream, mOutputStream, httpsURLConnection.getContentLength(), emitter);
+        }
+
+        httpsURLConnection.disconnect();
+
+        emitter.onComplete();
     }
 
     @NonNull

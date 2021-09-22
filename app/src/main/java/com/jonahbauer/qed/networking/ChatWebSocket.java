@@ -52,11 +52,7 @@ public class ChatWebSocket extends WebSocketListener implements ObservableOnSubs
         mEmitter = emitter;
         mEmitter.setDisposable(Disposable.fromRunnable(this::close));
 
-        try {
-            connect();
-        } catch (Throwable t) {
-            mEmitter.tryOnError(t);
-        }
+        connect();
     }
 
     private void connect() {
@@ -89,7 +85,7 @@ public class ChatWebSocket extends WebSocketListener implements ObservableOnSubs
 
     private void close() {
         if (mWebSocket != null) {
-            mWebSocket.close(1001, "");
+            mWebSocket.close(1001, null);
         }
     }
 
@@ -134,7 +130,7 @@ public class ChatWebSocket extends WebSocketListener implements ObservableOnSubs
         if (BuildConfig.DEBUG) Log.d(LOG_TAG, "WebSocket closed.");
 
         if (code == 4000 && reason.contains("Ungültige Anmeldedaten")) {
-            mEmitter.tryOnError(new InvalidCredentialsException());
+            mEmitter.onError(new InvalidCredentialsException());
         } else {
             mEmitter.onComplete();
         }
@@ -144,7 +140,7 @@ public class ChatWebSocket extends WebSocketListener implements ObservableOnSubs
     public void onFailure(@NonNull WebSocket webSocket, @NonNull Throwable t, Response response) {
         if (BuildConfig.DEBUG) Log.d(LOG_TAG, "WebSocket failure.", t);
 
-        mEmitter.tryOnError(t);
+        mEmitter.onError(t);
     }
 
     public boolean send(String name, String message, boolean publicId) {

@@ -83,6 +83,7 @@
     <string name="error_login">Login fehlgeschlagen.</string>
     <string name="error_network">Ein Netzwerk-Fehler trat auf.</string>
     <string name="error_404">Die angeforderte Ressource wurde nicht gefunden.</string>
+    <string name="error_out_of_memory">Speicher reicht nicht aus.</string>
     <string name="error_empty">Diese Liste ist leer.</string>
     <string name="error_user">Fehler in Layer 8</string>
     <string name="offline_mode_not_available">Im Offline-Modus nicht verfügbar.</string>
@@ -90,13 +91,12 @@
     <string name="image_overwrite_offline_mode">Du befindest dich im Offline-Modus. Möchtest du das Bild trotzdem herunterladen?</string>
     <string name="album_overwrite_offline_mode">Du befindest dich im Offline-Modus. Möchtest du das Album trotzdem herunterladen?</string>
     <string name="log_status_download_pending">Download ausstehend…</string>
-    <string name="log_status_download_paused">Download pausiert… %s</string>
-    <string name="log_status_download_successful">Download erfolgreich. %s</string>
-    <string name="log_status_download_failed">Download fehlgeschlagen. %s</string>
+    <string name="log_status_download_successful">Download erfolgreich. %.2f MiB</string>
     <string name="log_status_downloading">Download im Gange… %.2f MiB</string>
     <string name="log_status_parsing">JSON wird interpretiert… %d / %d</string>
     <string name="log_status_parse_pending">JSON Interpretation ausstehend…</string>
-    <string name="log_status_parse_failed">JSON Interpretation fefhlgeschlagen. %s</string>
+    <string name="log_status_parse_failed">JSON Interpretation fehlgeschlagen. %s</string>
+    <string name="log_status_likely_oom">Hohe Anzahl an Nachrichten könnte zu Speicherproblemen führen.</string>
 
     <string name="log_confirm_exit">Ein Chatlog-Download ist noch im Gange. </string>
     <string name="log_confirm_exit_continue_in_background">Im Hintergrund fortsetzen</string>

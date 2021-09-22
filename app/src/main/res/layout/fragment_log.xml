@@ -9,6 +9,7 @@
         <import type="com.jonahbauer.qed.util.StatusWrapper"/>
 
         <variable name="status" type="int"/>
+        <variable name="statusText" type="String"/>
         <variable name="error" type="String" />
         <variable name="subtitle" type="String" />
         <variable name="downloadText" type="String"/>
@@ -41,18 +42,18 @@
             android:id="@+id/subtitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentStart="true"
             android:layout_below="@id/progress_bar"
-            android:text="@{subtitle}"
-            android:textSize="16sp"
-            android:gravity="center"
-            android:textAppearance="?textAppearanceSubtitle2"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
             android:background="?colorSurface"
+            android:gravity="center"
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
+            android:text="@{subtitle}"
+            android:textAppearance="?textAppearanceSubtitle2"
+            android:textSize="16sp"
             tools:text="Lorem ipsum dolor sit."
-            tools:visibility="visible"/>
+            tools:visibility="visible" />
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -131,19 +132,34 @@
                 android:layout_gravity="center"/>
 
             <TextView
+                android:id="@+id/log_fragment_progress_json_parse_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_toEndOf="@id/log_fragment_icon_json_parse"
                 android:layout_alignTop="@id/log_fragment_icon_json_parse"
                 android:layout_alignBottom="@id/log_fragment_icon_json_parse"
-                android:gravity="center_vertical"
-                android:textAppearance="?textAppearanceBody1"
-                android:padding="4dp"
+                android:layout_gravity="center_vertical"
+                android:layout_toEndOf="@id/log_fragment_icon_json_parse"
                 android:enabled="@{parseStatus > 0}"
+                android:gravity="center_vertical"
+                android:padding="4dp"
                 android:text="@{parseText ?? @string/log_status_parse_pending}"
+                android:textAppearance="?textAppearanceBody1"
                 tools:enabled="false"
-                tools:text="@string/log_status_parse_pending"/>
+                tools:text="@string/log_status_parse_pending" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/log_fragment_progress_json_parse_text"
+                android:layout_gravity="center_vertical"
+                android:layout_toEndOf="@id/log_fragment_icon_json_parse"
+                android:gravity="center_vertical"
+                android:padding="4dp"
+                android:text="@{statusText}"
+                android:textAppearance="?textAppearanceBody1"
+                android:textColor="?colorError"
+                android:visibility="@{statusText == null ? View.GONE : View.VISIBLE}"
+                tools:text="@string/log_status_likely_oom" />
         </RelativeLayout>
 
         <TextView

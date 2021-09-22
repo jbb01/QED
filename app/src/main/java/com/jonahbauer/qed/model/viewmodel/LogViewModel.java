@@ -57,10 +57,19 @@ public class LogViewModel extends AndroidViewModel {
         mParseStatus.setValue(null);
         mDisposable.clear();
 
-        if (logRequest instanceof FileLogRequest) {
-            parse(((FileLogRequest) logRequest).getFile());
-        } else {
-            try {
+        try {
+            if (logRequest instanceof FileLogRequest) {
+                Uri file = ((FileLogRequest) logRequest).getFile();
+
+                // set download status
+                var descriptor = getApplication().getContentResolver().openAssetFileDescriptor(file, "r");
+                if (descriptor == null) throw new IOException("Content resolver returned null.");
+                long length = descriptor.getLength();
+                if (length == -1) length = 0;
+                mDownloadStatus.setValue(LongLongImmutablePair.of(length, length));
+
+                parse(file);
+            } else {
                 File tempDir = getApplication().getCacheDir();
                 File file = File.createTempFile("chat", ".log", tempDir);
                 file.deleteOnExit();
@@ -68,9 +77,9 @@ public class LogViewModel extends AndroidViewModel {
                 mDisposable.add(
                         QEDChatPages.getChatLog(getApplication(), logRequest, Uri.fromFile(file), new DownloadListener())
                 );
-            } catch (IOException e) {
-                onError(Reason.guess(e));
             }
+        } catch (IOException e) {
+            onError(Reason.guess(e));
         }
     }
 
@@ -105,9 +114,11 @@ public class LogViewModel extends AndroidViewModel {
     }
 
     private class DownloadListener implements QEDPageStreamReceiver<Uri> {
+        private long size;
 
         @Override
         public void onResult(@NonNull Uri out) {
+            mDownloadStatus.setValue(LongLongImmutablePair.of(size, size));
             parse(out);
         }
 
@@ -119,6 +130,7 @@ public class LogViewModel extends AndroidViewModel {
 
         @Override
         public void onProgressUpdate(Uri obj, long done, long total) {
+            this.size = done;
             mDownloadStatus.setValue(LongLongImmutablePair.of(done, total));
         }
     }

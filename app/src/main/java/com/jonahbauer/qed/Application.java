@@ -1,9 +1,11 @@
 package com.jonahbauer.qed;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.security.keystore.KeyGenParameterSpec;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.MainThread;
@@ -27,9 +29,15 @@ import java.security.GeneralSecurityException;
 import java.util.HashSet;
 import java.util.Set;
 
+import io.reactivex.rxjava3.exceptions.UndeliverableException;
+import io.reactivex.rxjava3.plugins.RxJavaPlugins;
+
 public class Application extends android.app.Application implements android.app.Application.ActivityLifecycleCallbacks {
+    private static final String LOG_TAG = Application.class.getName();
     private static final String COOKIE_SHARED_PREFERENCE_FILE = "com.jonahbauer.qed_cookies";
     private static final String ENCRYPTED_SHARED_PREFERENCE_FILE = "com.jonahbauer.qed_encrypted";
+
+    public static int MEMORY_CLASS;
 
     private static SoftReference<Application> sContext;
 
@@ -45,6 +53,28 @@ public class Application extends android.app.Application implements android.app.
         registerActivityLifecycleCallbacks(this);
 
         sContext = new SoftReference<>(this);
+
+        // Memory Class
+        ActivityManager am = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+        MEMORY_CLASS = am.getMemoryClass();
+
+        // RxJava global exception handler
+        RxJavaPlugins.setErrorHandler(e -> {
+            if (e instanceof UndeliverableException) {
+                e = e.getCause();
+            }
+
+            if (e instanceof IOException) {
+                // fine, irrelevant network problem or API that throws on cancellation
+                return;
+            }
+            if (e instanceof InterruptedException) {
+                // fine, some blocking code was interrupted by a dispose call
+                return;
+            }
+
+            Log.e(LOG_TAG, "Undeliverable Exception", e);
+        });
 
         // Setup cookie handler
         SharedPreferences cookieSharedPreferences = getEncryptedSharedPreferences(COOKIE_SHARED_PREFERENCE_FILE);

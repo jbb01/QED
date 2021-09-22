@@ -25,6 +25,7 @@
     <string name="error_login">Unable to log in.</string>
     <string name="error_network">A network error occurred.</string>
     <string name="error_404">Requested resource could not be found.</string>
+    <string name="error_out_of_memory">Out of memory.</string>
     <string name="error_empty">Empty</string>
     <string name="error_user">Error in Layer 8</string>
 
@@ -285,12 +286,11 @@
 
     <string name="log_status_download_pending">Download pending…</string>
     <string name="log_status_downloading">Downloading… %.2f MiB</string>
-    <string name="log_status_download_paused">Download paused… %s</string>
-    <string name="log_status_download_successful">Download successful. %s</string>
-    <string name="log_status_download_failed">Download failed. %s</string>
+    <string name="log_status_download_successful">Download successful. %.2f MiB</string>
     <string name="log_status_parse_pending">JSON Parsing pending…</string>
     <string name="log_status_parsing">Parsing JSON… %d / %d</string>
     <string name="log_status_parse_failed">JSON Parsing failed. %s</string>
+    <string name="log_status_likely_oom">An OOM is likely due to high number of messages.</string>
 
     <string name="log_confirm_exit">A log download is running. Do you really want to leave?</string>
     <string name="log_confirm_exit_continue_in_background">Continue in Background</string>
