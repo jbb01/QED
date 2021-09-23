@@ -25,8 +25,11 @@ import com.jonahbauer.qed.model.Message;
 import com.jonahbauer.qed.model.adapter.MessageAdapter;
 import com.jonahbauer.qed.model.room.Database;
 import com.jonahbauer.qed.networking.ChatWebSocket;
+import com.jonahbauer.qed.networking.Feature;
 import com.jonahbauer.qed.networking.NetworkListener;
 import com.jonahbauer.qed.networking.Reason;
+import com.jonahbauer.qed.networking.exceptions.InvalidCredentialsException;
+import com.jonahbauer.qed.networking.login.QEDLogin;
 import com.jonahbauer.qed.util.MessageUtils;
 import com.jonahbauer.qed.util.Preferences;
 import com.jonahbauer.qed.util.ViewUtils;
@@ -58,6 +61,7 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
 
     @Nullable
     private MenuItem mRefreshButton;
+    private int mRetryCount = 0;
 
     @NonNull
     public static ChatFragment newInstance(@StyleRes int themeId) {
@@ -169,6 +173,8 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
             Drawable icon = mRefreshButton.getIcon();
             if (icon instanceof Animatable) ((Animatable) icon).start();
 
+            mRetryCount = 0;
+
             reload();
             return true;
         }
@@ -204,7 +210,20 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
                                       addPost(msg, mInitDone);
                                       if (mLastPostId < msg.getId()) mLastPostId = msg.getId();
                                   },
-                                  err -> error(getString(Reason.guess(err).getStringRes())),
+                                  err -> {
+                                      if (err instanceof InvalidCredentialsException) {
+                                          if (mRetryCount++ == 0) {
+                                              try {
+                                                  QEDLogin.login(Feature.CHAT);
+                                                  reload();
+                                                  return;
+                                              } catch (InvalidCredentialsException e) {
+                                                  // show error
+                                              }
+                                          }
+                                      }
+                                      error(getString(Reason.guess(err).getStringRes()));
+                                  },
                                   () -> error(getString(R.string.chat_websocket_closed))
                           ),
                 Disposable.fromRunnable(() -> mWebSocket = null)
