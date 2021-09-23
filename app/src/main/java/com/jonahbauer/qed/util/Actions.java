@@ -12,10 +12,17 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.jonahbauer.qed.R;
+import com.jonahbauer.qed.activities.sheets.event.EventInfoBottomSheet;
+import com.jonahbauer.qed.activities.sheets.message.MessageInfoBottomSheet;
+import com.jonahbauer.qed.activities.sheets.person.PersonInfoBottomSheet;
 import com.jonahbauer.qed.model.Event;
+import com.jonahbauer.qed.model.Message;
+import com.jonahbauer.qed.model.Person;
 
 import lombok.experimental.UtilityClass;
 
@@ -122,6 +129,31 @@ public class Actions {
     public static boolean openXmpp(@NonNull Context context, String username) {
         String uri = String.format("xmpp:%s", username);
         return open(context, uri);
+    }
+
+    public static void showInfoSheet(@NonNull Fragment fragment, @NonNull Event event) {
+        EventInfoBottomSheet sheet = EventInfoBottomSheet.newInstance(event);
+        sheet.show(fragment.getParentFragmentManager(), sheet.getTag());
+    }
+
+    public static void showInfoSheet(@NonNull FragmentActivity activity, @NonNull Event event, @Nullable String tag) {
+        EventInfoBottomSheet sheet = EventInfoBottomSheet.newInstance(event);
+        sheet.show(activity.getSupportFragmentManager(), tag);
+    }
+
+    public static void showInfoSheet(@NonNull Fragment fragment, @NonNull Person person) {
+        PersonInfoBottomSheet sheet = PersonInfoBottomSheet.newInstance(person);
+        sheet.show(fragment.getParentFragmentManager(), sheet.getTag());
+    }
+
+    public static void showInfoSheet(@NonNull FragmentActivity activity, @NonNull Person person, @Nullable String tag) {
+        PersonInfoBottomSheet sheet = PersonInfoBottomSheet.newInstance(person);
+        sheet.show(activity.getSupportFragmentManager(), tag);
+    }
+
+    public static void showInfoSheet(@NonNull Fragment fragment, @NonNull Message message) {
+        MessageInfoBottomSheet sheet = MessageInfoBottomSheet.newInstance(message);
+        sheet.show(fragment.getParentFragmentManager(), sheet.getTag());
     }
 
     private static boolean tryStartActivity(@NonNull Context context, Intent intent) {

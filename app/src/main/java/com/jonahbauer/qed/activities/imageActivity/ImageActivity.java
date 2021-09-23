@@ -1,6 +1,6 @@
 package com.jonahbauer.qed.activities.imageActivity;
 
-import static com.jonahbauer.qed.DeepLinkingActivity.QEDIntent;
+import static com.jonahbauer.qed.activities.DeepLinkingActivity.QEDIntent;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -39,9 +39,7 @@ import java.io.File;
 import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -252,9 +250,7 @@ public class ImageActivity extends AppCompatActivity {
 
     @Override
     protected void onNewIntent(Intent intent) {
-        boolean success = handleIntent(intent, this);
-
-        if (success) {
+        if (handleIntent(intent, this)) {
             super.onNewIntent(intent);
         } else {
             Toast.makeText(this, R.string.error, Toast.LENGTH_SHORT).show();
@@ -266,6 +262,7 @@ public class ImageActivity extends AppCompatActivity {
         Image image = intent.getParcelableExtra(GALLERY_IMAGE_KEY);
         ArrayList<Image> images = intent.getParcelableArrayListExtra(GALLERY_IMAGES_KEY);
 
+        // internal intent
         if (image != null || images != null) {
             if (imageActivity != null) {
                 if (image != null) {
@@ -280,45 +277,39 @@ public class ImageActivity extends AppCompatActivity {
                     imageActivity.mAdapter.submitList(Collections.singletonList(image));
                 }
             }
+
             return true;
         }
 
+        // external intent via deep link
         if (Intent.ACTION_VIEW.equals(intent.getAction()) || QEDIntent.ACTION_SHOW_IMAGE.equals(intent.getAction())) {
             Uri data = intent.getData();
+
             if (data != null) {
                 String host = data.getHost();
+                if (host == null || !host.equals("qedgallery.qed-verein.de")) return false;
+
                 String path = data.getPath();
+                if (path == null || !path.startsWith("/image_view.php")) return false;
 
-                String query = data.getQuery();
-                Map<String, String> queries = new HashMap<>();
-                if (query != null) for (String q : query.split("&")) {
-                    String[] parts = q.split("=");
-                    if (parts.length > 1) queries.put(parts[0], parts[1]);
-                    else if (parts.length > 0) queries.put(parts[0], "");
-                } else {
-                    return false;
-                }
-                if (host != null) if (host.equals("qedgallery.qed-verein.de")) {
-                    if (path != null) if (path.startsWith("/image_view.php")) {
-//                        SharedPreferences.Editor editor = sharedPreferences.edit();
-//                        editor.putInt(Pref.General.DRAWER_SELECTION, R.id.nav_gallery).apply();
+                String idStr = data.getQueryParameter("imageid");
+                if (idStr == null) return false;
 
-                        String imageIdStr = queries.getOrDefault("imageid", null);
-                        if (imageIdStr != null && imageIdStr.matches("\\d+")) {
-                            try {
-                                int id = Integer.parseInt(imageIdStr);
-                                if (imageActivity != null) {
-                                    imageActivity.mImage = new Image(id);
+                try {
+                    long id = Long.parseLong(idStr);
 
-                                    imageActivity.mAdapter.submitList(Collections.singletonList(imageActivity.mImage));
-                                }
-                                return true;
-                            } catch (NumberFormatException ignored) {}
-                        }
+                    if (imageActivity != null) {
+                        imageActivity.mImage = new Image(id);
+                        imageActivity.mAdapter.submitList(Collections.singletonList(imageActivity.mImage));
                     }
+
+                    return true;
+                } catch (NumberFormatException e) {
+                    return false;
                 }
             }
         }
+
         return false;
     }
 
@@ -329,7 +320,7 @@ public class ImageActivity extends AppCompatActivity {
         String type = "image";
         if (image.getFormat() != null) {
             type = image.getFormat().split("/")[0];
-        } else {
+        } else if (image.getName() != null) {
             String suffix = image.getName();
             suffix = suffix.substring(suffix.lastIndexOf('.') + 1);
 

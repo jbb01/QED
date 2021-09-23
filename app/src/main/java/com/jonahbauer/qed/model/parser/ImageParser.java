@@ -1,5 +1,7 @@
 package com.jonahbauer.qed.model.parser;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.jonahbauer.qed.model.Image;
@@ -11,9 +13,13 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public final class ImageParser extends HtmlParser<Image> {
+    private static final String LOG_TAG = ImageParser.class.getName();
     private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.GERMANY);
+    private static final Pattern ALBUM_ID = Pattern.compile("albumid=(\\d+)");
 
     private static final String INFO_KEY_ALBUM = "Album:";
     private static final String INFO_KEY_OWNER = "Besitzer:";
@@ -40,60 +46,71 @@ public final class ImageParser extends HtmlParser<Image> {
     protected Image parse(@NonNull Image image, Document document) {
         image.setName(document.select("main div div b").text());
 
+        String href = document.select("main > div:nth-child(3) > a")
+                              .attr("href");
+        Matcher matcher = ALBUM_ID.matcher(href);
+        if (matcher.find()) {
+            image.setAlbumId(Long.parseLong(matcher.group(1)));
+        }
+
         document.select("main .infotable th").forEach(th -> {
-            String key = th.text();
-            String value = th.nextElementSibling().text();
-            switch (key) {
-                case INFO_KEY_ALBUM:
-                    image.setAlbumName(value);
-                    image.getData().put(Image.DATA_KEY_ALBUM, value);
-                    break;
-                case INFO_KEY_OWNER:
-                    image.setOwner(value);
-                    image.getData().put(Image.DATA_KEY_OWNER, value);
-                    break;
-                case INFO_KEY_FORMAT:
-                    image.setFormat(value);
-                    image.getData().put(Image.DATA_KEY_FORMAT, value);
-                    break;
-                case INFO_KEY_UPLOAD_DATE:
-                    image.setUploadDate(parseDate(value));
-                    image.getData().put(Image.DATA_KEY_UPLOAD_DATE, value);
-                    break;
-                case INFO_KEY_CREATION_DATE:
-                    image.setCreationDate(parseDate(value));
-                    image.getData().put(Image.DATA_KEY_CREATION_DATE, value);
-                    break;
-                case INFO_KEY_ORIENTATION:
-                    image.getData().put(Image.DATA_KEY_ORIENTATION, value);
-                    break;
-                case INFO_KEY_MANUFACTURER:
-                    image.getData().put(Image.DATA_KEY_MANUFACTURER, value);
-                    break;
-                case INFO_KEY_MODEL:
-                    image.getData().put(Image.DATA_KEY_MODEL, value);
-                    break;
-                case INFO_KEY_FOCAL_LENGTH:
-                    image.getData().put(Image.DATA_KEY_FOCAL_LENGTH, value);
-                    break;
-                case INFO_KEY_FOCAL_RATIO:
-                    image.getData().put(Image.DATA_KEY_FOCAL_RATIO, value);
-                    break;
-                case INFO_KEY_EXPOSURE_TIME:
-                    image.getData().put(Image.DATA_KEY_EXPOSURE_TIME, value);
-                    break;
-                case INFO_KEY_ISO:
-                    image.getData().put(Image.DATA_KEY_ISO, value);
-                    break;
-                case INFO_KEY_POSITION:
-                    image.getData().put(Image.DATA_KEY_POSITION, value);
-                    break;
-                case INFO_KEY_FLASH:
-                    image.getData().put(Image.DATA_KEY_FLASH, value);
-                    break;
-                case INFO_KEY_VISITS:
-                    image.getData().put(Image.DATA_KEY_VISITS, value);
-                    break;
+            try {
+                String key = th.text();
+                String value = th.nextElementSibling().text();
+                switch (key) {
+                    case INFO_KEY_ALBUM:
+                        image.setAlbumName(value);
+                        image.getData().put(Image.DATA_KEY_ALBUM, value);
+                        break;
+                    case INFO_KEY_OWNER:
+                        image.setOwner(value);
+                        image.getData().put(Image.DATA_KEY_OWNER, value);
+                        break;
+                    case INFO_KEY_FORMAT:
+                        image.setFormat(value);
+                        image.getData().put(Image.DATA_KEY_FORMAT, value);
+                        break;
+                    case INFO_KEY_UPLOAD_DATE:
+                        image.setUploadDate(parseDate(value));
+                        image.getData().put(Image.DATA_KEY_UPLOAD_DATE, value);
+                        break;
+                    case INFO_KEY_CREATION_DATE:
+                        image.setCreationDate(parseDate(value));
+                        image.getData().put(Image.DATA_KEY_CREATION_DATE, value);
+                        break;
+                    case INFO_KEY_ORIENTATION:
+                        image.getData().put(Image.DATA_KEY_ORIENTATION, value);
+                        break;
+                    case INFO_KEY_MANUFACTURER:
+                        image.getData().put(Image.DATA_KEY_MANUFACTURER, value);
+                        break;
+                    case INFO_KEY_MODEL:
+                        image.getData().put(Image.DATA_KEY_MODEL, value);
+                        break;
+                    case INFO_KEY_FOCAL_LENGTH:
+                        image.getData().put(Image.DATA_KEY_FOCAL_LENGTH, value);
+                        break;
+                    case INFO_KEY_FOCAL_RATIO:
+                        image.getData().put(Image.DATA_KEY_FOCAL_RATIO, value);
+                        break;
+                    case INFO_KEY_EXPOSURE_TIME:
+                        image.getData().put(Image.DATA_KEY_EXPOSURE_TIME, value);
+                        break;
+                    case INFO_KEY_ISO:
+                        image.getData().put(Image.DATA_KEY_ISO, value);
+                        break;
+                    case INFO_KEY_POSITION:
+                        image.getData().put(Image.DATA_KEY_POSITION, value);
+                        break;
+                    case INFO_KEY_FLASH:
+                        image.getData().put(Image.DATA_KEY_FLASH, value);
+                        break;
+                    case INFO_KEY_VISITS:
+                        image.getData().put(Image.DATA_KEY_VISITS, value);
+                        break;
+                }
+            } catch (Exception e) {
+                Log.e(LOG_TAG, "Error parsing image info " + image.getId() + ".", e);
             }
         });
 

@@ -61,8 +61,8 @@
                 <TableRow
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
-                    <RadioButton
-                        android:id="@+id/album_photographer_radio_button"
+                    <CheckBox
+                        android:id="@+id/album_photographer_check_box"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:paddingEnd="8dp"
@@ -79,8 +79,8 @@
                 <TableRow
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
-                    <RadioButton
-                        android:id="@+id/album_date_radio_button"
+                    <CheckBox
+                        android:id="@+id/album_date_check_box"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:paddingEnd="8dp"
@@ -97,8 +97,8 @@
                 <TableRow
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
-                    <RadioButton
-                        android:id="@+id/album_category_radio_button"
+                    <CheckBox
+                        android:id="@+id/album_category_check_box"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:paddingEnd="8dp"

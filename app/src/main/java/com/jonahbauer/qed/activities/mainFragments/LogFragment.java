@@ -57,7 +57,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class LogFragment extends QEDFragment {
-    private static final String ARGUMENT_LOG_REQUEST = "logRequest";
+    public static final String ARGUMENT_LOG_REQUEST = "logRequest";
 
     private static final int STATUS_PENDING = 0;
     private static final int STATUS_RUNNING = 1;
@@ -72,7 +72,6 @@ public class LogFragment extends QEDFragment {
 
     private final MutableLiveData<Uri> mFile = new MutableLiveData<>();
     private ActivityResultLauncher<String[]> mFileChooser;
-
 
     public static LogFragment newInstance(@StyleRes int themeId) {
         Bundle args = new Bundle();
@@ -334,6 +333,7 @@ public class LogFragment extends QEDFragment {
             @Override
             public void onNothingSelected(AdapterView<?> parent) {}
         });
+        binding.logDialogChannel.setText(Preferences.chat().getChannel());
 
         Calendar dateFrom = Calendar.getInstance();
         Calendar dateTo = Calendar.getInstance();
@@ -357,7 +357,7 @@ public class LogFragment extends QEDFragment {
         dialog.setOnShowListener(d -> {
             dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
                 LogRequest logRequest = null;
-                String channel = Preferences.chat().getChannel();
+                String channel = binding.logDialogChannel.getText().toString();
                 switch (binding.getMode()) {
                     case POST_RECENT:
                         try {

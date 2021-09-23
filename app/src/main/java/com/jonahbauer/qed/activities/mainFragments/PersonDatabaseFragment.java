@@ -13,13 +13,13 @@ import androidx.annotation.StyleRes;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.jonahbauer.qed.R;
-import com.jonahbauer.qed.activities.sheets.person.PersonInfoBottomSheet;
 import com.jonahbauer.qed.databinding.FragmentPersonsDatabaseBinding;
 import com.jonahbauer.qed.layoutStuff.views.CheckBoxTriStates;
 import com.jonahbauer.qed.model.Person;
 import com.jonahbauer.qed.model.adapter.PersonAdapter;
 import com.jonahbauer.qed.model.viewmodel.PersonListViewModel;
 import com.jonahbauer.qed.networking.Reason;
+import com.jonahbauer.qed.util.Actions;
 import com.jonahbauer.qed.util.StatusWrapper;
 import com.jonahbauer.qed.util.ViewUtils;
 
@@ -165,12 +165,7 @@ public class PersonDatabaseFragment extends QEDFragment implements CompoundButto
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Person person = mPersonAdapter.getItem(position);
         if (person != null) {
-            showBottomSheetDialogFragment(person);
+            Actions.showInfoSheet(this, person);
         }
-    }
-
-    private void showBottomSheetDialogFragment(@NonNull Person person) {
-        PersonInfoBottomSheet sheet = PersonInfoBottomSheet.newInstance(person);
-        sheet.show(getParentFragmentManager(), sheet.getTag());
     }
 }

@@ -311,6 +311,7 @@
     <string name="log_request_dateinterval_from">From</string>
     <string name="log_request_dateinterval_to">Until</string>
     <string name="log_request_file_title">File</string>
+    <string name="log_request_channel">Channel</string>
     <string name="log_request_mode_postrecent">postrecent</string>
     <string name="log_request_mode_daterecent">daterecent</string>
     <string name="log_request_mode_dateinterval">dateinterval</string>

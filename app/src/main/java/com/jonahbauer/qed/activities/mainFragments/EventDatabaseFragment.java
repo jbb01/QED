@@ -10,12 +10,12 @@ import androidx.annotation.StyleRes;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.jonahbauer.qed.R;
-import com.jonahbauer.qed.activities.sheets.event.EventInfoBottomSheet;
 import com.jonahbauer.qed.databinding.FragmentEventsDatabaseBinding;
 import com.jonahbauer.qed.model.Event;
 import com.jonahbauer.qed.model.adapter.EventAdapter;
 import com.jonahbauer.qed.model.viewmodel.EventListViewModel;
 import com.jonahbauer.qed.networking.Reason;
+import com.jonahbauer.qed.util.Actions;
 import com.jonahbauer.qed.util.StatusWrapper;
 
 import java.util.ArrayList;
@@ -71,12 +71,7 @@ public class EventDatabaseFragment extends QEDFragment implements AdapterView.On
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Event event = mEventAdapter.getItem(position);
         if (event != null) {
-            showBottomSheetDialogFragment(event);
+            Actions.showInfoSheet(this, event);
         }
-    }
-
-    private void showBottomSheetDialogFragment(@NonNull Event event) {
-        EventInfoBottomSheet sheet = EventInfoBottomSheet.newInstance(event);
-        sheet.show(getParentFragmentManager(), sheet.getTag());
     }
 }

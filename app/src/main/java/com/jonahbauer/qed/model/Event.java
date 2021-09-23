@@ -111,7 +111,7 @@ public class Event implements Comparable<Event>, Parcelable {
         dest.writeByte((byte)(loaded ? 1 : 0));
     }
 
-    public static final Parcelable.Creator<Event> CREATOR = new Parcelable.Creator<Event>() {
+    public static final Parcelable.Creator<Event> CREATOR = new Parcelable.Creator<>() {
         @Override
         public Event createFromParcel(@NonNull Parcel source) {
             Event event = new Event(source.readLong());

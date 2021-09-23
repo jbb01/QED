@@ -33,21 +33,13 @@
 
         <!-- Deep Linking Activity -->
         <activity
-            android:name=".DeepLinkingActivity"
+            android:name=".activities.DeepLinkingActivity"
             android:excludeFromRecents="true"
             android:exported="true"
             android:label="QED"
             android:launchMode="singleInstance"
             android:noHistory="true"
             android:theme="@style/Theme.App.Translucent">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data android:scheme="test" />
-            </intent-filter>
 
             <!-- Image Activity -->
             <intent-filter>
@@ -58,6 +50,7 @@
 
                 <data android:scheme="http" />
                 <data android:scheme="https" />
+
                 <data
                     android:host="qedgallery.qed-verein.de"
                     android:pathPrefix="/image_view.php" />
@@ -72,6 +65,7 @@
 
                 <data android:scheme="http" />
                 <data android:scheme="https" />
+
                 <data
                     android:host="qedgallery.qed-verein.de"
                     android:pathPrefix="/album_view.php" />
@@ -86,24 +80,19 @@
 
                 <data android:scheme="http" />
                 <data android:scheme="https" />
+
                 <data
                     android:host="qeddb.qed-verein.de"
-                    android:pathPrefix="/personen.php" />
+                    android:pathPrefix="/people" />
                 <data
                     android:host="qeddb.qed-verein.de"
-                    android:pathPrefix="/person.php" />
-                <data
-                    android:host="qeddb.qed-verein.de"
-                    android:pathPrefix="/veranstaltungen.php" />
-                <data
-                    android:host="qeddb.qed-verein.de"
-                    android:pathPrefix="/veranstaltung.php" />
+                    android:pathPrefix="/events" />
                 <data
                     android:host="chat.qed-verein.de"
                     android:pathPrefix="/index.html" />
                 <data
                     android:host="chat.qed-verein.de"
-                    android:pathPrefix="/rubychat/history" />
+                    android:pathPrefix="/"/>
                 <data
                     android:host="qedgallery.qed-verein.de"
                     android:pathPrefix="/album_list.php" />

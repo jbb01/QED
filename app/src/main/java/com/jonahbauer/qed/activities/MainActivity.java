@@ -1,15 +1,13 @@
 package com.jonahbauer.qed.activities;
 
-import static com.jonahbauer.qed.DeepLinkingActivity.QEDIntent;
+import static com.jonahbauer.qed.activities.DeepLinkingActivity.QEDIntent;
 
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import android.util.SparseArray;
 import android.util.TypedValue;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,6 +22,7 @@ import androidx.annotation.StringRes;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.util.Pair;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
@@ -41,12 +40,13 @@ import com.jonahbauer.qed.activities.mainFragments.LogFragment;
 import com.jonahbauer.qed.activities.mainFragments.PersonDatabaseFragment;
 import com.jonahbauer.qed.activities.mainFragments.QEDFragment;
 import com.jonahbauer.qed.activities.settings.RootSettingsActivity;
+import com.jonahbauer.qed.databinding.ActivityMainBinding;
+import com.jonahbauer.qed.model.viewmodel.LogViewModel;
 import com.jonahbauer.qed.networking.NetworkListener;
 import com.jonahbauer.qed.networking.login.QEDLogout;
 import com.jonahbauer.qed.util.Preferences;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.function.Function;
 
 import lombok.Getter;
 
@@ -54,39 +54,33 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static final String LOG_TAG = MainActivity.class.getName();
     private static final String FRAGMENT_TAG = "com.jonahbauer.qed.activities.QEDFragment";
 
-    private final SparseArray<QEDFragment> mCachedFragments = new SparseArray<>();
-
-    private DrawerLayout mDrawerLayout;
-    private NavigationView mNavView;
-    private Toolbar mToolbar;
+    private ActivityMainBinding mBinding;
 
     private boolean mDoubleBackToExitPressedOnce;
 
-    // when changing fragments the onDrop method of the current fragment is called.
-    // if the result is null, i.e. the output could not be determined immediately, e.g. because it
-    // has to wait for user input, then the mWaitForDropResult flag will be set.
-    private boolean mWaitForDropResult;
-    // if the cause for mWaitForDropResult being set is a change of fragments the mFragmentTransaction
-    // will be a transaction that realizes that change of fragments.
-    // if the cause for mWaitForDropResult being set is a back press then mFragmentTransaction will be null
-    private FragmentTransaction mFragmentTransaction;
-    // the new drawer selection that will become active after a call to reloadFragment(false)
-    private DrawerSelection mNewSelection;
+    /**
+     * The next selection that will become active after a call to {@link #reloadFragment(boolean)}.
+     */
+    private Pair<DrawerSelection, Bundle> mNewFragment;
+    private Pair<FragmentTransaction, QEDFragment> mFragmentTransaction;
 
-    // used by onNavigationItemSelected and handleIntent in order to realize delayed change of fragment
-    private boolean mShouldReloadFragment;
-
+    /**
+     * The currently shown {@link QEDFragment}.
+     */
     private QEDFragment mFragment = null;
 
-    private Toolbar mAltToolbar;
     private boolean mAltToolbarBorrowed;
+    private boolean mWaitForDropResult;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(R.style.Theme_App_NoActionBar);
         super.onCreate(savedInstanceState);
 
-        mNewSelection = Preferences.general().getDrawerSelection();
+        mNewFragment = Pair.create(
+                Preferences.general().getDrawerSelection(),
+                null
+        );
 
         Intent intent = getIntent();
         if (!handleIntent(intent, this)) {
@@ -95,30 +89,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             return;
         }
 
-        setContentView(R.layout.activity_main);
-        mDrawerLayout = findViewById(R.id.drawer_layout);
-        mNavView = findViewById(R.id.nav_view);
-        mToolbar = findViewById(R.id.toolbar);
-        mAltToolbar = findViewById(R.id.alt_toolbar);
+        mBinding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(mBinding.getRoot());
 
-        mNavView.setNavigationItemSelectedListener(this);
-        mDrawerLayout.addDrawerListener(this);
+        mBinding.navView.setNavigationItemSelectedListener(this);
+        mBinding.drawerLayout.addDrawerListener(this);
 
-        final RelativeLayout navHeader = (RelativeLayout) mNavView.getHeaderView(0);
-        ViewTreeObserver vto = mNavView.getViewTreeObserver();
+        // setup navigation drawer header to be 16:9
+        final RelativeLayout navHeader = (RelativeLayout) mBinding.navView.getHeaderView(0);
+        ViewTreeObserver vto = mBinding.navView.getViewTreeObserver();
         vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-                mNavView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                int width = mNavView.getMeasuredWidth();
+                mBinding.navView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                int width = mBinding.navView.getMeasuredWidth();
 
                 navHeader.getLayoutParams().height = width * 9 / 16;
                 navHeader.requestLayout();
             }
         });
 
-
-        setSupportActionBar(mToolbar);
+        // setup toolbar
+        setSupportActionBar(mBinding.toolbar);
         ActionBar actionbar = getSupportActionBar();
         assert actionbar != null;
         actionbar.setDisplayHomeAsUpEnabled(true);
@@ -136,20 +128,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onPause() {
         if (!mDoubleBackToExitPressedOnce) {
-            FragmentManager manager = getSupportFragmentManager();
-
-            QEDFragment oldFragment = asQedFragment(manager.findFragmentByTag(FRAGMENT_TAG));
-
-            if (oldFragment != null)
-                oldFragment.onDrop(true);
+            if (mFragment != null) {
+                mFragment.onDrop(true);
+            }
         }
 
         super.onPause();
-    }
-
-    @Override
-    public void onConfigurationChanged(@NonNull Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
     }
 
     @Override
@@ -160,8 +144,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         // Close drawer if open
-        if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
-            mDrawerLayout.closeDrawers();
+        if (mBinding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            mBinding.drawerLayout.closeDrawers();
             return;
         }
 
@@ -175,12 +159,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (mDoubleBackToExitPressedOnce) {
             mDoubleBackToExitPressedOnce = false;
 
-            Boolean mayDrop = mFragment.onDrop(false);
+            if (mFragment != null) {
+                // allow fragment to intercept
+                Boolean mayDrop = mFragment.onDrop(false);
 
-            if (mayDrop == null) {
-                mFragmentTransaction = null;
-                mWaitForDropResult = true;
-            } else if (mayDrop) {
+                if (mayDrop == null) {
+                    disposeFragmentTransaction();
+                    mWaitForDropResult = true;
+                } else if (mayDrop) {
+                    super.onBackPressed();
+                }
+            } else {
                 super.onBackPressed();
             }
         } else {
@@ -216,8 +205,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        // open navigation drawer
         if (item.getItemId() == android.R.id.home) {
-            mDrawerLayout.openDrawer(GravityCompat.START);
+            mBinding.drawerLayout.openDrawer(GravityCompat.START);
             return true;
         }
 
@@ -247,11 +237,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             return true;
         } else {
             DrawerSelection selection = DrawerSelection.byMenuItem(menuItem, null);
-            if (selection != null && selection != Preferences.general().getDrawerSelection() && selection != mNewSelection) {
+            if (selection != null && selection != Preferences.general().getDrawerSelection()) {
                 // fragment will not be changed immediately but only after the drawer is closed
-                mNewSelection = selection;
-                mShouldReloadFragment = true;
-                mDrawerLayout.closeDrawers();
+                mNewFragment = Pair.create(selection, null);
+                mBinding.drawerLayout.closeDrawers();
                 return true;
             }
         }
@@ -260,38 +249,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     * Commit the stored {@link #mFragmentTransaction} and sets the persistent drawer selection
-     * according to {@link #mNewSelection}.
-     */
-    private void commitFragmentTransaction() {
-        if (mFragmentTransaction != null) {
-            mFragmentTransaction.commit();
-            mFragmentTransaction = null;
-        }
-
-        Preferences.general().edit().setDrawerSelection(mNewSelection).apply();
-        mNavView.setCheckedItem(mNewSelection.getMenuItemId());
-        mNewSelection = null;
-    }
-
-    /**
-     * Disposes of the stored {@link #mFragmentTransaction} and {@link #mNewSelection}.
-     */
-    private void disposeFragmentTransaction() {
-        mFragmentTransaction = null;
-        mNewSelection = null;
-    }
-
-    /**
      * Reloads the fragment.
      * <br>
      * If {@code titleOnly} is set, then only the title will be changed according to the
      * {@linkplain Preferences.General#getDrawerSelection() persistent selection}.
      * <br>
-     * Otherwise if {@link #mNewSelection} is set or the current fragment does not match the
-     * {@linkplain Preferences.General#getDrawerSelection() persistent selection} a fragment transaction is initiated
-     * in order to change to the new selection. The {@link QEDFragment#onDrop(boolean)} method is
-     * called before committing the transaction.
+     * Otherwise if {@link #mNewFragment} is set or the current fragment does not match the
+     * persistent selection a fragment transaction is initiated in order to change to the new
+     * selection. The {@link QEDFragment#onDrop(boolean)} method is called before committing the
+     * transaction.
      *
      * @param titleOnly if true only the title will be changed an no {@code FragmentTransaction} is initiated
      */
@@ -302,64 +268,81 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         mFragmentTransaction = null;
 
-        DrawerSelection selected = (titleOnly || mNewSelection == null)
-                ? Preferences.general().getDrawerSelection()
-                : mNewSelection;
-
-        mToolbar.setTitle(getString(selected.getTitle()));
-
-        if (!titleOnly) {
-            FragmentManager manager = getSupportFragmentManager();
-
-            QEDFragment oldQedFragment = asQedFragment(manager.findFragmentByTag(FRAGMENT_TAG));
-
-            if (oldQedFragment == null || selected.getFragmentClass() != oldQedFragment.getClass()) {
-                mFragment = mCachedFragments.get(selected.getId());
-                if (mFragment == null) {
-                    // cache miss
-                    switch (selected) {
-                        case CHAT:
-                            mFragment = ChatFragment.newInstance(R.style.Theme_App);
-                            break;
-                        case CHAT_DATABASE:
-                            mFragment = ChatDatabaseFragment.newInstance(R.style.Theme_App);
-                            break;
-                        case CHAT_LOG:
-                            mFragment = LogFragment.newInstance(R.style.Theme_App);
-                            break;
-                        case DATABASE_PEOPLE:
-                            mFragment = PersonDatabaseFragment.newInstance(R.style.Theme_App);
-                            break;
-                        case DATABASE_EVENTS:
-                            mFragment = EventDatabaseFragment.newInstance(R.style.Theme_App);
-                            break;
-                        case GALLERY:
-                            mFragment = GalleryFragment.newInstance(R.style.Theme_App);
-                            break;
-                        default:
-                            throw new AssertionError();
-                    }
-                    mCachedFragments.put(selected.getId(), mFragment);
+        DrawerSelection persistentSelection = Preferences.general().getDrawerSelection();
+        if (titleOnly) {
+            mBinding.toolbar.setTitle(persistentSelection.getTitle());
+        } else {
+            if (mNewFragment == null) {
+                if (mFragment == null || mFragment.getClass() != persistentSelection.getFragmentClass()) {
+                    mNewFragment = Pair.create(persistentSelection, null);
+                } else {
+                    mBinding.toolbar.setTitle(persistentSelection.getTitle());
                 }
+            }
 
-                assert mFragment != null;
+            if (mNewFragment != null) {
+                // reload fragment
+                QEDFragment newFragment = mNewFragment.first.getNewInstance().apply(R.style.Theme_App);
+                if (newFragment.getArguments() == null) newFragment.setArguments(new Bundle());
+                if (mNewFragment.second != null) newFragment.getArguments().putAll(mNewFragment.second);
 
-                mFragmentTransaction = manager.beginTransaction();
-                mFragmentTransaction.replace(R.id.fragment, mFragment, FRAGMENT_TAG);
+                FragmentManager manager = getSupportFragmentManager();
+                FragmentTransaction transaction = manager.beginTransaction();
+                transaction.replace(R.id.fragment, newFragment, FRAGMENT_TAG);
 
-                Boolean mayDrop = oldQedFragment == null;
-                if (!mayDrop)
-                    mayDrop = oldQedFragment.onDrop(false);
+                mFragmentTransaction = Pair.create(transaction, newFragment);
 
-                if (mayDrop == null) {
-                    mWaitForDropResult = true;
-                } else if (mayDrop) {
+                if (mFragment == null) {
                     commitFragmentTransaction();
+                } else {
+                    Boolean mayDrop = mFragment.onDrop(false);
+                    if (mayDrop == null) {
+                        mWaitForDropResult = true;
+                    } else if (mayDrop) {
+                        commitFragmentTransaction();
+                    } else {
+                        disposeFragmentTransaction();
+                    }
                 }
             }
         }
     }
 
+    /**
+     * Commit the stored {@link #mFragmentTransaction} and sets the persistent drawer selection
+     * according to {@link #mNewFragment}.
+     */
+    private void commitFragmentTransaction() {
+        if (mNewFragment != null) {
+            Preferences.general().edit().setDrawerSelection(mNewFragment.first).apply();
+            mBinding.navView.setCheckedItem(mNewFragment.first.getMenuItemId());
+            mBinding.toolbar.setTitle(getString(mNewFragment.first.getTitle()));
+
+            if (mFragmentTransaction != null) {
+                mFragmentTransaction.first.commit();
+                mFragment = mFragmentTransaction.second;
+            }
+        }
+
+        mNewFragment = null;
+        mFragmentTransaction = null;
+    }
+
+    /**
+     * Disposes of the stored {@link #mFragmentTransaction} and {@link #mNewFragment}.
+     */
+    private void disposeFragmentTransaction() {
+        mNewFragment = null;
+        mFragmentTransaction = null;
+
+        // since onNavigationItemSelected doesn't know if transaction will be executed
+        // the new selection is speculatively accepted and needs to be reversed in case of failure
+        DrawerSelection selection = DrawerSelection.byClass(mFragment.getClass(), DrawerSelection.CHAT);
+        mBinding.toolbar.setTitle(selection.getTitle());
+        mBinding.navView.setCheckedItem(selection.getMenuItemId());
+    }
+
+    //<editor-fold desc="Network Listener" defaultstate="collapsed">
     /**
      * Relays a network connection failure event to the content mFragment
      */
@@ -375,7 +358,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void onConnectionRegain() {
         if (mFragment != null && mFragment instanceof NetworkListener) ((NetworkListener) mFragment).onConnectionRegain();
     }
+    //</editor-fold>
 
+    //<editor-fold desc="Intent Handling" defaultstate="collapsed">
     /**
      * If {@code activity} is {@code null} this method determines if the {@code intent} is of interest and returns {@code true} or {@code false} accordingly.
      *
@@ -385,101 +370,70 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      * @param activity the current main activity, may be null
      * @return true iff the intent is of interest to the {@code MainActivity}
      */
-    public static boolean handleIntent(Intent intent, @Nullable MainActivity activity) {
-        if (activity != null) activity.mShouldReloadFragment = false;
-
-        if (intent.getAction() == null) {
-            if (activity != null) activity.mShouldReloadFragment = true;
-            return true;
-        }
-
+    public static boolean handleIntent(@NonNull Intent intent, @Nullable MainActivity activity) {
+        // launcher intent
         if (Intent.ACTION_MAIN.equals(intent.getAction()) && intent.getCategories().contains(Intent.CATEGORY_LAUNCHER)) return true;
 
+        // explicit intent
+        if (intent.getAction() == null) return true;
+
+        // external intent via deep link
         if (Intent.ACTION_VIEW.equals(intent.getAction()) || QEDIntent.ACTION_SHOW.equals(intent.getAction())) {
             Uri data = intent.getData();
+
             if (data != null) {
                 String host = data.getHost();
+                if (host == null) return false;
+
                 String path = data.getPath();
 
-                String query = data.getQuery();
-                Map<String,String> queries = new HashMap<>();
-                if (query != null) for (String q : query.split("&")) {
-                    String[] parts = q.split("=");
-                    if (parts.length > 1) queries.put(parts[0], parts[1]);
-                    else if (parts.length > 0) queries.put(parts[0], "");
-                }
+                switch (host) {
+                    // DB
+                    case "qeddb.qed-verein.de":
+                        if (path == null) return false;
 
-                // QED-DB
-                // TODO anpassen an neue datenbank
-                if (host != null) if (host.equals("qeddb.qed-verein.de")) {
-                    if (path != null) {
-                        if (path.startsWith("/personen.php") || path.startsWith("/person.php")) {
-                            String person = queries.getOrDefault("person", null);
+                        // people
+                        if (path.startsWith("/people")) {
                             if (activity != null) {
-                                if (person != null && person.matches("\\d{1,5}")) {
-                                    long personId = Long.parseLong(person);
-                                    // TODO show person bottom sheet
-                                    activity.mShouldReloadFragment = false;
-                                } else {
-                                    activity.mNewSelection = DrawerSelection.DATABASE_PEOPLE;
-                                    activity.mShouldReloadFragment = true;
+                                activity.mNewFragment = Pair.create(DrawerSelection.DATABASE_PEOPLE, null);
+                            }
+                            return true;
+                        }
+
+                        // events
+                        if (path.startsWith("/events")) {
+                            if (activity != null) {
+                                activity.mNewFragment = Pair.create(DrawerSelection.DATABASE_EVENTS, null);
+                            }
+                            return true;
+                        }
+
+                        return false;
+                    // Chat
+                    case "chat.qed-verein.de":
+                        if (path != null && path.contains("/history")) {
+                            // Chat log
+                            if (activity != null) {
+                                LogViewModel.LogRequest request = LogViewModel.LogRequest.parse(data);
+                                Bundle bundle = new Bundle();
+                                if (request != null) {
+                                    bundle.putSerializable(LogFragment.ARGUMENT_LOG_REQUEST, request);
                                 }
+                                activity.mNewFragment = Pair.create(DrawerSelection.CHAT_LOG, bundle);
                             }
-
-                            return true;
-                        } else if (path.startsWith("/veranstaltungen.php") || path.startsWith("/veranstaltung.php")) {
-                            String event = queries.getOrDefault("veranstaltung", null);
+                        } else {
+                            // Chat
                             if (activity != null) {
-                                if (event != null && event.matches("\\d{1,5}")) {
-                                    try {
-                                        long eventId = Long.parseLong(event);
-                                        // TODO show event bottom sheet
-                                        activity.mShouldReloadFragment = false;
-                                    } catch (NumberFormatException ignored) {}
-                                } else {
-                                    activity.mNewSelection = DrawerSelection.DATABASE_EVENTS;
-                                    activity.mShouldReloadFragment = true;
-                                }
+                                activity.mNewFragment = Pair.create(DrawerSelection.CHAT, null);
                             }
-
-                            return true;
                         }
-                    }
-                // QED-Chat
-                } else if (host.equals("chat.qed-verein.de")) {
-                    if (path != null) {
-                        if (path.startsWith("/index.html")) {
-                            if (activity != null) {
-                                Preferences.chat().edit().setChannel(queries.getOrDefault("channel", "")).apply();
-
-                                activity.mNewSelection = DrawerSelection.CHAT;
-                                activity.mShouldReloadFragment = true;
-                            }
-
-                            return true;
-                        } else if (path.startsWith("/rubychat/history")) {
-                            if (activity != null) {
-                                Preferences.chat().edit().setChannel(queries.getOrDefault("channel", "")).apply();
-
-                                activity.mNewSelection = DrawerSelection.CHAT_LOG;
-                                activity.mShouldReloadFragment = true;
-                            }
-
-                            return true;
+                        return true;
+                    // Gallery
+                    case "qedgallery.qed-verein.de":
+                        if (activity != null) {
+                            activity.mNewFragment = Pair.create(DrawerSelection.GALLERY, null);
                         }
-                    }
-                // QED-Gallery
-                } else if (host.equals("qedgallery.qed-verein.de")) {
-                    if (path != null) {
-                        if (path.startsWith("/album_list.php")) {
-                            if (activity != null) {
-                                activity.mNewSelection = DrawerSelection.GALLERY;
-                                activity.mShouldReloadFragment = true;
-                            }
-
-                            return true;
-                        }
-                    }
+                        return true;
                 }
             }
         }
@@ -489,8 +443,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onNewIntent(Intent intent) {
         if (handleIntent(intent,this)) {
-            if (mShouldReloadFragment) {
-                mShouldReloadFragment = false;
+            if (mNewFragment != null) {
                 new Handler(Looper.getMainLooper()).post(() -> reloadFragment(false));
             }
         } else {
@@ -501,9 +454,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         super.onNewIntent(intent);
     }
+    //</editor-fold>
 
+    //<editor-fold desc="AltToolbar" defaultstate="collapsed">
     /**
-     * Borrows the alternative toolbar {@link #mAltToolbar} which will be shown atop the standard one.
+     * Borrows the alternative toolbar which will be shown atop the standard one.
      *
      * The toolbar will be cleaned (menu and listeners removed) every time this method is called.
      *
@@ -520,18 +475,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         mAltToolbarBorrowed = true;
 
-        mAltToolbar.setNavigationIcon(R.drawable.ic_arrow_back);
-        mAltToolbar.setOnMenuItemClickListener(null);
-        mAltToolbar.setNavigationOnClickListener(null);
-        mAltToolbar.setVisibility(View.VISIBLE);
-        mAltToolbar.getMenu().clear();
+        mBinding.altToolbar.setNavigationIcon(R.drawable.ic_arrow_back);
+        mBinding.altToolbar.setOnMenuItemClickListener(null);
+        mBinding.altToolbar.setNavigationOnClickListener(null);
+        mBinding.altToolbar.setVisibility(View.VISIBLE);
+        mBinding.altToolbar.getMenu().clear();
 
         TypedValue colorPrimary = new TypedValue();
         getTheme().resolveAttribute(R.attr.colorPrimary, colorPrimary, true);
 
         getWindow().setStatusBarColor(colorPrimary.data);
 
-        return mAltToolbar;
+        return mBinding.altToolbar;
     }
 
     /**
@@ -541,7 +496,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (mAltToolbarBorrowed) {
             if (mFragment != null) mFragment.revokeAltToolbar();
 
-            mAltToolbar.setVisibility(View.GONE);
+            mBinding.altToolbar.setVisibility(View.GONE);
 
             TypedValue colorPrimaryDark = new TypedValue();
             getTheme().resolveAttribute(R.attr.colorPrimaryDark, colorPrimaryDark, true);
@@ -551,7 +506,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             mAltToolbarBorrowed = false;
         }
     }
+    //</editor-fold>
 
+    //<editor-fold desc="Drawer Callback" defaultstate="collapsed">
     @Override
     public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {}
 
@@ -560,23 +517,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onDrawerClosed(@NonNull View drawerView) {
-        if (mShouldReloadFragment) {
+        if (mNewFragment != null) {
             reloadFragment(false);
-            mShouldReloadFragment = false;
         }
     }
 
     @Override
     public void onDrawerStateChanged(int newState) {}
+    //</editor-fold>
 
     @Getter
     public enum DrawerSelection {
-        CHAT(1, R.string.title_fragment_chat, R.id.nav_chat, ChatFragment.class),
-        CHAT_LOG(2, R.string.title_fragment_log, R.id.nav_chat_log, LogFragment.class),
-        CHAT_DATABASE(3, R.string.title_fragment_chat_database, R.id.nav_chat_db, ChatDatabaseFragment.class),
-        DATABASE_PEOPLE(4, R.string.title_fragment_persons_database, R.id.nav_database_persons, PersonDatabaseFragment.class),
-        DATABASE_EVENTS(5, R.string.title_fragment_events_database, R.id.nav_database_events, EventDatabaseFragment.class),
-        GALLERY(6, R.string.title_fragment_gallery, R.id.nav_gallery, GalleryFragment.class);
+        CHAT(1, R.string.title_fragment_chat, R.id.nav_chat, ChatFragment.class, ChatFragment::newInstance),
+        CHAT_LOG(2, R.string.title_fragment_log, R.id.nav_chat_log, LogFragment.class, LogFragment::newInstance),
+        CHAT_DATABASE(3, R.string.title_fragment_chat_database, R.id.nav_chat_db, ChatDatabaseFragment.class, ChatDatabaseFragment::newInstance),
+        DATABASE_PEOPLE(4, R.string.title_fragment_persons_database, R.id.nav_database_persons, PersonDatabaseFragment.class, PersonDatabaseFragment::newInstance),
+        DATABASE_EVENTS(5, R.string.title_fragment_events_database, R.id.nav_database_events, EventDatabaseFragment.class, EventDatabaseFragment::newInstance),
+        GALLERY(6, R.string.title_fragment_gallery, R.id.nav_gallery, GalleryFragment.class, GalleryFragment::newInstance);
 
         private final int id;
         @StringRes
@@ -585,12 +542,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         private final int menuItemId;
 
         private final Class<? extends QEDFragment> fragmentClass;
+        private final Function<Integer, QEDFragment> newInstance;
 
-        DrawerSelection(int id, @StringRes int title, int menuItemId, Class<? extends QEDFragment> fragmentClass) {
+        DrawerSelection(int id,
+                        @StringRes int title,
+                        @IdRes int menuItemId,
+                        @NonNull Class<? extends QEDFragment> fragmentClass,
+                        @NonNull Function<Integer, QEDFragment> newInstance) {
             this.id = id;
             this.title = title;
             this.menuItemId = menuItemId;
             this.fragmentClass = fragmentClass;
+            this.newInstance = newInstance;
         }
 
         public static DrawerSelection byId(int id, DrawerSelection defaultValue) {
@@ -605,6 +568,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         }
 
+        public static DrawerSelection byClass(Class<? extends QEDFragment> clazz, DrawerSelection defaultValue) {
+            if (clazz == ChatFragment.class) {
+                return CHAT;
+            } else if (clazz == LogFragment.class) {
+                return CHAT_LOG;
+            } else if (clazz == ChatDatabaseFragment.class) {
+                return CHAT_DATABASE;
+            } else if (clazz == PersonDatabaseFragment.class) {
+                return DATABASE_PEOPLE;
+            } else if (clazz == EventDatabaseFragment.class) {
+                return DATABASE_EVENTS;
+            } else if (clazz == GalleryFragment.class) {
+                return GALLERY;
+            } else {
+                return defaultValue;
+            }
+        }
+
         public static DrawerSelection byMenuItem(MenuItem menuItem, DrawerSelection defaultValue) {
             for (DrawerSelection value : values()) {
                 if (menuItem.getItemId() == value.getMenuItemId()) {
@@ -613,10 +594,5 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             return defaultValue;
         }
-    }
-
-    private static QEDFragment asQedFragment(Fragment fragment) {
-        if (fragment instanceof QEDFragment) return (QEDFragment) fragment;
-        else return null;
     }
 }

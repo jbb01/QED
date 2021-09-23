@@ -3,6 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+        <import type="android.view.View"/>
+
+        <variable name="loaded" type="boolean" />
+        <variable name="ready" type="boolean" />
+    </data>
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -21,23 +28,23 @@
             android:focusable="false"/>
 
         <ListView
-            android:id="@+id/messageBox"
+            android:id="@+id/list"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:divider="@android:color/transparent"
-            android:dividerHeight="0dp"
-            android:clipToPadding="false"
-            android:clipChildren="false"
             android:layout_above="@id/strip"
             android:layout_alignParentStart="true"
             android:choiceMode="singleChoice"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="0dp"
             android:listSelector="#0000"
-            android:transcriptMode="normal"
-            android:scrollbarStyle="outsideOverlay"
             android:paddingEnd="?android:attr/scrollbarSize"
-            android:visibility="gone"
-            tools:visibility="visible"
-            tools:ignore="RtlSymmetry" />
+            android:scrollbarStyle="outsideOverlay"
+            android:transcriptMode="normal"
+            android:visibility="@{loaded ? View.VISIBLE : View.GONE}"
+            tools:ignore="RtlSymmetry"
+            tools:visibility="visible" />
 
         <ProgressBar
             android:id="@+id/progress_bar"
@@ -50,7 +57,7 @@
             android:paddingTop="15dp"
             android:gravity="center_horizontal"
             style="?android:attr/progressBarStyleLarge"
-            android:visibility="visible" />
+            android:visibility="@{loaded ? View.GONE : View.VISIBLE}" />
 
         <View
             android:id="@+id/strip"
@@ -63,26 +70,27 @@
             android:id="@+id/editText_message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="48dp"
             android:layout_alignBottom="@+id/button_send"
-            android:layout_toStartOf="@+id/button_send"
             android:layout_marginStart="6dp"
-            android:gravity="center_vertical"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
-            android:paddingTop="3dp"
-            android:paddingBottom="3dp"
+            android:layout_toStartOf="@+id/button_send"
             android:background="@drawable/background_send"
-            android:hint="@string/chat_message_hint"
-            android:selectAllOnFocus="false"
             android:clickable="true"
-            android:focusable="true"
-            android:inputType="textMultiLine"
-            android:singleLine="false"
-            android:scrollbars="vertical"
             android:elevation="6dp"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:hint="@string/chat_message_hint"
+            android:importantForAutofill="no"
+            android:inputType="textMultiLine"
             android:maxLines="5"
-            android:importantForAutofill="no" />
+            android:minHeight="48dp"
+            android:paddingStart="12dp"
+            android:paddingTop="3dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="3dp"
+            android:scrollbars="vertical"
+            android:selectAllOnFocus="false"
+            android:enabled="@{ready}"
+            android:singleLine="false" />
 
         <View
             android:layout_width="match_parent"
@@ -103,6 +111,7 @@
             android:layout_marginBottom="6dp"
             android:contentDescription="@string/chat_button_send"
             android:src="@drawable/ic_send"
+            android:enabled="@{ready}"
             app:fabCustomSize="48dp" />
 
 

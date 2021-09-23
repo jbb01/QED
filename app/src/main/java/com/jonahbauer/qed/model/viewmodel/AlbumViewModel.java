@@ -131,12 +131,13 @@ public class AlbumViewModel extends AndroidViewModel implements QEDPageReceiver<
     }
 
     public void loadFromInternet(@NonNull Album album) {
-        if (album.isLoaded()) {
-            // TODO
+        if (!album.isLoaded()) {
+            mDisposable.add(
+                    QEDGalleryPages.getAlbum(album, null, this)
+            );
+        } else {
+            onResult(album);
         }
-        mDisposable.add(
-                QEDGalleryPages.getAlbum(album, null, this)
-        );
     }
 
     /**

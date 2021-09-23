@@ -273,6 +273,23 @@ public class ImageViewHolder extends RecyclerView.ViewHolder implements QEDPageR
      */
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public void onResult(@NonNull Image image) {
+        // callback for image info
+        if (!image.isDatabaseLoaded()) {
+            image.setLoaded(true);
+            image.setDatabaseLoaded(true);
+            mDisposable.add(
+                    this.mAlbumDao.insertOrUpdateImage(image)
+                                  .subscribeOn(Schedulers.io())
+                                  .observeOn(AndroidSchedulers.mainThread())
+                                  .subscribe(
+                                          () -> setImage(image),
+                                          err -> Log.e(LOG_TAG, "Could not save image info to database.", err)
+                                  )
+            );
+            return;
+        }
+
+        // callback for image
         if (mDownloadTmp != null && mTarget != null && mDownloadTmp.exists()) {
             if (mTarget.exists()) mTarget.delete();
 

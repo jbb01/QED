@@ -8,9 +8,7 @@ import androidx.preference.PreferenceFragmentCompat;
 
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.sheets.album.AlbumInfoBottomSheet;
-import com.jonahbauer.qed.activities.sheets.event.EventInfoBottomSheet;
-import com.jonahbauer.qed.activities.sheets.message.MessageInfoBottomSheet;
-import com.jonahbauer.qed.activities.sheets.person.PersonInfoBottomSheet;
+import com.jonahbauer.qed.util.Actions;
 import com.jonahbauer.qed.util.Debug;
 
 public class DebugPreferenceFragment extends PreferenceFragmentCompat implements PreferenceFragment, Preference.OnPreferenceClickListener {
@@ -43,20 +41,17 @@ public class DebugPreferenceFragment extends PreferenceFragmentCompat implements
     @Override
     public boolean onPreferenceClick(@NonNull Preference preference) {
         if (preference == mPersonInfoSheet) {
-            PersonInfoBottomSheet sheet = PersonInfoBottomSheet.newInstance(Debug.dummyPerson());
-            sheet.show(getChildFragmentManager(), sheet.getTag());
+            Actions.showInfoSheet(this, Debug.dummyPerson());
             return true;
         } else if (preference == mEventInfoSheet) {
-            EventInfoBottomSheet sheet = EventInfoBottomSheet.newInstance(Debug.dummyEvent());
-            sheet.show(getChildFragmentManager(), sheet.getTag());
+            Actions.showInfoSheet(this, Debug.dummyEvent());
             return true;
         } else if (preference == mAlbumInfoSheet) {
             AlbumInfoBottomSheet sheet = AlbumInfoBottomSheet.newInstance(Debug.dummyAlbum());
             sheet.show(getChildFragmentManager(), sheet.getTag());
             return true;
         } else if (preference == mMessageInfoSheet) {
-            MessageInfoBottomSheet sheet = MessageInfoBottomSheet.newInstance(Debug.dummyMessage());
-            sheet.show(getChildFragmentManager(), sheet.getTag());
+            Actions.showInfoSheet(this, Debug.dummyMessage());
             return true;
         }
 

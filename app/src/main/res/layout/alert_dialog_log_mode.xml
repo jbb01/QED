@@ -200,7 +200,8 @@
                 android:ems="10"
                 android:focusable="false"
                 android:importantForAutofill="no"
-                android:inputType="date"
+                android:inputType="text"
+                android:singleLine="true"
                 android:selectAllOnFocus="true" />
 
         </TableRow>
@@ -246,6 +247,29 @@
                 android:ems="10"
                 android:importantForAutofill="no"
                 android:inputType="number"
+                android:selectAllOnFocus="true" />
+        </TableRow>
+
+        <TableRow android:visibility="@{mode != Mode.FILE ? View.VISIBLE : View.GONE}">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:labelFor="@id/log_dialog_channel"
+                android:text="@string/log_request_channel"
+                android:textAppearance="?textAppearanceBody1" />
+
+            <EditText
+                android:id="@+id/log_dialog_channel"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:ems="10"
+                android:importantForAutofill="no"
+                android:inputType="text"
+                android:singleLine="true"
                 android:selectAllOnFocus="true" />
         </TableRow>
 

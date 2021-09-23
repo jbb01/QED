@@ -1,6 +1,6 @@
 package com.jonahbauer.qed.activities;
 
-import static com.jonahbauer.qed.DeepLinkingActivity.QEDIntent;
+import static com.jonahbauer.qed.activities.DeepLinkingActivity.QEDIntent;
 
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -14,7 +14,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
-import android.widget.RadioButton;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -48,15 +47,15 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class GalleryAlbumActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener, View.OnClickListener, AdapterView.OnItemClickListener {
+public class GalleryAlbumActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener, AdapterView.OnItemClickListener {
     private static final String LOG_TAG = GalleryAlbumActivity.class.getName();
     public static final String GALLERY_ALBUM_KEY = "galleryAlbum";
 
+    private Album mAlbum;
     private AlbumViewModel mAlbumViewModel;
     private ActivityGalleryAlbumBinding mBinding;
 
@@ -65,12 +64,6 @@ public class GalleryAlbumActivity extends AppCompatActivity implements CompoundB
     private ArrayAdapter<String> mAdapterDate;
     private ArrayAdapter<String> mAdapterPhotographer;
 
-    // -1: none
-    // 0: photographer
-    // 1: date
-    // 2: category
-    private int mActiveRadioButton = -1;
-
     private ActivityResultLauncher<Intent> mImageLauncher;
 
     @Override
@@ -78,15 +71,12 @@ public class GalleryAlbumActivity extends AppCompatActivity implements CompoundB
         super.onCreate(savedInstanceState);
 
         Intent intent = getIntent();
-        Album album = intent.getParcelableExtra(GALLERY_ALBUM_KEY);
-        if (album == null) {
-            super.finish();
-            Toast.makeText(this, R.string.error, Toast.LENGTH_SHORT).show();
-            return;
-        }
+
+        onNewIntent(intent);
+        if (isFinishing()) return;
 
         mAlbumViewModel = new ViewModelProvider(this).get(AlbumViewModel.class);
-        mAlbumViewModel.init(album);
+        mAlbumViewModel.init(mAlbum);
 
         mBinding = ActivityGalleryAlbumBinding.inflate(getLayoutInflater());
         setContentView(mBinding.getRoot());
@@ -101,12 +91,9 @@ public class GalleryAlbumActivity extends AppCompatActivity implements CompoundB
         mBinding.imageContainer.setOnItemClickListener(this);
 
         mBinding.expandCheckBox.setOnCheckedChangeListener(this);
-        mBinding.albumPhotographerRadioButton.setOnCheckedChangeListener(this);
-        mBinding.albumDateRadioButton.setOnCheckedChangeListener(this);
-        mBinding.albumCategoryRadioButton.setOnCheckedChangeListener(this);
-        mBinding.albumPhotographerRadioButton.setOnClickListener(this);
-        mBinding.albumDateRadioButton.setOnClickListener(this);
-        mBinding.albumCategoryRadioButton.setOnClickListener(this);
+        mBinding.albumPhotographerCheckBox.setOnCheckedChangeListener(this);
+        mBinding.albumDateCheckBox.setOnCheckedChangeListener(this);
+        mBinding.albumCategoryCheckBox.setOnCheckedChangeListener(this);
 
         mAdapterCategory = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, new ArrayList<>());
         mAdapterCategory.setDropDownViewResource(android.R.layout.simple_list_item_single_choice);
@@ -153,6 +140,8 @@ public class GalleryAlbumActivity extends AppCompatActivity implements CompoundB
                     }
                 }
         );
+
+        mAlbumViewModel.load();
     }
 
     @NonNull
@@ -167,7 +156,7 @@ public class GalleryAlbumActivity extends AppCompatActivity implements CompoundB
     private void search() {
         HashMap<Filter, String> filterData = new HashMap<>();
 
-        if (mBinding.albumCategoryRadioButton.isChecked()) {
+        if (mBinding.albumCategoryCheckBox.isChecked()) {
             String category = (String) mBinding.albumCategorySpinner.getSelectedItem();
             if (Album.CATEGORY_ETC.equals(category)) category = "";
             try {
@@ -175,7 +164,7 @@ public class GalleryAlbumActivity extends AppCompatActivity implements CompoundB
             } catch (UnsupportedEncodingException ignored) {}
             filterData.put(Filter.BY_CATEGORY, category);
         }
-        if (mBinding.albumDateRadioButton.isChecked()) {
+        if (mBinding.albumDateCheckBox.isChecked()) {
             String[] parts = ((String) mBinding.albumDateSpinner.getSelectedItem()).split("\\.");
             try {
                 filterData.put(Filter.BY_DATE, parts[2] + "-" + parts[1] + "-" + parts[0]);
@@ -183,7 +172,7 @@ public class GalleryAlbumActivity extends AppCompatActivity implements CompoundB
                 Log.e(LOG_TAG, e.getMessage(), e);
             }
         }
-        if (mBinding.albumPhotographerRadioButton.isChecked()) {
+        if (mBinding.albumPhotographerCheckBox.isChecked()) {
             String personName = (String) mBinding.albumPhotographerSpinner.getSelectedItem();
             Optional<Person> personOptional = getAlbum().getPersons().stream().filter(person -> person.getFirstName().equals(personName)).findFirst();
             personOptional.ifPresent(person -> filterData.put(Filter.BY_PERSON, String.valueOf(person.getId())));
@@ -220,6 +209,7 @@ public class GalleryAlbumActivity extends AppCompatActivity implements CompoundB
             mImageAdapter.addAll(images);
             mImageAdapter.notifyDataSetChanged();
         } else if (albumStatusWrapper.getCode() == StatusWrapper.STATUS_ERROR) {
+            mImageAdapter.clear();
             Reason reason = albumStatusWrapper.getReason();
             mBinding.setError(getString(reason == Reason.EMPTY ? R.string.album_empty : reason.getStringRes()));
         }
@@ -230,13 +220,6 @@ public class GalleryAlbumActivity extends AppCompatActivity implements CompoundB
         } else {
             mBinding.setHits("");
         }
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        mAlbumViewModel.load();
     }
 
     @Override
@@ -279,37 +262,6 @@ public class GalleryAlbumActivity extends AppCompatActivity implements CompoundB
     }
 
     @Override
-    public void onClick(View v) {
-        if (!(v instanceof RadioButton)) return;
-
-        RadioButton radioButton = (RadioButton) v;
-
-        int id = v.getId();
-        if (id == R.id.album_photographer_radio_button) {
-            if (mActiveRadioButton == 0) {
-                radioButton.setChecked(false);
-                mActiveRadioButton = -1;
-            } else {
-                mActiveRadioButton = 0;
-            }
-        } else if (id == R.id.album_date_radio_button) {
-            if (mActiveRadioButton == 1) {
-                radioButton.setChecked(false);
-                mActiveRadioButton = -1;
-            } else {
-                mActiveRadioButton = 1;
-            }
-        } else if (id == R.id.album_category_radio_button) {
-            if (mActiveRadioButton == 2) {
-                radioButton.setChecked(false);
-                mActiveRadioButton = -1;
-            } else {
-                mActiveRadioButton = 2;
-            }
-        }
-    }
-
-    @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         int id = buttonView.getId();
         if (id == R.id.expand_checkBox) {
@@ -322,27 +274,14 @@ public class GalleryAlbumActivity extends AppCompatActivity implements CompoundB
                 ((Animatable) Objects.requireNonNull(buttonView.getButtonDrawable())).start();
                 ViewUtils.collapse(mBinding.expandable);
             }
-        } else if (id == R.id.album_photographer_radio_button) {
-            if (isChecked) {
-                mBinding.albumCategoryRadioButton.setChecked(false);
-                mBinding.albumDateRadioButton.setChecked(false);
-            }
+        } else if (id == R.id.album_photographer_check_box) {
             mBinding.albumPhotographerSpinner.setEnabled(isChecked);
-        } else if (id == R.id.album_category_radio_button) {
-            if (isChecked) {
-                mBinding.albumDateRadioButton.setChecked(false);
-                mBinding.albumPhotographerRadioButton.setChecked(false);
-            }
+        } else if (id == R.id.album_category_check_box) {
             mBinding.albumCategorySpinner.setEnabled(isChecked);
-        } else if (id == R.id.album_date_radio_button) {
-            if (isChecked) {
-                mBinding.albumCategoryRadioButton.setChecked(false);
-                mBinding.albumPhotographerRadioButton.setChecked(false);
-            }
+        } else if (id == R.id.album_date_check_box) {
             mBinding.albumDateSpinner.setEnabled(isChecked);
         }
     }
-
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -362,54 +301,56 @@ public class GalleryAlbumActivity extends AppCompatActivity implements CompoundB
 
     @Override
     protected void onNewIntent(Intent intent) {
-        if (!handleIntent(intent, this)) {
-            super.finish();
+        if (handleIntent(intent, this)) {
+            super.onNewIntent(intent);
+        } else {
             Toast.makeText(this, R.string.error, Toast.LENGTH_SHORT).show();
-            return;
+            finish();
         }
-        super.onNewIntent(intent);
     }
 
     public static boolean handleIntent(@NonNull Intent intent, @Nullable GalleryAlbumActivity activity) {
-        Object obj = intent.getParcelableExtra(GALLERY_ALBUM_KEY);
-        if (obj instanceof Album) {
-//            if (activity != null) activity.mAlbum = (Album) obj;
+        Album album = intent.getParcelableExtra(GALLERY_ALBUM_KEY);
+
+        // internal intent
+        if (album != null) {
+            if (activity != null) {
+                activity.mAlbum = album;
+            }
+
             return true;
         }
 
+        // external intent via deep link
         if (Intent.ACTION_VIEW.equals(intent.getAction()) || QEDIntent.ACTION_SHOW_ALBUM.equals(intent.getAction())) {
             Uri data = intent.getData();
+
             if (data != null) {
                 String host = data.getHost();
+                if (host == null || !host.equals("qedgallery.qed-verein.de")) return false;
+
                 String path = data.getPath();
+                if (path == null || !path.startsWith("/album_view.php")) return false;
 
-                String query = data.getQuery();
-                Map<String, String> queries = new HashMap<>();
-                if (query != null) for (String q : query.split("&")) {
-                    String[] parts = q.split("=");
-                    if (parts.length > 1) queries.put(parts[0], parts[1]);
-                    else if (parts.length > 0) queries.put(parts[0], "");
-                }
-                if (host != null) if (host.equals("qedgallery.qed-verein.de")) {
-                    if (path != null) if (path.startsWith("/album_view.php")) {
-                        if (activity != null) {
-                            Preferences.general().edit().setDrawerSelection(MainActivity.DrawerSelection.GALLERY).apply();
-                        }
+                String idStr = data.getQueryParameter("albumid");
+                if (idStr == null) return false;
 
-                        String albumIdStr = queries.getOrDefault("albumid", null);
-                        if (albumIdStr != null && albumIdStr.matches("\\d*")) {
-                            try {
-//                                int id = Integer.parseInt(albumIdStr);
-//                                if (activity != null) {
-//                                    activity.mAlbum = new Album(id);
-//                                }
-                                return true;
-                            } catch (NumberFormatException ignored) {}
-                        }
+                // TODO apply filters
+                try {
+                    long id = Long.parseLong(idStr);
+
+                    if (activity != null) {
+                        Preferences.general().edit().setDrawerSelection(MainActivity.DrawerSelection.GALLERY).apply();
+                        activity.mAlbum = new Album(id);
                     }
+
+                    return true;
+                } catch (NumberFormatException e) {
+                    return false;
                 }
             }
         }
+
         return false;
     }
 }

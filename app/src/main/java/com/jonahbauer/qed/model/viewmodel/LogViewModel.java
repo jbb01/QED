@@ -185,6 +185,45 @@ public class LogViewModel extends AndroidViewModel {
         public abstract String getQueryString();
 
         public abstract String getSubtitle(Resources resources);
+
+        @Nullable
+        @SuppressWarnings("ConstantConditions")
+        public static LogRequest parse(@NonNull Uri uri) {
+            String mode = uri.getQueryParameter("mode");
+            if (mode == null) return null;
+
+            String channel = uri.getQueryParameter("channel");
+            if (channel == null) channel = "";
+
+            try {
+                switch (mode) {
+                    case "postrecent": {
+                        long last = Long.parseLong(uri.getQueryParameter("last"));
+                        return new PostRecentLogRequest(channel, last);
+                    }
+                    case "daterecent": {
+                        long seconds = Long.parseLong(uri.getQueryParameter("last"));
+                        return new DateRecentLogRequest(channel, seconds, TimeUnit.SECONDS);
+                    }
+                    case "postinterval": {
+                        long from = Long.parseLong(uri.getQueryParameter("from"));
+                        long to = Long.parseLong(uri.getQueryParameter("to"));
+                        return new PostIntervalLogRequest(channel, from, to);
+                    }
+                    case "dateinterval": {
+                        Date from = DateIntervalLogRequest.DATE_FORMAT.parse(uri.getQueryParameter("from"));
+                        Date to = DateIntervalLogRequest.DATE_FORMAT.parse(uri.getQueryParameter("to"));
+                        return new DateIntervalLogRequest(channel, from, to);
+                    }
+                    case "fromownpost": {
+                        long skip = Long.parseLong(uri.getQueryParameter("skip"));
+                        return new SinceOwnLogRequest(channel, skip);
+                    }
+                }
+            } catch (Exception ignored) {}
+
+            return null;
+        }
     }
 
     @Getter
@@ -195,6 +234,11 @@ public class LogViewModel extends AndroidViewModel {
         protected OnlineLogRequest(Mode mode, String channel) {
             super(mode);
             this.channel = channel;
+        }
+
+        @Override
+        public String getQueryString() {
+            return "?channel=" + channel;
         }
     }
 
@@ -210,7 +254,7 @@ public class LogViewModel extends AndroidViewModel {
 
         @Override
         public String getQueryString() {
-            return "?mode=postrecent&last=" + last;
+            return super.getQueryString() + "&mode=postrecent&last=" + last;
         }
 
         @Override
@@ -231,7 +275,7 @@ public class LogViewModel extends AndroidViewModel {
 
         @Override
         public String getQueryString() {
-            return "?mode=daterecent&last=" + seconds;
+            return super.getQueryString() + "&mode=daterecent&last=" + seconds;
         }
 
         @Override
@@ -254,7 +298,7 @@ public class LogViewModel extends AndroidViewModel {
 
         @Override
         public String getQueryString() {
-            return "?mode=postinterval&from=" + from + "&to=" + to;
+            return super.getQueryString() + "&mode=postinterval&from=" + from + "&to=" + to;
         }
 
         @Override
@@ -279,7 +323,7 @@ public class LogViewModel extends AndroidViewModel {
 
         @Override
         public String getQueryString() {
-            return "?mode=dateinterval&from=" + DATE_FORMAT.format(from) + "&to=" + DATE_FORMAT.format(to);
+            return super.getQueryString() + "&mode=dateinterval&from=" + DATE_FORMAT.format(from) + "&to=" + DATE_FORMAT.format(to);
         }
 
         @Override
@@ -300,7 +344,7 @@ public class LogViewModel extends AndroidViewModel {
 
         @Override
         public String getQueryString() {
-            return "?mode=fromownpost&skip=" + skip;
+            return super.getQueryString() + "&mode=fromownpost&skip=" + skip;
         }
 
         @Override

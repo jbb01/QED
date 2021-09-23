@@ -9,7 +9,6 @@ import androidx.appcompat.widget.Toolbar;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.MainActivity;
 import com.jonahbauer.qed.activities.mainFragments.QEDFragment;
-import com.jonahbauer.qed.activities.sheets.message.MessageInfoBottomSheet;
 import com.jonahbauer.qed.model.Message;
 import com.jonahbauer.qed.model.adapter.MessageAdapter;
 
@@ -44,8 +43,7 @@ public class MessageUtils {
                 toolbar.inflateMenu(R.menu.menu_message);
                 toolbar.setOnMenuItemClickListener(item -> {
                     if (item.getItemId() == R.id.message_info) {
-                        MessageInfoBottomSheet sheet = MessageInfoBottomSheet.newInstance(msg);
-                        sheet.show(fragment.getChildFragmentManager(), sheet.getTag());
+                        Actions.showInfoSheet(fragment, msg);
                     } else if (item.getItemId() == R.id.message_copy) {
                         Actions.copy(fragment.requireContext(), fragment.requireView(), msg.getName(), msg.getMessage());
                     }

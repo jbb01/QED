@@ -85,6 +85,8 @@ public class ImageInfoViewModel extends AndroidViewModel implements QEDPageRecei
     @Override
     public void onResult(@NonNull Image out) {
         if (!out.isLoaded()) {
+            out.setLoaded(true);
+
             //noinspection ResultOfMethodCallIgnored
             this.mAlbumDao.insertOrUpdateImage(out)
                           .subscribeOn(Schedulers.io())
@@ -95,7 +97,6 @@ public class ImageInfoViewModel extends AndroidViewModel implements QEDPageRecei
                           );
         }
 
-        out.setLoaded(true);
         this.mImage.setValue(StatusWrapper.wrap(out, STATUS_LOADED));
     }
 

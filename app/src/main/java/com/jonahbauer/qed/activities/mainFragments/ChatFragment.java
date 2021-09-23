@@ -76,8 +76,8 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
         mBinding = FragmentChatBinding.bind(view);
 
         mBinding.editTextMessage.setOnClickListener(v -> {
-            if (mBinding.messageBox.getLastVisiblePosition() >= mMessageAdapter.getCount() - 1) {
-                mHandler.postDelayed(() -> mBinding.messageBox.setSelection(mMessageAdapter.getCount() - 1), 100);
+            if (mBinding.list.getLastVisiblePosition() >= mMessageAdapter.getCount() - 1) {
+                mHandler.postDelayed(() -> mBinding.list.setSelection(mMessageAdapter.getCount() - 1), 100);
             }
         });
         mBinding.buttonSend.setOnClickListener(v -> send());
@@ -131,7 +131,7 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
             }
         });
 
-        var messageBox = mBinding.messageBox;
+        var messageBox = mBinding.list;
         mMessageAdapter = new MessageAdapter(view.getContext(), new ArrayList<>(), mBinding.mathPreload);
         messageBox.setAdapter(mMessageAdapter);
         messageBox.setOnScrollListener(this);
@@ -192,8 +192,7 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
         mInitMessages.clear();
         mMessageAdapter.clear();
         mInitDone = false;
-        mBinding.progressBar.setVisibility(View.VISIBLE);
-        mBinding.messageBox.setVisibility(View.GONE);
+        mBinding.setLoaded(false);
 
         mWebSocket = new ChatWebSocket(Preferences.chat().getChannel());
         mDisposable.addAll(
@@ -211,9 +210,8 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
                 Disposable.fromRunnable(() -> mWebSocket = null)
         );
 
-        mBinding.editTextMessage.setEnabled(true);
+        mBinding.setReady(true);
         ViewUtils.setError(mBinding.editTextMessage, false);
-        mBinding.buttonSend.setEnabled(true);
 
         mMessageAdapter.notifyDataSetChanged();
 
@@ -281,7 +279,7 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
                 mMessageAdapter.addAll(mInitMessages);
                 mMessageAdapter.notifyDataSetChanged();
 
-                mBinding.messageBox.setSelection(mInitMessages.size() - 1);
+                mBinding.list.setSelection(mInitMessages.size() - 1);
 
                 //noinspection ResultOfMethodCallIgnored
                 Database.getInstance(requireContext()).messageDao().insert(mInitMessages)
@@ -292,8 +290,7 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
                                 e -> Log.e(LOG_TAG, "Error inserting messages into database.", e)
                         );
 
-                mBinding.progressBar.setVisibility(View.GONE);
-                mBinding.messageBox.setVisibility(View.VISIBLE);
+                mBinding.setLoaded(true);
             }
 
             return;
@@ -329,7 +326,7 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
 
     @Override
     public void revokeAltToolbar() {
-        int checked = mBinding.messageBox.getCheckedItemPosition();
+        int checked = mBinding.list.getCheckedItemPosition();
         if (checked != -1) setChecked(checked, false);
     }
 
@@ -379,11 +376,11 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
      * @param value if the item is checked or not
      */
     private void setChecked(int position, boolean value) {
-        MessageUtils.setChecked(this, mBinding.messageBox, mMessageAdapter, position, value);
+        MessageUtils.setChecked(this, mBinding.list, mMessageAdapter, position, value);
     }
 
     private void scrollDown() {
-        mBinding.messageBox.smoothScrollToPositionFromTop(mMessageAdapter.getCount(), 0, 250);
+        mBinding.list.smoothScrollToPositionFromTop(mMessageAdapter.getCount(), 0, 250);
     }
 
     /**
@@ -397,10 +394,8 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
 
         addPost(new Message(Integer.MAX_VALUE, "Error", message, Calendar.getInstance().getTime(),503,"Error","220000", 0, ""), true);
 
-        mBinding.editTextMessage.setEnabled(false);
-        mBinding.buttonSend.setEnabled(false);
-        mBinding.progressBar.setVisibility(View.GONE);
-        mBinding.messageBox.setVisibility(View.VISIBLE);
+        mBinding.setReady(false);
+        mBinding.setLoaded(true);
     }
     //</editor-fold>
 }
