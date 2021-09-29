@@ -128,6 +128,8 @@
 
     <string name="message_info">@string/info</string>
     <string name="message_copy">Copy</string>
+    <string name="message_name_anonymous"><i>Anonym</i></string>
+    <string name="message_channel_main"><i>main</i></string>
 
     <!-- Login Activity -->
     <string name="title_activity_login">Anmelden</string>
@@ -224,7 +226,6 @@
     <string name="message_title_username">{0} ({1})</string>
     <string name="message_subtitle_username">Benutzername</string>
     <string name="message_subtitle_channel">Channel</string>
-    <string name="message_title_channel_main">(main)</string>
     <string name="message_subtitle_timestamp">Zeitstempel</string>
     <string name="message_title_timestamp">{0, date} {0, time}</string>
     <string name="message_subtitle_bottag">Bottag</string>

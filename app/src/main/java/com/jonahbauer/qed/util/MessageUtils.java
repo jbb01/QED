@@ -12,10 +12,13 @@ import com.jonahbauer.qed.activities.mainFragments.QEDFragment;
 import com.jonahbauer.qed.model.Message;
 import com.jonahbauer.qed.model.adapter.MessageAdapter;
 
+import java.util.Locale;
+
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class MessageUtils {
+    private static final String COPY_FORMAT = "%3$tm-%3$td %3$tH:%3$tM:%3$tS\t%4$s\t%1$s:\t%2$s";
 
     /**
      * Sets the checked item in the list and shows an appropriate toolbar.
@@ -45,16 +48,31 @@ public class MessageUtils {
                     if (item.getItemId() == R.id.message_info) {
                         Actions.showInfoSheet(fragment, msg);
                     } else if (item.getItemId() == R.id.message_copy) {
-                        Actions.copy(fragment.requireContext(), fragment.requireView(), msg.getName(), msg.getMessage());
+                        Actions.copy(fragment.requireContext(), fragment.requireView(), msg.getName(), MessageUtils.copyFormat(msg));
                     }
 
                     return false;
                 });
 
-                toolbar.setTitle(msg.getName());
+                toolbar.setTitle(msg.getName().trim().isEmpty() ? activity.getText(R.string.message_name_anonymous) : msg.getName());
             } else {
                 mainActivity.returnAltToolbar();
             }
         }
+    }
+
+    /**
+     * Returns a string that mimics what one would get when trying to copy a message on the
+     * browser chat client.
+     */
+    public static String copyFormat(Message message) {
+        return String.format(
+                Locale.GERMANY,
+                COPY_FORMAT,
+                message.getName(),
+                message.getMessage(),
+                message.getDate(),
+                message.getUserName() != null ? "✓" : ""
+        );
     }
 }

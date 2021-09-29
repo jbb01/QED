@@ -102,6 +102,7 @@
         <!-- Login Activity -->
         <activity
             android:name=".activities.LoginActivity"
+            android:windowSoftInputMode="stateVisible|adjustResize"
             android:label="@string/title_activity_login" />
 
         <!-- Main Activity -->
@@ -112,7 +113,7 @@
             android:label="@string/app_name"
             android:launchMode="singleTask"
             android:theme="@style/Theme.App.SplashScreen"
-            android:windowSoftInputMode="stateVisible|adjustResize"
+            android:windowSoftInputMode="adjustResize|stateHidden"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

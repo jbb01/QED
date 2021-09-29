@@ -40,7 +40,7 @@
             android:layout_alignTop="@id/toolbar"
             android:layout_alignBottom="@id/toolbar"
             android:background="?colorPrimaryLight"
-            android:translationZ="10dp"
+            android:translationZ="4dp"
             style="?toolbarStyle"/>
 
         <View

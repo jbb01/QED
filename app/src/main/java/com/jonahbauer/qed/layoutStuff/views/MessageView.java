@@ -14,6 +14,7 @@ import android.os.Looper;
 import android.text.Layout;
 import android.text.Selection;
 import android.text.Spannable;
+import android.text.SpannableStringBuilder;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.text.util.Linkify;
@@ -72,11 +73,11 @@ public class MessageView extends RelativeLayout {
     private boolean mColorful;
     private boolean mKatex;
 
-    private String mName;
+    private CharSequence mName;
     private String mMessage;
     private String mDate;
     private String mDateBanner;
-    private String mChannel;
+    private CharSequence mChannel;
     private String mId;
 
     @Dimension @Px private float mNameTextSize;
@@ -571,12 +572,24 @@ public class MessageView extends RelativeLayout {
     }
 
     private void setMessageInternal(@NonNull Message message) {
-        mName = message.getName() + (message.getUserName() != null ? " | " + message.getUserName() : "");
+        SpannableStringBuilder name = new SpannableStringBuilder();
+
+        if (message.getName().trim().isEmpty()) {
+            name.append(getContext().getText(R.string.message_name_anonymous));
+        } else {
+            name.append(message.getName());
+        }
+
+        if (message.getUserName() != null) {
+            name.append(" | ").append(message.getUserName());
+        }
+
+        mName = name;
         mMessage = message.getMessage();
         mId = String.valueOf(message.getId());
 
         if (message.getChannel().isEmpty()) {
-            mChannel = "(main)";
+            mChannel = getContext().getText(R.string.message_channel_main);
         } else {
             mChannel = message.getChannel();
         }
@@ -587,18 +600,12 @@ public class MessageView extends RelativeLayout {
             mDate = DATE_FORMAT.format(message.getDate());
         }
 
-        if (mName != null && !mName.matches("[\\s\\n\\r]*")) {
-            mNameTextView.setVisibility(VISIBLE);
-            mNameTextColor = message.getTransformedColor();
-            mNameTextColorSet = true;
+        mNameTextView.setVisibility(VISIBLE);
+        mNameTextColor = message.getTransformedColor();
+        mNameTextColorSet = true;
 
-            mMessageTextColor = 0;
-            mMessageTextColorSet = false;
-        } else {
-            mNameTextView.setVisibility(GONE);
-            mNameTextColor    = mMessageTextColor    = message.getTransformedColor();
-            mNameTextColorSet = mMessageTextColorSet = true;
-        }
+        mMessageTextColor = 0;
+        mMessageTextColorSet = false;
 
         this.mMessageId = message.getId();
     }
@@ -633,7 +640,7 @@ public class MessageView extends RelativeLayout {
         mNameTextView.setText(mName);
     }
 
-    public String getName() {
+    public CharSequence getName() {
         return mName;
     }
 
@@ -644,7 +651,7 @@ public class MessageView extends RelativeLayout {
         }
     }
 
-    public String getChannel() {
+    public CharSequence getChannel() {
         return mChannel;
     }
 

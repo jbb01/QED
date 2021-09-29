@@ -39,7 +39,7 @@
 
             <include layout="@layout/list_item"
                 app:icon="@{@drawable/ic_message_name}"
-                app:title="@{message.name}"
+                app:title="@{message.name.trim().empty ? @text/message_name_anonymous : message.name}"
                 app:subtitle="@{@string/message_subtitle_name}"/>
 
             <include layout="@layout/list_item"
@@ -50,7 +50,7 @@
 
             <include layout="@layout/list_item"
                 app:icon="@{@drawable/ic_message_channel}"
-                app:title="@{message.channel.empty ? @string/message_title_channel_main : message.channel}"
+                app:title="@{message.channel.empty ? @text/message_channel_main : message.channel}"
                 app:subtitle="@{@string/message_subtitle_channel}"/>
 
             <include layout="@layout/list_item"

@@ -6,8 +6,8 @@
     <data>
         <import type="android.view.View"/>
 
-        <variable name="title" type="java.lang.String"/>
-        <variable name="subtitle" type="java.lang.String" />
+        <variable name="title" type="CharSequence"/>
+        <variable name="subtitle" type="CharSequence" />
         <variable name="icon" type="android.graphics.drawable.Drawable" />
         <variable name="onClick" type="android.view.View.OnClickListener" />
         <variable name="onLongClick" type="android.view.View.OnLongClickListener" />
