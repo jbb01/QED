@@ -14,6 +14,7 @@ import com.jonahbauer.qed.networking.NetworkConstants;
 import com.jonahbauer.qed.networking.Reason;
 import com.jonahbauer.qed.networking.async.AsyncLoadQEDPageToStream;
 import com.jonahbauer.qed.networking.async.QEDPageStreamReceiver;
+import com.jonahbauer.qed.util.MessageUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.annotations.CheckReturnValue;
@@ -66,8 +68,10 @@ public class QEDChatPages extends QEDPages {
     public static Disposable parseChatLog(@NonNull Context context, @NonNull Uri file, QEDPageStreamReceiver<List<Message>> listener) {
         ArrayList<Message> out = new ArrayList<>();
 
+        Function<Message, Message> dateFixer = MessageUtils.dateFixer();
+
         Supplier<InputStream> in = () -> context.getContentResolver().openInputStream(file);
-        Consumer<Message> consumer = out::add;
+        Consumer<Message> consumer = msg -> out.add(dateFixer.apply(msg));
 
         return Observable.create(new ChatLogParser(in, consumer))
                 .subscribeOn(Schedulers.computation())

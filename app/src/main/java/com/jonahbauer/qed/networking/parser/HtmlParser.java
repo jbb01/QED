@@ -1,27 +1,18 @@
 package com.jonahbauer.qed.networking.parser;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import org.jetbrains.annotations.Contract;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 
 public abstract class HtmlParser<T> implements Parser<T> {
-    private static final ThreadLocal<SimpleDateFormat> DATE_FORMAT = new ThreadLocal<>() {
-        @NonNull
-        @Override
-        protected SimpleDateFormat initialValue() {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.GERMANY);
-            sdf.setTimeZone(TimeZone.getTimeZone("CET"));
-            return sdf;
-        }
-    };
+    private static final String LOG_TAG = HtmlParser.class.getName();
 
     @Override
     public final T apply(T obj, String s) {
@@ -33,11 +24,11 @@ public abstract class HtmlParser<T> implements Parser<T> {
     @Contract("_, _ -> param1")
     protected abstract T parse(@NonNull T obj, Document document) throws HtmlParseException;
 
-    protected Date parseDate(String date) {
+    protected LocalDate parseLocalDate(String date) {
         try {
-            //noinspection ConstantConditions
-            return DATE_FORMAT.get().parse(date);
-        } catch (ParseException e) {
+            return LocalDate.parse(date);
+        } catch (DateTimeParseException e) {
+            Log.w(LOG_TAG, "Could not parse local date \"" + date + "\".", e);
             return null;
         }
     }

@@ -5,7 +5,7 @@ import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -22,13 +22,13 @@ public class Event implements Comparable<Event>, Parcelable {
     private String notes;
     private int maxParticipants;
 
-    private Date start;
+    private LocalDate start;
     private String startString;
 
-    private Date end;
+    private LocalDate end;
     private String endString;
 
-    private Date deadline;
+    private LocalDate deadline;
     private String deadlineString;
 
     private String hotel;
@@ -117,11 +117,11 @@ public class Event implements Comparable<Event>, Parcelable {
             Event event = new Event(source.readLong());
             event.title = source.readString();
             event.startString = source.readString();
-            event.start = (Date) source.readSerializable();
+            event.start = (LocalDate) source.readSerializable();
             event.endString = source.readString();
-            event.end = (Date) source.readSerializable();
+            event.end = (LocalDate) source.readSerializable();
             event.deadlineString = source.readString();
-            event.deadline = (Date) source.readSerializable();
+            event.deadline = (LocalDate) source.readSerializable();
             event.cost = source.readInt();
             event.maxParticipants = source.readInt();
             event.hotel = source.readString();

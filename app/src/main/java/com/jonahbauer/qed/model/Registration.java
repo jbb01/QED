@@ -31,7 +31,7 @@ public class Registration implements Parcelable {
         dest.writeParcelable(person, flags);
     }
 
-    public static final Creator<Registration> CREATOR = new Creator<Registration>() {
+    public static final Creator<Registration> CREATOR = new Creator<>() {
         @Override
         public Registration createFromParcel(Parcel in) {
             Registration registration = new Registration(in.readLong());

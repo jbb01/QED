@@ -16,8 +16,8 @@ import com.jonahbauer.qed.model.room.Database;
 import com.jonahbauer.qed.model.room.MessageDao;
 import com.jonahbauer.qed.util.StatusWrapper;
 
+import java.time.Instant;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -39,8 +39,8 @@ public class MessageListViewModel extends AndroidViewModel {
     public void load(@Nullable String channel,
                      @Nullable String message,
                      @Nullable String name,
-                     @Nullable Date fromDate,
-                     @Nullable Date toDate,
+                     @Nullable Instant fromDate,
+                     @Nullable Instant toDate,
                      @Nullable Long fromId,
                      @Nullable Long toId,
                      long limit) {

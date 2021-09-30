@@ -9,7 +9,7 @@ import com.jonahbauer.qed.model.Album;
 import com.jonahbauer.qed.model.Image;
 import com.jonahbauer.qed.model.Message;
 
-@androidx.room.Database(entities = {Album.class, Message.class, Image.class}, version = 7, exportSchema = false)
+@androidx.room.Database(entities = {Album.class, Message.class, Image.class}, version = 8, exportSchema = false)
 public abstract class Database extends RoomDatabase {
     private static final String DB_NAME = "qed_db";
     private static Database INSTANCE;

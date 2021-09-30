@@ -36,10 +36,12 @@ public final class PersonListParser extends HtmlParser<List<Person>> {
                         Element emailElement = columns.get(5).select("a").first();
                         String email = emailElement != null ? emailElement.text() : null;
                         long id = Long.parseLong(columns.get(8).text());
+                        String username = columns.get(9).text();
                         boolean active = "Ja".equals(columns.get(10).text());
                         boolean member = "Ja".equals(columns.get(11).text());
 
                         Person person = new Person(id);
+                        person.setUsername(username);
                         person.setFirstName(firstName);
                         person.setLastName(lastName);
                         person.setEmail(email);

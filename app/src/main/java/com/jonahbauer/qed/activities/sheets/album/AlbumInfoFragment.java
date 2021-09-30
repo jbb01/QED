@@ -114,7 +114,7 @@ public class AlbumInfoFragment extends AbstractInfoFragment {
         persons.forEach((person) -> {
             ListItemBinding item = ListItemBinding.inflate(LayoutInflater.from(context), parent, true);
             item.setIcon(AppCompatResources.getDrawable(context, R.drawable.ic_album_person));
-            item.setTitle(person.getFirstName());
+            item.setTitle(person.getUsername());
         });
     }
 }

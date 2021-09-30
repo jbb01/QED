@@ -34,8 +34,8 @@ import com.jonahbauer.qed.util.MessageUtils;
 import com.jonahbauer.qed.util.Preferences;
 import com.jonahbauer.qed.util.ViewUtils;
 
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -204,6 +204,8 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
         mDisposable.addAll(
                 Observable.create(mWebSocket)
                           .subscribeOn(Schedulers.io())
+                          .observeOn(Schedulers.computation())
+                          .map(MessageUtils.dateFixer()::apply)
                           .observeOn(AndroidSchedulers.mainThread())
                           .subscribe(
                                   msg -> {
@@ -411,7 +413,7 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
         mDisposable.clear();
         mInitDone = true;
 
-        addPost(new Message(Integer.MAX_VALUE, "Error", message, Calendar.getInstance().getTime(),503,"Error","220000", 0, ""), true);
+        addPost(new Message(Integer.MAX_VALUE, "Error", message, Instant.now(), 503, "Error", "220000", 0, ""), true);
 
         mBinding.setReady(false);
         mBinding.setLoaded(true);

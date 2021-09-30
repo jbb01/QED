@@ -5,6 +5,7 @@
     <data>
         <import type="android.view.View"/>
         <import type="com.jonahbauer.qed.util.Actions"/>
+        <import type="com.jonahbauer.qed.util.TimeUtils"/>
         <import type="java.text.MessageFormat"/>
 
         <variable name="loading" type="boolean" />
@@ -72,19 +73,19 @@
             <include layout="@layout/list_item"
                 android:visibility="@{(person.birthday != null || person.birthdayString != null) ? View.VISIBLE : View.GONE}"
                 app:icon="@{@drawable/ic_person_birthday}"
-                app:title="@{person.birthday != null ? MessageFormat.format(@string/person_title_birthday, person.birthday) : person.birthdayString}"
+                app:title="@{person.birthday != null ? MessageFormat.format(@string/person_title_birthday, TimeUtils.format(person.birthday)) : person.birthdayString}"
                 app:subtitle="@{@string/person_subtitle_birthday}"/>
 
             <include layout="@layout/list_item"
                 android:visibility="@{(person.dateOfJoining != null || person.dateOfJoiningString != null) ? View.VISIBLE : View.GONE}"
                 app:icon="@{@drawable/ic_person_date_of_joining}"
-                app:title="@{person.dateOfJoining != null ? MessageFormat.format(@string/person_title_date_of_joining, person.dateOfJoining) : person.dateOfJoiningString}"
+                app:title="@{person.dateOfJoining != null ? MessageFormat.format(@string/person_title_date_of_joining, TimeUtils.format(person.dateOfJoining)) : person.dateOfJoiningString}"
                 app:subtitle="@{@string/person_subtitle_date_of_joining}"/>
 
             <include layout="@layout/list_item"
                 android:visibility="@{(person.leavingDate != null || person.leavingDateString != null) ? View.VISIBLE : View.GONE}"
                 app:icon="@{@drawable/ic_person_leaving_date}"
-                app:title="@{person.dateOfJoining != null ? MessageFormat.format(@string/person_title_leaving_date, person.dateOfJoining) : person.dateOfJoiningString}"
+                app:title="@{person.leavingDate != null ? MessageFormat.format(@string/person_title_leaving_date, TimeUtils.format(person.leavingDate)) : person.leavingDateString}"
                 app:subtitle="@{@string/person_subtitle_leaving_date}"/>
 
             <include layout="@layout/list_item"

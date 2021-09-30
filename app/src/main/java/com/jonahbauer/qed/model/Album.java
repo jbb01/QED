@@ -12,8 +12,8 @@ import androidx.room.TypeConverters;
 
 import com.jonahbauer.qed.model.room.Converters;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -45,7 +45,7 @@ public class Album implements Parcelable {
     private List<Person> persons = new ArrayList<>();
 
     @ColumnInfo(name = "dates")
-    private List<Date> dates = new ArrayList<>();
+    private List<LocalDate> dates = new ArrayList<>();
 
     @ColumnInfo(name = "categories")
     private List<String> categories = new ArrayList<>();
@@ -96,7 +96,7 @@ public class Album implements Parcelable {
         dest.writeInt(private_ ? 1 : 0);
         dest.writeTypedList(persons);
         dest.writeInt(dates.size());
-        for (Date date : dates) {
+        for (LocalDate date : dates) {
             dest.writeSerializable(date);
         }
         dest.writeStringList(categories);
@@ -104,7 +104,7 @@ public class Album implements Parcelable {
         dest.writeInt(imageListDownloaded ? 1 : 0);
     }
 
-    public static final Parcelable.Creator<Album> CREATOR = new Parcelable.Creator<Album>() {
+    public static final Parcelable.Creator<Album> CREATOR = new Parcelable.Creator<>() {
         @NonNull
         @Override
         public Album createFromParcel(@NonNull Parcel source) {
@@ -117,7 +117,7 @@ public class Album implements Parcelable {
 
             int dateSize = source.readInt();
             for (int i = 0; i < dateSize; i++) {
-                album.dates.add((Date) source.readSerializable());
+                album.dates.add((LocalDate) source.readSerializable());
             }
 
             source.readStringList(album.categories);

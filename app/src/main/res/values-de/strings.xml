@@ -75,7 +75,7 @@
     <string name="no_internet">Etwas ist schief gelaufen. Bitte überprüfe deine Internetverbidung.</string>
     <string name="not_official">Diese App steht in keiner offiziellen Verbindung zum Quod Erat Demonstrandum e.V.</string>
     <string name="offline_mode">Offline-Modus</string>
-    <string name="log_subtitle_date_interval">Posts vom {0,date,dd.MM.yyyy} bis zum {1,date,dd.MM.yyyy}</string>
+    <string name="log_subtitle_date_interval">Posts von {0} bis {1}</string>
     <string name="log_subtitle_date_recent">Posts der letzten {0,choice,1#|2#{0} }Stunde{0,choice,1#|2#n}</string>
     <string name="log_subtitle_post_recent">Letzte{0,choice,1#r|2# {0}} Post{0,choice,1#|2#s}</string>
     <string name="image_download_non_picture">Du bist im Begriff eine Audio- oder Video-Datei herunterzuladen. Eine WLAN-Verbindung wird empfohlen. Möchtest du fortfahren?</string>
@@ -193,9 +193,9 @@
     <string name="event_section_information">Informationen</string>
     <string name="event_section_organization">Organisatoren</string>
     <string name="event_section_participants">Teilnehmer</string>
-    <string name="event_title_time">{0,date} - {1,date}</string>
+    <string name="event_title_time">{0} - {1}</string>
     <string name="event_subtitle_time">Zeitraum</string>
-    <string name="event_title_deadline">{0,date} {0,time}</string>
+    <string name="event_title_deadline">{0}</string>
     <string name="event_subtitle_deadline">Anmeldeschluss</string>
     <string name="event_subtitle_hotel">Unterkunft</string>
     <string name="event_subtitle_hotel_address">Adresse der Unterkunft</string>
@@ -213,7 +213,7 @@
     <string name="album_section_categories">Kategorien</string>
     <string name="album_subtitle_owner">Besitzer</string>
     <string name="album_subtitle_creation_date">Erstelldatum</string>
-    <string name="album_title_dates">{0,date} - {1,date}</string>
+    <string name="album_title_dates">{0} - {1}</string>
     <string name="album_subtitle_dates">Zeitraum</string>
     <string name="album_subtitle_image_count">Anzahl der Bilder</string>
     <string name="album_title_private">Privates Album</string>
@@ -227,7 +227,7 @@
     <string name="message_subtitle_username">Benutzername</string>
     <string name="message_subtitle_channel">Channel</string>
     <string name="message_subtitle_timestamp">Zeitstempel</string>
-    <string name="message_title_timestamp">{0, date} {0, time}</string>
+    <string name="message_title_timestamp">{0}</string>
     <string name="message_subtitle_bottag">Bottag</string>
 
     <!-- Person Bottom Sheet -->
@@ -237,11 +237,11 @@
     <string name="person_section_contacts">Kontaktinformationen</string>
     <string name="person_section_registrations">Anmeldungen</string>
     <string name="person_subtitle_mail">E-Mail Adresse</string>
-    <string name="person_title_birthday">{0,date}</string>
+    <string name="person_title_birthday">{0}</string>
     <string name="person_subtitle_birthday">Geburtstag</string>
-    <string name="person_title_date_of_joining">{0,date}</string>
+    <string name="person_title_date_of_joining">{0}</string>
     <string name="person_subtitle_date_of_joining">Eintrittsdatum</string>
-    <string name="person_title_leaving_date">{0,date}</string>
+    <string name="person_title_leaving_date">{0}</string>
     <string name="person_subtitle_leaving_date">Austrittsdatum</string>
     <string name="person_title_member_true">Ja</string>
     <string name="person_title_member_false">Nein</string>
@@ -279,6 +279,7 @@
     <!-- Log Dialog Activity -->
     <string name="title_activity_log_dialog">Logs</string>
     <string name="log_dialog_mode_label">Mode</string>
+    <string name="log_dialog_date_convert_timezone">{0} wird aufgrund von Informationverlusten beim Umwandeln zwischen Zeitzonen zu {1}.</string>
     <string name="log_request_postrecent_before">Letzte</string>
     <string name="log_request_postrecent_after">Posts</string>
     <string name="log_request_sinceown_before">Überspringe</string>

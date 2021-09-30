@@ -5,6 +5,7 @@
     <data>
         <import type="android.view.View"/>
         <import type="com.jonahbauer.qed.util.Actions"/>
+        <import type="com.jonahbauer.qed.util.TimeUtils"/>
         <import type="java.text.MessageFormat"/>
 
         <variable name="color" type="int" />
@@ -55,7 +56,7 @@
 
             <include layout="@layout/list_item"
                 app:icon="@{@drawable/ic_message_timestamp}"
-                app:title="@{MessageFormat.format(@string/message_title_timestamp, message.date)}"
+                app:title="@{MessageFormat.format(@string/message_title_timestamp, TimeUtils.format(message.date))}"
                 app:subtitle="@{@string/message_subtitle_timestamp}"/>
 
             <include layout="@layout/list_item"

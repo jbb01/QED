@@ -36,6 +36,7 @@ public final class AlbumListParser extends HtmlParser<List<Album>> {
                         String href = a.attr("href");
                         Matcher matcher = ALBUM_ID.matcher(href);
                         if (matcher.find()) {
+                            //noinspection ConstantConditions
                             album = new Album(Long.parseLong(matcher.group(1)));
                         } else {
                             album = new Album(-1);

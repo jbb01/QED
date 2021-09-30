@@ -10,7 +10,7 @@ import com.jonahbauer.qed.networking.parser.HtmlParser;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
@@ -35,8 +35,8 @@ public final class EventListParser extends HtmlParser<List<Event>> {
                         String startString = columns.get(2).select("time").text();
                         String endString = columns.get(3).select("time").text();
 
-                        Date start = parseDate(columns.get(2).select("time").attr("datetime"));
-                        Date end = parseDate(columns.get(3).select("time").attr("datetime"));
+                        LocalDate start = parseLocalDate(columns.get(2).select("time").attr("datetime"));
+                        LocalDate end = parseLocalDate(columns.get(3).select("time").attr("datetime"));
 
                         long id = Long.parseLong(columns.get(1).select("a").attr("href").substring("/events/".length()));
 

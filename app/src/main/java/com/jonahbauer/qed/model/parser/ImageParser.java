@@ -5,20 +5,24 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.jonahbauer.qed.model.Image;
+import com.jonahbauer.qed.networking.NetworkConstants;
 import com.jonahbauer.qed.networking.parser.HtmlParser;
 
 import org.jsoup.nodes.Document;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class ImageParser extends HtmlParser<Image> {
     private static final String LOG_TAG = ImageParser.class.getName();
-    private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.GERMANY);
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter
+            .ofPattern("dd.MM.yyyy HH:mm:ss")
+            .withLocale(Locale.GERMANY)
+            .withZone(NetworkConstants.SERVER_TIME_ZONE);
     private static final Pattern ALBUM_ID = Pattern.compile("albumid=(\\d+)");
 
     private static final String INFO_KEY_ALBUM = "Album:";
@@ -56,6 +60,7 @@ public final class ImageParser extends HtmlParser<Image> {
         document.select("main .infotable th").forEach(th -> {
             try {
                 String key = th.text();
+                //noinspection ConstantConditions
                 String value = th.nextElementSibling().text();
                 switch (key) {
                     case INFO_KEY_ALBUM:
@@ -71,11 +76,11 @@ public final class ImageParser extends HtmlParser<Image> {
                         image.getData().put(Image.DATA_KEY_FORMAT, value);
                         break;
                     case INFO_KEY_UPLOAD_DATE:
-                        image.setUploadDate(parseDate(value));
+                        image.setUploadTime(parseInstant(value));
                         image.getData().put(Image.DATA_KEY_UPLOAD_DATE, value);
                         break;
                     case INFO_KEY_CREATION_DATE:
-                        image.setCreationDate(parseDate(value));
+                        image.setCreationTime(parseInstant(value));
                         image.getData().put(Image.DATA_KEY_CREATION_DATE, value);
                         break;
                     case INFO_KEY_ORIENTATION:
@@ -117,11 +122,11 @@ public final class ImageParser extends HtmlParser<Image> {
         return image;
     }
 
-    @Override
-    protected Date parseDate(String date) {
+    protected Instant parseInstant(String date) {
         try {
-            return SIMPLE_DATE_FORMAT.parse(date);
-        } catch (ParseException e) {
+            return Instant.from(DATE_TIME_FORMATTER.parse(date));
+        } catch (DateTimeParseException e) {
+            Log.w(LOG_TAG, "Could not parse instant \"" + date + "\".", e);
             return null;
         }
     }

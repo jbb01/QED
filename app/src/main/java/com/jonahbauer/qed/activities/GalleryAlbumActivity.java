@@ -7,7 +7,6 @@ import android.content.res.Configuration;
 import android.graphics.drawable.Animatable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,6 +29,7 @@ import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.imageActivity.ImageActivity;
 import com.jonahbauer.qed.activities.sheets.album.AlbumInfoBottomSheet;
 import com.jonahbauer.qed.databinding.ActivityGalleryAlbumBinding;
+import com.jonahbauer.qed.layoutStuff.CustomArrayAdapter;
 import com.jonahbauer.qed.model.Album;
 import com.jonahbauer.qed.model.Image;
 import com.jonahbauer.qed.model.Person;
@@ -39,20 +39,19 @@ import com.jonahbauer.qed.networking.Reason;
 import com.jonahbauer.qed.networking.pages.QEDGalleryPages.Filter;
 import com.jonahbauer.qed.util.Preferences;
 import com.jonahbauer.qed.util.StatusWrapper;
+import com.jonahbauer.qed.util.TimeUtils;
 import com.jonahbauer.qed.util.ViewUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.text.MessageFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class GalleryAlbumActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener, AdapterView.OnItemClickListener {
-    private static final String LOG_TAG = GalleryAlbumActivity.class.getName();
     public static final String GALLERY_ALBUM_KEY = "galleryAlbum";
 
     private Album mAlbum;
@@ -61,8 +60,8 @@ public class GalleryAlbumActivity extends AppCompatActivity implements CompoundB
 
     private ImageAdapter mImageAdapter;
     private ArrayAdapter<String> mAdapterCategory;
-    private ArrayAdapter<String> mAdapterDate;
-    private ArrayAdapter<String> mAdapterPhotographer;
+    private CustomArrayAdapter<LocalDate> mAdapterDate;
+    private CustomArrayAdapter<Person> mAdapterPhotographer;
 
     private ActivityResultLauncher<Intent> mImageLauncher;
 
@@ -100,12 +99,14 @@ public class GalleryAlbumActivity extends AppCompatActivity implements CompoundB
         mBinding.albumCategorySpinner.setAdapter(mAdapterCategory);
         mBinding.albumCategorySpinner.setEnabled(false);
 
-        mAdapterPhotographer = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, new ArrayList<>());
+        mAdapterPhotographer = new CustomArrayAdapter<>(this, android.R.layout.simple_spinner_item, new ArrayList<>());
+        mAdapterPhotographer.setToString(Person::getUsername);
         mAdapterPhotographer.setDropDownViewResource(android.R.layout.simple_list_item_single_choice);
         mBinding.albumPhotographerSpinner.setAdapter(mAdapterPhotographer);
         mBinding.albumPhotographerSpinner.setEnabled(false);
 
-        mAdapterDate = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, new ArrayList<>());
+        mAdapterDate = new CustomArrayAdapter<>(this, android.R.layout.simple_spinner_item, new ArrayList<>());
+        mAdapterDate.setToString(TimeUtils::format);
         mAdapterDate.setDropDownViewResource(android.R.layout.simple_list_item_single_choice);
         mBinding.albumDateSpinner.setAdapter(mAdapterDate);
         mBinding.albumDateSpinner.setEnabled(false);
@@ -165,17 +166,12 @@ public class GalleryAlbumActivity extends AppCompatActivity implements CompoundB
             filterData.put(Filter.BY_CATEGORY, category);
         }
         if (mBinding.albumDateCheckBox.isChecked()) {
-            String[] parts = ((String) mBinding.albumDateSpinner.getSelectedItem()).split("\\.");
-            try {
-                filterData.put(Filter.BY_DATE, parts[2] + "-" + parts[1] + "-" + parts[0]);
-            } catch (ArrayIndexOutOfBoundsException e) {
-                Log.e(LOG_TAG, e.getMessage(), e);
-            }
+            LocalDate date = (LocalDate) mBinding.albumDateSpinner.getSelectedItem();
+            filterData.put(Filter.BY_DATE, DateTimeFormatter.ISO_LOCAL_DATE.format(date));
         }
         if (mBinding.albumPhotographerCheckBox.isChecked()) {
-            String personName = (String) mBinding.albumPhotographerSpinner.getSelectedItem();
-            Optional<Person> personOptional = getAlbum().getPersons().stream().filter(person -> person.getFirstName().equals(personName)).findFirst();
-            personOptional.ifPresent(person -> filterData.put(Filter.BY_PERSON, String.valueOf(person.getId())));
+            Person person = (Person) mBinding.albumPhotographerSpinner.getSelectedItem();
+            filterData.put(Filter.BY_PERSON, String.valueOf(person.getId()));
         }
 
         mAlbumViewModel.filter(filterData);
@@ -198,11 +194,11 @@ public class GalleryAlbumActivity extends AppCompatActivity implements CompoundB
             mAdapterCategory.notifyDataSetChanged();
 
             mAdapterPhotographer.clear();
-            mAdapterPhotographer.addAll(album.getPersons().stream().map(Person::getFirstName).collect(Collectors.toList()));
+            mAdapterPhotographer.addAll(album.getPersons());
             mAdapterPhotographer.notifyDataSetChanged();
 
             mAdapterDate.clear();
-            mAdapterDate.addAll(album.getDates().stream().map(date -> MessageFormat.format("{0,date}", date)).collect(Collectors.toList()));
+            mAdapterDate.addAll(album.getDates());
             mAdapterDate.notifyDataSetChanged();
 
             mImageAdapter.clear();

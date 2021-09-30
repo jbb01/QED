@@ -12,12 +12,16 @@ import android.view.animation.Transformation;
 import android.widget.EditText;
 
 import androidx.annotation.StringRes;
+import androidx.lifecycle.MutableLiveData;
 
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.databinding.AlertDialogEditTextBinding;
 
-import java.text.DateFormat;
-import java.util.Calendar;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -137,43 +141,46 @@ public class ViewUtils {
         );
     }
 
-    public static void setupDateEditText(EditText editText, Calendar date) {
-        DateFormat format = android.text.format.DateFormat.getDateFormat(editText.getContext());
+    public static void setupDateEditText(EditText editText, MutableLiveData<LocalDate> date) {
+        DateTimeFormatter formatter = DateTimeFormatter
+                .ofLocalizedDate(FormatStyle.MEDIUM)
+                .withZone(ZoneId.systemDefault());
 
-        editText.setText(format.format(date.getTime()));
+        editText.setText(formatter.format(date.getValue()));
         editText.setOnClickListener(v -> {
             Context context = editText.getContext();
 
             DatePickerDialog dialog = new DatePickerDialog(
                     context,
                     (view, year, month, dayOfMonth) -> {
-                        date.set(year, month, dayOfMonth);
-                        editText.setText(format.format(date.getTime()));
+                        date.setValue(LocalDate.of(year, month + 1, dayOfMonth));
+                        editText.setText(formatter.format(date.getValue()));
                     },
-                    date.get(Calendar.YEAR),
-                    date.get(Calendar.MONTH),
-                    date.get(Calendar.DAY_OF_MONTH)
+                    date.getValue().getYear(),
+                    date.getValue().getMonthValue() - 1,
+                    date.getValue().getDayOfMonth()
             );
             dialog.show();
         });
     }
 
-    public static void setupTimeEditText(EditText editText, Calendar date) {
-        DateFormat format = android.text.format.DateFormat.getTimeFormat(editText.getContext());
+    public static void setupTimeEditText(EditText editText, MutableLiveData<LocalTime> time) {
+        DateTimeFormatter formatter = DateTimeFormatter
+                .ofLocalizedTime(FormatStyle.MEDIUM)
+                .withZone(ZoneId.systemDefault());
 
-        editText.setText(format.format(date.getTime()));
+        editText.setText(formatter.format(time.getValue()));
         editText.setOnClickListener(v -> {
             Context context = editText.getContext();
 
             TimePickerDialog dialog = new TimePickerDialog(
                     context,
                     (view, hourOfDay, minute) -> {
-                        date.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                        date.set(Calendar.MINUTE, minute);
-                        editText.setText(format.format(date.getTime()));
+                        time.setValue(LocalTime.of(hourOfDay, minute));
+                        editText.setText(formatter.format(time.getValue()));
                     },
-                    date.get(Calendar.HOUR_OF_DAY),
-                    date.get(Calendar.MINUTE),
+                    time.getValue().getHour(),
+                    time.getValue().getMinute(),
                     android.text.format.DateFormat.is24HourFormat(context)
             );
 

@@ -8,9 +8,10 @@ import androidx.room.Query;
 import androidx.room.TypeConverters;
 
 import com.jonahbauer.qed.model.Message;
+import com.jonahbauer.qed.util.MessageUtils;
 
+import java.time.Instant;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 import io.reactivex.rxjava3.core.Completable;
@@ -34,8 +35,8 @@ public interface MessageDao {
     Single<List<Message>> findAll(@Nullable String channel,
                                   @Nullable String message,
                                   @Nullable String name,
-                                  @Nullable Date fromDate,
-                                  @Nullable Date toDate,
+                                  @Nullable Instant fromDate,
+                                  @Nullable Instant toDate,
                                   @Nullable Long fromId,
                                   @Nullable Long toId,
                                   long limit);
@@ -48,4 +49,11 @@ public interface MessageDao {
 
     @Query("DELETE FROM message")
     Completable clear();
+
+    /**
+     * Returns all messages that are "near" a local time overlap due to daylight savings time.
+     * @see MessageUtils#dateFixer()
+     */
+    @Query("SELECT * FROM message WHERE (date / 86400) % 7 == 3 AND strftime('%m-%d', date, 'unixepoch') BETWEEN '10-25' AND '10-31' ORDER BY id")
+    Single<List<Message>> possibleDateErrors();
 }

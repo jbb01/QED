@@ -13,8 +13,8 @@ import androidx.room.TypeConverters;
 
 import com.jonahbauer.qed.model.room.Converters;
 
+import java.time.Instant;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -96,10 +96,10 @@ public class Image implements Parcelable {
     private String owner;
 
     @ColumnInfo(name = "upload_date")
-    private Date uploadDate;
+    private Instant uploadTime;
 
     @ColumnInfo(name = "creation_date")
-    private Date creationDate;
+    private Instant creationTime;
 
     @ColumnInfo(name = "original")
     private boolean original;
@@ -123,8 +123,8 @@ public class Image implements Parcelable {
         this.setPath(image.getPath());
         this.setName(image.getName());
         this.setOwner(image.getOwner());
-        this.setUploadDate(image.getUploadDate());
-        this.setCreationDate(image.getCreationDate());
+        this.setUploadTime(image.getUploadTime());
+        this.setCreationTime(image.getCreationTime());
         this.setOriginal(image.isOriginal());
         this.setLoaded(image.isLoaded());
         this.setThumbnail(image.getThumbnail());
@@ -140,8 +140,8 @@ public class Image implements Parcelable {
         if (path != null) entries.add("\"path\":\"" + path + "\"");
         if (name != null) entries.add("\"name\":\"" + name + "\"");
         if (owner != null) entries.add("\"owner\":\"" + owner + "\"");
-        if (uploadDate != null) entries.add("\"uploadDate\":" + uploadDate.getTime());
-        if (creationDate != null) entries.add("\"creationDate\":" + creationDate.getTime());
+        if (uploadTime != null) entries.add("\"uploadDate\":" + uploadTime.getEpochSecond());
+        if (creationTime != null) entries.add("\"creationDate\":" + creationTime.getEpochSecond());
         entries.add("\"original\":" + original);
         entries.add("\"loaded\":" + loaded);
         if (!data.isEmpty()) entries.add(data.entrySet().stream().map(e -> "\"" + e.getKey() + "\":\"" + e.getValue() + "\"").collect(Collectors.joining(",")));
@@ -175,14 +175,14 @@ public class Image implements Parcelable {
         dest.writeString(format);
         dest.writeString(path);
         dest.writeString(owner);
-        dest.writeSerializable(uploadDate);
-        dest.writeSerializable(creationDate);
+        dest.writeSerializable(uploadTime);
+        dest.writeSerializable(creationTime);
         dest.writeInt((original ? 1 : 0));
         dest.writeInt((loaded ? 1 : 0));
         dest.writeMap(data);
     }
 
-    public static final Parcelable.Creator<Image> CREATOR = new Parcelable.Creator<Image>() {
+    public static final Parcelable.Creator<Image> CREATOR = new Parcelable.Creator<>() {
         @NonNull
         @Override
         public Image createFromParcel(@NonNull Parcel source) {
@@ -191,8 +191,8 @@ public class Image implements Parcelable {
             image.format = source.readString();
             image.path = source.readString();
             image.owner = source.readString();
-            image.uploadDate = (Date) source.readSerializable();
-            image.creationDate = (Date) source.readSerializable();
+            image.uploadTime = (Instant) source.readSerializable();
+            image.creationTime = (Instant) source.readSerializable();
             image.original = source.readInt() != 0;
             image.loaded = source.readInt() != 0;
 

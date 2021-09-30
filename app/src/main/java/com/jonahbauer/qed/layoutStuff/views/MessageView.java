@@ -42,17 +42,15 @@ import androidx.annotation.StyleRes;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.model.Message;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 
 @SuppressWarnings({"unused"})
 public class MessageView extends RelativeLayout {
     private static final String TRIM = "(^[\\s\\u200B]*|[\\s\\u200B]*$)";
     private static final String TRIM_END = "[\\s\\u200B]*$";
     private static float dp = 0;
-
-    private final DateFormat DATE_FORMAT = SimpleDateFormat.getTimeInstance();
-    private final DateFormat DATE_FORMAT_EXTENDED = SimpleDateFormat.getDateTimeInstance();
 
     private TextView mNameTextView;
     private TextView mMessageTextView;
@@ -595,9 +593,13 @@ public class MessageView extends RelativeLayout {
         }
 
         if (mExtended) {
-            mDate = DATE_FORMAT_EXTENDED.format(message.getDate());
+            mDate = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
+                                     .withZone(ZoneId.systemDefault())
+                                     .format(message.getDate());
         } else {
-            mDate = DATE_FORMAT.format(message.getDate());
+            mDate = DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM)
+                                     .withZone(ZoneId.systemDefault())
+                                     .format(message.getDate());
         }
 
         mNameTextView.setVisibility(VISIBLE);

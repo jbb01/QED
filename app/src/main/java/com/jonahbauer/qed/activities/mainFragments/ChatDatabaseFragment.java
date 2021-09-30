@@ -2,6 +2,7 @@ package com.jonahbauer.qed.activities.mainFragments;
 
 import android.graphics.drawable.Animatable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -9,31 +10,46 @@ import android.widget.EditText;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StyleRes;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.databinding.FragmentChatDatabaseBinding;
+import com.jonahbauer.qed.model.Message;
 import com.jonahbauer.qed.model.adapter.MessageAdapter;
+import com.jonahbauer.qed.model.room.Database;
+import com.jonahbauer.qed.model.room.MessageDao;
 import com.jonahbauer.qed.model.viewmodel.MessageListViewModel;
 import com.jonahbauer.qed.util.MessageUtils;
 import com.jonahbauer.qed.util.Preferences;
 import com.jonahbauer.qed.util.StatusWrapper;
 import com.jonahbauer.qed.util.ViewUtils;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 
 public class ChatDatabaseFragment extends QEDFragment implements CompoundButton.OnCheckedChangeListener {
+    private static final String LOG_TAG = ChatDatabaseFragment.class.getName();
+
     private MessageAdapter mMessageAdapter;
     private MessageListViewModel mMessageListViewModel;
 
-    private Calendar mDateFrom;
-    private Calendar mDateTo;
+    private MutableLiveData<LocalDate> mDateFrom;
+    private MutableLiveData<LocalTime> mTimeFrom;
+    private MutableLiveData<LocalDate> mDateTo;
+    private MutableLiveData<LocalTime> mTimeTo;
 
     private FragmentChatDatabaseBinding mBinding;
 
@@ -50,12 +66,42 @@ public class ChatDatabaseFragment extends QEDFragment implements CompoundButton.
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // Search the database for possible misassigned dates due to daylight savings time
+        // and try to fix them
+        Function<Message, Message> dateFixer = MessageUtils.dateFixer();
+        MessageDao messageDao = Database.getInstance(getContext()).messageDao();
+        //noinspection ResultOfMethodCallIgnored
+        messageDao.possibleDateErrors()
+                  .subscribeOn(Schedulers.io())
+                  .observeOn(Schedulers.computation())
+                  .map(list -> list.stream()
+                                   .map(msg -> {
+                                       Message out = dateFixer.apply(msg);
+                                       if (out == msg) return null;
+                                       else return out;
+                                   })
+                                   .filter(Objects::nonNull)
+                                   .collect(Collectors.toList())
+                  )
+                  .flatMapCompletable(messageDao::insert)
+                  .subscribe(
+                          () -> {},
+                          err -> Log.e(LOG_TAG, "Error fixing dates.", err)
+                  );
+    }
+
+    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         mBinding = FragmentChatDatabaseBinding.bind(view);
         mMessageListViewModel = new ViewModelProvider(this).get(MessageListViewModel.class);
 
-        mDateFrom = Calendar.getInstance();
-        mDateTo = Calendar.getInstance();
+        mDateFrom = new MutableLiveData<>(LocalDate.now());
+        mTimeFrom = new MutableLiveData<>(LocalTime.now());
+        mDateTo = new MutableLiveData<>(LocalDate.now());
+        mTimeTo = new MutableLiveData<>(LocalTime.now());
 
         // setup list view
         mMessageAdapter = new MessageAdapter(requireContext(), new ArrayList<>(), null, false, null, true);
@@ -90,8 +136,8 @@ public class ChatDatabaseFragment extends QEDFragment implements CompoundButton.
 
         ViewUtils.setupDateEditText(mBinding.databaseDateFromEditText, mDateFrom);
         ViewUtils.setupDateEditText(mBinding.databaseDateToEditText, mDateTo);
-        ViewUtils.setupTimeEditText(mBinding.databaseTimeFromEditText, mDateFrom);
-        ViewUtils.setupTimeEditText(mBinding.databaseTimeToEditText, mDateTo);
+        ViewUtils.setupTimeEditText(mBinding.databaseTimeFromEditText, mTimeFrom);
+        ViewUtils.setupTimeEditText(mBinding.databaseTimeToEditText, mTimeTo);
 
         mMessageListViewModel.getMessages().observe(getViewLifecycleOwner(), messages -> {
             mBinding.setStatus(messages.getCode());
@@ -158,8 +204,8 @@ public class ChatDatabaseFragment extends QEDFragment implements CompoundButton.
         String channel = null;
         String message = null;
         String name = null;
-        Date fromDate = null;
-        Date toDate = null;
+        Instant fromDate = null;
+        Instant toDate = null;
         Long fromId = null;
         Long toId = null;
         long limit = Preferences.chat().getDbMaxResults();
@@ -177,11 +223,15 @@ public class ChatDatabaseFragment extends QEDFragment implements CompoundButton.
         }
         
         if (mBinding.databaseDateFromCheckbox.isChecked()) {
-            fromDate = mDateFrom.getTime();
+            LocalDate date = mDateFrom.getValue();
+            LocalTime time = mTimeFrom.getValue();
+            fromDate = ZonedDateTime.of(date, time, ZoneId.systemDefault()).toInstant();
         }
 
         if (mBinding.databaseDateToCheckbox.isChecked()) {
-            toDate = mDateTo.getTime();
+            LocalDate date = mDateTo.getValue();
+            LocalTime time = mTimeTo.getValue();
+            toDate = ZonedDateTime.of(date, time, ZoneId.systemDefault()).toInstant();
         }
 
         if (mBinding.databaseIdCheckbox.isChecked()) {

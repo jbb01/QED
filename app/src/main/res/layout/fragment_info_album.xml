@@ -5,6 +5,7 @@
     <data>
         <import type="android.view.View"/>
         <import type="com.jonahbauer.qed.util.Actions"/>
+        <import type="com.jonahbauer.qed.util.TimeUtils"/>
         <import type="java.text.MessageFormat"/>
 
         <variable name="loading" type="boolean" />
@@ -74,7 +75,7 @@
             <include layout="@layout/list_item"
                 android:visibility="@{album.dates.size() > 0 ? View.VISIBLE : View.GONE}"
                 app:icon="@{@drawable/ic_album_dates}"
-                app:title="@{MessageFormat.format(@string/album_title_dates, album.dates[0], album.dates[album.dates.size() - 1])}"
+                app:title="@{MessageFormat.format(@string/album_title_dates, TimeUtils.format(album.dates[0]), TimeUtils.format(album.dates[album.dates.size() - 1]))}"
                 app:subtitle="@{@string/album_subtitle_dates}"/>
 
             <include layout="@layout/list_item"

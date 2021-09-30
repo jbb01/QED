@@ -125,11 +125,11 @@
     <string name="person_section_contacts">Contact Information</string>
     <string name="person_section_registrations">Registrations</string>
     <string name="person_subtitle_mail">Email Address</string>
-    <string name="person_title_birthday">{0,date}</string>
+    <string name="person_title_birthday">{0}</string>
     <string name="person_subtitle_birthday">Birthday</string>
-    <string name="person_title_date_of_joining">{0,date}</string>
+    <string name="person_title_date_of_joining">{0}</string>
     <string name="person_subtitle_date_of_joining">Date of Joining</string>
-    <string name="person_title_leaving_date">{0,date}</string>
+    <string name="person_title_leaving_date">{0}</string>
     <string name="person_subtitle_leaving_date">Leaving Date</string>
     <string name="person_title_member_true">Yes</string>
     <string name="person_title_member_false">No</string>
@@ -147,9 +147,9 @@
     <string name="event_section_information">General</string>
     <string name="event_section_organization">Organizers</string>
     <string name="event_section_participants">Participants</string>
-    <string name="event_title_time">{0,date} - {1,date}</string>
+    <string name="event_title_time">{0} - {1}</string>
     <string name="event_subtitle_time">Time Frame</string>
-    <string name="event_title_deadline">{0,date} {0,time}</string>
+    <string name="event_title_deadline">{0}</string>
     <string name="event_subtitle_deadline">Registration Deadline</string>
     <string name="event_subtitle_hotel">Venue</string>
     <string name="event_subtitle_hotel_address">Venue Address</string>
@@ -167,7 +167,7 @@
     <string name="album_section_categories">Categories</string>
     <string name="album_subtitle_owner">Owner</string>
     <string name="album_subtitle_creation_date">Creation Date</string>
-    <string name="album_title_dates">{0,date} - {1,date}</string>
+    <string name="album_title_dates">{0} - {1}</string>
     <string name="album_subtitle_dates">Time</string>
     <string name="album_subtitle_image_count">Image Count</string>
     <string name="album_title_private">Private Album</string>
@@ -181,7 +181,7 @@
     <string name="message_subtitle_username">Username</string>
     <string name="message_subtitle_channel">Channel</string>
     <string name="message_subtitle_timestamp">Timestamp</string>
-    <string name="message_title_timestamp">{0, date} {0, time}</string>
+    <string name="message_title_timestamp">{0}</string>
     <string name="message_subtitle_bottag">Bottag</string>
 
     <!-- Registration -->
@@ -276,7 +276,7 @@
 
     <!-- Log Fragment -->
     <string name="title_fragment_log">Log</string>
-    <string name="log_subtitle_date_interval">Posts from {0,date,dd.MM.yyyy} until {1,date,dd.MM.yyyy}</string>
+    <string name="log_subtitle_date_interval">Posts from {0} until {1}</string>
     <string name="log_subtitle_date_recent">Posts of the last {0,choice,1#|2#{0} }hour{0,choice,1#|2#s}</string>
     <string name="log_subtitle_post_recent">Last{0,choice,1#|2# {0}} Post{0,choice,1#|2#s}</string>
     <string name="log_subtitle_post_interval">Posts from #{0} to #{1}</string>
@@ -303,6 +303,7 @@
     <!-- Log Dialog Activity -->
     <string name="title_activity_log_dialog">Logs</string>
     <string name="log_dialog_mode_label">Mode</string>
+    <string name="log_dialog_date_convert_timezone">{0} will be converted to {1} due to loss of information when converting between time zones</string>
     <string name="log_request_postrecent_before">Last</string>
     <string name="log_request_postrecent_after">Posts</string>
     <string name="log_request_sinceown_before">Skip</string>
@@ -319,14 +320,6 @@
     <string name="log_request_mode_postinterval">postinterval</string>
     <string name="log_request_mode_sinceown">fromownpost</string>
     <string name="log_request_mode_file">file</string>
-    <string-array name="log_request_modes">
-        <item>@string/log_request_mode_postrecent</item>
-        <item>@string/log_request_mode_postinterval</item>
-        <item>@string/log_request_mode_daterecent</item>
-        <item>@string/log_request_mode_dateinterval</item>
-        <item>@string/log_request_mode_sinceown</item>
-        <item>@string/log_request_mode_file</item>
-    </string-array>
 
     <!-- Album Fragment-->
     <string name="gallery_folder_images" translatable="false">gallery/images</string>

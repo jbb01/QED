@@ -2,6 +2,7 @@ package com.jonahbauer.qed.activities;
 
 import static com.jonahbauer.qed.activities.DeepLinkingActivity.QEDIntent;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.util.TypedValue;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -208,6 +210,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // open navigation drawer
         if (item.getItemId() == android.R.id.home) {
             mBinding.drawerLayout.openDrawer(GravityCompat.START);
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(mBinding.getRoot().getWindowToken(), 0);
             return true;
         }
 

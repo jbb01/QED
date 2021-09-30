@@ -5,12 +5,12 @@
     <data>
 
         <import type="android.view.View" />
-
         <import type="com.jonahbauer.qed.model.viewmodel.LogViewModel.Mode" />
 
-        <variable
-            name="mode"
-            type="Mode" />
+        <variable name="mode" type="Mode" />
+        <variable name="error" type="java.lang.String"/>
+        <variable name="errorDateFrom" type="java.lang.String"/>
+        <variable name="errorDateTo" type="java.lang.String"/>
     </data>
 
     <TableLayout
@@ -36,8 +36,7 @@
                 android:layout_height="match_parent"
                 android:layout_marginStart="8dp"
                 android:layout_weight="1"
-                android:minHeight="40dp"
-                android:entries="@array/log_request_modes"/>
+                android:minHeight="40dp"/>
         </TableRow>
 
         <TableRow android:visibility="@{mode == Mode.POST_RECENT ? View.VISIBLE : View.GONE}">
@@ -137,21 +136,53 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
-                android:labelFor="@id/log_dialog_dateinterval_from"
+                android:labelFor="@id/log_dialog_dateinterval_date_from"
                 android:text="@string/log_request_dateinterval_from"
                 android:textAppearance="?textAppearanceBody1" />
 
-            <EditText
-                android:id="@+id/log_dialog_dateinterval_from"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_marginStart="8dp"
                 android:layout_weight="1"
-                android:ems="10"
-                android:focusable="false"
-                android:importantForAutofill="no"
-                android:inputType="date"
-                android:selectAllOnFocus="true" />
+                android:orientation="horizontal">
+                <EditText
+                    android:id="@+id/log_dialog_dateinterval_date_from"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:focusable="false"
+                    android:importantForAutofill="no"
+                    android:inputType="date"
+                    android:selectAllOnFocus="true" />
+                <EditText
+                    android:id="@+id/log_dialog_dateinterval_time_from"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:focusable="false"
+                    android:importantForAutofill="no"
+                    android:inputType="time"
+                    android:selectAllOnFocus="true" />
+            </LinearLayout>
+        </TableRow>
+
+        <TableRow android:visibility="@{mode == Mode.DATE_INTERVAL ? View.VISIBLE : View.GONE}">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_column="1"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:text="@{errorDateFrom}"
+                android:textSize="12sp"
+                android:textAppearance="?textAppearanceBody1"
+                android:textColor="?colorError"
+                android:visibility="@{errorDateFrom == null ? View.GONE : View.VISIBLE}"
+                tools:text="@string/error"/>
         </TableRow>
 
         <TableRow android:visibility="@{mode == Mode.DATE_INTERVAL ? View.VISIBLE : View.GONE}">
@@ -160,21 +191,53 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
-                android:labelFor="@id/log_dialog_dateinterval_to"
+                android:labelFor="@id/log_dialog_dateinterval_date_to"
                 android:text="@string/log_request_dateinterval_to"
                 android:textAppearance="?textAppearanceBody1" />
 
-            <EditText
-                android:id="@+id/log_dialog_dateinterval_to"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_marginStart="8dp"
                 android:layout_weight="1"
-                android:ems="10"
-                android:focusable="false"
-                android:importantForAutofill="no"
-                android:inputType="date"
-                android:selectAllOnFocus="true" />
+                android:orientation="horizontal">
+                <EditText
+                    android:id="@+id/log_dialog_dateinterval_date_to"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:focusable="false"
+                    android:importantForAutofill="no"
+                    android:inputType="date"
+                    android:selectAllOnFocus="true" />
+                <EditText
+                    android:id="@+id/log_dialog_dateinterval_time_to"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:focusable="false"
+                    android:importantForAutofill="no"
+                    android:inputType="time"
+                    android:selectAllOnFocus="true" />
+            </LinearLayout>
+        </TableRow>
+
+        <TableRow android:visibility="@{mode == Mode.DATE_INTERVAL ? View.VISIBLE : View.GONE}">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_column="1"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:text="@{errorDateTo}"
+                android:textSize="12sp"
+                android:textAppearance="?textAppearanceBody1"
+                android:textColor="?colorError"
+                android:visibility="@{errorDateTo == null ? View.GONE : View.VISIBLE}"
+                tools:text="@string/error"/>
         </TableRow>
 
         <TableRow
@@ -274,14 +337,15 @@
         </TableRow>
 
         <TextView
-            android:id="@+id/log_dialog_running_download"
+            android:id="@+id/log_dialog_status"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingTop="16dp"
-            android:text="@string/log_download_running_force_cancel"
+            android:text="@{error}"
             android:textAppearance="?textAppearanceBody1"
             android:textColor="?colorError"
-            android:visibility="gone"
+            android:visibility="@{error == null ? View.GONE : View.VISIBLE}"
+            tools:text="@string/error"
             tools:visibility="visible" />
 
     </TableLayout>

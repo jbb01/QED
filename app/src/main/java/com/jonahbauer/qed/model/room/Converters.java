@@ -12,8 +12,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.nio.ByteBuffer;
+import java.nio.LongBuffer;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -22,17 +25,56 @@ import java.util.Map;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
+@SuppressWarnings("unused")
 public class Converters {
+    //<editor-fold desc="Time" defaultstate="collapse">
     @TypeConverter
-    public static Date dateFromTimestamp(Long value) {
-        return value == null ? null : new Date(value);
+    public static Instant instantFromLong(Long value) {
+        return value == null ? null : Instant.ofEpochSecond(value);
     }
 
     @TypeConverter
-    public static Long dateToTimestamp(Date date) {
-        return date == null ? null : date.getTime();
+    public static Long instantToLong(Instant instant) {
+        return instant == null ? null : instant.getEpochSecond();
     }
 
+    @TypeConverter
+    public static LocalDate localDateFromLong(Long value) {
+        return value == null ? null : LocalDate.ofEpochDay(value);
+    }
+
+    @TypeConverter
+    public static Long localDateToLong(LocalDate date) {
+        return date == null ? null : date.toEpochDay();
+    }
+
+    @TypeConverter
+    public static List<LocalDate> localDateListFromBlob(byte[] list) {
+        ArrayList<LocalDate> out = new ArrayList<>(list.length / 8);
+
+        ByteBuffer buffer = ByteBuffer.wrap(list);
+        LongBuffer longBuffer = buffer.asLongBuffer();
+        while (longBuffer.hasRemaining()) {
+            out.add(LocalDate.ofEpochDay(longBuffer.get()));
+        }
+
+        return out;
+    }
+
+    @TypeConverter
+    public static byte[] localDateListToBlob(List<LocalDate> list) {
+        ByteBuffer buffer = ByteBuffer.allocate(list.size() * 8);
+        LongBuffer longBuffer = buffer.asLongBuffer();
+
+        for (LocalDate date : list) {
+            longBuffer.put(date.toEpochDay());
+        }
+
+        return buffer.array();
+    }
+    //</editor-fold>
+
+    //<editor-fold desc="Collections" defaultstate="collapse">
     @TypeConverter
     public static Map<String, String> mapFromString(String str) {
         try {
@@ -63,22 +105,6 @@ public class Converters {
     }
 
     @TypeConverter
-    public static Bitmap bitmapFromBlob(byte[] blob) {
-        if (blob == null) return null;
-
-        return BitmapFactory.decodeByteArray(blob, 0, blob.length);
-    }
-
-    @TypeConverter
-    public static byte[] bitmapToBlob(Bitmap bitmap) {
-        if (bitmap == null) return null;
-
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-        return stream.toByteArray();
-    }
-
-    @TypeConverter
     public static List<String> stringListFromString(String str) {
         try {
             JSONArray json = new JSONArray(str);
@@ -99,6 +125,23 @@ public class Converters {
         JSONArray jsonArray = new JSONArray();
         list.forEach(jsonArray::put);
         return jsonArray.toString();
+    }
+    //</editor-fold>
+
+    @TypeConverter
+    public static Bitmap bitmapFromBlob(byte[] blob) {
+        if (blob == null) return null;
+
+        return BitmapFactory.decodeByteArray(blob, 0, blob.length);
+    }
+
+    @TypeConverter
+    public static byte[] bitmapToBlob(Bitmap bitmap) {
+        if (bitmap == null) return null;
+
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        return stream.toByteArray();
     }
 
     @TypeConverter
@@ -126,29 +169,6 @@ public class Converters {
             jsonArray.put(person.getId());
             jsonArray.put(person.getFirstName());
         });
-        return jsonArray.toString();
-    }
-
-    @TypeConverter
-    public static List<Date> dateListFromString(String str) {
-        try {
-            JSONArray json = new JSONArray(str);
-            List<Date> out = new ArrayList<>(json.length());
-
-            for (int i = 0, length = json.length(); i < length; i++) {
-                out.add(new Date(json.getLong(i)));
-            }
-
-            return out;
-        } catch (JSONException e) {
-            return null;
-        }
-    }
-
-    @TypeConverter
-    public static String dateListToString(List<Date> list) {
-        JSONArray jsonArray = new JSONArray();
-        list.forEach(date -> jsonArray.put(date.getTime()));
         return jsonArray.toString();
     }
 }

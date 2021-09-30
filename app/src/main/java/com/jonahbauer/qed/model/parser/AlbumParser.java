@@ -16,7 +16,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.net.URLDecoder;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -113,6 +113,7 @@ public final class AlbumParser extends HtmlParser<Album> {
                 Element value = b.nextElementSibling();
                 switch (key) {
                     case FILTER_KEY_OWNER: {
+                        //noinspection ConstantConditions
                         value.select("a").forEach(a -> {
                             try {
                                 Person person;
@@ -121,6 +122,7 @@ public final class AlbumParser extends HtmlParser<Album> {
                                 String href = a.attr("href");
                                 Matcher matcher = BY_OWNER.matcher(href);
                                 if (matcher.find()) {
+                                    //noinspection ConstantConditions
                                     person = new Person(Long.parseLong(matcher.group(1)));
                                 } else {
                                     person = new Person(-1);
@@ -131,40 +133,43 @@ public final class AlbumParser extends HtmlParser<Album> {
                                 if (name.startsWith(FILTER_OWNER_PREFIX)) {
                                     name = name.substring(FILTER_OWNER_PREFIX.length());
                                 }
-                                person.setFirstName(name);
+                                person.setUsername(name);
 
                                 album.getPersons().add(person);
                             } catch (Exception e) {
-                                Log.e(LOG_TAG, "Error parsing album.", e);
+                                Log.e(LOG_TAG, "Error parsing album " + album.getId() + ".", e);
                             }
                         });
                         break;
                     }
                     case FILTER_KEY_DATE: {
+                        //noinspection ConstantConditions
                         value.select("a").forEach(a -> {
                             try {
                                 // extract id
                                 String href = a.attr("href");
                                 Matcher matcher = BY_DAY.matcher(href);
                                 if (matcher.find()) {
-                                    Date date = parseDate(matcher.group(1));
+                                    LocalDate date = parseLocalDate(matcher.group(1));
                                     if (date != null) {
                                         album.getDates().add(date);
                                     }
                                 }
                             } catch (Exception e) {
-                                Log.e(LOG_TAG, "Error parsing album.", e);
+                                Log.e(LOG_TAG, "Error parsing album " + album.getId() + ".", e);
                             }
                         });
                         break;
                     }
                     case FILTER_KEY_CATEGORY: {
+                        //noinspection ConstantConditions
                         value.select("a").forEach(a -> {
                             try {
                                 String href = a.attr("href");
                                 Matcher matcher = BY_CATEGORY.matcher(href);
                                 if (matcher.find()) {
                                     String category = matcher.group(1);
+                                    //noinspection ConstantConditions
                                     if (category.isEmpty()) {
                                         album.getCategories().add(Album.CATEGORY_ETC);
                                     } else {
@@ -172,30 +177,36 @@ public final class AlbumParser extends HtmlParser<Album> {
                                     }
                                 }
                             } catch (Exception e) {
-                                Log.e(LOG_TAG, "Error parsing album.", e);
+                                Log.e(LOG_TAG, "Error parsing album " + album.getId() + ".", e);
                             }
                         });
                         break;
                     }
                 }
             } catch (Exception e) {
-                Log.e(LOG_TAG, "Error parsing album.", e);
+                Log.e(LOG_TAG, "Error parsing album " + album.getId() + ".", e);
             }
         });
     }
 
     private void parseInfoTable(Album album, Elements elements) {
         elements.forEach(th -> {
-            String key = th.text();
-            switch (key) {
-                case INFO_KEY_OWNER: {
-                    album.setOwner(th.nextElementSibling().text());
-                    break;
+            try {
+                String key = th.text();
+                switch (key) {
+                    case INFO_KEY_OWNER: {
+                        //noinspection ConstantConditions
+                        album.setOwner(th.nextElementSibling().text());
+                        break;
+                    }
+                    case INFO_KEY_CREATION_DATE: {
+                        //noinspection ConstantConditions
+                        album.setCreationDate(th.nextElementSibling().text());
+                        break;
+                    }
                 }
-                case INFO_KEY_CREATION_DATE: {
-                    album.setCreationDate(th.nextElementSibling().text());
-                    break;
-                }
+            } catch (Exception e) {
+                Log.e(LOG_TAG, "Error parsing album " + album.getId() + ".", e);
             }
         });
     }

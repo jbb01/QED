@@ -1,5 +1,7 @@
 package com.jonahbauer.qed.networking;
 
+import java.time.ZoneId;
+
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
@@ -29,4 +31,6 @@ public class NetworkConstants {
 
     public static final String GIT_HUB = "https://github.com/jbb01/QED";
     public static final String GIT_HUB_ISSUE_TRACKER = "https://github.com/jbb01/QED/issues/new";
+
+    public static final ZoneId SERVER_TIME_ZONE = ZoneId.of("Europe/Berlin");
 }

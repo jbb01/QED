@@ -17,6 +17,24 @@ public final class PersonParser extends HtmlParser<Person> {
     
     public static final PersonParser INSTANCE = new PersonParser();
 
+    private static final String GENERAL_KEY_FIRST_NAME = "Vorname:";
+    private static final String GENERAL_KEY_LAST_NAME = "Nachname:";
+    private static final String GENERAL_KEY_EMAIL = "Emailadresse:";
+    private static final String GENERAL_KEY_BIRTH_DAY = "Geburtstag:";
+    private static final String GENERAL_KEY_DATE_OF_JOINING = "Eingetreten:";
+    private static final String GENERAL_KEY_LEAVING_DATE = "Ausgetreten:";
+    private static final String GENERAL_KEY_MEMBER = "Aktuell Mitglied:";
+    private static final String GENERAL_KEY_ACTIVE = "Aktiviertes Profil:";
+
+    private static final String ADDITIONAL_KEY_HOME_STATION = "Bahnhof:";
+    private static final String ADDITIONAL_KEY_RAILCARD = "Bahnermäßigung:";
+    private static final String ADDITIONAL_KEY_NOTES = "Anmerkungen:";
+    private static final String ADDITIONAL_KEY_FOOD = "Essenswünsche:";
+
+    private static final String REGISTRATIONS_KEY_CANCELLED = "abgesagt";
+    private static final String REGISTRATIONS_KEY_OPEN = "offen";
+    private static final String REGISTRATIONS_KEY_ORGA = "Orga";
+
     private PersonParser() {}
 
     @NonNull
@@ -38,44 +56,45 @@ public final class PersonParser extends HtmlParser<Person> {
                    try {
                        String key = dt.text();
                        Element value = dt.nextElementSibling();
+                       //noinspection ConstantConditions
                        if (value.selectFirst("i") != null) return;
 
                        switch (key) {
-                           case "Vorname:": {
+                           case GENERAL_KEY_FIRST_NAME: {
                                person.setFirstName(value.text());
                                break;
                            }
-                           case "Nachname:": {
+                           case GENERAL_KEY_LAST_NAME: {
                                person.setLastName(value.text());
                                break;
                            }
-                           case "Emailadresse:": {
+                           case GENERAL_KEY_EMAIL: {
                                person.setEmail(value.child(0).text());
                                break;
                            }
-                           case "Geburtstag:": {
+                           case GENERAL_KEY_BIRTH_DAY: {
                                Element time = value.child(0);
                                person.setBirthdayString(time.text());
-                               person.setBirthday(parseDate(time.attr("datetime")));
+                               person.setBirthday(parseLocalDate(time.attr("datetime")));
                                break;
                            }
-                           case "Eingetreten:": {
+                           case GENERAL_KEY_DATE_OF_JOINING: {
                                Element time = value.child(0);
                                person.setDateOfJoiningString(time.text());
-                               person.setDateOfJoining(parseDate(time.attr("datetime")));
+                               person.setDateOfJoining(parseLocalDate(time.attr("datetime")));
                                break;
                            }
-                           case "Ausgetreten:": {
+                           case GENERAL_KEY_LEAVING_DATE: {
                                Element time = value.child(0);
                                person.setLeavingDateString(time.text());
-                               person.setLeavingDate(parseDate(time.attr("datetime")));
+                               person.setLeavingDate(parseLocalDate(time.attr("datetime")));
                                break;
                            }
-                           case "Aktuell Mitglied:": {
+                           case GENERAL_KEY_MEMBER: {
                                person.setMember("Ja".equals(value.text()));
                                break;
                            }
-                           case "Aktiviertes Profil:": {
+                           case GENERAL_KEY_ACTIVE: {
                                person.setActive("Ja".equals(value.text()));
                                break;
                            }
@@ -93,22 +112,23 @@ public final class PersonParser extends HtmlParser<Person> {
                    try {
                        String key = dt.text();
                        Element value = dt.nextElementSibling();
+                       //noinspection ConstantConditions
                        if (value.selectFirst("i") != null) return;
 
                        switch (key) {
-                           case "Bahnhof:": {
+                           case ADDITIONAL_KEY_HOME_STATION: {
                                person.setHomeStation(value.text());
                                break;
                            }
-                           case "Bahnermäßigung:": {
+                           case ADDITIONAL_KEY_RAILCARD: {
                                person.setRailcard(value.text());
                                break;
                            }
-                           case "Anmerkungen:": {
+                           case ADDITIONAL_KEY_NOTES: {
                                person.setNotes(value.text());
                                break;
                            }
-                           case "Essenswünsche:": {
+                           case ADDITIONAL_KEY_FOOD: {
                                person.setFood(value.text());
                                break;
                            }
@@ -141,6 +161,7 @@ public final class PersonParser extends HtmlParser<Person> {
                    try {
                        String key = dt.text();
                        Element value = dt.nextElementSibling();
+                       //noinspection ConstantConditions
                        if (value.selectFirst("i") != null) return;
 
                        person.getContacts().add(Pair.create(
@@ -165,12 +186,12 @@ public final class PersonParser extends HtmlParser<Person> {
                 Element statusElement = li.selectFirst("i");
                 String statusString = statusElement != null ? statusElement.text() : "";
 
-                boolean orga = statusString.contains("Orga");
+                boolean orga = statusString.contains(REGISTRATIONS_KEY_ORGA);
 
                 Registration.Status status = Registration.Status.CONFIRMED;
-                if (statusString.contains("abgesagt")) {
+                if (statusString.contains(REGISTRATIONS_KEY_CANCELLED)) {
                     status = Registration.Status.CANCELLED;
-                } else if (statusString.contains("offen")) {
+                } else if (statusString.contains(REGISTRATIONS_KEY_OPEN)) {
                     status = Registration.Status.OPEN;
                 }
 

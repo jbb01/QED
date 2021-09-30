@@ -13,26 +13,31 @@ import android.net.Uri;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.model.Message;
+import com.jonahbauer.qed.networking.NetworkConstants;
 import com.jonahbauer.qed.networking.Reason;
 import com.jonahbauer.qed.networking.async.QEDPageStreamReceiver;
 import com.jonahbauer.qed.networking.pages.QEDChatPages;
 import com.jonahbauer.qed.util.StatusWrapper;
+import com.jonahbauer.qed.util.TimeUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
@@ -159,17 +164,24 @@ public class LogViewModel extends AndroidViewModel {
     }
 
     public enum Mode {
-        POST_RECENT("postrecent"),
-        DATE_RECENT("daterecent"),
-        DATE_INTERVAL("dateinterval"),
-        POST_INTERVAL("postinterval"),
-        SINCE_OWN("fromownpost"),
-        FILE("file");
+        POST_RECENT,
+        DATE_RECENT,
+        DATE_INTERVAL,
+        POST_INTERVAL,
+        SINCE_OWN,
+        FILE;
 
-        final String modeStr;
-
-        Mode(String modeStr) {
-            this.modeStr = modeStr;
+        @StringRes
+        public int toStringRes() {
+            switch (this) {
+                case POST_RECENT: return R.string.log_request_mode_postrecent;
+                case DATE_RECENT: return R.string.log_request_mode_daterecent;
+                case DATE_INTERVAL: return R.string.log_request_mode_dateinterval;
+                case POST_INTERVAL: return R.string.log_request_mode_postinterval;
+                case SINCE_OWN: return R.string.log_request_mode_sinceown;
+                case FILE: return R.string.log_request_mode_file;
+            }
+            throw new AssertionError();
         }
     }
 
@@ -211,8 +223,11 @@ public class LogViewModel extends AndroidViewModel {
                         return new PostIntervalLogRequest(channel, from, to);
                     }
                     case "dateinterval": {
-                        Date from = DateIntervalLogRequest.DATE_FORMAT.parse(uri.getQueryParameter("from"));
-                        Date to = DateIntervalLogRequest.DATE_FORMAT.parse(uri.getQueryParameter("to"));
+                        LocalDate localFrom = LocalDate.from(DateIntervalLogRequest.DATE_PARSER.parse(uri.getQueryParameter("from")));
+                        LocalDate localTo = LocalDate.from(DateIntervalLogRequest.DATE_PARSER.parse(uri.getQueryParameter("to")));
+
+                        Instant from = ZonedDateTime.of(localFrom, LocalTime.MIN, NetworkConstants.SERVER_TIME_ZONE).toInstant();
+                        Instant to = ZonedDateTime.of(localTo, LocalTime.MAX, NetworkConstants.SERVER_TIME_ZONE).toInstant();
                         return new DateIntervalLogRequest(channel, from, to);
                     }
                     case "fromownpost": {
@@ -242,6 +257,9 @@ public class LogViewModel extends AndroidViewModel {
         }
     }
 
+    /**
+     * A {@link LogRequest} requesting the {@link #last n} most recent posts.
+     */
     @Getter
     @EqualsAndHashCode(callSuper = true)
     public static class PostRecentLogRequest extends OnlineLogRequest {
@@ -263,6 +281,9 @@ public class LogViewModel extends AndroidViewModel {
         }
     }
 
+    /**
+     * A {@link LogRequest} requesting all posts since {@link #seconds n} seconds ago.
+     */
     @Getter
     @EqualsAndHashCode(callSuper = true)
     public static class DateRecentLogRequest extends OnlineLogRequest {
@@ -284,6 +305,10 @@ public class LogViewModel extends AndroidViewModel {
         }
     }
 
+    /**
+     * A {@link LogRequest} requesting all posts that have an {@link Message#getId() id} between
+     * {@link #from} and {@link #to} (both inclusive).
+     */
     @Getter
     @EqualsAndHashCode(callSuper = true)
     public static class PostIntervalLogRequest extends OnlineLogRequest {
@@ -307,15 +332,22 @@ public class LogViewModel extends AndroidViewModel {
         }
     }
 
+    /**
+     * A {@link LogRequest} requesting all posts posted between {@link #from} and {@link #to}.
+     */
     @Getter
     @EqualsAndHashCode(callSuper = true)
     public static class DateIntervalLogRequest extends OnlineLogRequest {
-        private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd", Locale.GERMANY);
+        private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter
+                .ofPattern("yyyy-MM-dd'T'HH:mm:ss")
+                .withZone(NetworkConstants.SERVER_TIME_ZONE);
+        private static final DateTimeFormatter DATE_PARSER = DateTimeFormatter
+                .ofPattern("yyyy-MM-dd");
 
-        private final Date from;
-        private final Date to;
+        private final Instant from;
+        private final Instant to;
 
-        public DateIntervalLogRequest(String channel, Date from, Date to) {
+        public DateIntervalLogRequest(String channel, Instant from, Instant to) {
             super(DATE_INTERVAL, channel);
             this.from = from;
             this.to = to;
@@ -323,15 +355,19 @@ public class LogViewModel extends AndroidViewModel {
 
         @Override
         public String getQueryString() {
-            return super.getQueryString() + "&mode=dateinterval&from=" + DATE_FORMAT.format(from) + "&to=" + DATE_FORMAT.format(to);
+            return super.getQueryString() + "&mode=dateinterval&from=" + DATE_TIME_FORMATTER.format(from) + "&to=" + DATE_TIME_FORMATTER.format(to);
         }
 
         @Override
         public String getSubtitle(Resources resources) {
-            return MessageFormat.format(resources.getString(R.string.log_subtitle_date_interval), from, to);
+            return MessageFormat.format(resources.getString(R.string.log_subtitle_date_interval), TimeUtils.format(from), TimeUtils.format(to));
         }
     }
 
+    /**
+     * A {@link LogRequest} requesting all posts since one's most recent post skipping the {@link #skip n}
+     * most recent posts.
+     */
     @Getter
     @EqualsAndHashCode(callSuper = true)
     public static class SinceOwnLogRequest extends OnlineLogRequest {

@@ -9,8 +9,9 @@ import com.jonahbauer.qed.model.Message;
 import com.jonahbauer.qed.model.Person;
 import com.jonahbauer.qed.model.Registration;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 import lombok.experimental.UtilityClass;
 
@@ -21,7 +22,7 @@ public class Debug {
         person.setFirstName("Max");
         person.setLastName("Mustermann");
         person.setEmail("max.mustermann@example.org");
-        person.setBirthday(new GregorianCalendar(2000, Calendar.JANUARY, 1).getTime());
+        person.setBirthday(LocalDate.of(2000, 1, 1));
         person.setBirthdayString("01.01.2000");
         person.setHomeStation("Musterstadt");
         person.setRailcard("Bahncard 42");
@@ -29,9 +30,9 @@ public class Debug {
         person.setNotes("Raum für Notizen");
         person.setMember(true);
         person.setActive(true);
-        person.setDateOfJoining(new GregorianCalendar(2020, Calendar.MONTH, 14).getTime());
+        person.setDateOfJoining(LocalDate.of(2020, 3, 2));
         person.setDateOfJoiningString("03/14/2020");
-        person.setLeavingDate(new GregorianCalendar(2050, Calendar.DECEMBER, 31).getTime());
+        person.setLeavingDate(LocalDate.of(2050, 12, 31));
         person.setLeavingDateString("31-12-2050");
         person.getContacts().add(Pair.create("mobil", "0123456789"));
         person.getContacts().add(Pair.create("daheim", "987654321"));
@@ -69,13 +70,13 @@ public class Debug {
         event.setNotes("Raum für Notizen");
         event.setMaxParticipants(50);
 
-        event.setStart(new GregorianCalendar(2021, Calendar.AUGUST, 1).getTime());
+        event.setStart(LocalDate.of(2021, 8, 1));
         event.setStartString("01.08.2021");
 
-        event.setEnd(new GregorianCalendar(2021, Calendar.AUGUST, 10).getTime());
+        event.setEnd(LocalDate.of(2021, 8, 10));
         event.setEndString("10.08.2021");
 
-        event.setDeadline(new GregorianCalendar(2021, Calendar.JULY, 16).getTime());
+        event.setDeadline(LocalDate.of(2021, 7, 16));
         event.setDeadlineString("16.07.2021");
 
         event.setHotel("Musterunterkunft");
@@ -122,7 +123,7 @@ public class Debug {
         album.getCategories().add("Sonstige");
         album.getPersons().add(dummyPerson());
         for (int i = 1; i < 6; i++) {
-            album.getDates().add(new GregorianCalendar(2000, Calendar.JANUARY, i).getTime());
+            album.getDates().add(LocalDate.of(2000, 1, i));
         }
         for (int i = 0; i < 10; i++) {
             album.getImages().add(new Image(-1));
@@ -135,7 +136,7 @@ public class Debug {
                 1_000_007,
                 "Max Mustermann",
                 loremIpsum(),
-                new GregorianCalendar(2000, Calendar.JANUARY, 1).getTime(),
+                ZonedDateTime.of(2000, 1, 1, 13, 37, 0, 0, ZoneId.of("Europe/Berlin")).toInstant(),
                 1337,
                 "Max Mustermann",
                 "FF0000",

@@ -15,6 +15,7 @@ import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
 
 import com.jonahbauer.qed.model.room.Converters;
+import com.jonahbauer.qed.networking.NetworkConstants;
 import com.jonahbauer.qed.util.Preferences;
 
 import org.jetbrains.annotations.Contract;
@@ -22,11 +23,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Locale;
-import java.util.TimeZone;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -40,20 +43,15 @@ import lombok.EqualsAndHashCode;
 @TypeConverters(Converters.class)
 public class Message implements Parcelable, Comparable<Message>, Serializable {
     private static final String LOG_TAG = Message.class.getName();
-    private static final ThreadLocal<SimpleDateFormat> DATE_FORMAT = new ThreadLocal<>() {
-        @NonNull
-        @Override
-        protected SimpleDateFormat initialValue() {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.GERMANY);
-            sdf.setTimeZone(TimeZone.getTimeZone("CET"));
-            return sdf;
-        }
-    };
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter
+            .ofPattern("yyyy-MM-dd HH:mm:ss")
+            .withLocale(Locale.GERMANY)
+            .withZone(NetworkConstants.SERVER_TIME_ZONE);
 
-    public static final Message PONG = new Message(0, "PONG", "PONG", new Date(0), 0, "PONG", "000000", 0, "PONG");
-    public static final Message PING = new Message(0, "PING", "PING", new Date(0), 0, "PING", "000000", 0, "PING");
-    public static final Message ACK = new Message(0, "ACK", "ACK", new Date(0), 0, "ACK", "000000", 0, "ACK");
-    public static final Message OK = new Message(0, "OK", "OK", new Date(0), 0, "OK", "000000", 0, "OK");
+    public static final Message PONG = new Message(0, "PONG", "PONG", Instant.EPOCH, 0, "PONG", "000000", 0, "PONG");
+    public static final Message PING = new Message(0, "PING", "PING", Instant.EPOCH, 0, "PING", "000000", 0, "PING");
+    public static final Message ACK = new Message(0, "ACK", "ACK", Instant.EPOCH, 0, "ACK", "000000", 0, "ACK");
+    public static final Message OK = new Message(0, "OK", "OK", Instant.EPOCH, 0, "OK", "000000", 0, "OK");
 
     @PrimaryKey
     private final long id;
@@ -68,7 +66,7 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
 
     @NonNull
     @ColumnInfo(name = "date")
-    private final Date date;
+    private final Instant date;
 
     @ColumnInfo(name = "user_id")
     private final long userId;
@@ -93,9 +91,25 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
     private final int transformedColor;
 
     @Ignore
-    private final String bannerDate;
+    public Message(long id,
+                   @NonNull String name,
+                   @NonNull String message,
+                   @NonNull Instant date,
+                   @NonNull String color,
+                   int bottag,
+                   @NonNull String channel) {
+        this(id, name, message, date, -1, null, color, bottag, channel);
+    }
 
-    public Message(long id, @NonNull String name, @NonNull String message, @NonNull Date date, long userId, @Nullable String userName, @NonNull String color, int bottag, @NonNull String channel) {
+    public Message(long id,
+                   @NonNull String name,
+                   @NonNull String message,
+                   @NonNull Instant date,
+                   long userId,
+                   @Nullable String userName,
+                   @NonNull String color,
+                   int bottag,
+                   @NonNull String channel) {
         this.name = name;
         this.message = message;
         this.date = date;
@@ -107,7 +121,6 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
         this.channel = channel;
 
         this.transformedColor = transformColor(color);
-        this.bannerDate = SimpleDateFormat.getDateInstance().format(date).intern();
     }
 
     @NonNull
@@ -136,6 +149,10 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
         } else {
             return Type.POST;
         }
+    }
+
+    public LocalDate getLocalDate() {
+        return ZonedDateTime.ofInstant(date, ZoneId.systemDefault()).toLocalDate();
     }
 
     public int compareTo(Message other) {
@@ -186,12 +203,10 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
                     int id = json.getInt("id");
                     int bottag = json.getInt("bottag");
 
-                    Date date;
+                    Instant date;
                     try {
-                        //noinspection ConstantConditions
-                        date = DATE_FORMAT.get().parse(dateStr);
-                        assert date != null;
-                    } catch (ParseException | NumberFormatException e) {
+                        date = Instant.from(DATE_TIME_FORMATTER.parse(dateStr));
+                    } catch (DateTimeParseException e) {
                         Log.w(LOG_TAG, "Message did not contain a valid date: " + json);
                         return null;
                     }
@@ -251,7 +266,7 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
         public Message createFromParcel(Parcel source) {
             String name = source.readString();
             String message = source.readString();
-            Date date = (Date) source.readSerializable();
+            Instant date = (Instant) source.readSerializable();
             long userId = source.readLong();
             String userName = source.readString();
             String color = source.readString();

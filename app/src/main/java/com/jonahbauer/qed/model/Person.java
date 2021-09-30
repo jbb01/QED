@@ -6,40 +6,58 @@ import android.os.Parcelable;
 import androidx.annotation.NonNull;
 import androidx.core.util.Pair;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 @Data
 public class Person implements Parcelable {
     public static final Comparator<Person> COMPARATOR_FIRST_NAME = Comparator.nullsLast(Comparator.comparing(
             person -> {
-                if (person.mComparableFirstName == null) person.mComparableFirstName = (person.firstName + " " + person.lastName).replaceAll("Ö", "O").replaceAll("Ü", "U").replaceAll("Ä","A");
+                if (person.mComparableFirstName == null) {
+                    person.mComparableFirstName = (person.firstName + " " + person.lastName)
+                            .replace('Ö', 'O')
+                            .replace('Ü', 'U')
+                            .replace('Ä','A');
+                }
                 return person.mComparableFirstName;
             }));
     public static final Comparator<Person> COMPARATOR_LAST_NAME = Comparator.nullsLast(Comparator.comparing(
             person -> {
-                if (person.mComparableLastName == null) person.mComparableLastName = (person.lastName + " " + person.firstName).replaceAll("Ö", "O").replaceAll("Ü", "U").replaceAll("Ä","A");
+                if (person.mComparableLastName == null) {
+                    person.mComparableLastName = (person.lastName + " " + person.firstName)
+                            .replace('Ö', 'O')
+                            .replace('Ü', 'U')
+                            .replace('Ä','A');
+                }
                 return person.mComparableLastName;
             }));
 
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
     private String mComparableFirstName;
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
     private String mComparableLastName;
 
     private final long id;
+    private String username;
     private String firstName;
     private String lastName;
     private String email;
 
     private String birthdayString;
-    private Date birthday;
+    private LocalDate birthday;
 
     private String homeStation;
     private String railcard;
@@ -50,10 +68,10 @@ public class Person implements Parcelable {
     private boolean active;
 
     private String dateOfJoiningString;
-    private Date dateOfJoining;
+    private LocalDate dateOfJoining;
 
     private String leavingDateString;
-    private Date leavingDate;
+    private LocalDate leavingDate;
 
     private boolean loaded;
 
@@ -125,6 +143,7 @@ public class Person implements Parcelable {
     @Override
     public void writeToParcel(@NonNull Parcel dest, int flags) {
         dest.writeLong(id);
+        dest.writeString(username);
         dest.writeString(firstName);
         dest.writeString(lastName);
         dest.writeString(birthdayString);
@@ -153,15 +172,16 @@ public class Person implements Parcelable {
         dest.writeByte((byte)(loaded ? 1 : 0));
     }
 
-    public static final Parcelable.Creator<Person> CREATOR = new Parcelable.Creator<Person>() {
+    public static final Parcelable.Creator<Person> CREATOR = new Parcelable.Creator<>() {
         @NonNull
         @Override
         public Person createFromParcel(@NonNull Parcel source) {
             Person person = new Person(source.readLong());
+            person.username = source.readString();
             person.firstName = source.readString();
             person.lastName = source.readString();
             person.birthdayString = source.readString();
-            person.birthday = (Date) source.readSerializable();
+            person.birthday = (LocalDate) source.readSerializable();
             person.email = source.readString();
             person.homeStation = source.readString();
             person.railcard = source.readString();
@@ -169,9 +189,9 @@ public class Person implements Parcelable {
             person.member = memberActive / 2 == 1;
             person.active = memberActive % 2 == 1;
             person.dateOfJoiningString = source.readString();
-            person.dateOfJoining = (Date) source.readSerializable();
+            person.dateOfJoining = (LocalDate) source.readSerializable();
             person.leavingDateString = source.readString();
-            person.leavingDate = (Date) source.readSerializable();
+            person.leavingDate = (LocalDate) source.readSerializable();
 
             int phoneNumberCount = source.readInt();
             for (int i = 0; i < phoneNumberCount; i++) {

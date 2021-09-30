@@ -20,9 +20,10 @@ import com.jonahbauer.qed.layoutStuff.views.MessageView;
 import com.jonahbauer.qed.model.Message;
 import com.jonahbauer.qed.util.Preferences;
 
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -30,9 +31,14 @@ public class MessageAdapter extends ArrayAdapter<Message> {
     private final Context mContext;
     private final List<Message> mMessageList;
 
-    private final HashSet<Integer> mDateBannerPositions;
+    // Date Banners
+    private final DateTimeFormatter mDateBannerFormat = DateTimeFormatter
+            .ofLocalizedDate(FormatStyle.MEDIUM)
+            .withZone(ZoneId.systemDefault());
 
     private final int mDp3;
+
+    // Settings
     private boolean mLinkify;
     private boolean mColorful;
     private boolean mKatex;
@@ -55,7 +61,6 @@ public class MessageAdapter extends ArrayAdapter<Message> {
         super(context, 0, messageList);
         this.mContext = context;
         this.mMessageList = messageList;
-        this.mDateBannerPositions = new HashSet<>();
         this.mathPreload = mathPreload;
 
         this.mExtended = extended;
@@ -67,8 +72,6 @@ public class MessageAdapter extends ArrayAdapter<Message> {
         if (this.mKatexSet) this.mKatex = katex;
 
         if (mExtended && mKatexSet && mKatex) throw new IllegalArgumentException("Extended message views do not support Katex!");
-
-        if (!messageList.isEmpty()) findDateBanners();
 
         mDp3 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3, context.getResources().getDisplayMetrics());
         obtainDefaultTextAppearance();
@@ -110,12 +113,15 @@ public class MessageAdapter extends ArrayAdapter<Message> {
             view = new MessageView(mContext, mExtended);
         }
 
+        boolean hasBanner = (position == 0)
+                || (message.getLocalDate().isAfter(mMessageList.get(position - 1).getLocalDate()));
+
         view.setPadding(mDp3, mDp3, mDp3, mDp3);
         view.setKatex(mKatex);
         view.setMessage(message);
         view.setFocusable(false);
         view.setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
-        view.setDateBanner(mDateBannerPositions.contains(position) ? message.getBannerDate() : null);
+        view.setDateBanner(hasBanner ? mDateBannerFormat.format(message.getLocalDate()) : null);
         view.setLinkify(mLinkify);
         view.setColorful(mColorful);
 
@@ -127,62 +133,22 @@ public class MessageAdapter extends ArrayAdapter<Message> {
     }
 
     @Override
-    public void addAll(@NonNull Collection<? extends Message> collection) {
-        super.addAll(collection);
-        findDateBanners();
-
-        if (mKatex) {
-            for (Message message : collection) {
-                MathView.extractAndPreload(mContext, null, message.getMessage(), (int) mDefaultTextSize, mDefaultTextColor, message.getId(), mathPreload);
-            }
-        }
-    }
-
     public void add(Message message) {
         super.add(message);
-        checkDateBanner();
 
         if (mKatex) {
             MathView.extractAndPreload(mContext, null, message.getMessage(), (int) mDefaultTextSize, mDefaultTextColor, message.getId(), mathPreload);
         }
     }
 
-    private void findDateBanners() {
-        mDateBannerPositions.clear();
+    @Override
+    public void addAll(@NonNull Collection<? extends Message> collection) {
+        super.addAll(collection);
 
-        if (mMessageList.size() == 0) return;
-
-        mDateBannerPositions.add(0);
-
-        Iterator<Message> iterator = mMessageList.iterator();
-        String lastDate = iterator.next().getBannerDate();
-        String dateNoTime;
-
-        int i = 1;
-        while (iterator.hasNext()) {
-            dateNoTime = iterator.next().getBannerDate();
-
-            //noinspection StringEquality dateNoTime values are created with String.intern()
-            if (lastDate != dateNoTime) {
-                lastDate = dateNoTime;
-                mDateBannerPositions.add(i);
+        if (mKatex) {
+            for (Message message : collection) {
+                MathView.extractAndPreload(mContext, null, message.getMessage(), (int) mDefaultTextSize, mDefaultTextColor, message.getId(), mathPreload);
             }
-
-            i++;
-        }
-    }
-
-    private void checkDateBanner() {
-        int size = mMessageList.size();
-
-        if (size < 2) return;
-
-        String lastDateNoTime = mMessageList.get(size - 2).getBannerDate();
-        String dateNoTime = mMessageList.get(size - 1).getBannerDate();
-
-        //noinspection StringEquality dateNoTime values are created with String.intern()
-        if (lastDateNoTime != dateNoTime) {
-            mDateBannerPositions.add(size - 1);
         }
     }
 

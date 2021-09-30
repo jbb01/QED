@@ -21,6 +21,21 @@ public final class EventParser extends HtmlParser<Event> {
     private static final Pattern COST_PATTERN = Pattern.compile("(\\d+(?:,\\d+))\\s*€");
     private static final Pattern NUMBER_PATTERN = Pattern.compile("\\d+");
 
+    private static final String GENERAL_KEY_START = "Beginn:";
+    private static final String GENERAL_KEY_END = "Ende:";
+    private static final String GENERAL_KEY_DEADLINE = "Anmeldeschluss:";
+    private static final String GENERAL_KEY_COST = "Kosten:";
+    private static final String GENERAL_KEY_MAX_PARTICIPANTS = "Teilnehmerlimit:";
+    private static final String GENERAL_KEY_HOTEL = "Unterkunft:";
+    private static final String GENERAL_KEY_HOTEL_ADDRESS = "Adresse der Unterkunft:";
+    private static final String GENERAL_KEY_EMAIL_ORGA = "Email an Orgas:";
+    private static final String GENERAL_KEY_EMAIL_ALL = "Email an Teilnehmer:";
+    private static final String GENERAL_KEY_NOTES = "Anmerkungen:";
+
+    private static final String REGISTRATIONS_KEY_CANCELLED = "abgesagt";
+    private static final String REGISTRATIONS_KEY_OPEN = "offen";
+    private static final String REGISTRATIONS_KEY_ORGA = "Orga";
+
     public static final EventParser INSTANCE = new EventParser();
 
     private EventParser() {}
@@ -43,36 +58,38 @@ public final class EventParser extends HtmlParser<Event> {
                    try {
                        String key = dt.text();
                        Element value = dt.nextElementSibling();
+                       //noinspection ConstantConditions
                        if (value.selectFirst("i") != null) return;
 
                        switch (key) {
-                           case "Beginn:": {
+                           case GENERAL_KEY_START: {
                                Element time = value.child(0);
                                event.setStartString(time.text());
-                               event.setStart(parseDate(time.attr("datetime")));
+                               event.setStart(parseLocalDate(time.attr("datetime")));
                                break;
                            }
-                           case "Ende:": {
+                           case GENERAL_KEY_END: {
                                Element time = value.child(0);
                                event.setEndString(time.text());
-                               event.setEnd(parseDate(time.attr("datetime")));
+                               event.setEnd(parseLocalDate(time.attr("datetime")));
                                break;
                            }
-                           case "Anmeldeschluss:": {
+                           case GENERAL_KEY_DEADLINE: {
                                Element time = value.child(0);
                                event.setDeadlineString(time.text());
-                               event.setDeadline(parseDate(time.attr("datetime")));
+                               event.setDeadline(parseLocalDate(time.attr("datetime")));
                                break;
                            }
-                           case "Kosten:": {
+                           case GENERAL_KEY_COST: {
                                String cost = value.text();
                                Matcher matcher = COST_PATTERN.matcher(cost);
                                if (matcher.find()) {
-                                   event.setCost((int) Double.parseDouble(matcher.group(1).replaceAll(",", ".")));
+                                   //noinspection ConstantConditions
+                                   event.setCost((int) Double.parseDouble(matcher.group(1).replace(',', '.')));
                                }
                                break;
                            }
-                           case "Teilnehmerlimit:": {
+                           case GENERAL_KEY_MAX_PARTICIPANTS: {
                                String limit = value.text();
                                Matcher matcher = NUMBER_PATTERN.matcher(limit);
                                if (matcher.find()) {
@@ -80,27 +97,27 @@ public final class EventParser extends HtmlParser<Event> {
                                }
                                break;
                            }
-                           case "Unterkunft:": {
+                           case GENERAL_KEY_HOTEL: {
                                String hotel = value.child(0).text();
                                event.setHotel(hotel);
                                break;
                            }
-                           case "Adresse der Unterkunft:": {
+                           case GENERAL_KEY_HOTEL_ADDRESS: {
                                String hotelAddress = value.text();
                                event.setHotelAddress(hotelAddress);
                                break;
                            }
-                           case "Email an Orgas:": {
+                           case GENERAL_KEY_EMAIL_ORGA: {
                                String mail = value.child(0).text();
                                event.setEmailOrga(mail);
                                break;
                            }
-                           case "Email an Teilnehmer:": {
+                           case GENERAL_KEY_EMAIL_ALL: {
                                String mail = value.child(0).text();
                                event.setEmailAll(mail);
                                break;
                            }
-                           case "Anmerkungen:": {
+                           case GENERAL_KEY_NOTES: {
                                String notes = value.text();
                                event.setNotes(notes);
                                break;
@@ -119,35 +136,40 @@ public final class EventParser extends HtmlParser<Event> {
         if (element == null) return;
         element.select("dl dt")
                .forEach(dt -> {
-                   String key = dt.text();
-                   if ("Teilnehmerliste:".equals(key)) {
-                       Elements divs = dt.nextElementSibling().select("li div");
-                       divs.forEach(div -> {
-                           try {
-                               long id = Long.parseLong(div.child(0).attr("href").substring("/registrations/".length()));
-                               String participant = div.child(0).text();
+                   try {
+                       String key = dt.text();
+                       if ("Teilnehmerliste:".equals(key)) {
+                           //noinspection ConstantConditions
+                           Elements divs = dt.nextElementSibling().select("li div");
+                           divs.forEach(div -> {
+                               try {
+                                   long id = Long.parseLong(div.child(0).attr("href").substring("/registrations/".length()));
+                                   String participant = div.child(0).text();
 
-                               Element statusElement = div.selectFirst("i");
-                               String statusString = statusElement != null ? statusElement.text() : "";
+                                   Element statusElement = div.selectFirst("i");
+                                   String statusString = statusElement != null ? statusElement.text() : "";
 
-                               boolean orga = statusString.contains("Orga");
+                                   boolean orga = statusString.contains(REGISTRATIONS_KEY_ORGA);
 
-                               Registration.Status status = Registration.Status.CONFIRMED;
-                               if (statusString.contains("abgesagt")) {
-                                   status = Registration.Status.CANCELLED;
-                               } else if (statusString.contains("offen")) {
-                                   status = Registration.Status.OPEN;
+                                   Registration.Status status = Registration.Status.CONFIRMED;
+                                   if (statusString.contains(REGISTRATIONS_KEY_CANCELLED)) {
+                                       status = Registration.Status.CANCELLED;
+                                   } else if (statusString.contains(REGISTRATIONS_KEY_OPEN)) {
+                                       status = Registration.Status.OPEN;
+                                   }
+
+                                   Registration registration = new Registration(id);
+                                   registration.setStatus(status);
+                                   registration.setOrganizer(orga);
+
+                                   event.getParticipants().put(participant, registration);
+                               } catch (Exception e) {
+                                   Log.e(LOG_TAG, "Error parsing event " + event.getId() + ".", e);
                                }
-
-                               Registration registration = new Registration(id);
-                               registration.setStatus(status);
-                               registration.setOrganizer(orga);
-
-                               event.getParticipants().put(participant, registration);
-                           } catch (Exception e) {
-                               Log.e(LOG_TAG, "Error parsing event " + event.getId() + ".", e);
-                           }
-                       });
+                           });
+                       }
+                   } catch (Exception e) {
+                       Log.e(LOG_TAG, "Error parsing event " + event.getId() + ".", e);
                    }
                });
     }

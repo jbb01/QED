@@ -23,6 +23,10 @@ import com.jonahbauer.qed.activities.sheets.person.PersonInfoBottomSheet;
 import com.jonahbauer.qed.model.Event;
 import com.jonahbauer.qed.model.Message;
 import com.jonahbauer.qed.model.Person;
+import com.jonahbauer.qed.networking.NetworkConstants;
+
+import java.time.LocalTime;
+import java.time.ZonedDateTime;
 
 import lombok.experimental.UtilityClass;
 
@@ -46,8 +50,14 @@ public class Actions {
         Intent intent = new Intent(Intent.ACTION_INSERT)
                 .setData(CalendarContract.Events.CONTENT_URI)
                 .putExtra(CalendarContract.Events.TITLE, event.getTitle())
-                .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, event.getStart().getTime())
-                .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, event.getEnd().getTime())
+                .putExtra(
+                        CalendarContract.EXTRA_EVENT_BEGIN_TIME,
+                        ZonedDateTime.of(event.getStart(), LocalTime.MIN, NetworkConstants.SERVER_TIME_ZONE).toInstant().toEpochMilli()
+                )
+                .putExtra(
+                        CalendarContract.EXTRA_EVENT_END_TIME,
+                        ZonedDateTime.of(event.getEnd(), LocalTime.MAX, NetworkConstants.SERVER_TIME_ZONE).toInstant().toEpochMilli()
+                )
                 .putExtra(CalendarContract.EXTRA_EVENT_ALL_DAY, true)
                 .putExtra(CalendarContract.Events.EVENT_LOCATION, event.getHotelAddress())
                 .putExtra(Intent.EXTRA_EMAIL, event.getEmailOrga());

@@ -1,19 +1,17 @@
 package com.jonahbauer.qed.activities.mainFragments;
 
+import static android.content.DialogInterface.BUTTON_NEGATIVE;
+import static android.content.DialogInterface.BUTTON_POSITIVE;
 import static com.jonahbauer.qed.model.viewmodel.LogViewModel.DateIntervalLogRequest;
 import static com.jonahbauer.qed.model.viewmodel.LogViewModel.DateRecentLogRequest;
-import static com.jonahbauer.qed.model.viewmodel.LogViewModel.Mode.DATE_INTERVAL;
-import static com.jonahbauer.qed.model.viewmodel.LogViewModel.Mode.DATE_RECENT;
-import static com.jonahbauer.qed.model.viewmodel.LogViewModel.Mode.FILE;
-import static com.jonahbauer.qed.model.viewmodel.LogViewModel.Mode.POST_INTERVAL;
-import static com.jonahbauer.qed.model.viewmodel.LogViewModel.Mode.POST_RECENT;
-import static com.jonahbauer.qed.model.viewmodel.LogViewModel.Mode.SINCE_OWN;
 import static com.jonahbauer.qed.model.viewmodel.LogViewModel.OnlineLogRequest;
 import static com.jonahbauer.qed.model.viewmodel.LogViewModel.PostIntervalLogRequest;
 import static com.jonahbauer.qed.model.viewmodel.LogViewModel.PostRecentLogRequest;
 import static com.jonahbauer.qed.model.viewmodel.LogViewModel.SinceOwnLogRequest;
 
-import android.app.AlertDialog;
+import android.app.Activity;
+import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
@@ -30,34 +28,48 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StyleRes;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.databinding.AlertDialogLogModeBinding;
 import com.jonahbauer.qed.databinding.FragmentLogBinding;
+import com.jonahbauer.qed.layoutStuff.CustomArrayAdapter;
 import com.jonahbauer.qed.model.adapter.MessageAdapter;
 import com.jonahbauer.qed.model.room.Database;
 import com.jonahbauer.qed.model.viewmodel.LogViewModel;
 import com.jonahbauer.qed.model.viewmodel.LogViewModel.LogRequest;
 import com.jonahbauer.qed.networking.Reason;
+import com.jonahbauer.qed.util.Callback;
 import com.jonahbauer.qed.util.MessageUtils;
 import com.jonahbauer.qed.util.Preferences;
 import com.jonahbauer.qed.util.StatusWrapper;
+import com.jonahbauer.qed.util.TimeUtils;
 import com.jonahbauer.qed.util.ViewUtils;
 
+import java.text.MessageFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
-public class LogFragment extends QEDFragment {
+public class LogFragment extends QEDFragment implements Callback<LogRequest> {
     public static final String ARGUMENT_LOG_REQUEST = "logRequest";
+    private static final String FRAGMENT_TAG = "com.jonahbauer.qed.logfragment.dialog";
 
     private static final int STATUS_PENDING = 0;
     private static final int STATUS_RUNNING = 1;
@@ -69,9 +81,6 @@ public class LogFragment extends QEDFragment {
     private LogViewModel mLogViewModel;
 
     private LogRequest mLogRequest;
-
-    private final MutableLiveData<Uri> mFile = new MutableLiveData<>();
-    private ActivityResultLauncher<String[]> mFileChooser;
 
     public static LogFragment newInstance(@StyleRes int themeId) {
         Bundle args = new Bundle();
@@ -92,11 +101,6 @@ public class LogFragment extends QEDFragment {
         if (args != null) {
             this.mLogRequest = (OnlineLogRequest) args.getSerializable(ARGUMENT_LOG_REQUEST);
         }
-
-        mFileChooser = registerForActivityResult(
-                new ActivityResultContracts.OpenDocument(),
-                mFile::setValue
-        );
 
         setHasOptionsMenu(true);
     }
@@ -120,7 +124,10 @@ public class LogFragment extends QEDFragment {
             return false;
         });
 
-        mBinding.subtitle.setOnClickListener(v -> showDialog());
+        mBinding.subtitle.setOnClickListener(v -> {
+            LogDialog logDialog = LogDialog.newInstance();
+            logDialog.show(getChildFragmentManager(), FRAGMENT_TAG);
+        });
 
         mLogViewModel.getDownloadStatus().observe(getViewLifecycleOwner(), pair -> {
             if (pair == null) {
@@ -232,166 +239,148 @@ public class LogFragment extends QEDFragment {
         return false;
     }
 
-    //<editor-fold desc="Lifecycle" defaultstate="collapsed">
     @Override
-    public Boolean onDrop(boolean force) {
-        return true;
-//        if (getActivity() == null) return true;
-//
-//        @QEDChatPages.Status
-//        int asyncStatus = QEDChatPages.getStatus(getClass().toString());
-//
-//        boolean downloadRunning = (asyncStatus & (QEDChatPages.STATUS_DOWNLOAD_RUNNING | QEDChatPages.STATUS_DOWNLOAD_PENDING)) != 0;
-//        boolean parseRunning = (asyncStatus & (QEDChatPages.STATUS_PARSE_THREAD_ALIVE)) != 0;
-//
-//        final MainActivity mainActivity = (MainActivity) getActivity();
-//
-//        if (force && downloadRunning) { // force closing
-//            Toast.makeText(mainActivity, R.string.log_download_continue_in_background_toast, Toast.LENGTH_LONG).show();
-//            downloadContinueInBackground();
-//            return true;
-//        } else if (downloadRunning) {
-//            AlertDialog.Builder builder = new AlertDialog.Builder(mainActivity);
-//            builder.setMessage(R.string.log_confirm_exit);
-//
-//            // do nothing
-//            builder.setPositiveButton(R.string.log_confirm_exit_stay, (dialog, which) -> {
-//                mainActivity.onDropResult(false);
-//                dialog.dismiss();
-//            });
-//
-//            // interrupt download manger, ui async task and parse thread
-//            builder.setNegativeButton(R.string.log_confirm_exit_cancel, (dialog, which) -> {
-//                mainActivity.onDropResult(true);
-//                downloadGoAndCancel();
-//                dialog.dismiss();
-//            });
-//
-//            // interrupt ui async task
-//            builder.setNeutralButton(R.string.log_confirm_exit_continue_in_background, (dialog, which) -> {
-//                mainActivity.onDropResult(true);
-//                downloadContinueInBackground();
-//                dialog.dismiss();
-//            });
-//
-//            // stay on cancel
-//            builder.setOnCancelListener(dialog -> {
-//                mainActivity.onDropResult(false);
-//                dialog.dismiss();
-//            });
-//
-//            mDropAlertDialog = builder.show();
-//            return null;
-//        } else if (parseRunning) {
-//            QEDChatPages.interrupt(getClass().toString());
-//            return true;
-//        } else {
-//            return true;
-//        }
+    public void onResult(LogRequest logRequest) {
+        if (logRequest != null) {
+            reload(logRequest);
+        }
     }
 
-//    private void downloadContinueInBackground() {
-//        DownloadListener listener = mLogDownload.getListener();
-//        if (listener != null)
-//            mLogDownload.detachListener(listener);
-//    }
-//
-//    private void downloadGoAndCancel() {
-//        QEDChatPages.interrupt(getClass().toString());
-//    }
-    //</editor-fold>
+    public static class LogDialog extends DialogFragment implements AdapterView.OnItemSelectedListener,
+                                                                     DialogInterface.OnClickListener,
+                                                                     DialogInterface.OnDismissListener,
+                                                                     DialogInterface.OnCancelListener
+    {
 
-    private void showDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-        builder.setTitle(R.string.title_activity_log_dialog);
+        // date interval
+        private final MutableLiveData<LocalDate> mDateFrom = new MutableLiveData<>(LocalDate.now());
+        private final MutableLiveData<LocalTime> mTimeFrom = new MutableLiveData<>(LocalTime.now());
+        private final MutableLiveData<LocalDate> mDateTo = new MutableLiveData<>(LocalDate.now());
+        private final MutableLiveData<LocalTime> mTimeTo = new MutableLiveData<>(LocalTime.now());
+        private final LiveData<LocalDateTime> mDateTimeFrom = TimeUtils.combine(mDateFrom, mTimeFrom);
+        private final LiveData<LocalDateTime> mDateTimeTo = TimeUtils.combine(mDateTo, mTimeTo);
 
-        AlertDialogLogModeBinding binding = AlertDialogLogModeBinding.inflate(LayoutInflater.from(requireContext()));
-        binding.setMode(POST_RECENT);
-        builder.setView(binding.getRoot());
+        // file
+        private final ActivityResultLauncher<String[]> mFileChooser;
+        private final MutableLiveData<Uri> mFile = new MutableLiveData<>();
 
-        binding.logDialogModeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Spinner spinner = (Spinner) parent;
-                String item = (String) spinner.getItemAtPosition(position);
+        private AlertDialogLogModeBinding mBinding;
 
-                if (LogFragment.this.getString(R.string.log_request_mode_postrecent).equals(item)) {
-                    binding.setMode(POST_RECENT);
-                } else if (LogFragment.this.getString(R.string.log_request_mode_daterecent).equals(item)) {
-                    binding.setMode(DATE_RECENT);
-                } else if (LogFragment.this.getString(R.string.log_request_mode_dateinterval).equals(item)) {
-                    binding.setMode(DATE_INTERVAL);
-                } else if (LogFragment.this.getString(R.string.log_request_mode_postinterval).equals(item)) {
-                    binding.setMode(POST_INTERVAL);
-                } else if (getString(R.string.log_request_mode_sinceown).equals(item)) {
-                    binding.setMode(SINCE_OWN);
-                } else if (LogFragment.this.getString(R.string.log_request_mode_file).equals(item)) {
-                    binding.setMode(FILE);
+        public static LogDialog newInstance() {
+            return new LogDialog();
+        }
+
+        public LogDialog() {
+            mFileChooser = registerForActivityResult(
+                    new ActivityResultContracts.OpenDocument(),
+                    mFile::setValue
+            );
+        }
+
+        @NonNull
+        @Override
+        public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext());
+            builder.setTitle(R.string.title_activity_log_dialog);
+            builder.setCancelable(true);
+            builder.setPositiveButton(R.string.ok, this);
+            builder.setNegativeButton(R.string.cancel, this);
+            builder.setView(createView(requireContext()));
+            return builder.create();
+        }
+
+        @NonNull
+        public View createView(@NonNull Context context) {
+            mBinding = AlertDialogLogModeBinding.inflate(LayoutInflater.from(context));
+
+            // setup mode spinner
+            var adapter = new CustomArrayAdapter<>(context, android.R.layout.simple_spinner_item, LogViewModel.Mode.values());
+            adapter.setToString((mode) -> context.getString(mode.toStringRes()));
+            adapter.setDropDownViewResource(android.R.layout.simple_list_item_1);
+            mBinding.logDialogModeSpinner.setAdapter(adapter);
+            mBinding.logDialogModeSpinner.setSelection(0);
+            mBinding.logDialogModeSpinner.setOnItemSelectedListener(this);
+
+            // setup file
+            mBinding.logDialogFile.setOnClickListener(v -> {
+                mFileChooser.launch(new String[] {"*/*"});
+                mFile.observe(this, uri -> mBinding.logDialogFile.setText(uri != null ? uri.getPath() : ""));
+            });
+
+            // setup date interval
+            ViewUtils.setupDateEditText(mBinding.logDialogDateintervalDateFrom, mDateFrom);
+            ViewUtils.setupTimeEditText(mBinding.logDialogDateintervalTimeFrom, mTimeFrom);
+            ViewUtils.setupDateEditText(mBinding.logDialogDateintervalDateTo, mDateTo);
+            ViewUtils.setupTimeEditText(mBinding.logDialogDateintervalTimeTo, mTimeTo);
+
+            Function<LocalDateTime, String> dateTimeWarning = (dateTime) -> {
+                LocalDateTime converted = TimeUtils.check(dateTime);
+                if (!converted.isEqual(dateTime)) {
+                    return MessageFormat.format(
+                            context.getString(R.string.log_dialog_date_convert_timezone),
+                            TimeUtils.format(dateTime),
+                            TimeUtils.format(converted)
+                    );
                 }
-            }
+                return null;
+            };
+            mDateTimeFrom.observe(this, dateTime -> mBinding.setErrorDateFrom(dateTimeWarning.apply(dateTime)));
+            mDateTimeTo.observe(this, dateTime -> mBinding.setErrorDateTo(dateTimeWarning.apply(dateTime)));
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
-        });
-        binding.logDialogChannel.setText(Preferences.chat().getChannel());
+            return mBinding.getRoot();
+        }
 
-        Calendar dateFrom = Calendar.getInstance();
-        Calendar dateTo = Calendar.getInstance();
-        ViewUtils.setupDateEditText(binding.logDialogDateintervalFrom, dateFrom);
-        ViewUtils.setupDateEditText(binding.logDialogDateintervalTo, dateTo);
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            Spinner spinner = (Spinner) parent;
+            LogViewModel.Mode item = (LogViewModel.Mode) spinner.getItemAtPosition(position);
+            mBinding.setMode(item);
+        }
 
-        binding.logDialogFile.setOnClickListener(v -> mFileChooser.launch(new String[] {"*/*"}));
-        Observer<Uri> fileObserver = uri -> binding.logDialogFile.setText(uri != null ? uri.getPath() : "");
-        mFile.observe(getViewLifecycleOwner(), fileObserver);
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {}
 
-        AlertDialog dialog = builder.create();
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            if (which == BUTTON_POSITIVE) {
+                String channel = mBinding.logDialogChannel.getText().toString();
+                LogViewModel.Mode mode = (LogViewModel.Mode) mBinding.logDialogModeSpinner.getSelectedItem();
 
-        dialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.ok), (DialogInterface.OnClickListener) null);
-        dialog.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.cancel), (d, which) -> {});
-        dialog.setOnDismissListener(d -> {
-            mFile.removeObserver(fileObserver);
-        });
-
-        // positive button click listener is set directly on the button after dialog is shown
-        // to prevent dialog from dismissing when input could not be validated
-        dialog.setOnShowListener(d -> {
-            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
                 LogRequest logRequest = null;
-                String channel = binding.logDialogChannel.getText().toString();
-                switch (binding.getMode()) {
+                switch (mode) {
                     case POST_RECENT:
                         try {
-                            long last = Long.parseLong(binding.logDialogPostrecent.getText().toString());
+                            long last = Long.parseLong(mBinding.logDialogPostrecent.getText().toString());
                             logRequest = new PostRecentLogRequest(channel, last);
-                            ViewUtils.setError(binding.logDialogPostrecent, false);
+                            ViewUtils.setError(mBinding.logDialogPostrecent, false);
                         } catch (NumberFormatException e) {
-                            ViewUtils.setError(binding.logDialogPostrecent, true);
+                            ViewUtils.setError(mBinding.logDialogPostrecent, true);
                         }
                         break;
                     case DATE_RECENT:
                         try {
-                            long last = Long.parseLong(binding.logDialogDaterecent.getText().toString());
+                            long last = Long.parseLong(mBinding.logDialogDaterecent.getText().toString());
                             logRequest = new DateRecentLogRequest(channel, last, TimeUnit.HOURS);
-                            ViewUtils.setError(binding.logDialogDaterecent, false);
+                            ViewUtils.setError(mBinding.logDialogDaterecent, false);
                         } catch (NumberFormatException e) {
-                            ViewUtils.setError(binding.logDialogDaterecent, true);
+                            ViewUtils.setError(mBinding.logDialogDaterecent, true);
                         }
                         break;
                     case POST_INTERVAL:
                         long from = 0, to = 0;
                         boolean error = false;
                         try {
-                            from = Long.parseLong(binding.logDialogPostintervalFrom.getText().toString());
-                            ViewUtils.setError(binding.logDialogPostintervalFrom, false);
+                            from = Long.parseLong(mBinding.logDialogPostintervalFrom.getText().toString());
+                            ViewUtils.setError(mBinding.logDialogPostintervalFrom, false);
                         } catch (NumberFormatException e) {
-                            ViewUtils.setError(binding.logDialogPostintervalFrom, true);
+                            ViewUtils.setError(mBinding.logDialogPostintervalFrom, true);
                             error = true;
                         }
                         try {
-                            to = Long.parseLong(binding.logDialogPostintervalTo.getText().toString());
-                            ViewUtils.setError(binding.logDialogPostintervalTo, false);
+                            to = Long.parseLong(mBinding.logDialogPostintervalTo.getText().toString());
+                            ViewUtils.setError(mBinding.logDialogPostintervalTo, false);
                         } catch (NumberFormatException e) {
-                            ViewUtils.setError(binding.logDialogPostintervalTo, true);
+                            ViewUtils.setError(mBinding.logDialogPostintervalTo, true);
                             error = true;
                         }
 
@@ -400,35 +389,64 @@ public class LogFragment extends QEDFragment {
                         logRequest = new PostIntervalLogRequest(channel, from, to);
                         break;
                     case DATE_INTERVAL:
-                        logRequest = new DateIntervalLogRequest(channel, dateFrom.getTime(), dateTo.getTime());
+                        Instant instantFrom = ZonedDateTime.of(mDateTimeFrom.getValue(), ZoneId.systemDefault()).toInstant();
+                        Instant instantTo = ZonedDateTime.of(mDateTimeTo.getValue(), ZoneId.systemDefault()).toInstant();
+
+                        logRequest = new DateIntervalLogRequest(
+                                channel,
+                                instantFrom,
+                                instantTo
+                        );
                         break;
                     case FILE:
                         Uri uri = mFile.getValue();
                         if (uri == null) {
-                            ViewUtils.setError(binding.logDialogFile, true);
+                            ViewUtils.setError(mBinding.logDialogFile, true);
                         } else {
                             logRequest = new LogViewModel.FileLogRequest(uri);
-                            ViewUtils.setError(binding.logDialogFile, false);
+                            ViewUtils.setError(mBinding.logDialogFile, false);
                         }
                         break;
                     case SINCE_OWN:
                         try {
-                            long skip = Long.parseLong(binding.logDialogSinceown.getText().toString());
+                            long skip = Long.parseLong(mBinding.logDialogSinceown.getText().toString());
                             logRequest = new SinceOwnLogRequest(channel, skip);
-                            ViewUtils.setError(binding.logDialogSinceown, false);
+                            ViewUtils.setError(mBinding.logDialogSinceown, false);
                         } catch (NumberFormatException e) {
-                            ViewUtils.setError(binding.logDialogSinceown, true);
+                            ViewUtils.setError(mBinding.logDialogSinceown, true);
                         }
                         break;
                 }
                 if (logRequest != null) {
-                    reload(logRequest);
+                    sendResult(logRequest);
                     dialog.dismiss();
                 }
-            });
-        });
+            } else if (which == BUTTON_NEGATIVE) {
+                dialog.cancel();
+            }
+        }
 
-        dialog.show();
+        @Override
+        public void onDismiss(@NonNull DialogInterface dialog) {
+            this.dismiss();
+        }
+
+        @Override
+        public void onCancel(@NonNull DialogInterface dialog) {
+            sendResult(null);
+            dialog.dismiss();
+        }
+
+        private void sendResult(LogRequest request) {
+            Fragment fragment = getParentFragment();
+            Activity activity = getActivity();
+            if (fragment instanceof Callback) {
+                //noinspection unchecked
+                ((Callback<LogRequest>) fragment).onResult(request);
+            } else if (activity instanceof Callback) {
+                //noinspection unchecked
+                ((Callback<LogRequest>) activity).onResult(request);
+            }
+        }
     }
-
 }
