@@ -127,7 +127,8 @@
     <string name="chat_quick_settings">Schnelleinstellungen</string>
 
     <string name="message_info">@string/info</string>
-    <string name="message_copy">Copy</string>
+    <string name="message_copy">Kopieren</string>
+    <string name="message_reply">Antworten</string>
     <string name="message_name_anonymous"><i>Anonym</i></string>
     <string name="message_channel_main"><i>main</i></string>
 

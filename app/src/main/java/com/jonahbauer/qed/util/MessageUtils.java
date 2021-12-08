@@ -6,6 +6,9 @@ import android.widget.ListView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
 
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.MainActivity;
 import com.jonahbauer.qed.activities.mainFragments.QEDFragment;
@@ -56,6 +59,11 @@ public class MessageUtils {
                         Actions.showInfoSheet(fragment, msg);
                     } else if (item.getItemId() == R.id.message_copy) {
                         Actions.copy(fragment.requireContext(), fragment.requireView(), msg.getName(), MessageUtils.copyFormat(msg));
+                        Actions.copy(fragment.requireContext(), fragment.requireView(), msg.getName(), msg.getMessage());
+                    } else if (item.getItemId() == R.id.message_reply) {
+                        SimpleDateFormat sdf = new SimpleDateFormat("MM-dd HH:mm:ss", Locale.GERMANY);
+                        Actions.copy(fragment.requireContext(), fragment.requireView(), msg.getName(),
+                                sdf.format(msg.getDate()) + "     " + msg.getName() + ": " + msg.getMessage() + "\n");
                     }
 
                     return false;
