@@ -2,6 +2,7 @@ package com.jonahbauer.qed.activities;
 
 import static com.jonahbauer.qed.activities.DeepLinkingActivity.QEDIntent;
 
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -23,7 +24,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
+import androidx.appcompat.view.ActionMode;
 import androidx.core.util.Pair;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -71,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      */
     private QEDFragment mFragment = null;
 
-    private boolean mAltToolbarBorrowed;
+    private ActionMode mActionMode;
     private boolean mWaitForDropResult;
 
     @Override
@@ -151,11 +152,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             return;
         }
 
-        // Hide visible alternative toolbar
-        if (mAltToolbarBorrowed) {
-            returnAltToolbar();
-            return;
-        }
 
         // Require double back to exit
         if (mDoubleBackToExitPressedOnce) {
@@ -460,56 +456,38 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
     //</editor-fold>
 
-    //<editor-fold desc="AltToolbar" defaultstate="collapsed">
-    /**
-     * Borrows the alternative toolbar which will be shown atop the standard one.
-     *
-     * The toolbar will be cleaned (menu and listeners removed) every time this method is called.
-     *
-     * After the alternative toolbar is no longer needed {@link #returnAltToolbar()} must be called in
-     * order to hide the toolbar and make it accessible for other fragments.
-     *
-     * @return the alternative toolbar
-     * @throws IllegalStateException when the alternative toolbar is has already been borrowed and is not yet returned
-     *
-     * @see #returnAltToolbar()
-     */
-    public Toolbar borrowAltToolbar() {
-        if (mAltToolbarBorrowed) throw new IllegalStateException("borrowAltToolbar may only be called once before calling returnAltToolbar!");
+    //<editor-fold desc="ActionModes" defaultstate="collapsed">
 
-        mAltToolbarBorrowed = true;
+    @Override
+    public void onSupportActionModeStarted(@NonNull ActionMode mode) {
+        super.onSupportActionModeStarted(mode);
+        mActionMode = mode;
 
-        mBinding.altToolbar.setNavigationIcon(R.drawable.ic_arrow_back);
-        mBinding.altToolbar.setOnMenuItemClickListener(null);
-        mBinding.altToolbar.setNavigationOnClickListener(null);
-        mBinding.altToolbar.setVisibility(View.VISIBLE);
-        mBinding.altToolbar.getMenu().clear();
-
-        TypedValue colorPrimary = new TypedValue();
+        var colorPrimary = new TypedValue();
         getTheme().resolveAttribute(R.attr.colorPrimary, colorPrimary, true);
-
-        getWindow().setStatusBarColor(colorPrimary.data);
-
-        return mBinding.altToolbar;
+        var anim = ObjectAnimator.ofArgb(getWindow(), "statusBarColor", colorPrimary.data);
+        anim.setDuration(300);
+        anim.start();
     }
 
-    /**
-     * @see #borrowAltToolbar()
-     */
-    public void returnAltToolbar() {
-        if (mAltToolbarBorrowed) {
-            if (mFragment != null) mFragment.revokeAltToolbar();
+    @Override
+    public void onSupportActionModeFinished(@NonNull ActionMode mode) {
+        super.onSupportActionModeFinished(mode);
+        mActionMode = null;
 
-            mBinding.altToolbar.setVisibility(View.GONE);
+        var colorPrimaryDark = new TypedValue();
+        getTheme().resolveAttribute(R.attr.colorPrimaryDark, colorPrimaryDark, true);
+        var anim = ObjectAnimator.ofArgb(getWindow(), "statusBarColor", colorPrimaryDark.data);
+        anim.setDuration(300);
+        anim.start();
+    }
 
-            TypedValue colorPrimaryDark = new TypedValue();
-            getTheme().resolveAttribute(R.attr.colorPrimaryDark, colorPrimaryDark, true);
-
-            getWindow().setStatusBarColor(colorPrimaryDark.data);
-
-            mAltToolbarBorrowed = false;
+    public void finishActionMode() {
+        if (mActionMode != null) {
+            mActionMode.finish();
         }
     }
+
     //</editor-fold>
 
     //<editor-fold desc="Drawer Callback" defaultstate="collapsed">
