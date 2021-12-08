@@ -418,5 +418,10 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
         mBinding.setReady(false);
         mBinding.setLoaded(true);
     }
+
+    public void set_edit_text(String message) {
+        mBinding.editTextMessage.setText(message);
+        mBinding.editTextMessage.requestFocus();
+    }
     //</editor-fold>
 }

@@ -12,6 +12,7 @@ import java.util.Locale;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.MainActivity;
 import com.jonahbauer.qed.activities.mainFragments.QEDFragment;
+import com.jonahbauer.qed.activities.mainFragments.ChatFragment;
 import com.jonahbauer.qed.model.Message;
 import com.jonahbauer.qed.model.adapter.MessageAdapter;
 import com.jonahbauer.qed.networking.NetworkConstants;
@@ -62,8 +63,8 @@ public class MessageUtils {
                         Actions.copy(fragment.requireContext(), fragment.requireView(), msg.getName(), msg.getMessage());
                     } else if (item.getItemId() == R.id.message_reply) {
                         SimpleDateFormat sdf = new SimpleDateFormat("MM-dd HH:mm:ss", Locale.GERMANY);
-                        Actions.copy(fragment.requireContext(), fragment.requireView(), msg.getName(),
-                                sdf.format(msg.getDate()) + "     " + msg.getName() + ": " + msg.getMessage() + "\n");
+                        ((ChatFragment) fragment).set_edit_text(sdf.format(msg.getDate()) + "     " + msg.getName() + ": " + msg.getMessage() + "\n");
+                        mainActivity.returnAltToolbar();
                     }
 
                     return false;
