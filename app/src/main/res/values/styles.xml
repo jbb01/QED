@@ -37,6 +37,10 @@
         <item name="android:layout_width">match_parent</item>
     </style>
 
+    <style name="Widget.App.ActionMode" parent="Widget.AppCompat.ActionMode">
+        <item name="background">?colorPrimaryLight</item>
+    </style>
+
     <!-- TextAppearance -->
     <style name="TextAppearance.App.Button" parent="android:TextAppearance.Material.Button">
         <item name="android:textColor">?colorSecondary</item>

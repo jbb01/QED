@@ -21,6 +21,7 @@
         <item name="triCheckboxStyle">?checkboxStyle</item>
         <item name="dividerStyle">@style/Widget.App.Divider</item>
         <item name="textInputStyle">@style/Widget.Design.TextInputLayout</item>
+        <item name="actionModeStyle">@style/Widget.App.ActionMode</item>
 
         <!-- Text Appearances -->
         <item name="textAppearanceButton">@style/TextAppearance.App.Button</item>
@@ -40,6 +41,7 @@
 
         <item name="windowNoTitle">false</item>
         <item name="windowActionBar">true</item>
+        <item name="windowActionModeOverlay">true</item>
     </style>
 
     <style name="Theme.App" parent="Base.Theme.App">
@@ -147,5 +149,8 @@
     </style>
     <style name="ThemeOverlay.App.BottomSheetDialog" parent="@style/ThemeOverlay.MaterialComponents.BottomSheetDialog">
         <item name="android:windowIsFloating">false</item>
+    </style>
+    <style name="ThemeOverlay.App.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar">
+
     </style>
 </resources>

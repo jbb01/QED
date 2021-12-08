@@ -189,7 +189,7 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
         Activity activity = getActivity();
         if (activity instanceof MainActivity) {
             MainActivity mainActivity = (MainActivity) activity;
-            mainActivity.returnAltToolbar();
+            mainActivity.finishActionMode();
         }
 
         mDisposable.clear();

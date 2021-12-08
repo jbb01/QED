@@ -2,10 +2,12 @@ package com.jonahbauer.qed.util;
 
 import android.app.Activity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.ListView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.Toolbar;
+import androidx.appcompat.view.ActionMode;
 
 import java.util.Locale;
 
@@ -52,39 +54,68 @@ public class MessageUtils {
                 Message msg = adapter.getItem(position);
                 if (msg == null) return;
 
-                Toolbar toolbar = mainActivity.borrowAltToolbar();
-                toolbar.setNavigationOnClickListener(v -> setChecked(fragment, listView, adapter, position, false));
-
-                toolbar.inflateMenu(R.menu.menu_message);
-                toolbar.getMenu().findItem(R.id.message_reply).setVisible(fragment instanceof ChatFragment);
-                toolbar.setOnMenuItemClickListener(item -> {
-                    if (item.getItemId() == R.id.message_info) {
-                        Actions.showInfoSheet(fragment, msg);
-                    } else if (item.getItemId() == R.id.message_copy) {
-                        Actions.copy(fragment.requireContext(), fragment.requireView(), msg.getName(), msg.getMessage());
-                    } else if (item.getItemId() == R.id.message_reply) {
-                        if (fragment instanceof ChatFragment) {
-                            var chatFragment = (ChatFragment) fragment;
-                            var text = chatFragment.getText();
-                            var reply = MessageUtils.copyFormat(msg);
-                            if (!text.toString().startsWith(reply)) {
-                                text.insert(0, reply + "\n\n");
-                                Snackbar.make(chatFragment.requireView(), R.string.message_reply_prepended, Snackbar.LENGTH_SHORT).show();
-                                mainActivity.returnAltToolbar();
-                            } else {
-                                Snackbar.make(chatFragment.requireView(), R.string.message_reply_present, Snackbar.LENGTH_SHORT).show();
-                            }
-                        } else {
-                            Log.e(LOG_TAG, "Reply button click received but not in ChatFragment.");
+                var actionModeCallBack = new ActionMode.Callback() {
+                    @Override
+                    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                        mainActivity.getMenuInflater().inflate(R.menu.menu_message, menu);
+                        if (!(fragment instanceof ChatFragment)) {
+                            menu.findItem(R.id.message_reply).setVisible(false);
                         }
+                        return true;
                     }
 
-                    return false;
-                });
+                    @Override
+                    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                        return false;
+                    }
 
-                toolbar.setTitle(msg.getName().trim().isEmpty() ? activity.getText(R.string.message_name_anonymous) : msg.getName());
+                    @Override
+                    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                        if (item.getItemId() == R.id.message_info) {
+                            Actions.showInfoSheet(fragment, msg);
+                            return true;
+                        } else if (item.getItemId() == R.id.message_copy) {
+                            Actions.copy(fragment.requireContext(), fragment.requireView(), msg.getName(), msg.getMessage());
+                            return true;
+                        } else if (item.getItemId() == R.id.message_reply) {
+                            if (fragment instanceof ChatFragment) {
+                                var chatFragment = (ChatFragment) fragment;
+                                var text = chatFragment.getText();
+                                var reply = MessageUtils.copyFormat(msg);
+                                if (!text.toString().startsWith(reply)) {
+                                    text.insert(0, reply + "\n\n");
+                                    Snackbar.make(chatFragment.requireView(), R.string.message_reply_prepended, Snackbar.LENGTH_SHORT).show();
+                                    mainActivity.finishActionMode();
+                                } else {
+                                    Snackbar.make(chatFragment.requireView(), R.string.message_reply_present, Snackbar.LENGTH_SHORT).show();
+                                }
+                            } else {
+                                Log.e(LOG_TAG, "Reply button click received but not in ChatFragment.");
+                            }
+                            return true;
+                        }
+                        return false;
+                    }
+
+                    @Override
+                    public void onDestroyActionMode(ActionMode mode) {
+                        setChecked(fragment, listView, adapter, position, false);
+                    }
+                };
+
+                var actionMode = mainActivity.startSupportActionMode(actionModeCallBack);
+                if (actionMode == null) {
+                    Log.e(LOG_TAG, "Unexpected null value for action mode");
+                } else {
+                    if (msg.getName().trim().isEmpty()) {
+                        actionMode.setTitle(R.string.message_name_anonymous);
+                    } else {
+                        actionMode.setTitle(msg.getName());
+                    }
+                }
+
             } else {
-                mainActivity.returnAltToolbar();
+                mainActivity.finishActionMode();
             }
         }
     }
