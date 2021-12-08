@@ -1,14 +1,15 @@
 package com.jonahbauer.qed.util;
 
 import android.app.Activity;
+import android.util.Log;
 import android.widget.ListView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
 
-import java.text.SimpleDateFormat;
 import java.util.Locale;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.MainActivity;
 import com.jonahbauer.qed.activities.mainFragments.QEDFragment;
@@ -22,7 +23,6 @@ import java.time.Month;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Locale;
 import java.util.function.Function;
 
 import lombok.experimental.UtilityClass;
@@ -30,6 +30,7 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class MessageUtils {
     private static final String COPY_FORMAT = "%3$tm-%3$td %3$tH:%3$tM:%3$tS\t%4$s\t%1$s:\t%2$s";
+    private static final String LOG_TAG = MessageUtils.class.getName();
 
     /**
      * Sets the checked item in the list and shows an appropriate toolbar.
@@ -55,16 +56,27 @@ public class MessageUtils {
                 toolbar.setNavigationOnClickListener(v -> setChecked(fragment, listView, adapter, position, false));
 
                 toolbar.inflateMenu(R.menu.menu_message);
+                toolbar.getMenu().findItem(R.id.message_reply).setVisible(fragment instanceof ChatFragment);
                 toolbar.setOnMenuItemClickListener(item -> {
                     if (item.getItemId() == R.id.message_info) {
                         Actions.showInfoSheet(fragment, msg);
                     } else if (item.getItemId() == R.id.message_copy) {
-                        Actions.copy(fragment.requireContext(), fragment.requireView(), msg.getName(), MessageUtils.copyFormat(msg));
                         Actions.copy(fragment.requireContext(), fragment.requireView(), msg.getName(), msg.getMessage());
                     } else if (item.getItemId() == R.id.message_reply) {
-                        SimpleDateFormat sdf = new SimpleDateFormat("MM-dd HH:mm:ss", Locale.GERMANY);
-                        ((ChatFragment) fragment).set_edit_text(sdf.format(msg.getDate()) + "     " + msg.getName() + ": " + msg.getMessage() + "\n");
-                        mainActivity.returnAltToolbar();
+                        if (fragment instanceof ChatFragment) {
+                            var chatFragment = (ChatFragment) fragment;
+                            var text = chatFragment.getText();
+                            var reply = MessageUtils.copyFormat(msg);
+                            if (!text.toString().startsWith(reply)) {
+                                text.insert(0, reply + "\n\n");
+                                Snackbar.make(chatFragment.requireView(), R.string.message_reply_prepended, Snackbar.LENGTH_SHORT).show();
+                                mainActivity.returnAltToolbar();
+                            } else {
+                                Snackbar.make(chatFragment.requireView(), R.string.message_reply_present, Snackbar.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            Log.e(LOG_TAG, "Reply button click received but not in ChatFragment.");
+                        }
                     }
 
                     return false;

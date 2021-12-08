@@ -56,6 +56,8 @@
     <string name="message_name_anonymous"><i>Anonymous</i></string>
     <string name="message_channel_main"><i>main</i></string>
     <string name="message_reply">Reply</string>
+    <string name="message_reply_prepended">Reply inserted</string>
+    <string name="message_reply_present">Reply already present</string>
 
     <!-- Message Info Sheet -->
     <string name="message_info_title_id">ID</string>

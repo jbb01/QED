@@ -7,6 +7,7 @@ import android.content.Context;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.text.Editable;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -419,9 +420,8 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
         mBinding.setLoaded(true);
     }
 
-    public void set_edit_text(String message) {
-        mBinding.editTextMessage.setText(message);
-        mBinding.editTextMessage.requestFocus();
+    public Editable getText() {
+        return mBinding.editTextMessage.getEditableText();
     }
     //</editor-fold>
 }

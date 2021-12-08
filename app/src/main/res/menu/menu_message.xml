@@ -4,7 +4,7 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/message_reply"
-            android:icon="@drawable/ic_menu_copy"
+            android:icon="@drawable/ic_menu_reply"
             android:title="@string/message_reply"
             app:showAsAction="ifRoom"/>
         <item
