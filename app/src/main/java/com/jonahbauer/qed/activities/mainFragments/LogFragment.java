@@ -2,12 +2,6 @@ package com.jonahbauer.qed.activities.mainFragments;
 
 import static android.content.DialogInterface.BUTTON_NEGATIVE;
 import static android.content.DialogInterface.BUTTON_POSITIVE;
-import static com.jonahbauer.qed.model.viewmodel.LogViewModel.DateIntervalLogRequest;
-import static com.jonahbauer.qed.model.viewmodel.LogViewModel.DateRecentLogRequest;
-import static com.jonahbauer.qed.model.viewmodel.LogViewModel.OnlineLogRequest;
-import static com.jonahbauer.qed.model.viewmodel.LogViewModel.PostIntervalLogRequest;
-import static com.jonahbauer.qed.model.viewmodel.LogViewModel.PostRecentLogRequest;
-import static com.jonahbauer.qed.model.viewmodel.LogViewModel.SinceOwnLogRequest;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -41,10 +35,10 @@ import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.databinding.AlertDialogLogModeBinding;
 import com.jonahbauer.qed.databinding.FragmentLogBinding;
 import com.jonahbauer.qed.layoutStuff.CustomArrayAdapter;
+import com.jonahbauer.qed.model.LogRequest;
 import com.jonahbauer.qed.model.adapter.MessageAdapter;
 import com.jonahbauer.qed.model.room.Database;
 import com.jonahbauer.qed.model.viewmodel.LogViewModel;
-import com.jonahbauer.qed.model.viewmodel.LogViewModel.LogRequest;
 import com.jonahbauer.qed.networking.Reason;
 import com.jonahbauer.qed.util.Callback;
 import com.jonahbauer.qed.util.MessageUtils;
@@ -66,6 +60,8 @@ import java.util.function.Function;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+
+import static com.jonahbauer.qed.model.LogRequest.*;
 
 public class LogFragment extends QEDFragment implements Callback<LogRequest> {
     public static final String ARGUMENT_LOG_REQUEST = "logRequest";
@@ -180,6 +176,12 @@ public class LogFragment extends QEDFragment implements Callback<LogRequest> {
             mMessageAdapter.notifyDataSetChanged();
         });
 
+
+        mLogViewModel.getLogRequest().observe(getViewLifecycleOwner(), logRequest -> {
+            mBinding.setSubtitle(logRequest.getSubtitle(getResources()));
+            mBinding.setStatusText(null);
+        });
+
         reload();
     }
 
@@ -191,6 +193,7 @@ public class LogFragment extends QEDFragment implements Callback<LogRequest> {
         if (logRequest != null) {
             mLogRequest = logRequest;
         }
+
         if (mLogRequest == null) {
             mLogRequest = new DateRecentLogRequest(Preferences.chat().getChannel(), 24, TimeUnit.HOURS);
         }
@@ -294,7 +297,7 @@ public class LogFragment extends QEDFragment implements Callback<LogRequest> {
             mBinding = AlertDialogLogModeBinding.inflate(LayoutInflater.from(context));
 
             // setup mode spinner
-            var adapter = new CustomArrayAdapter<>(context, android.R.layout.simple_spinner_item, LogViewModel.Mode.values());
+            var adapter = new CustomArrayAdapter<>(context, android.R.layout.simple_spinner_item, LogRequest.Mode.values());
             adapter.setToString((mode) -> context.getString(mode.toStringRes()));
             adapter.setDropDownViewResource(android.R.layout.simple_list_item_1);
             mBinding.logDialogModeSpinner.setAdapter(adapter);
@@ -333,7 +336,7 @@ public class LogFragment extends QEDFragment implements Callback<LogRequest> {
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
             Spinner spinner = (Spinner) parent;
-            LogViewModel.Mode item = (LogViewModel.Mode) spinner.getItemAtPosition(position);
+            LogRequest.Mode item = (LogRequest.Mode) spinner.getItemAtPosition(position);
             mBinding.setMode(item);
         }
 
@@ -344,7 +347,7 @@ public class LogFragment extends QEDFragment implements Callback<LogRequest> {
         public void onClick(DialogInterface dialog, int which) {
             if (which == BUTTON_POSITIVE) {
                 String channel = mBinding.logDialogChannel.getText().toString();
-                LogViewModel.Mode mode = (LogViewModel.Mode) mBinding.logDialogModeSpinner.getSelectedItem();
+                LogRequest.Mode mode = (LogRequest.Mode) mBinding.logDialogModeSpinner.getSelectedItem();
 
                 LogRequest logRequest = null;
                 switch (mode) {
@@ -403,7 +406,7 @@ public class LogFragment extends QEDFragment implements Callback<LogRequest> {
                         if (uri == null) {
                             ViewUtils.setError(mBinding.logDialogFile, true);
                         } else {
-                            logRequest = new LogViewModel.FileLogRequest(uri);
+                            logRequest = new FileLogRequest(uri);
                             ViewUtils.setError(mBinding.logDialogFile, false);
                         }
                         break;

@@ -1,8 +1,5 @@
 package com.jonahbauer.qed.model.viewmodel;
 
-import static com.jonahbauer.qed.util.StatusWrapper.STATUS_LOADED;
-import static com.jonahbauer.qed.util.StatusWrapper.STATUS_PRELOADED;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
@@ -25,11 +22,11 @@ public class EventListViewModel extends ViewModel implements QEDPageReceiver<Lis
     private final CompositeDisposable mDisposable = new CompositeDisposable();
 
     public EventListViewModel() {
-        mEvents.setValue(StatusWrapper.wrap(Collections.emptyList(), STATUS_LOADED));
+        load();
     }
 
     public void load() {
-        mEvents.setValue(StatusWrapper.wrap(Collections.emptyList(), STATUS_PRELOADED));
+        mEvents.setValue(StatusWrapper.preloaded(Collections.emptyList()));
         mDisposable.add(
                 QEDDBPages.getEventList(this)
         );
@@ -42,16 +39,16 @@ public class EventListViewModel extends ViewModel implements QEDPageReceiver<Lis
     @Override
     public void onResult(@NonNull List<Event> out) {
         if (out.size() > 0) {
-            this.mEvents.setValue(StatusWrapper.wrap(out, STATUS_LOADED));
+            this.mEvents.setValue(StatusWrapper.loaded(out));
         } else {
-            this.mEvents.setValue(StatusWrapper.wrap(Collections.emptyList(), Reason.EMPTY));
+            this.mEvents.setValue(StatusWrapper.error(Collections.emptyList(), Reason.EMPTY));
         }
     }
 
     @Override
     public void onError(List<Event> out, @NonNull Reason reason, @Nullable Throwable cause) {
         QEDPageReceiver.super.onError(out, reason, cause);
-        this.mEvents.setValue(StatusWrapper.wrap(out, reason));
+        this.mEvents.setValue(StatusWrapper.error(out, reason));
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.jonahbauer.qed.util;
 
 import androidx.annotation.IntDef;
+import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 
 import com.jonahbauer.qed.R;
@@ -24,17 +25,19 @@ public class StatusWrapper<T> {
 
     private Reason reason;
 
-    public static <T> StatusWrapper<T> wrap(T value, @Status int code) {
-        StatusWrapper<T> out = new StatusWrapper<>(value);
-        out.setCode(code);
-        return out;
+    public static <T> StatusWrapper<T> preloaded(T value) {
+        return wrap(value, STATUS_PRELOADED, null);
     }
 
-    public static <T> StatusWrapper<T> wrap(T value, Throwable e) {
+    public static <T> StatusWrapper<T> loaded(T value) {
+        return wrap(value, STATUS_LOADED, null);
+    }
+
+    public static <T> StatusWrapper<T> error(T value, Throwable e) {
         return wrap(value, STATUS_ERROR, Reason.guess(e));
     }
 
-    public static <T> StatusWrapper<T> wrap(T value, Reason reason) {
+    public static <T> StatusWrapper<T> error(T value, @NonNull Reason reason) {
         return wrap(value, STATUS_ERROR, reason);
     }
 

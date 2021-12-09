@@ -6,7 +6,6 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class NetworkConstants {
-    public static final String CHAT_SERVER_PING = "chat.qed-verein.de";
     public static final String CHAT_SERVER_LOGIN = "https://chat.qed-verein.de/rubychat/account";
     public static final String CHAT_SERVER_LOGOUT = "https://chat.qed-verein.de/rubychat/account";
     public static final String CHAT_SERVER_HISTORY = "https://chat.qed-verein.de/rubychat/history";

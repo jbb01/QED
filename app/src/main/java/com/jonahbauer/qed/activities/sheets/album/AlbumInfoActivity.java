@@ -33,8 +33,7 @@ public class AlbumInfoActivity extends AbstractInfoActivity {
         }
 
         mAlbumViewModel = new ViewModelProvider(this).get(AlbumViewModel.class);
-        mAlbumViewModel.init(album);
-        mAlbumViewModel.load();
+        mAlbumViewModel.load(album);
 
         super.onCreate(savedInstanceState);
     }

@@ -1,8 +1,5 @@
 package com.jonahbauer.qed.model.viewmodel;
 
-import static com.jonahbauer.qed.util.StatusWrapper.STATUS_LOADED;
-import static com.jonahbauer.qed.util.StatusWrapper.STATUS_PRELOADED;
-
 import android.app.Application;
 import android.util.Log;
 
@@ -41,7 +38,8 @@ public class AlbumListViewModel extends AndroidViewModel implements QEDPageRecei
         super(application);
 
         mAlbumDao = Database.getInstance(application).albumDao();
-        mAlbums.setValue(StatusWrapper.wrap(Collections.emptyList(), STATUS_LOADED));
+        mAlbums.setValue(StatusWrapper.loaded(Collections.emptyList()));
+        load();
     }
 
     public void load() {
@@ -55,27 +53,24 @@ public class AlbumListViewModel extends AndroidViewModel implements QEDPageRecei
     }
 
     private void loadFromInternet() {
-        this.mAlbums.setValue(StatusWrapper.wrap(Collections.emptyList(), STATUS_PRELOADED));
+        this.mAlbums.setValue(StatusWrapper.preloaded(Collections.emptyList()));
         mDisposable.add(
                 QEDGalleryPages.getAlbumList(this)
         );
     }
 
     private void loadFromDatabase() {
-        mAlbums.setValue(StatusWrapper.wrap(Collections.emptyList(), STATUS_PRELOADED));
+        mAlbums.setValue(StatusWrapper.preloaded(Collections.emptyList()));
         mDisposable.add(
                 mAlbumDao.getAll()
                          .subscribeOn(Schedulers.io())
                          .observeOn(AndroidSchedulers.mainThread())
                          .subscribe(
                                  albums -> {
-                                     if (albums != null && albums.size() > 0) {
-                                         mAlbums.setValue(StatusWrapper.wrap(albums, STATUS_LOADED));
-                                     } else {
-                                         mAlbums.setValue(StatusWrapper.wrap(Collections.emptyList(), Reason.EMPTY));
-                                     }
+                                     if (albums == null) albums = Collections.emptyList();
+                                     mAlbums.setValue(StatusWrapper.loaded(albums));
                                  },
-                                 e -> mAlbums.setValue(StatusWrapper.wrap(Collections.emptyList(), e))
+                                 e -> mAlbums.setValue(StatusWrapper.error(Collections.emptyList(), e))
                          )
         );
     }
@@ -91,7 +86,7 @@ public class AlbumListViewModel extends AndroidViewModel implements QEDPageRecei
     @Override
     public void onResult(@NonNull List<Album> out) {
         if (out.size() > 0) {
-            this.mAlbums.setValue(StatusWrapper.wrap(out, STATUS_LOADED));
+            this.mAlbums.setValue(StatusWrapper.loaded(out));
 
             //noinspection ResultOfMethodCallIgnored
             this.mAlbumDao.insertAlbums(out)
@@ -101,7 +96,7 @@ public class AlbumListViewModel extends AndroidViewModel implements QEDPageRecei
                                   e -> Log.e(LOG_TAG, "Error inserting album list into database.", e)
                           );
         } else {
-            mAlbums.setValue(StatusWrapper.wrap(Collections.emptyList(), Reason.EMPTY));
+            mAlbums.setValue(StatusWrapper.error(Collections.emptyList(), Reason.EMPTY));
         }
     }
 
@@ -113,7 +108,7 @@ public class AlbumListViewModel extends AndroidViewModel implements QEDPageRecei
             mOffline.setValue(true);
             loadFromDatabase();
         } else {
-            this.mAlbums.setValue(StatusWrapper.wrap(out, reason));
+            this.mAlbums.setValue(StatusWrapper.error(out, reason));
         }
     }
 

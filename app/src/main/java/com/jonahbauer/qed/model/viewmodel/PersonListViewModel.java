@@ -1,8 +1,5 @@
 package com.jonahbauer.qed.model.viewmodel;
 
-import static com.jonahbauer.qed.util.StatusWrapper.STATUS_LOADED;
-import static com.jonahbauer.qed.util.StatusWrapper.STATUS_PRELOADED;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
@@ -33,8 +30,6 @@ public class PersonListViewModel extends ViewModel implements QEDPageReceiver<Li
     private final CompositeDisposable mDisposable = new CompositeDisposable();
 
     public PersonListViewModel() {
-        mPersons.setValue(StatusWrapper.wrap(Collections.emptyList(), STATUS_LOADED));
-
         BiConsumer<StatusWrapper<List<Person>>, Predicate<Person>> observer = (wrapper, filter) -> {
             if (wrapper == null || wrapper.getValue() == null || wrapper.getValue().isEmpty()) {
                 mFilteredPersons.setValue(wrapper);
@@ -49,10 +44,12 @@ public class PersonListViewModel extends ViewModel implements QEDPageReceiver<Li
 
         mFilteredPersons.addSource(mFilter, filter -> observer.accept(mPersons.getValue(), filter));
         mFilteredPersons.addSource(mPersons, wrapper -> observer.accept(wrapper, mFilter.getValue()));
+
+        load();
     }
 
     public void load() {
-        mPersons.setValue(StatusWrapper.wrap(Collections.emptyList(), STATUS_PRELOADED));
+        mPersons.setValue(StatusWrapper.preloaded(Collections.emptyList()));
         mDisposable.add(
                 QEDDBPages.getPersonList(this)
         );
@@ -79,16 +76,16 @@ public class PersonListViewModel extends ViewModel implements QEDPageReceiver<Li
     @Override
     public void onResult(@NonNull List<Person> out) {
         if (out.size() > 0) {
-            this.mPersons.setValue(StatusWrapper.wrap(out, STATUS_LOADED));
+            this.mPersons.setValue(StatusWrapper.loaded(out));
         } else {
-            this.mPersons.setValue(StatusWrapper.wrap(Collections.emptyList(), Reason.EMPTY));
+            this.mPersons.setValue(StatusWrapper.error(Collections.emptyList(), Reason.EMPTY));
         }
     }
 
     @Override
     public void onError(List<Person> out, @NonNull Reason reason, @Nullable Throwable cause) {
         QEDPageReceiver.super.onError(out, reason, cause);
-        this.mPersons.setValue(StatusWrapper.wrap(out, reason));
+        this.mPersons.setValue(StatusWrapper.error(out, reason));
     }
 
     @Override

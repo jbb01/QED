@@ -5,10 +5,10 @@ import android.net.Uri;
 
 import androidx.annotation.NonNull;
 
+import com.jonahbauer.qed.model.LogRequest;
+import com.jonahbauer.qed.model.LogRequest.FileLogRequest;
 import com.jonahbauer.qed.model.Message;
 import com.jonahbauer.qed.model.parser.ChatLogParser;
-import com.jonahbauer.qed.model.viewmodel.LogViewModel;
-import com.jonahbauer.qed.model.viewmodel.LogViewModel.FileLogRequest;
 import com.jonahbauer.qed.networking.Feature;
 import com.jonahbauer.qed.networking.NetworkConstants;
 import com.jonahbauer.qed.networking.Reason;
@@ -38,7 +38,7 @@ public class QEDChatPages extends QEDPages {
 
     @NonNull
     @CheckReturnValue
-    public static Disposable getChatLog(@NonNull Context context, @NonNull LogViewModel.LogRequest logRequest, @NonNull Uri file, QEDPageStreamReceiver<Uri> listener) {
+    public static Disposable getChatLog(@NonNull Context context, @NonNull LogRequest logRequest, @NonNull Uri file, QEDPageStreamReceiver<Uri> listener) {
         if (logRequest instanceof FileLogRequest) throw new IllegalStateException();
 
         OutputStream out;

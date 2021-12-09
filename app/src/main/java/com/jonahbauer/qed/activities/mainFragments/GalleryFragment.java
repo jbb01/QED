@@ -88,7 +88,7 @@ public class GalleryFragment extends QEDFragment implements AdapterView.OnItemCl
         Album album = mAlbumAdapter.getItem((int) id);
 
         if (album == null) return;
-        if (isOnline() || album.isImageListDownloaded()) {
+        if (isOnline() || album.getImageListDownloaded() != null) {
             Intent intent = new Intent(GalleryFragment.this.getContext(), GalleryAlbumActivity.class);
             intent.putExtra(GalleryAlbumActivity.GALLERY_ALBUM_KEY, album);
             startActivity(intent);

@@ -46,8 +46,7 @@ public class AlbumInfoBottomSheet extends AbstractInfoBottomSheet {
         }
 
         mAlbumViewModel = new ViewModelProvider(this).get(AlbumViewModel.class);
-        mAlbumViewModel.init(album);
-        mAlbumViewModel.load();
+        mAlbumViewModel.load(album);
     }
 
     @Override

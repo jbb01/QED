@@ -1,6 +1,7 @@
 package com.jonahbauer.qed.networking;
 
 
+import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 import androidx.room.rxjava3.EmptyResultSetException;
 
@@ -27,6 +28,7 @@ public enum Reason {
         this.stringRes = res;
     }
 
+    @NonNull
     public static Reason guess(Throwable throwable) {
         if (throwable instanceof InvalidCredentialsException) {
             return UNABLE_TO_LOG_IN;

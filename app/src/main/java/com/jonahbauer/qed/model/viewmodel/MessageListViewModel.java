@@ -1,8 +1,5 @@
 package com.jonahbauer.qed.model.viewmodel;
 
-import static com.jonahbauer.qed.util.StatusWrapper.STATUS_LOADED;
-import static com.jonahbauer.qed.util.StatusWrapper.STATUS_PRELOADED;
-
 import android.app.Application;
 
 import androidx.annotation.NonNull;
@@ -33,7 +30,7 @@ public class MessageListViewModel extends AndroidViewModel {
         super(application);
 
         mMessageDao = Database.getInstance(application).messageDao();
-        mMessages.setValue(StatusWrapper.wrap(Collections.emptyList(), STATUS_LOADED));
+        mMessages.setValue(StatusWrapper.loaded(Collections.emptyList()));
     }
 
     public void load(@Nullable String channel,
@@ -44,14 +41,14 @@ public class MessageListViewModel extends AndroidViewModel {
                      @Nullable Long fromId,
                      @Nullable Long toId,
                      long limit) {
-        mMessages.setValue(StatusWrapper.wrap(Collections.emptyList(), STATUS_PRELOADED));
+        mMessages.setValue(StatusWrapper.preloaded(Collections.emptyList()));
         mDisposable.add(
                 mMessageDao.findAll(channel, message, name, fromDate, toDate, fromId, toId, limit)
                            .subscribeOn(Schedulers.io())
                            .observeOn(AndroidSchedulers.mainThread())
                            .subscribe(
-                                   (messages) -> mMessages.setValue(StatusWrapper.wrap(messages, STATUS_LOADED)),
-                                   (e) -> mMessages.setValue(StatusWrapper.wrap(Collections.emptyList(), e))
+                                   (messages) -> mMessages.setValue(StatusWrapper.loaded(messages)),
+                                   (e) -> mMessages.setValue(StatusWrapper.error(Collections.emptyList(), e))
                            )
         );
     }

@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
@@ -12,12 +13,17 @@ import androidx.room.TypeConverters;
 
 import com.jonahbauer.qed.model.room.Converters;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import lombok.Builder;
 import lombok.Data;
 
 @Data
@@ -58,7 +64,7 @@ public class Album implements Parcelable {
      * database. If this flag is not set the album cannot be viewed in offline mode.
      */
     @ColumnInfo(name = "image_list_downloaded")
-    private boolean imageListDownloaded;
+    private Instant imageListDownloaded;
 
     /**
      * This flag indicates whether the album has been completely loaded from the website.
@@ -101,7 +107,7 @@ public class Album implements Parcelable {
         }
         dest.writeStringList(categories);
         dest.writeTypedList(images);
-        dest.writeInt(imageListDownloaded ? 1 : 0);
+        dest.writeLong(imageListDownloaded != null ? imageListDownloaded.getEpochSecond() : Long.MIN_VALUE);
     }
 
     public static final Parcelable.Creator<Album> CREATOR = new Parcelable.Creator<>() {
@@ -122,7 +128,9 @@ public class Album implements Parcelable {
 
             source.readStringList(album.categories);
             source.readTypedList(album.images, Image.CREATOR);
-            album.imageListDownloaded = source.readInt() != 0;
+
+            var timestamp = source.readLong();
+            album.imageListDownloaded = timestamp == Long.MIN_VALUE ? null : Instant.ofEpochSecond(timestamp);
             return album;
         }
 
@@ -131,4 +139,39 @@ public class Album implements Parcelable {
             return new Album[size];
         }
     };
+
+    @Data
+    @Builder(builderClassName = "Builder", setterPrefix = "set")
+    public static class Filter {
+        @Nullable
+        private final LocalDate day;
+        @Nullable
+        private final Person owner;
+        @Nullable
+        private final String category;
+
+        @NonNull
+        public String toString() {
+            String out = "";
+            if (day != null) {
+                out += "&byday=" + DateTimeFormatter.ISO_LOCAL_DATE.format(day);
+            }
+            if (owner != null) {
+                out += "&byowner=" + owner.getId();
+            }
+            if (category != null) {
+                out += "&bycategory=";
+                if (!CATEGORY_ETC.equals(category)) {
+                    try {
+                        out += URLEncoder.encode(category, "UTF-8");
+                    } catch (UnsupportedEncodingException ignored) {}
+                }
+            }
+            return out;
+        }
+
+        public boolean isEmpty() {
+            return day == null && owner == null && category == null;
+        }
+    }
 }

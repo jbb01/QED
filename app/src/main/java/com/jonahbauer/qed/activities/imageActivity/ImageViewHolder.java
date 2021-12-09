@@ -167,7 +167,7 @@ public class ImageViewHolder extends RecyclerView.ViewHolder implements QEDPageR
                 default:
                 case "image":
                     Bitmap bitmap = BitmapFactory.decodeFile(image.getPath());
-                    this.mStatus.setValue(StatusWrapper.wrap(image, StatusWrapper.STATUS_LOADED));
+                    this.mStatus.setValue(StatusWrapper.loaded(image));
                     if (bitmap != null) {
                         this.mBinding.setDrawable(new BitmapDrawable(mContext.getResources(), bitmap));
                     } else {
@@ -176,15 +176,15 @@ public class ImageViewHolder extends RecyclerView.ViewHolder implements QEDPageR
                     break;
                 case "video":
                     this.mBinding.setDrawable(AppCompatResources.getDrawable(mContext, R.drawable.ic_gallery_video));
-                    this.mStatus.setValue(StatusWrapper.wrap(image, StatusWrapper.STATUS_LOADED));
+                    this.mStatus.setValue(StatusWrapper.loaded(image));
                     break;
                 case "audio":
                     this.mBinding.setDrawable(AppCompatResources.getDrawable(mContext, R.drawable.ic_gallery_audio));
-                    this.mStatus.setValue(StatusWrapper.wrap(image, StatusWrapper.STATUS_LOADED));
+                    this.mStatus.setValue(StatusWrapper.loaded(image));
                     break;
             }
         } else {
-            this.mStatus.setValue(StatusWrapper.wrap(image, StatusWrapper.STATUS_PRELOADED));
+            this.mStatus.setValue(StatusWrapper.preloaded(image));
             if ("image".equals(type)) {
                 downloadImage(image);
             } else {
@@ -324,7 +324,7 @@ public class ImageViewHolder extends RecyclerView.ViewHolder implements QEDPageR
                 break;
         }
 
-        mStatus.setValue(StatusWrapper.wrap(image, StatusWrapper.STATUS_LOADED));
+        mStatus.setValue(StatusWrapper.loaded(image));
 
         onProgressUpdate(null, 0,0);
     }
@@ -335,7 +335,7 @@ public class ImageViewHolder extends RecyclerView.ViewHolder implements QEDPageR
         QEDPageStreamReceiver.super.onError(image, reason, cause);
         if (mDownloadTmp != null) mDownloadTmp.delete();
 
-        mStatus.setValue(StatusWrapper.wrap(image, reason));
+        mStatus.setValue(StatusWrapper.error(image, reason));
 
         switch (ImageActivity.getType(image)) {
             default:

@@ -21,7 +21,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.util.Pair;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -36,18 +35,14 @@ import com.jonahbauer.qed.model.Person;
 import com.jonahbauer.qed.model.adapter.ImageAdapter;
 import com.jonahbauer.qed.model.viewmodel.AlbumViewModel;
 import com.jonahbauer.qed.networking.Reason;
-import com.jonahbauer.qed.networking.pages.QEDGalleryPages.Filter;
 import com.jonahbauer.qed.util.Preferences;
 import com.jonahbauer.qed.util.StatusWrapper;
 import com.jonahbauer.qed.util.TimeUtils;
 import com.jonahbauer.qed.util.ViewUtils;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -55,6 +50,8 @@ public class GalleryAlbumActivity extends AppCompatActivity implements CompoundB
     public static final String GALLERY_ALBUM_KEY = "galleryAlbum";
 
     private Album mAlbum;
+    private Album.Filter mFilter;
+
     private AlbumViewModel mAlbumViewModel;
     private ActivityGalleryAlbumBinding mBinding;
 
@@ -75,7 +72,6 @@ public class GalleryAlbumActivity extends AppCompatActivity implements CompoundB
         if (isFinishing()) return;
 
         mAlbumViewModel = new ViewModelProvider(this).get(AlbumViewModel.class);
-        mAlbumViewModel.init(mAlbum);
 
         mBinding = ActivityGalleryAlbumBinding.inflate(getLayoutInflater());
         setContentView(mBinding.getRoot());
@@ -117,12 +113,12 @@ public class GalleryAlbumActivity extends AppCompatActivity implements CompoundB
             if (Preferences.gallery().isOfflineMode()) {
                 Preferences.gallery().edit().setOfflineMode(false).apply();
             }
-            mAlbumViewModel.load();
+            search();
         });
 
         adjustColumnCount(getResources().getConfiguration());
 
-        mAlbumViewModel.getFilteredAlbum().observe(this, this::updateView);
+        mAlbumViewModel.getAlbum().observe(this, this::updateView);
         mAlbumViewModel.getOffline().observe(this, offline -> {
             mBinding.setOffline(offline);
             mBinding.setForcedOfflineMode(Preferences.gallery().isOfflineMode());
@@ -142,7 +138,7 @@ public class GalleryAlbumActivity extends AppCompatActivity implements CompoundB
                 }
         );
 
-        mAlbumViewModel.load();
+        load();
     }
 
     @NonNull
@@ -154,39 +150,48 @@ public class GalleryAlbumActivity extends AppCompatActivity implements CompoundB
         return album;
     }
 
-    private void search() {
-        HashMap<Filter, String> filterData = new HashMap<>();
+    private void loadFilters() {
+        Album.Filter.Builder builder = Album.Filter.builder();
 
         if (mBinding.albumCategoryCheckBox.isChecked()) {
             String category = (String) mBinding.albumCategorySpinner.getSelectedItem();
-            if (Album.CATEGORY_ETC.equals(category)) category = "";
-            try {
-                category = URLEncoder.encode(category, "UTF-8");
-            } catch (UnsupportedEncodingException ignored) {}
-            filterData.put(Filter.BY_CATEGORY, category);
+            builder.setCategory(category);
         }
         if (mBinding.albumDateCheckBox.isChecked()) {
             LocalDate date = (LocalDate) mBinding.albumDateSpinner.getSelectedItem();
-            filterData.put(Filter.BY_DATE, DateTimeFormatter.ISO_LOCAL_DATE.format(date));
+            builder.setDay(date);
         }
         if (mBinding.albumPhotographerCheckBox.isChecked()) {
             Person person = (Person) mBinding.albumPhotographerSpinner.getSelectedItem();
-            filterData.put(Filter.BY_PERSON, String.valueOf(person.getId()));
+            builder.setOwner(person);
         }
 
-        mAlbumViewModel.filter(filterData);
+        mFilter = builder.build();
     }
 
-    private void updateView(StatusWrapper<Pair<Album, List<Image>>> albumStatusWrapper) {
-        Pair<Album, List<Image>> pair = albumStatusWrapper.getValue();
-        Album album = pair.first;
-        List<Image> images = pair.second;
+    private void search() {
+        loadFilters();
+        load();
+    }
+
+    private void load() {
+        boolean offline = Preferences.gallery().isOfflineMode();
+        mAlbumViewModel.load(mAlbum, offline ? null : mFilter, offline);
+    }
+
+    private void updateView(StatusWrapper<Album> albumStatusWrapper) {
+        Album album = albumStatusWrapper.getValue();
+        List<Image> images = album != null ? album.getImages() : Collections.emptyList();
 
         mBinding.setAlbum(album);
         mBinding.setStatus(albumStatusWrapper.getCode());
         mBinding.setError(getString(albumStatusWrapper.getErrorMessage()));
 
-        if (albumStatusWrapper.getCode() == StatusWrapper.STATUS_LOADED) {
+        boolean successOrEmpty = albumStatusWrapper.getCode() == StatusWrapper.STATUS_LOADED;
+        successOrEmpty |= albumStatusWrapper.getReason() == Reason.EMPTY && album != null;
+        if (successOrEmpty) {
+            assert album != null;
+
             Objects.requireNonNull(getSupportActionBar()).setTitle(album.getName());
 
             mAdapterCategory.clear();
@@ -204,7 +209,9 @@ public class GalleryAlbumActivity extends AppCompatActivity implements CompoundB
             mImageAdapter.clear();
             mImageAdapter.addAll(images);
             mImageAdapter.notifyDataSetChanged();
-        } else if (albumStatusWrapper.getCode() == StatusWrapper.STATUS_ERROR) {
+        }
+
+        if (albumStatusWrapper.getCode() == StatusWrapper.STATUS_ERROR) {
             mImageAdapter.clear();
             Reason reason = albumStatusWrapper.getReason();
             mBinding.setError(getString(reason == Reason.EMPTY ? R.string.album_empty : reason.getStringRes()));

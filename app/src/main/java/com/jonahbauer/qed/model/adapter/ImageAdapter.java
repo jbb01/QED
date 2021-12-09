@@ -5,7 +5,6 @@ import static com.jonahbauer.qed.model.Image.VIDEO_FILE_EXTENSIONS;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
@@ -22,21 +21,16 @@ import com.jonahbauer.qed.databinding.ListItemImageBinding;
 import com.jonahbauer.qed.model.Image;
 import com.jonahbauer.qed.model.room.AlbumDao;
 import com.jonahbauer.qed.model.room.Database;
-import com.jonahbauer.qed.networking.Reason;
-import com.jonahbauer.qed.networking.async.QEDPageStreamReceiver;
 import com.jonahbauer.qed.networking.pages.QEDGalleryPages;
-import com.jonahbauer.qed.networking.pages.QEDGalleryPages.Mode;
 import com.jonahbauer.qed.util.Preferences;
 
-import java.io.ByteArrayOutputStream;
 import java.util.List;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
-import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
-public class ImageAdapter extends ArrayAdapter<Image> implements QEDPageStreamReceiver<ListItemImageBinding> {
+public class ImageAdapter extends ArrayAdapter<Image> {
     private static final String LOG_TAG = ImageAdapter.class.getName();
 
     private final Context mContext;
@@ -113,12 +107,28 @@ public class ImageAdapter extends ArrayAdapter<Image> implements QEDPageStreamRe
     }
 
     private void downloadThumbnail(Image image, ListItemImageBinding binding) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        binding.setBaos(baos);
         binding.getDisposable().addAll(
-                QEDGalleryPages.getImage(binding, image, Mode.THUMBNAIL, baos, this),
-                Disposable.fromAutoCloseable(baos)
+                QEDGalleryPages.getThumbnail(image)
+                               .doOnSuccess(optional -> optional.ifPresent(bitmap -> saveThumbnail(image, bitmap)))
+                               .subscribe(
+                                       optional -> {
+                                           image.setThumbnail(optional.orElse(null));
+                                           binding.setThumbnail(getThumbnail(image, false));
+                                       },
+                                       err -> {
+                                           Log.e(LOG_TAG, "Error loading thumbnail for image " + image.getId() + ".", err);
+                                           binding.setThumbnail(getThumbnail(image, true));
+                                       }
+                               )
         );
+    }
+
+    private void saveThumbnail(Image image, Bitmap bitmap) {
+        //noinspection ResultOfMethodCallIgnored
+        mAlbumDao.insertThumbnail(image.getId(), bitmap)
+                 .subscribeOn(Schedulers.io())
+                 .observeOn(AndroidSchedulers.mainThread())
+                 .subscribe(() -> {}, err -> Log.e(LOG_TAG, "Could not save thumbnail to database.", err));
     }
 
     private Drawable getThumbnail(Image image, boolean error) {
@@ -146,32 +156,6 @@ public class ImageAdapter extends ArrayAdapter<Image> implements QEDPageStreamRe
         }
 
         return AppCompatResources.getDrawable(mContext, resource);
-    }
-
-    @Override
-    public void onResult(@NonNull ListItemImageBinding binding) {
-        ByteArrayOutputStream baos = binding.getBaos();
-        Image image = binding.getImage();
-
-        byte[] encodedBitmap = baos.toByteArray();
-        Bitmap bitmap = BitmapFactory.decodeByteArray(encodedBitmap, 0, encodedBitmap.length);
-        image.setThumbnail(bitmap);
-
-        binding.setThumbnail(getThumbnail(image, false));
-        binding.setBaos(null);
-
-        //noinspection ResultOfMethodCallIgnored
-        mAlbumDao.insertThumbnail(image.getId(), bitmap)
-                 .subscribeOn(Schedulers.io())
-                 .observeOn(AndroidSchedulers.mainThread())
-                 .subscribe(() -> {}, err -> Log.e(LOG_TAG, "Could not save thumbnail to database.", err));
-    }
-
-    @Override
-    public void onError(ListItemImageBinding binding, @NonNull Reason reason, Throwable cause) {
-        QEDPageStreamReceiver.super.onError(binding, reason, cause);
-
-        binding.setThumbnail(getThumbnail(binding.getImage(), true));
     }
 
     public List<Image> getImages() {

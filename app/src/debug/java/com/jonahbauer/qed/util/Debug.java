@@ -9,6 +9,7 @@ import com.jonahbauer.qed.model.Message;
 import com.jonahbauer.qed.model.Person;
 import com.jonahbauer.qed.model.Registration;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -116,7 +117,7 @@ public class Debug {
         album.setOwner("Max Mustermann");
         album.setCreationDate("01.01.2000");
         album.setPrivate_(true);
-        album.setImageListDownloaded(true);
+        album.setImageListDownloaded(Instant.now());
         album.getCategories().add("Kategorie 1");
         album.getCategories().add("Kategorie 2");
         album.getCategories().add("Kategorie 3");

@@ -5,7 +5,7 @@
     <data>
 
         <import type="android.view.View" />
-        <import type="com.jonahbauer.qed.model.viewmodel.LogViewModel.Mode" />
+        <import type="com.jonahbauer.qed.model.LogRequest.Mode" />
 
         <variable name="mode" type="Mode" />
         <variable name="error" type="java.lang.String"/>

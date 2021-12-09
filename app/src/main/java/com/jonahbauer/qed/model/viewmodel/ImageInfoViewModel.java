@@ -1,9 +1,5 @@
 package com.jonahbauer.qed.model.viewmodel;
 
-import static com.jonahbauer.qed.util.StatusWrapper.STATUS_ERROR;
-import static com.jonahbauer.qed.util.StatusWrapper.STATUS_LOADED;
-import static com.jonahbauer.qed.util.StatusWrapper.STATUS_PRELOADED;
-
 import android.app.Application;
 import android.util.Log;
 
@@ -41,7 +37,7 @@ public class ImageInfoViewModel extends AndroidViewModel implements QEDPageRecei
 
     public void load(@NonNull Image image) {
         if (!image.isLoaded()) {
-            this.mImage.setValue(StatusWrapper.wrap(image, STATUS_PRELOADED));
+            this.mImage.setValue(StatusWrapper.preloaded(image));
             mDisposable.add(
                     mAlbumDao.findImageById(image.getId())
                              .subscribeOn(Schedulers.io())
@@ -97,13 +93,13 @@ public class ImageInfoViewModel extends AndroidViewModel implements QEDPageRecei
                           );
         }
 
-        this.mImage.setValue(StatusWrapper.wrap(out, STATUS_LOADED));
+        this.mImage.setValue(StatusWrapper.loaded(out));
     }
 
     @Override
     public void onError(Image out, @NonNull Reason reason, @Nullable Throwable cause) {
         QEDPageReceiver.super.onError(out, reason, cause);
-        this.mImage.setValue(StatusWrapper.wrap(out, STATUS_ERROR, reason));
+        this.mImage.setValue(StatusWrapper.error(out, reason));
     }
 
     @Override

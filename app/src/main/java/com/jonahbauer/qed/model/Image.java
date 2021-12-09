@@ -19,14 +19,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
 @Entity
+@EqualsAndHashCode(of = "id")
 @TypeConverters(Converters.class)
 public class Image implements Parcelable {
     public static final Set<String> VIDEO_FILE_EXTENSIONS;
@@ -150,17 +151,28 @@ public class Image implements Parcelable {
         return entries.stream().collect(Collectors.joining(", ", "{", "}"));
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Image image = (Image) o;
-        return id == image.id;
-    }
+    public Type getType() {
+        if (getFormat() != null) {
+            String format = getFormat().split("/")[0];
+            if ("audio".equals(format)) {
+                return Type.AUDIO;
+            } else if ("video".equals(format)) {
+                return Type.VIDEO;
+            } else {
+                return Type.IMAGE;
+            }
+        } else if (getName() != null) {
+            String suffix = getName();
+            suffix = suffix.substring(suffix.lastIndexOf('.') + 1);
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
+            if (Image.VIDEO_FILE_EXTENSIONS.contains(suffix)) {
+                return Type.VIDEO;
+            } else if (Image.AUDIO_FILE_EXTENSIONS.contains(suffix)) {
+                return Type.AUDIO;
+            }
+        }
+
+        return Type.IMAGE;
     }
 
     @Override
@@ -206,4 +218,8 @@ public class Image implements Parcelable {
             return new Image[size];
         }
     };
+
+    public enum Type {
+        IMAGE, VIDEO, AUDIO
+    }
 }

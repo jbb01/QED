@@ -44,7 +44,7 @@ import com.jonahbauer.qed.activities.mainFragments.PersonDatabaseFragment;
 import com.jonahbauer.qed.activities.mainFragments.QEDFragment;
 import com.jonahbauer.qed.activities.settings.RootSettingsActivity;
 import com.jonahbauer.qed.databinding.ActivityMainBinding;
-import com.jonahbauer.qed.model.viewmodel.LogViewModel;
+import com.jonahbauer.qed.model.LogRequest;
 import com.jonahbauer.qed.networking.NetworkListener;
 import com.jonahbauer.qed.networking.login.QEDLogout;
 import com.jonahbauer.qed.util.Preferences;
@@ -414,7 +414,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         if (path != null && path.contains("/history")) {
                             // Chat log
                             if (activity != null) {
-                                LogViewModel.LogRequest request = LogViewModel.LogRequest.parse(data);
+                                LogRequest request = LogRequest.parse(data);
                                 Bundle bundle = new Bundle();
                                 if (request != null) {
                                     bundle.putSerializable(LogFragment.ARGUMENT_LOG_REQUEST, request);

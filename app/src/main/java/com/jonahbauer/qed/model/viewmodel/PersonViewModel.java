@@ -1,9 +1,5 @@
 package com.jonahbauer.qed.model.viewmodel;
 
-import static com.jonahbauer.qed.util.StatusWrapper.STATUS_ERROR;
-import static com.jonahbauer.qed.util.StatusWrapper.STATUS_LOADED;
-import static com.jonahbauer.qed.util.StatusWrapper.STATUS_PRELOADED;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
@@ -24,7 +20,7 @@ public class PersonViewModel extends ViewModel implements QEDPageReceiver<Person
 
     public void load(@NonNull Person person) {
         if (!person.isLoaded()) {
-            this.mPerson.setValue(StatusWrapper.wrap(person, STATUS_PRELOADED));
+            this.mPerson.setValue(StatusWrapper.preloaded(person));
             mDisposable.add(
                     QEDDBPages.getPerson(person, this)
             );
@@ -40,13 +36,13 @@ public class PersonViewModel extends ViewModel implements QEDPageReceiver<Person
     @Override
     public void onResult(@NonNull Person out) {
         out.setLoaded(true);
-        this.mPerson.setValue(StatusWrapper.wrap(out, STATUS_LOADED));
+        this.mPerson.setValue(StatusWrapper.loaded(out));
     }
 
     @Override
     public void onError(Person out, @NonNull Reason reason, @Nullable Throwable cause) {
         QEDPageReceiver.super.onError(out, reason, cause);
-        this.mPerson.setValue(StatusWrapper.wrap(out, STATUS_ERROR, reason));
+        this.mPerson.setValue(StatusWrapper.error(out, reason));
     }
 
     @Override
