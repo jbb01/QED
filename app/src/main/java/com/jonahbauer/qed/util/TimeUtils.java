@@ -23,18 +23,22 @@ public class TimeUtils {
     public static final DateTimeFormatter DATE_TIME_MEDIUM = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM);
 
     public static String format(LocalDate date) {
+        if (date == null) return null;
         return DATE_MEDIUM.format(date);
     }
 
     public static String format(LocalTime time) {
+        if (time == null) return null;
         return TIME_MEDIUM.format(time);
     }
 
     public static String format(LocalDateTime dateTime) {
+        if (dateTime == null) return null;
         return DATE_TIME_MEDIUM.format(dateTime);
     }
 
     public static String format(Instant instant) {
+        if (instant == null) return null;
         return DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
                                 .withZone(ZoneId.systemDefault())
                                 .format(instant);
@@ -52,13 +56,9 @@ public class TimeUtils {
     }
 
     public static LiveData<LocalDateTime> combine(LiveData<LocalDate> date, LiveData<LocalTime> time) {
-        MediatorLiveData<LocalDateTime> mediatorLiveData = new MediatorLiveData<>();
-        mediatorLiveData.addSource(date, d -> {
-            mediatorLiveData.setValue(LocalDateTime.of(date.getValue(), time.getValue()));
-        });
-        mediatorLiveData.addSource(time, t -> {
-            mediatorLiveData.setValue(LocalDateTime.of(date.getValue(), time.getValue()));
-        });
-        return mediatorLiveData;
+        MediatorLiveData<LocalDateTime> out = new MediatorLiveData<>();
+        out.addSource(date, d -> out.setValue(LocalDateTime.of(date.getValue(), time.getValue())));
+        out.addSource(time, t -> out.setValue(LocalDateTime.of(date.getValue(), time.getValue())));
+        return out;
     }
 }

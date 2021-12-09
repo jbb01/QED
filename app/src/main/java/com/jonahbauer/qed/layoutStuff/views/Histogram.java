@@ -15,6 +15,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 
@@ -94,10 +95,12 @@ public class Histogram extends AppCompatImageView {
                 task.subscribeOn(Schedulers.computation())
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnComplete(() -> {
+                        this.setVisibility(View.INVISIBLE);
                         HistogramDrawable drawable = new HistogramDrawable(data, mMode);
                         this.setImageDrawable(drawable);
                     })
                     .delay(20, TimeUnit.MILLISECONDS)
+                    .observeOn(AndroidSchedulers.mainThread())
                     .doOnComplete(() -> {
                         this.setVisibility(VISIBLE);
                         Animation animation = AnimationUtils.loadAnimation(this.getContext(), R.anim.scale_up);

@@ -4,6 +4,8 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.res.Resources;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,7 +13,9 @@ import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.EditText;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.MutableLiveData;
 
 import com.jonahbauer.qed.R;
@@ -22,6 +26,7 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -34,7 +39,7 @@ public class ViewUtils {
     /**
      * Expands the given view.
      */
-    public static void expand(final View view) {
+    public static void expand(@NonNull final View view) {
         // measure view
         int matchParentMeasureSpec = View.MeasureSpec.makeMeasureSpec(((View) view.getParent()).getWidth(), View.MeasureSpec.EXACTLY);
         int wrapContentMeasureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
@@ -76,7 +81,7 @@ public class ViewUtils {
     /**
      * Collapses the given view.
      */
-    public static void collapse(final View view) {
+    public static void collapse(@NonNull final View view) {
         final int duration = view.getContext().getResources().getInteger(android.R.integer.config_mediumAnimTime);
         final int initialHeight = view.getMeasuredHeight();
         final int initialPadding = view.getPaddingTop();
@@ -105,7 +110,8 @@ public class ViewUtils {
         view.startAnimation(anim);
     }
 
-    public static void setPaddingTop(View view, int paddingTop) {
+    //<editor-fold desc="Padding" defaultstate="collapsed">
+    public static void setPaddingTop(@NonNull View view, int paddingTop) {
         view.setPadding(
                 view.getPaddingLeft(),
                 paddingTop,
@@ -114,7 +120,7 @@ public class ViewUtils {
         );
     }
 
-    public static void setPaddingLeft(View view, int paddingLeft) {
+    public static void setPaddingLeft(@NonNull View view, int paddingLeft) {
         view.setPadding(
                 paddingLeft,
                 view.getPaddingTop(),
@@ -123,7 +129,7 @@ public class ViewUtils {
         );
     }
 
-    public static void setPaddingRight(View view, int paddingRight) {
+    public static void setPaddingRight(@NonNull View view, int paddingRight) {
         view.setPadding(
                 view.getPaddingLeft(),
                 view.getPaddingTop(),
@@ -132,7 +138,7 @@ public class ViewUtils {
         );
     }
 
-    public static void setPaddingBottom(View view, int paddingBottom) {
+    public static void setPaddingBottom(@NonNull View view, int paddingBottom) {
         view.setPadding(
                 view.getPaddingLeft(),
                 view.getPaddingTop(),
@@ -140,8 +146,9 @@ public class ViewUtils {
                 paddingBottom
         );
     }
+    //</editor-fold>
 
-    public static void setupDateEditText(EditText editText, MutableLiveData<LocalDate> date) {
+    public static void setupDateEditText(@NonNull EditText editText, @NonNull MutableLiveData<LocalDate> date) {
         DateTimeFormatter formatter = DateTimeFormatter
                 .ofLocalizedDate(FormatStyle.MEDIUM)
                 .withZone(ZoneId.systemDefault());
@@ -150,21 +157,22 @@ public class ViewUtils {
         editText.setOnClickListener(v -> {
             Context context = editText.getContext();
 
+            var value = Objects.requireNonNull(date.getValue());
             DatePickerDialog dialog = new DatePickerDialog(
                     context,
                     (view, year, month, dayOfMonth) -> {
                         date.setValue(LocalDate.of(year, month + 1, dayOfMonth));
                         editText.setText(formatter.format(date.getValue()));
                     },
-                    date.getValue().getYear(),
-                    date.getValue().getMonthValue() - 1,
-                    date.getValue().getDayOfMonth()
+                    value.getYear(),
+                    value.getMonthValue() - 1,
+                    value.getDayOfMonth()
             );
             dialog.show();
         });
     }
 
-    public static void setupTimeEditText(EditText editText, MutableLiveData<LocalTime> time) {
+    public static void setupTimeEditText(@NonNull EditText editText, @NonNull MutableLiveData<LocalTime> time) {
         DateTimeFormatter formatter = DateTimeFormatter
                 .ofLocalizedTime(FormatStyle.MEDIUM)
                 .withZone(ZoneId.systemDefault());
@@ -173,14 +181,15 @@ public class ViewUtils {
         editText.setOnClickListener(v -> {
             Context context = editText.getContext();
 
+            var value = Objects.requireNonNull(time.getValue());
             TimePickerDialog dialog = new TimePickerDialog(
                     context,
                     (view, hourOfDay, minute) -> {
                         time.setValue(LocalTime.of(hourOfDay, minute));
                         editText.setText(formatter.format(time.getValue()));
                     },
-                    time.getValue().getHour(),
-                    time.getValue().getMinute(),
+                    value.getHour(),
+                    value.getMinute(),
                     android.text.format.DateFormat.is24HourFormat(context)
             );
 
@@ -188,7 +197,7 @@ public class ViewUtils {
         });
     }
 
-    public static void showPreferenceDialog(Context context, @StringRes int title, Supplier<String> getter, Consumer<String> setter) {
+    public static void showPreferenceDialog(Context context, @StringRes int title, @NonNull Supplier<String> getter, Consumer<String> setter) {
         AlertDialog.Builder dialog = new AlertDialog.Builder(context);
         dialog.setTitle(title);
 
@@ -204,7 +213,37 @@ public class ViewUtils {
         dialog.show();
     }
 
-    public static void setError(EditText editText, boolean error) {
+    public static void setError(@NonNull EditText editText, boolean error) {
         editText.setCompoundDrawablesWithIntrinsicBounds(0, 0, error ? R.drawable.ic_error : 0, 0);
     }
+
+    //<editor-fold desc="Conversions" defaultstate="collapsed">
+    public static float spToPx(@NonNull Resources resources, float sp) {
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp, resources.getDisplayMetrics());
+    }
+
+    public static float spToPx(@NonNull Context context, float sp) {
+        return spToPx(context.getResources(), sp);
+    }
+
+    public static float spToPx(@NonNull View view, float sp) {
+        return spToPx(view.getResources(), sp);
+    }
+
+    public static float dpToPx(@NonNull Resources resources, float dp) {
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, resources.getDisplayMetrics());
+    }
+
+    public static float dpToPx(@NonNull Context context, float dp) {
+        return dpToPx(context.getResources(), dp);
+    }
+
+    public static float dpToPx(@NonNull View view, float dp) {
+        return dpToPx(view.getResources(), dp);
+    }
+
+    public static float dpToPx(@NonNull Fragment fragment, float dp) {
+        return dpToPx(fragment.getResources(), dp);
+    }
+    //</editor-fold>
 }

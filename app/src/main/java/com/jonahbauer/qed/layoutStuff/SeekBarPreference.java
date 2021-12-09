@@ -27,7 +27,6 @@ import android.os.Parcelable;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.SeekBar;
@@ -38,6 +37,7 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceViewHolder;
 
 import com.jonahbauer.qed.R;
+import com.jonahbauer.qed.util.ViewUtils;
 
 /**
  * Preference based on android.preference.SeekBarPreference but uses support preference as a base
@@ -198,7 +198,7 @@ public class SeekBarPreference extends Preference {
     private void adjustSeekBarValueTextViewWidth() {
         if (mSeekBarValueTextView != null) {
             if (mExternalValueStrings != null) {
-                float dp10 = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getContext().getResources().getDisplayMetrics());
+                float dp10 = ViewUtils.dpToPx(getContext(), 10);
                 TextPaint paint = mSeekBarValueTextView.getPaint();
                 float max = 0;
                 for (String externalValueString : mExternalValueStrings) {
@@ -207,7 +207,7 @@ public class SeekBarPreference extends Preference {
                 }
                 mSeekBarValueTextView.setWidth((int) (max + dp10));
             } else if (mExternalValues != null) {
-                float dp10 = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getContext().getResources().getDisplayMetrics());
+                float dp10 = ViewUtils.dpToPx(getContext(), 10);
                 TextPaint paint = mSeekBarValueTextView.getPaint();
                 float max = 0;
                 for (int externalValue : mExternalValues) {

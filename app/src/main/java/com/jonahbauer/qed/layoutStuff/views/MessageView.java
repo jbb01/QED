@@ -41,6 +41,7 @@ import androidx.annotation.StyleRes;
 
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.model.Message;
+import com.jonahbauer.qed.util.ViewUtils;
 
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -150,7 +151,7 @@ public class MessageView extends RelativeLayout {
         super(applyTheme(context), attrs, defStyleAttr);
 
         if (dp == 0) {
-            dp = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1, getResources().getDisplayMetrics());
+            dp = ViewUtils.dpToPx(this, 1);
         }
 
         obtainAttributes(this.getContext(), attrs, defStyleAttr);
@@ -733,19 +734,19 @@ public class MessageView extends RelativeLayout {
 
     public void setNameTextSize(@Dimension(unit = Dimension.SP) float size) {
         mNameTextSizeSet = true;
-        mNameTextSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, size, getResources().getDisplayMetrics());
+        mNameTextSize = ViewUtils.spToPx(this, size);
         mNameTextView.setTextSize(size);
     }
 
     public void setDateTextSize(@Dimension(unit = Dimension.SP) int size) {
         mDateTextSizeSet = true;
-        mDateTextSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, size, getResources().getDisplayMetrics());
+        mDateTextSize = ViewUtils.spToPx(this, size);
         mDateTextView.setTextSize(size);
     }
 
     public void setDataTextSize(@Dimension(unit = Dimension.SP) int size) {
         mDataTextSizeSet = true;
-        mDataTextSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, size, getResources().getDisplayMetrics());
+        mDataTextSize = ViewUtils.spToPx(this, size);
 
         if (mExtended) {
             mChannelTextView.setTextSize(mDataTextSize);
@@ -756,7 +757,7 @@ public class MessageView extends RelativeLayout {
 
     public void setDateBannerTextSize(@Dimension(unit = Dimension.SP) float size) {
         mDateBannerTextSizeSet = true;
-        mDateBannerTextSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, size, getResources().getDisplayMetrics());
+        mDateBannerTextSize = ViewUtils.spToPx(this, size);
 
         if (!mExtended) {
             mDateBannerTextView.setTextSize(size);
@@ -765,7 +766,7 @@ public class MessageView extends RelativeLayout {
 
     public void setMessageTextSize(@Dimension(unit = Dimension.SP) int size) {
         mMessageTextSizeSet = true;
-        mMessageTextSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, size, getResources().getDisplayMetrics());
+        mMessageTextSize = ViewUtils.spToPx(this, size);
         mMessageTextView.setTextSize(size);
         if (mKatex) mMessageMathView.setTextSize(size);
     }

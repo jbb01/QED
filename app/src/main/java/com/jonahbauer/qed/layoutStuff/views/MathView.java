@@ -27,6 +27,7 @@ import androidx.annotation.StyleRes;
 
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.util.Triple;
+import com.jonahbauer.qed.util.ViewUtils;
 import com.x5.template.Chunk;
 import com.x5.template.Theme;
 import com.x5.template.providers.AndroidTemplates;
@@ -76,7 +77,7 @@ public class MathView extends LinearLayout {
 
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.MathView, defStyleAttr, defStyleRes);
 
-        mTextSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 14, getResources().getDisplayMetrics());
+        mTextSize = ViewUtils.spToPx(this, 14);
         mTextColor = Color.BLACK;
 
         int textAppearanceResId = typedArray.getResourceId(R.styleable.MathView_android_textAppearance, -1);

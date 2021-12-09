@@ -20,7 +20,7 @@ public class CustomArrayAdapter<T> extends ArrayAdapter<T> {
     @IdRes
     private final int mTextViewResourceId;
 
-    private Function<T, String> mToString = Objects::toString;
+    private Function<T, CharSequence> mToString = Objects::toString;
 
     public CustomArrayAdapter(@NonNull Context context, int resource) {
         super(context, resource);
@@ -94,7 +94,7 @@ public class CustomArrayAdapter<T> extends ArrayAdapter<T> {
         text.setText(mToString.apply(item));
     }
 
-    public void setToString(Function<T, String> toString) {
+    public void setToString(Function<T, CharSequence> toString) {
         mToString = toString;
     }
 }

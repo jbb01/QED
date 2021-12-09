@@ -1,5 +1,8 @@
 package com.jonahbauer.qed.util;
 
+import lombok.EqualsAndHashCode;
+
+@EqualsAndHashCode
 public final class Triple<A,B,C> {
     public final A first;
     public final B second;
