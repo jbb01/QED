@@ -12,6 +12,7 @@
         <item name="dialogTheme">?android:dialogTheme</item>
         <item name="alertDialogTheme">?android:alertDialogTheme</item>
         <item name="materialAlertDialogTheme">?android:alertDialogTheme</item>
+        <item name="bottomSheetDialogTheme">@style/ThemeOverlay.App.BottomSheetDialog</item>
 
         <!-- Styles -->
         <item name="materialButtonStyle">@style/Widget.App.Button</item>
@@ -150,7 +151,7 @@
         <item name="android:colorBackground">#2F3136</item>
     </style>
     <style name="ThemeOverlay.App.BottomSheetDialog" parent="@style/ThemeOverlay.MaterialComponents.BottomSheetDialog">
-        <item name="android:windowIsFloating">false</item>
+        <item name="bottomSheetStyle">@style/Widget.App.BottomSheet.Modal</item>
     </style>
     <style name="ThemeOverlay.App.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar"/>
 </resources>

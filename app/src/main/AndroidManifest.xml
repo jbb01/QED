@@ -36,9 +36,10 @@
             android:name=".activities.DeepLinkingActivity"
             android:excludeFromRecents="true"
             android:exported="true"
-            android:label="QED"
+            android:label=""
             android:launchMode="singleInstance"
             android:noHistory="true"
+            android:configChanges="orientation|screenSize"
             android:theme="@style/Theme.App.Translucent">
 
             <!-- Image Activity -->

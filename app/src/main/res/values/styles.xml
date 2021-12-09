@@ -42,6 +42,9 @@
     <style name="Widget.App.ListView.DropDown" parent="@style/Widget.AppCompat.ListView.DropDown">
         <item name="android:dividerHeight">0dp</item>
     </style>
+    <style name="Widget.App.BottomSheet.Modal" parent="Widget.MaterialComponents.BottomSheet.Modal">
+        <item name="android:maxWidth">@null</item>
+    </style>
 
     <!-- TextAppearance -->
     <style name="TextAppearance.App.Button" parent="android:TextAppearance.Material.Button">

@@ -7,8 +7,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 
 import com.jonahbauer.qed.R;
@@ -17,7 +17,7 @@ import com.jonahbauer.qed.model.Event;
 import com.jonahbauer.qed.model.Person;
 import com.jonahbauer.qed.util.Actions;
 
-public class DeepLinkingActivity extends FragmentActivity {
+public class DeepLinkingActivity extends AppCompatActivity {
     private static final String FRAGMENT_TAG = "com.jonahbauer.qed.deeplink.bottom_sheet";
 
     private boolean mUsedIntent = false;
