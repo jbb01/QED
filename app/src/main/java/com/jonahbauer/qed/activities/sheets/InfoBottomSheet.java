@@ -1,10 +1,13 @@
 package com.jonahbauer.qed.activities.sheets;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.Dialog;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.PorterDuff;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -12,24 +15,30 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.Window;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.view.ViewCompat;
-import androidx.databinding.OnRebindCallback;
-import androidx.databinding.ViewDataBinding;
-import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.databinding.FragmentInfoBinding;
+import com.jonahbauer.qed.layoutStuff.ColorfulBottomSheetCallback;
 import com.jonahbauer.qed.util.Colors;
+import com.jonahbauer.qed.util.ViewUtils;
 
-public abstract class AbstractInfoFragment extends Fragment implements View.OnScrollChangeListener {
+public abstract class InfoBottomSheet extends BottomSheetDialogFragment implements View.OnScrollChangeListener {
+    private BottomSheetBehavior.BottomSheetCallback mSheetCallback;
+    private Window mDialogWindow;
 
     private FragmentInfoBinding mBinding;
-    private ViewDataBinding mContentBinding;
+    private InfoFragment mFragment;
 
     private float mActionBarSize;
     private float mActionBarElevation;
@@ -39,28 +48,61 @@ public abstract class AbstractInfoFragment extends Fragment implements View.OnSc
     @ColorInt
     private int mDarkColor;
 
+    public InfoBottomSheet() {}
+
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext(), R.style.ThemeOverlay_App_BottomSheetDialog);
+        mDialogWindow = bottomSheetDialog.getWindow();
+        return bottomSheetDialog;
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mBinding = FragmentInfoBinding.inflate(inflater, container, false);
-        mContentBinding = onCreateContentView(inflater, mBinding.contentHolder, savedInstanceState);
+        mFragment = createFragment();
 
-        mContentBinding.addOnRebindCallback(new OnRebindCallback<ViewDataBinding>() {
-            @Override
-            public void onBound(ViewDataBinding binding) {
-                Fragment parent = getParentFragment();
-                if (parent instanceof AbstractInfoBottomSheet) {
-                    ((AbstractInfoBottomSheet) parent).adjustHeight();
-                }
+        View view = mBinding.getRoot();
+        view.setOnClickListener(v -> dismiss());
+
+        return view;
+    }
+
+    private void adjustHeight(View view) {
+        int contentHeight = 0;
+        Activity activity = getActivity();
+        if (activity != null) {
+            Window window = activity.getWindow();
+            View decorView = window.getDecorView();
+
+            Rect rectangle = new Rect();
+            decorView.getWindowVisibleDisplayFrame(rectangle);
+            contentHeight = rectangle.height();
+
+            if (!decorView.isAttachedToWindow()) {
+                var insets = view.getRootWindowInsets();
+                contentHeight -= insets.getSystemWindowInsetTop();
             }
-        });
+        }
 
-        return mBinding.getRoot();
+        // Ensure that bottom sheet can be expanded to cover the full screen
+        ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
+        if (layoutParams != null) {
+            layoutParams.height = contentHeight;
+        } else {
+            layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, contentHeight);
+        }
+        view.setLayoutParams(layoutParams);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        // instantiate fragment
+        getChildFragmentManager().beginTransaction().replace(R.id.fragment, mFragment, mFragment.getTag()).commit();
 
         mColor = getColor();
         mDarkColor = Colors.multiply(mColor, 0xFFCCCCCC);
@@ -164,6 +206,33 @@ public abstract class AbstractInfoFragment extends Fragment implements View.OnSc
 
             mBinding.common.setOnScrollChangeListener(this);
         }
+
+        // add bottom sheet callback
+        view.getViewTreeObserver().addOnWindowAttachListener(new ViewTreeObserver.OnWindowAttachListener() {
+            BottomSheetBehavior<?> mBehavior;
+
+            @Override
+            public void onWindowAttached() {
+                View touchOutside = view.getRootView().findViewById(R.id.touch_outside);
+
+                if (mSheetCallback == null) {
+                    mSheetCallback = new ColorfulBottomSheetCallback(mDialogWindow, touchOutside, getColor());
+                }
+
+                mBehavior = BottomSheetBehavior.from((View) view.getParent());
+                mBehavior.addBottomSheetCallback(mSheetCallback);
+
+                adjustHeight(mBinding.getRoot());
+            }
+
+            @Override
+            public void onWindowDetached() {
+                view.getViewTreeObserver().removeOnWindowAttachListener(this);
+
+                if (mBehavior != null)
+                    mBehavior.removeBottomSheetCallback(mSheetCallback);
+            }
+        });
     }
 
     @Override
@@ -184,14 +253,14 @@ public abstract class AbstractInfoFragment extends Fragment implements View.OnSc
         mBinding.backgroundPattern.setAlpha(alpha);
         mBinding.background.setTranslationY(- scrollY / 2f);
 
-        boolean shouldShowTitle = contentHolder.getTop() - scrollY + getTitleBottom() < mActionBarSize;
+        boolean shouldShowTitle = contentHolder.getTop() - scrollY + mFragment.getTitleBottom() < mActionBarSize;
         boolean shouldShowActionBar = alpha == 0;
         if (shouldShowTitle || shouldShowActionBar) {
             mBinding.toolbar.setBackgroundColor(mDarkColor);
 
             float height, elevation;
             if (shouldShowTitle) {
-                mBinding.toolbar.setTitle(getTitle());
+                mBinding.toolbar.setTitle(mFragment.getTitle());
                 elevation = mActionBarElevation;
                 height = mActionBarSize;
             } else {
@@ -221,18 +290,23 @@ public abstract class AbstractInfoFragment extends Fragment implements View.OnSc
     }
 
     private ViewGroup getContentRoot() {
-        return ((ViewGroup) mContentBinding.getRoot());
+        return ((ViewGroup) mFragment.requireView());
     }
 
-    protected abstract ViewDataBinding onCreateContentView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState);
-
     @ColorInt
-    protected abstract int getColor();
+    public abstract int getColor();
 
     @DrawableRes
-    protected abstract int getBackground();
+    public abstract int getBackground();
 
-    protected abstract String getTitle();
+    @NonNull
+    public abstract InfoFragment createFragment();
 
-    protected abstract float getTitleBottom();
+    protected ViewModelProvider getViewModelProvider() {
+        try {
+            return ViewUtils.getViewModelProvider(this);
+        } catch (Exception e) {
+            return new ViewModelProvider(this);
+        }
+    }
 }

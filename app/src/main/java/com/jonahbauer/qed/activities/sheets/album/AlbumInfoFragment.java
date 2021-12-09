@@ -10,12 +10,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.databinding.BindingAdapter;
-import androidx.databinding.ViewDataBinding;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelStoreOwner;
 
 import com.jonahbauer.qed.R;
-import com.jonahbauer.qed.activities.sheets.AbstractInfoFragment;
+import com.jonahbauer.qed.activities.sheets.InfoFragment;
 import com.jonahbauer.qed.databinding.FragmentInfoAlbumBinding;
 import com.jonahbauer.qed.databinding.ListItemBinding;
 import com.jonahbauer.qed.model.Album;
@@ -28,9 +25,11 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Collection;
 
-public class AlbumInfoFragment extends AbstractInfoFragment {
+public class AlbumInfoFragment extends InfoFragment {
     private AlbumViewModel mAlbumViewModel;
     private FragmentInfoAlbumBinding mBinding;
+
+    private boolean mHideTitle;
 
     public static AlbumInfoFragment newInstance() {
         return new AlbumInfoFragment();
@@ -41,21 +40,19 @@ public class AlbumInfoFragment extends AbstractInfoFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        ViewModelStoreOwner owner = getParentFragment();
-        if (owner == null) owner = requireActivity();
-        mAlbumViewModel = new ViewModelProvider(owner).get(AlbumViewModel.class);
+        mAlbumViewModel = getViewModelProvider().get(AlbumViewModel.class);
     }
 
     @Override
-    protected ViewDataBinding onCreateContentView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mBinding = FragmentInfoAlbumBinding.inflate(inflater, container, true);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        mBinding = FragmentInfoAlbumBinding.inflate(inflater, container, false);
         mAlbumViewModel.getAlbum().observe(getViewLifecycleOwner(), albumStatusWrapper -> {
             mBinding.setAlbum(albumStatusWrapper.getValue());
             mBinding.setLoading(albumStatusWrapper.getCode() == StatusWrapper.STATUS_PRELOADED);
         });
         mBinding.setColor(getColor());
-        return mBinding;
+        if (mHideTitle) hideTitle();
+        return mBinding.getRoot();
     }
 
     @NonNull
@@ -68,7 +65,7 @@ public class AlbumInfoFragment extends AbstractInfoFragment {
     }
 
     @Override
-    protected int getColor() {
+    public int getColor() {
         return Themes.colorful(getAlbum().getId());
     }
 
@@ -85,6 +82,14 @@ public class AlbumInfoFragment extends AbstractInfoFragment {
     @Override
     protected float getTitleBottom() {
         return mBinding.title.getBottom();
+    }
+
+    @Override
+    public void hideTitle() {
+        mHideTitle = true;
+        if (mBinding != null) {
+            mBinding.titleLayout.setVisibility(View.GONE);
+        }
     }
 
     @Override

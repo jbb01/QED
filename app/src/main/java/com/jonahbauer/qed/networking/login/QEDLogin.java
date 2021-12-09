@@ -1,12 +1,23 @@
 package com.jonahbauer.qed.networking.login;
 
-import android.content.Intent;
+import android.app.Activity;
+import android.app.PendingIntent;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
 import android.util.Pair;
 
 import androidx.annotation.NonNull;
+import androidx.navigation.NavController;
+import androidx.navigation.NavDeepLinkBuilder;
+import androidx.navigation.Navigation;
 
 import com.jonahbauer.qed.Application;
-import com.jonahbauer.qed.activities.LoginActivity;
+import com.jonahbauer.qed.MainDirections;
+import com.jonahbauer.qed.R;
+import com.jonahbauer.qed.activities.MainActivity;
+import com.jonahbauer.qed.activities.mainFragments.LoginFragmentArgs;
 import com.jonahbauer.qed.crypt.PasswordStorage;
 import com.jonahbauer.qed.crypt.PasswordUtils;
 import com.jonahbauer.qed.networking.Feature;
@@ -33,10 +44,12 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public final class QEDLogin {
+    private static final String LOG_TAG = QEDLogin.class.getName();
 
     /**
      * Performs a login to the chat using stored username and password.
@@ -281,6 +294,36 @@ public final class QEDLogin {
                          );
     }
 
+    public static Disposable loginAsync(@NonNull Feature feature, QEDPageReceiver<Boolean> listener) {
+        var observable = Single.fromCallable(() -> {
+            if (!Preferences.general().isRememberMe()) throw new InvalidCredentialsException("Remember me is deactivated.");
+            switch (feature) {
+                case CHAT:
+                    QEDLogin.loginChat();
+                    break;
+                case GALLERY:
+                    QEDLogin.loginGallery();
+                    break;
+                case DATABASE:
+                    QEDLogin.loginDatabase();
+                    break;
+            }
+            return true;
+        });
+
+        return observable.subscribeOn(Schedulers.io())
+                         .observeOn(AndroidSchedulers.mainThread())
+                         .doOnError(err -> {
+                             if (err instanceof InvalidCredentialsException) {
+                                 promptLogin(feature);
+                             }
+                         })
+                         .subscribe(
+                                 listener::onResult,
+                                 err -> listener.onError(false, err)
+                         );
+    }
+
     /**
      * @see #login(Feature, boolean)
      */
@@ -321,15 +364,35 @@ public final class QEDLogin {
     /**
      * Shows the login activity.
      */
+    @SneakyThrows
     public static void promptLogin(@NonNull Feature feature) {
         Application application = Application.getApplicationReference().get();
         if (application == null) throw new NullPointerException("Application not found!");
 
-        Intent intent = new Intent(application, LoginActivity.class);
-        intent.putExtra(LoginActivity.EXTRA_DONT_START_MAIN, true);
-        intent.putExtra(LoginActivity.EXTRA_FEATURE, feature);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        application.startActivity(intent);
+        Activity activity = application.getActivity();
+        if (activity instanceof MainActivity) {
+            new Handler(Looper.getMainLooper()).post(() -> {
+                MainActivity mainActivity = (MainActivity) activity;
+                NavController navController = Navigation.findNavController(mainActivity, R.id.nav_host);
+                navController.navigate(MainDirections.login().setFeature(feature));
+            });
+        } else {
+            Bundle args = new LoginFragmentArgs.Builder().setFeature(feature).build().toBundle();
+
+            PendingIntent pendingIntent = new NavDeepLinkBuilder(application)
+                    .setGraph(R.navigation.main)
+                    .setDestination(R.id.nav_login)
+                    .setArguments(args)
+                    .setComponentName(MainActivity.class)
+                    .createPendingIntent();
+
+            try {
+                pendingIntent.send();
+            } catch (PendingIntent.CanceledException e) {
+                Log.e(LOG_TAG, "Could not launch login fragment.", e);
+                throw e;
+            }
+        }
     }
 
     private static Pair<String, char[]> loadUsernameAndPassword() throws InvalidCredentialsException {

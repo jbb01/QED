@@ -4,11 +4,11 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 
 import com.jonahbauer.qed.R;
-import com.jonahbauer.qed.activities.MainActivity;
 
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
+@SuppressWarnings("unused")
 public class Preferences {
     private static boolean mInitialized;
     private static SharedPreferences mSharedPreferences;
@@ -44,7 +44,6 @@ public class Preferences {
     }
 
     public static class General {
-        private final String KEY_DRAWER_SELECTION;
         private final String KEY_REMEMBER_ME;
 
         private final String KEY_BUG_REPORT;
@@ -55,7 +54,6 @@ public class Preferences {
         private final Keys mKeys;
 
         private General(Resources resources) {
-            KEY_DRAWER_SELECTION = resources.getString(R.string.preferences_general_drawer_selection_key);
             KEY_REMEMBER_ME = resources.getString(R.string.preferences_general_remember_me_key);
 
             KEY_BUG_REPORT = resources.getString(R.string.preferences_general_bug_report_key);
@@ -63,10 +61,6 @@ public class Preferences {
             KEY_NIGHT_MODE = resources.getString(R.string.preferences_general_night_mode_key);
 
             mKeys = new Keys();
-        }
-
-        public MainActivity.DrawerSelection getDrawerSelection() {
-            return MainActivity.DrawerSelection.byId(mSharedPreferences.getInt(KEY_DRAWER_SELECTION, -1), MainActivity.DrawerSelection.CHAT);
         }
 
         public boolean isRememberMe() {
@@ -88,10 +82,6 @@ public class Preferences {
         public class Keys {
             private Keys() {}
 
-            public String drawerSelection() {
-                return KEY_DRAWER_SELECTION;
-            }
-
             public String bugReport() {
                 return KEY_BUG_REPORT;
             }
@@ -108,11 +98,6 @@ public class Preferences {
         public class Editor extends Preferences.Editor {
             private Editor(SharedPreferences.Editor editor) {
                 super(editor);
-            }
-
-            public Editor setDrawerSelection(MainActivity.DrawerSelection drawerSelection) {
-                mEditor.putInt(KEY_DRAWER_SELECTION, drawerSelection.getId());
-                return this;
             }
 
             public Editor setRememberMe(boolean rememberMe) {

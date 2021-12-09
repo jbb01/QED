@@ -5,6 +5,7 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.drawable.ColorDrawable;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,13 +14,21 @@ import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.EditText;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavBackStackEntry;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.databinding.AlertDialogEditTextBinding;
+
+import org.jetbrains.annotations.Contract;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -197,7 +206,7 @@ public class ViewUtils {
         });
     }
 
-    public static void showPreferenceDialog(Context context, @StringRes int title, @NonNull Supplier<String> getter, Consumer<String> setter) {
+    public static void showPreferenceDialog(@NonNull Context context, @StringRes int title, @NonNull Supplier<String> getter, Consumer<String> setter) {
         AlertDialog.Builder dialog = new AlertDialog.Builder(context);
         dialog.setTitle(title);
 
@@ -246,4 +255,83 @@ public class ViewUtils {
         return dpToPx(fragment.getResources(), dp);
     }
     //</editor-fold>
+
+    public static void setActionBarText(@NonNull Fragment fragment, @StringRes int title) {
+        setActionBarText(fragment, fragment.getText(title));
+    }
+
+    public static void setActionBarText(@NonNull Fragment fragment, CharSequence title) {
+        AppCompatActivity activity = (AppCompatActivity) fragment.requireActivity();
+        ActionBar actionBar = activity.getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(title);
+        }
+    }
+
+    public static void setActionStatusBarColor(Fragment fragment, @ColorInt int color) {
+        setActionBarColor(fragment, color);
+        setStatusBarColor(fragment, color);
+    }
+
+    public static void setActionBarColor(@NonNull Fragment fragment, @ColorInt int color) {
+        AppCompatActivity activity = (AppCompatActivity) fragment.requireActivity();
+        ActionBar actionBar = activity.getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setBackgroundDrawable(new ColorDrawable(color));
+        }
+    }
+
+    public static void setStatusBarColor(@NonNull Fragment fragment, @ColorInt int color) {
+        AppCompatActivity activity = (AppCompatActivity) fragment.requireActivity();
+        activity.getWindow().setStatusBarColor(Colors.multiply(color, 0xFFCCCCCC));
+    }
+
+    public static void resetActionStatusBarColor(@NonNull Fragment fragment) {
+        TypedValue typedValue = new TypedValue();
+        fragment.requireContext().getTheme().resolveAttribute(R.attr.colorPrimary, typedValue, true);
+        int colorPrimary = typedValue.data;
+
+        setActionBarColor(fragment, colorPrimary);
+        setStatusBarColor(fragment, colorPrimary);
+    }
+
+    public static void hideSupportActionBar(@NonNull Fragment fragment) {
+        AppCompatActivity activity = (AppCompatActivity)fragment.requireActivity();
+        ActionBar actionBar = activity.getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.hide();
+        }
+    }
+
+    public static void showSupportActionBar(@NonNull Fragment fragment) {
+        AppCompatActivity activity = (AppCompatActivity)fragment.requireActivity();
+        ActionBar actionBar = activity.getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.show();
+        }
+    }
+
+    public static int getStatusBarHeight(@NonNull View view) {
+        var insets = view.getRootWindowInsets();
+        if (insets != null) {
+            return insets.getSystemWindowInsetTop();
+        }
+        return 0;
+    }
+
+    public static int getNavigationBarHeight(@NonNull View view) {
+        var insets = view.getRootWindowInsets();
+        if (insets != null) {
+            return insets.getSystemWindowInsetBottom();
+        }
+        return 0;
+    }
+
+    @NonNull
+    @Contract("_ -> new")
+    public static ViewModelProvider getViewModelProvider(Fragment fragment) {
+        NavBackStackEntry entry = NavHostFragment.findNavController(fragment).getCurrentBackStackEntry();
+        assert entry != null;
+        return new ViewModelProvider(entry.getViewModelStore(), entry.getDefaultViewModelProviderFactory());
+    }
 }

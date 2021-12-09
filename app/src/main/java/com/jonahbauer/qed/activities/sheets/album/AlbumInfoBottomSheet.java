@@ -5,17 +5,16 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.jonahbauer.qed.R;
-import com.jonahbauer.qed.activities.sheets.AbstractInfoBottomSheet;
-import com.jonahbauer.qed.activities.sheets.AbstractInfoFragment;
+import com.jonahbauer.qed.activities.sheets.InfoBottomSheet;
+import com.jonahbauer.qed.activities.sheets.InfoFragment;
 import com.jonahbauer.qed.model.Album;
 import com.jonahbauer.qed.model.viewmodel.AlbumViewModel;
 import com.jonahbauer.qed.util.StatusWrapper;
 import com.jonahbauer.qed.util.Themes;
 
-public class AlbumInfoBottomSheet extends AbstractInfoBottomSheet {
+public class AlbumInfoBottomSheet extends InfoBottomSheet {
     private static final String ARGUMENT_ALBUM = "album";
 
     private AlbumViewModel mAlbumViewModel;
@@ -45,7 +44,7 @@ public class AlbumInfoBottomSheet extends AbstractInfoBottomSheet {
             return;
         }
 
-        mAlbumViewModel = new ViewModelProvider(this).get(AlbumViewModel.class);
+        mAlbumViewModel = getViewModelProvider().get(AlbumViewModel.class);
         mAlbumViewModel.load(album);
     }
 
@@ -55,7 +54,13 @@ public class AlbumInfoBottomSheet extends AbstractInfoBottomSheet {
     }
 
     @Override
-    public AbstractInfoFragment createFragment() {
+    public int getBackground() {
+        return Themes.pattern(getAlbum().getId());
+    }
+
+    @NonNull
+    @Override
+    public InfoFragment createFragment() {
         return AlbumInfoFragment.newInstance();
     }
 

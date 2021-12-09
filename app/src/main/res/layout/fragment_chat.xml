@@ -6,7 +6,7 @@
     <data>
         <import type="android.view.View"/>
 
-        <variable name="loaded" type="boolean" />
+        <variable name="loading" type="boolean" />
         <variable name="ready" type="boolean" />
     </data>
 
@@ -42,7 +42,7 @@
             android:paddingEnd="?android:attr/scrollbarSize"
             android:scrollbarStyle="outsideOverlay"
             android:transcriptMode="normal"
-            android:visibility="@{loaded ? View.VISIBLE : View.GONE}"
+            android:visibility="@{loading ? View.GONE : View.VISIBLE}"
             tools:ignore="RtlSymmetry"
             tools:visibility="visible" />
 
@@ -57,7 +57,7 @@
             android:paddingTop="15dp"
             android:gravity="center_horizontal"
             style="?android:attr/progressBarStyleLarge"
-            android:visibility="@{loaded ? View.GONE : View.VISIBLE}" />
+            android:visibility="@{loading ? View.VISIBLE : View.GONE}" />
 
         <View
             android:id="@+id/strip"

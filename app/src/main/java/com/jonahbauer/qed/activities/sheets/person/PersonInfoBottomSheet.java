@@ -5,17 +5,16 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.jonahbauer.qed.R;
-import com.jonahbauer.qed.activities.sheets.AbstractInfoBottomSheet;
-import com.jonahbauer.qed.activities.sheets.AbstractInfoFragment;
+import com.jonahbauer.qed.activities.sheets.InfoBottomSheet;
+import com.jonahbauer.qed.activities.sheets.InfoFragment;
 import com.jonahbauer.qed.model.Person;
 import com.jonahbauer.qed.model.viewmodel.PersonViewModel;
 import com.jonahbauer.qed.util.StatusWrapper;
 import com.jonahbauer.qed.util.Themes;
 
-public class PersonInfoBottomSheet extends AbstractInfoBottomSheet {
+public class PersonInfoBottomSheet extends InfoBottomSheet {
     private static final String ARGUMENT_PERSON = "person";
 
     private PersonViewModel mPersonViewModel;
@@ -45,7 +44,7 @@ public class PersonInfoBottomSheet extends AbstractInfoBottomSheet {
             return;
         }
 
-        mPersonViewModel = new ViewModelProvider(this).get(PersonViewModel.class);
+        mPersonViewModel = getViewModelProvider().get(PersonViewModel.class);
         mPersonViewModel.load(person);
     }
 
@@ -55,7 +54,13 @@ public class PersonInfoBottomSheet extends AbstractInfoBottomSheet {
     }
 
     @Override
-    public AbstractInfoFragment createFragment() {
+    public int getBackground() {
+        return Themes.pattern(getPerson().getId());
+    }
+
+    @NonNull
+    @Override
+    public InfoFragment createFragment() {
         return PersonInfoFragment.newInstance();
     }
 

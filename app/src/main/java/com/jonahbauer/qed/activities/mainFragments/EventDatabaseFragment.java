@@ -1,13 +1,15 @@
 package com.jonahbauer.qed.activities.mainFragments;
 
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.StyleRes;
-import androidx.lifecycle.ViewModelProvider;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.databinding.FragmentEventsDatabaseBinding;
@@ -15,40 +17,27 @@ import com.jonahbauer.qed.model.Event;
 import com.jonahbauer.qed.model.adapter.EventAdapter;
 import com.jonahbauer.qed.model.viewmodel.EventListViewModel;
 import com.jonahbauer.qed.networking.Reason;
-import com.jonahbauer.qed.util.Actions;
 import com.jonahbauer.qed.util.StatusWrapper;
+import com.jonahbauer.qed.util.ViewUtils;
 
 import java.util.ArrayList;
 
-public class EventDatabaseFragment extends QEDFragment implements AdapterView.OnItemClickListener {
+public class EventDatabaseFragment extends Fragment implements AdapterView.OnItemClickListener {
     private EventAdapter mEventAdapter;
     private FragmentEventsDatabaseBinding mBinding;
 
     private EventListViewModel mEventListViewModel;
 
-    @NonNull
-    public static EventDatabaseFragment newInstance(@StyleRes int themeId) {
-        Bundle args = new Bundle();
-
-        args.putInt(ARGUMENT_THEME_ID, themeId);
-        args.putInt(ARGUMENT_LAYOUT_ID, R.layout.fragment_events_database);
-
-        EventDatabaseFragment fragment = new EventDatabaseFragment();
-        fragment.setArguments(args);
-        return fragment;
-    }
-
+    @Nullable
     @Override
-    public void onStart() {
-        super.onStart();
-        mEventListViewModel.load();
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        mBinding = FragmentEventsDatabaseBinding.inflate(inflater, container, false);
+        mEventListViewModel = ViewUtils.getViewModelProvider(this).get(EventListViewModel.class);
+        return mBinding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        mBinding = FragmentEventsDatabaseBinding.bind(view);
-        mEventListViewModel = new ViewModelProvider(this).get(EventListViewModel.class);
-
         mEventAdapter = new EventAdapter(getContext(), new ArrayList<>());
         mBinding.list.setOnItemClickListener(this);
         mBinding.list.setAdapter(mEventAdapter);
@@ -71,7 +60,8 @@ public class EventDatabaseFragment extends QEDFragment implements AdapterView.On
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Event event = mEventAdapter.getItem(position);
         if (event != null) {
-            Actions.showInfoSheet(this, event);
+            var action = EventDatabaseFragmentDirections.showEvent(event);
+            Navigation.findNavController(view).navigate(action);
         }
     }
 }

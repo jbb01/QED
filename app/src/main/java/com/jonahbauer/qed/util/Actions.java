@@ -141,29 +141,34 @@ public class Actions {
         return open(context, uri);
     }
 
-    public static void showInfoSheet(@NonNull Fragment fragment, @NonNull Event event) {
+    public static EventInfoBottomSheet showInfoSheet(@NonNull Fragment fragment, @NonNull Event event) {
         EventInfoBottomSheet sheet = EventInfoBottomSheet.newInstance(event);
         sheet.show(fragment.getParentFragmentManager(), sheet.getTag());
+        return sheet;
     }
 
-    public static void showInfoSheet(@NonNull FragmentActivity activity, @NonNull Event event, @Nullable String tag) {
+    public static EventInfoBottomSheet showInfoSheet(@NonNull FragmentActivity activity, @NonNull Event event, @Nullable String tag) {
         EventInfoBottomSheet sheet = EventInfoBottomSheet.newInstance(event);
         sheet.show(activity.getSupportFragmentManager(), tag);
+        return sheet;
     }
 
-    public static void showInfoSheet(@NonNull Fragment fragment, @NonNull Person person) {
+    public static PersonInfoBottomSheet showInfoSheet(@NonNull Fragment fragment, @NonNull Person person) {
         PersonInfoBottomSheet sheet = PersonInfoBottomSheet.newInstance(person);
         sheet.show(fragment.getParentFragmentManager(), sheet.getTag());
+        return sheet;
     }
 
-    public static void showInfoSheet(@NonNull FragmentActivity activity, @NonNull Person person, @Nullable String tag) {
+    public static PersonInfoBottomSheet showInfoSheet(@NonNull FragmentActivity activity, @NonNull Person person, @Nullable String tag) {
         PersonInfoBottomSheet sheet = PersonInfoBottomSheet.newInstance(person);
         sheet.show(activity.getSupportFragmentManager(), tag);
+        return sheet;
     }
 
-    public static void showInfoSheet(@NonNull Fragment fragment, @NonNull Message message) {
+    public static MessageInfoBottomSheet showInfoSheet(@NonNull Fragment fragment, @NonNull Message message) {
         MessageInfoBottomSheet sheet = MessageInfoBottomSheet.newInstance(message);
         sheet.show(fragment.getParentFragmentManager(), sheet.getTag());
+        return sheet;
     }
 
     private static boolean tryStartActivity(@NonNull Context context, Intent intent) {

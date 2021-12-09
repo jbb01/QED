@@ -2,22 +2,20 @@ package com.jonahbauer.qed.activities.sheets.message;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.databinding.ViewDataBinding;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelStoreOwner;
 
-import com.jonahbauer.qed.activities.sheets.AbstractInfoFragment;
+import com.jonahbauer.qed.activities.sheets.InfoFragment;
 import com.jonahbauer.qed.databinding.FragmentInfoMessageBinding;
 import com.jonahbauer.qed.model.Message;
 import com.jonahbauer.qed.model.viewmodel.MessageViewModel;
 import com.jonahbauer.qed.util.StatusWrapper;
 import com.jonahbauer.qed.util.Themes;
 
-public class MessageInfoFragment extends AbstractInfoFragment {
+public class MessageInfoFragment extends InfoFragment {
     private MessageViewModel mMessageViewModel;
     private FragmentInfoMessageBinding mBinding;
 
@@ -30,20 +28,17 @@ public class MessageInfoFragment extends AbstractInfoFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        ViewModelStoreOwner owner = getParentFragment();
-        if (owner == null) owner = requireActivity();
-        mMessageViewModel = new ViewModelProvider(owner).get(MessageViewModel.class);
+        mMessageViewModel = getViewModelProvider().get(MessageViewModel.class);
     }
 
     @Override
-    protected ViewDataBinding onCreateContentView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mBinding = FragmentInfoMessageBinding.inflate(inflater, container, true);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        mBinding = FragmentInfoMessageBinding.inflate(inflater, container, false);
         mMessageViewModel.getMessage().observe(getViewLifecycleOwner(), messageStatusWrapper -> {
             mBinding.setMessage(messageStatusWrapper.getValue());
             mBinding.setColor(messageStatusWrapper.getValue().getTransformedColor());
         });
-        return mBinding;
+        return mBinding.getRoot();
     }
 
     @NonNull
@@ -56,7 +51,7 @@ public class MessageInfoFragment extends AbstractInfoFragment {
     }
 
     @Override
-    protected int getColor() {
+    public int getColor() {
         return getMessage().getTransformedColor();
     }
 
@@ -74,4 +69,7 @@ public class MessageInfoFragment extends AbstractInfoFragment {
     protected float getTitleBottom() {
         return mBinding.getRoot().getTop();
     }
+
+    @Override
+    public void hideTitle() {}
 }

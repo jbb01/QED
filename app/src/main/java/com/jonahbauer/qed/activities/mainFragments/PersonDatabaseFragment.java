@@ -2,15 +2,17 @@ package com.jonahbauer.qed.activities.mainFragments;
 
 import android.graphics.drawable.Animatable;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.CompoundButton;
 import android.widget.RadioButton;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.StyleRes;
-import androidx.lifecycle.ViewModelProvider;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.databinding.FragmentPersonsDatabaseBinding;
@@ -19,14 +21,13 @@ import com.jonahbauer.qed.model.Person;
 import com.jonahbauer.qed.model.adapter.PersonAdapter;
 import com.jonahbauer.qed.model.viewmodel.PersonListViewModel;
 import com.jonahbauer.qed.networking.Reason;
-import com.jonahbauer.qed.util.Actions;
 import com.jonahbauer.qed.util.StatusWrapper;
 import com.jonahbauer.qed.util.ViewUtils;
 
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class PersonDatabaseFragment extends QEDFragment implements CompoundButton.OnCheckedChangeListener, AdapterView.OnItemClickListener {
+public class PersonDatabaseFragment extends Fragment implements CompoundButton.OnCheckedChangeListener, AdapterView.OnItemClickListener {
     private PersonAdapter mPersonAdapter;
     private FragmentPersonsDatabaseBinding mBinding;
 
@@ -34,28 +35,16 @@ public class PersonDatabaseFragment extends QEDFragment implements CompoundButto
 
     private boolean mSortLastName = false;
 
-    public static PersonDatabaseFragment newInstance(@StyleRes int themeId) {
-        Bundle args = new Bundle();
-
-        args.putInt(ARGUMENT_THEME_ID, themeId);
-        args.putInt(ARGUMENT_LAYOUT_ID, R.layout.fragment_persons_database);
-
-        PersonDatabaseFragment fragment = new PersonDatabaseFragment();
-        fragment.setArguments(args);
-        return fragment;
-    }
-
+    @Nullable
     @Override
-    public void onStart() {
-        super.onStart();
-        mPersonListViewModel.load();
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        mBinding = FragmentPersonsDatabaseBinding.inflate(inflater, container, false);
+        mPersonListViewModel = ViewUtils.getViewModelProvider(this).get(PersonListViewModel.class);
+        return mBinding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        mBinding = FragmentPersonsDatabaseBinding.bind(view);
-        mPersonListViewModel = new ViewModelProvider(this).get(PersonListViewModel.class);
-
         mPersonAdapter = new PersonAdapter(getContext(), new ArrayList<>(), PersonAdapter.SortMode.FIRST_NAME, mBinding.fixedHeader.getRoot());
         mBinding.list.setOnItemClickListener(this);
         mBinding.list.setOnScrollListener(mPersonAdapter);
@@ -165,7 +154,8 @@ public class PersonDatabaseFragment extends QEDFragment implements CompoundButto
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Person person = mPersonAdapter.getItem(position);
         if (person != null) {
-            Actions.showInfoSheet(this, person);
+            var action = PersonDatabaseFragmentDirections.showPerson(person);
+            Navigation.findNavController(view).navigate(action);
         }
     }
 }

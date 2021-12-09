@@ -7,17 +7,22 @@ import android.content.Context;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Editable;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AbsListView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.StyleRes;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.MainActivity;
@@ -35,7 +40,6 @@ import com.jonahbauer.qed.util.MessageUtils;
 import com.jonahbauer.qed.util.Preferences;
 import com.jonahbauer.qed.util.ViewUtils;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,8 +49,10 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
-public class ChatFragment extends QEDFragment implements NetworkListener, AbsListView.OnScrollListener {
+public class ChatFragment extends Fragment implements NetworkListener, AbsListView.OnScrollListener {
     private static final String LOG_TAG = ChatFragment.class.getName();
+
+    private final Handler mHandler = new Handler(Looper.getMainLooper());
 
     private FragmentChatBinding mBinding;
 
@@ -64,22 +70,21 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
     private MenuItem mRefreshButton;
     private int mRetryCount = 0;
 
-    @NonNull
-    public static ChatFragment newInstance(@StyleRes int themeId) {
-        Bundle args = new Bundle();
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
 
-        args.putInt(ARGUMENT_THEME_ID, themeId);
-        args.putInt(ARGUMENT_LAYOUT_ID, R.layout.fragment_chat);
-
-        ChatFragment fragment = new ChatFragment();
-        fragment.setArguments(args);
-        return fragment;
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        mBinding = FragmentChatBinding.inflate(inflater, container, false);
+        return mBinding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        mBinding = FragmentChatBinding.bind(view);
-
         mBinding.editTextMessage.setOnClickListener(v -> {
             if (mBinding.list.getLastVisiblePosition() >= mMessageAdapter.getCount() - 1) {
                 mHandler.postDelayed(() -> mBinding.list.setSelection(mMessageAdapter.getCount() - 1), 100);
@@ -91,7 +96,7 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
         mBinding.quickSettingsChannel.hide();
         mBinding.quickSettings.setAlpha(0.35f);
 
-        Context context = getContext();
+        Context context = requireContext();
         // setup quick settings
         mBinding.quickSettingsName.setOnClickListener(v -> {
             ViewUtils.showPreferenceDialog(
@@ -158,6 +163,18 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        reload();
+    }
+
+    @Override
+    public void onStop() {
+        mDisposable.clear();
+        super.onStop();
+    }
+
+    @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.menu_chat, menu);
         mRefreshButton = menu.findItem(R.id.chat_refresh);
@@ -199,7 +216,7 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
         mInitMessages.clear();
         mMessageAdapter.clear();
         mInitDone = false;
-        mBinding.setLoaded(false);
+        mBinding.setLoading(true);
 
         mWebSocket = new ChatWebSocket(Preferences.chat().getChannel());
         mDisposable.addAll(
@@ -214,18 +231,14 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
                                       if (mLastPostId < msg.getId()) mLastPostId = msg.getId();
                                   },
                                   err -> {
+                                      error(getString(Reason.guess(err).getStringRes()));
                                       if (err instanceof InvalidCredentialsException) {
                                           if (mRetryCount++ == 0) {
-                                              try {
-                                                  QEDLogin.login(Feature.CHAT);
-                                                  reload();
-                                                  return;
-                                              } catch (InvalidCredentialsException e) {
-                                                  // show error
-                                              }
+                                              mDisposable.add(
+                                                      QEDLogin.loginAsync(Feature.CHAT, success -> reload())
+                                              );
                                           }
                                       }
-                                      error(getString(Reason.guess(err).getStringRes()));
                                   },
                                   () -> error(getString(R.string.chat_websocket_closed))
                           ),
@@ -293,9 +306,13 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
         if (getContext() == null) return;
 
         // insert recent messages in bulk
-        if (Message.PONG.equals(message)) {
+        if (message.getType() == Message.Type.PONG) {
             if (!mInitDone) {
                 mInitDone = true;
+                mInitMessages.removeIf(msg -> msg.getType() != Message.Type.POST);
+                if (Preferences.chat().isSense()) {
+                    mInitMessages.removeIf(Message::isBot);
+                }
 
                 mMessageAdapter.clear();
                 mMessageAdapter.addAll(mInitMessages);
@@ -312,7 +329,7 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
                                 e -> Log.e(LOG_TAG, "Error inserting messages into database.", e)
                         );
 
-                mBinding.setLoaded(true);
+                mBinding.setLoading(false);
             }
 
             return;
@@ -323,13 +340,15 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
             return;
         }
 
-        //noinspection ResultOfMethodCallIgnored
-        Database.getInstance(requireContext()).messageDao().insert(message)
-                .subscribeOn(Schedulers.io())
-                .subscribe(() -> {}, e -> Log.e(LOG_TAG, "Error inserting message into database.", e));
+        if (message.getType() == Message.Type.POST) {
+            //noinspection ResultOfMethodCallIgnored
+            Database.getInstance(requireContext()).messageDao().insert(message)
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(() -> {}, e -> Log.e(LOG_TAG, "Error inserting message into database.", e));
+        }
 
         if (message.getId() < mTopPosition) mTopPosition = message.getId();
-        if (message.getBottag() == 1 && Preferences.chat().isSense()) return;
+        if (message.isBot() && Preferences.chat().isSense()) return;
 
         mHandler.post(() -> {
             mMessageAdapter.add(message);
@@ -345,38 +364,6 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
         if (totalItemCount - visibleItemCount - firstVisibleItem > 0) mBinding.scrollDownButton.show();
         else mBinding.scrollDownButton.hide();
     }
-
-    @Override
-    public void revokeAltToolbar() {
-        int checked = mBinding.list.getCheckedItemPosition();
-        if (checked != -1) setChecked(checked, false);
-    }
-
-    //<editor-fold desc="Lifecycle" defaultstate="collapsed">
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        setHasOptionsMenu(true);
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        reload();
-    }
-
-    @Override
-    public void onStop() {
-        mDisposable.clear();
-        super.onStop();
-    }
-
-    @Override
-    public void onDestroy() {
-        mDisposable.clear();
-        super.onDestroy();
-    }
-    //</editor-fold>
 
     //<editor-fold desc="Network Listener" defaultstate="collapsed">
     @Override
@@ -398,7 +385,15 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
      * @param value if the item is checked or not
      */
     private void setChecked(int position, boolean value) {
-        MessageUtils.setChecked(this, mBinding.list, mMessageAdapter, position, value);
+        MessageUtils.setChecked(
+                this,
+                mBinding.list,
+                mMessageAdapter,
+                msg -> NavHostFragment.findNavController(this)
+                                      .navigate(ChatFragmentDirections.showMessage(msg)),
+                position,
+                value
+        );
     }
 
     private void scrollDown() {
@@ -414,10 +409,10 @@ public class ChatFragment extends QEDFragment implements NetworkListener, AbsLis
         mDisposable.clear();
         mInitDone = true;
 
-        addPost(new Message(Integer.MAX_VALUE, "Error", message, Instant.now(), 503, "Error", "220000", 0, ""), true);
+        addPost(new Message(message), true);
 
         mBinding.setReady(false);
-        mBinding.setLoaded(true);
+        mBinding.setLoading(false);
     }
 
     public Editable getText() {

@@ -5,17 +5,16 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.jonahbauer.qed.R;
-import com.jonahbauer.qed.activities.sheets.AbstractInfoBottomSheet;
-import com.jonahbauer.qed.activities.sheets.AbstractInfoFragment;
+import com.jonahbauer.qed.activities.sheets.InfoBottomSheet;
+import com.jonahbauer.qed.activities.sheets.InfoFragment;
 import com.jonahbauer.qed.model.Event;
 import com.jonahbauer.qed.model.viewmodel.EventViewModel;
 import com.jonahbauer.qed.util.StatusWrapper;
 import com.jonahbauer.qed.util.Themes;
 
-public class EventInfoBottomSheet extends AbstractInfoBottomSheet {
+public class EventInfoBottomSheet extends InfoBottomSheet {
     private static final String ARGUMENT_EVENT = "event";
 
     private EventViewModel mEventViewModel;
@@ -45,7 +44,7 @@ public class EventInfoBottomSheet extends AbstractInfoBottomSheet {
             return;
         }
 
-        mEventViewModel = new ViewModelProvider(this).get(EventViewModel.class);
+        mEventViewModel = getViewModelProvider().get(EventViewModel.class);
         mEventViewModel.load(event);
     }
 
@@ -55,7 +54,13 @@ public class EventInfoBottomSheet extends AbstractInfoBottomSheet {
     }
 
     @Override
-    public AbstractInfoFragment createFragment() {
+    public int getBackground() {
+        return Themes.pattern(getEvent().getId());
+    }
+
+    @NonNull
+    @Override
+    public InfoFragment createFragment() {
         return EventInfoFragment.newInstance();
     }
 

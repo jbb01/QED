@@ -1,29 +1,29 @@
-package com.jonahbauer.qed.activities;
+package com.jonahbauer.qed.activities.mainFragments;
 
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.TypedValue;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.view.Window;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.lifecycle.ViewModelProvider;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.jonahbauer.qed.R;
-import com.jonahbauer.qed.layoutStuff.views.Histogram;
+import com.jonahbauer.qed.databinding.FragmentImageInfoBinding;
 import com.jonahbauer.qed.model.Image;
 import com.jonahbauer.qed.model.viewmodel.ImageInfoViewModel;
+import com.jonahbauer.qed.util.StatusWrapper;
+import com.jonahbauer.qed.util.ViewUtils;
 
 import org.jetbrains.annotations.Contract;
 
@@ -34,8 +34,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMaps;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 
-public class ImageInfoActivity extends AppCompatActivity {
-    public static final String EXTRA_IMAGE = "image";
+public class ImageInfoFragment extends Fragment {
     private static final Object2IntMap<String> INFO_PRIORITY;
     private static final Object2IntMap<String> INFO_NAMES;
 
@@ -77,87 +76,83 @@ public class ImageInfoActivity extends AppCompatActivity {
         INFO_NAMES = Object2IntMaps.unmodifiable(names);
     }
 
-    private LinearLayout mDetailContainer;
-    private LinearLayout mQedContainer;
-    private LinearLayout mOtherContainer;
+    private Image mImage;
+
+    private FragmentImageInfoBinding mBinding;
+    private ImageInfoViewModel mImageInfoViewModel;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_image_info);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        ImageInfoFragmentArgs args = ImageInfoFragmentArgs.fromBundle(getArguments());
+        mImage = args.getImage();
+    }
 
-        ActionBar actionbar = getSupportActionBar();
-        assert actionbar != null;
-        actionbar.setDisplayHomeAsUpEnabled(true);
-        actionbar.setTitle(R.string.title_activity_image_info);
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        mBinding = FragmentImageInfoBinding.inflate(inflater, container, false);
+        mImageInfoViewModel = ViewUtils.getViewModelProvider(this).get(ImageInfoViewModel.class);
+        return mBinding.getRoot();
+    }
 
-        Window window = getWindow();
-        window.setStatusBarColor(Color.BLACK);
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        mImageInfoViewModel.getImage().observe(getViewLifecycleOwner(), status -> {
+            if (status.getCode() == StatusWrapper.STATUS_ERROR) {
+                Toast.makeText(requireContext(), status.getReason().getStringRes(), Toast.LENGTH_SHORT).show();
 
-
-        Intent intent = getIntent();
-        Image image = intent.getParcelableExtra(EXTRA_IMAGE);
-        if (image == null) {
-            Toast.makeText(this, R.string.error, Toast.LENGTH_SHORT).show();
-            finish();
-            return;
-        }
-
-        mDetailContainer = findViewById(R.id.image_info_detail_container);
-        mQedContainer = findViewById(R.id.image_info_qed_container);
-        mOtherContainer = findViewById(R.id.image_info_other_container);
-
-        ImageInfoViewModel viewModel = new ViewModelProvider(this).get(ImageInfoViewModel.class);
-        viewModel.load(image);
-
-        viewModel.getImage().observe(this, status -> {
-            Image img = status.getValue();
-            if (img != null) {
-                updateView(img);
+                NavHostFragment.findNavController(this)
+                               .navigateUp();
+                return;
             }
+
+            updateView(status.getValue());
+
+            var image = status.getValue();
+            ViewUtils.setActionBarText(this, image != null ? image.getName() : "");
         });
     }
 
+    @Override
+    public void onStart() {
+        mImageInfoViewModel.load(mImage);
+        ViewUtils.setActionStatusBarColor(this, Color.BLACK);
+        super.onStart();
+    }
+
+    @Override
+    public void onStop() {
+        ViewUtils.resetActionStatusBarColor(this);
+        super.onStop();
+    }
+
     private void updateView(Image image) {
-        while (mDetailContainer.getChildCount() > 1) {
-            mDetailContainer.removeViewAt(1);
-        }
+        mBinding.imageInfo.removeAllViews();
+        mBinding.otherInfos.removeAllViews();
+        mBinding.qedInfos.removeAllViews();
 
-        while (mOtherContainer.getChildCount() > 1) {
-            mOtherContainer.removeViewAt(1);
-        }
-
-        while (mQedContainer.getChildCount() > 1) {
-            mQedContainer.removeViewAt(1);
-        }
-
+        // histogram
         if (image.getPath() != null) {
             File file = new File(image.getPath());
-
             if (file.exists()) {
                 Bitmap bitmap = BitmapFactory.decodeFile(image.getPath());
-                // create histogram
                 if (bitmap != null) {
                     image.getData().put(Image.DATA_KEY_RESOLUTION, bitmap.getWidth() + "x" + bitmap.getHeight());
 
-                    LinearLayout histogramContainer = findViewById(R.id.image_info_histogram_container);
-                    Histogram histogram = findViewById(R.id.image_detail_histogram);
-                    histogram.setBitmap(bitmap);
-                    histogramContainer.setVisibility(View.VISIBLE);
+                    mBinding.histogram.setBitmap(bitmap);
+                    mBinding.histogramLayout.setVisibility(View.VISIBLE);
                 }
-
-                addLine(R.string.image_info_path, image.getPath(), mOtherContainer);
             }
         }
 
-        image.getData().keySet().stream()
-             .sorted(Comparator.comparing(key -> INFO_PRIORITY.getOrDefault(key, Integer.MAX_VALUE)))
-             .forEach(key -> {
-                 String value = image.getData().get(String.valueOf(key));
-                 if (value == null) return;
+        // image info
+        image.getData().entrySet().stream()
+             .sorted(Comparator.comparingInt(e -> INFO_PRIORITY.getOrDefault(e.getKey(), Integer.MAX_VALUE)))
+             .forEach(entry -> {
+                 String key = entry.getKey();
+                 String value = entry.getValue();
 
                  LinearLayout container = null;
 
@@ -167,28 +162,28 @@ public class ImageInfoActivity extends AppCompatActivity {
                              String[] split = value.split("/");
                              if (split.length == 2) value = ((double)Integer.parseInt(split[0]) / Integer.parseInt(split[1])) + "mm";
                          } catch (Exception ignored) {}
-                         container = mDetailContainer;
+                         container = mBinding.imageInfo;
                          break;
                      case Image.DATA_KEY_FOCAL_RATIO:
                          try {
                              String[] split = value.split("/");
                              if (split.length == 2) value = "f/" + ((double)Integer.parseInt(split[0]) / Integer.parseInt(split[1]));
                          } catch (Exception ignored) {}
-                         container = mDetailContainer;
+                         container = mBinding.imageInfo;
                          break;
                      case Image.DATA_KEY_EXPOSURE_TIME:
                          try {
                              String[] split = value.split("/");
                              if (split.length == 2) value = approximate((double)Integer.parseInt(split[0]) / Integer.parseInt(split[1]), 10000);
                          } catch (Exception ignored) {}
-                         container = mDetailContainer;
+                         container = mBinding.imageInfo;
                          break;
                      case Image.DATA_KEY_FLASH:
                          try {
                              int flash = Integer.parseInt(value);
                              value = ((flash & 0b1) == 0) ? getString(R.string.image_info_flash_no_flash) : getString(R.string.image_info_flash_triggered);
                          } catch (Exception ignored) {}
-                         container = mDetailContainer;
+                         container = mBinding.imageInfo;
                          break;
                      case Image.DATA_KEY_MANUFACTURER:
                      case Image.DATA_KEY_MODEL:
@@ -198,33 +193,26 @@ public class ImageInfoActivity extends AppCompatActivity {
                      case Image.DATA_KEY_CREATION_DATE:
                      case Image.DATA_KEY_FORMAT:
                      case Image.DATA_KEY_POSITION:
-                         container = mDetailContainer;
+                         container = mBinding.imageInfo;
                          break;
                      case Image.DATA_KEY_ALBUM:
                      case Image.DATA_KEY_OWNER:
                      case Image.DATA_KEY_UPLOAD_DATE:
                      case Image.DATA_KEY_VISITS:
-                         container = mQedContainer;
+                         container = mBinding.qedInfos;
                          break;
                  }
 
-                 if (INFO_NAMES.containsKey(key)) {
-                     addLine(INFO_NAMES.getInt(key), value, container);
-                 } else {
-                     addLine(key, value, container);
+                 if (container != null) {
+                     if (INFO_NAMES.containsKey(key)) {
+                         addLine(INFO_NAMES.getInt(key), value, container);
+                     } else {
+                         addLine(key, value, container);
+                     }
                  }
              });
     }
 
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
-        if (id == android.R.id.home) {
-            finish();
-            return true;
-        }
-        return false;
-    }
 
     private void addLine(@StringRes int resId, String value, LinearLayout container) {
         addLine(getString(resId), value, container);
@@ -232,13 +220,13 @@ public class ImageInfoActivity extends AppCompatActivity {
 
     private void addLine(String title, String value, LinearLayout container) {
         if (container == null) return;
-        TextView textView = new TextView(this);
+        TextView textView = new TextView(requireContext());
         textView.setTextColor(Color.WHITE);
         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
         textView.setText(String.format("%s: %s", title, value));
 
         container.addView(textView);
-        container.setVisibility(View.VISIBLE);
+        ((View)container.getParent()).setVisibility(View.VISIBLE);
     }
 
     @NonNull

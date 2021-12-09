@@ -1,12 +1,9 @@
 package com.jonahbauer.qed.activities.settings;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.MenuItem;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
@@ -50,16 +47,6 @@ public class ChatPreferenceFragment extends PreferenceFragmentCompat implements 
         SeekBarPreference maxShownRows = findPreference(Preferences.chat().keys().dbMaxResults());
         assert maxShownRows != null;
         maxShownRows.setExternalValues(maxShownRowsValues, maxShownRowsStringValues);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
-        if (id == android.R.id.home) {
-            startActivity(new Intent(getActivity(), RootSettingsActivity.class));
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     @Override

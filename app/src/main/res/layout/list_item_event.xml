@@ -4,6 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <import type="com.jonahbauer.qed.util.Themes"/>
+        <import type="com.jonahbauer.qed.util.TimeUtils"/>
         <import type="java.text.MessageFormat"/>
 
         <variable name="event" type="com.jonahbauer.qed.model.Event" />
@@ -44,7 +45,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{(event.start != null &amp;&amp; event.end != null) ? MessageFormat.format(@string/event_title_time, event.start, event.end) : event.startString + ` - ` + event.endString }"
+                android:text="@{(event.start != null &amp;&amp; event.end != null) ? MessageFormat.format(@string/event_title_time, TimeUtils.format(event.start), TimeUtils.format(event.end)) : event.startString + ` - ` + event.endString }"
                 android:textAppearance="?textAppearanceListItemSecondary"
                 tools:text="25.08.2018 - 03.09.2018"/>
         </LinearLayout>

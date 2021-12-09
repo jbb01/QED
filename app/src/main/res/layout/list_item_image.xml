@@ -8,7 +8,6 @@
         <variable name="image" type="com.jonahbauer.qed.model.Image" />
         <variable name="thumbnail" type="android.graphics.drawable.Drawable" />
         <variable name="disposable" type="io.reactivex.rxjava3.disposables.CompositeDisposable"/>
-        <variable name="baos" type="java.io.ByteArrayOutputStream"/>
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

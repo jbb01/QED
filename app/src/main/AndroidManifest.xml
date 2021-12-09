@@ -39,141 +39,40 @@
             android:label=""
             android:launchMode="singleInstance"
             android:noHistory="true"
-            android:configChanges="orientation|screenSize"
             android:theme="@style/Theme.App.Translucent">
 
-            <!-- Image Activity -->
             <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
                 <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:scheme="http" />
-                <data android:scheme="https" />
+                <data android:scheme="http"/>
+                <data android:scheme="https"/>
 
-                <data
-                    android:host="qedgallery.qed-verein.de"
-                    android:pathPrefix="/image_view.php" />
-            </intent-filter>
-
-            <!-- Album Activity -->
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data android:scheme="http" />
-                <data android:scheme="https" />
-
-                <data
-                    android:host="qedgallery.qed-verein.de"
-                    android:pathPrefix="/album_view.php" />
-            </intent-filter>
-
-            <!-- Main Activity -->
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data android:scheme="http" />
-                <data android:scheme="https" />
-
-                <data
-                    android:host="qeddb.qed-verein.de"
-                    android:pathPrefix="/people" />
-                <data
-                    android:host="qeddb.qed-verein.de"
-                    android:pathPrefix="/events" />
-                <data
-                    android:host="chat.qed-verein.de"
-                    android:pathPrefix="/index.html" />
-                <data
-                    android:host="chat.qed-verein.de"
-                    android:pathPrefix="/"/>
-                <data
-                    android:host="qedgallery.qed-verein.de"
-                    android:pathPrefix="/album_list.php" />
+                <data android:host="qeddb.qed-verein.de"/>
+                <data android:pathPattern="/people/..*"/>
+                <data android:pathPattern="/events/..*"/>
             </intent-filter>
         </activity>
-
-        <!-- Login Activity -->
-        <activity
-            android:name=".activities.LoginActivity"
-            android:windowSoftInputMode="stateVisible|adjustResize"
-            android:label="@string/title_activity_login" />
 
         <!-- Main Activity -->
         <activity
             android:name=".activities.MainActivity"
-            android:configChanges="orientation|screenSize"
             android:hardwareAccelerated="true"
             android:label="@string/app_name"
             android:launchMode="singleTask"
             android:theme="@style/Theme.App.SplashScreen"
             android:windowSoftInputMode="adjustResize|stateHidden"
             android:exported="true">
+
+            <nav-graph android:value="@navigation/main"/>
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <!-- Settings Activities -->
-        <activity
-            android:name=".activities.settings.RootSettingsActivity"
-            android:label="@string/title_activity_settings"
-            android:parentActivityName=".activities.MainActivity"
-            android:theme="@style/Theme.App">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activities.MainActivity" />
-        </activity>
-        <activity
-            android:name=".activities.settings.SettingsActivity"
-            android:label="@string/title_activity_settings"
-            android:parentActivityName=".activities.settings.RootSettingsActivity"
-            android:configChanges="screenSize|orientation"
-            android:theme="@style/Theme.App">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activities.settings.RootSettingsActivity" />
-        </activity>
-
-        <!-- Gallery Activities -->
-        <activity
-            android:name=".activities.GalleryAlbumActivity"
-            android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_album"
-            android:parentActivityName=".activities.MainActivity"
-            android:theme="@style/Theme.App">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activities.MainActivity" />
-        </activity>
-        <activity
-            android:name=".activities.imageActivity.ImageActivity"
-            android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_image"
-            android:theme="@style/Theme.App.Dark.NoActionBar" />
-        <activity
-            android:name=".activities.ImageInfoActivity"
-            android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_image_info"
-            android:theme="@style/Theme.App.Dark.NoActionBar" />
-
-        <!-- Info Activities -->
-        <activity
-            android:name=".activities.sheets.event.EventInfoActivity"
-            android:theme="@style/Theme.App.NoActionBar" />
-        <activity
-            android:name=".activities.sheets.person.PersonInfoActivity"
-            android:theme="@style/Theme.App.NoActionBar" />
-
 
         <provider
             android:name="androidx.core.content.FileProvider"

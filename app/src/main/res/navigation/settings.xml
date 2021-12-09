@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_settings"
+    app:startDestination="@id/nav_preference_root">
+
+    <fragment
+        android:id="@+id/nav_preference_root"
+        android:name="com.jonahbauer.qed.activities.settings.RootPreferenceFragment"
+        android:label="@string/title_fragment_settings">
+        <action
+            android:id="@+id/general"
+            app:destination="@id/nav_preference_general" />
+        <action
+            android:id="@+id/chat"
+            app:destination="@id/nav_preference_chat" />
+        <action
+            android:id="@+id/gallery"
+            app:destination="@id/nav_preference_gallery" />
+        <action
+            android:id="@+id/debug"
+            app:destination="@id/nav_preference_debug" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_preference_general"
+        android:name="com.jonahbauer.qed.activities.settings.GeneralPreferenceFragment"
+        android:label="@string/preferences_header_general" />
+
+    <fragment
+        android:id="@+id/nav_preference_chat"
+        android:name="com.jonahbauer.qed.activities.settings.ChatPreferenceFragment"
+        android:label="@string/preferences_header_chat" />
+
+    <fragment
+        android:id="@+id/nav_preference_gallery"
+        android:name="com.jonahbauer.qed.activities.settings.GalleryPreferenceFragment"
+        android:label="@string/preferences_header_gallery" />
+
+    <fragment
+        android:id="@+id/nav_preference_debug"
+        android:name="com.jonahbauer.qed.activities.settings.DebugPreferenceFragment"
+        android:label="@string/preferences_header_debug" />
+</navigation>

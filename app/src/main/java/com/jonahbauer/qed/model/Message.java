@@ -31,8 +31,10 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Locale;
 
+import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
 /**
  * An object representing a message in the qed chat
@@ -91,6 +93,26 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
     private final int transformedColor;
 
     @Ignore
+    @Getter(AccessLevel.PRIVATE)
+    private final boolean error;
+
+    @Ignore
+    public Message(@NonNull String message) {
+        this.name = "Error";
+        this.message = message;
+        this.date = Instant.now();
+        this.userId = 503;
+        this.userName = "Error";
+        this.color = "220000";
+        this.id = Long.MAX_VALUE;
+        this.bottag = 0;
+        this.channel = "";
+
+        this.transformedColor = Color.rgb(255, 0, 0);
+        this.error = true;
+    }
+
+    @Ignore
     public Message(long id,
                    @NonNull String name,
                    @NonNull String message,
@@ -121,6 +143,7 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
         this.channel = channel;
 
         this.transformedColor = transformColor(color);
+        this.error = false;
     }
 
     @NonNull
@@ -138,7 +161,9 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
     }
 
     public Type getType() {
-        if (this == PING) {
+        if (this.isError()) {
+            return Type.ERROR;
+        } else if (this == PING) {
             return Type.PING;
         } else if (this == PONG) {
             return Type.PONG;
@@ -153,6 +178,10 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
 
     public LocalDate getLocalDate() {
         return ZonedDateTime.ofInstant(date, ZoneId.systemDefault()).toLocalDate();
+    }
+
+    public boolean isBot() {
+        return getBottag() != 0;
     }
 
     public int compareTo(Message other) {
@@ -223,12 +252,12 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
     }
 
     @ColorInt
-    private int transformColor(String color) {
+    private static int transformColor(String color) {
         return transformColor(Color.parseColor("#" + color));
     }
 
     @ColorInt
-    private int transformColor(int color) {
+    private static int transformColor(int color) {
         if (Preferences.general().isNightMode()) {
             return color;
         } else {
@@ -290,6 +319,7 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
         PONG,
         ACK,
         OK,
-        POST
+        POST,
+        ERROR
     }
 }

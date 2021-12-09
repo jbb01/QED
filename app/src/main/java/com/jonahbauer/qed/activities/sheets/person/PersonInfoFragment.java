@@ -14,12 +14,9 @@ import androidx.annotation.StyleRes;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.util.Pair;
 import androidx.databinding.BindingAdapter;
-import androidx.databinding.ViewDataBinding;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelStoreOwner;
 
 import com.jonahbauer.qed.R;
-import com.jonahbauer.qed.activities.sheets.AbstractInfoFragment;
+import com.jonahbauer.qed.activities.sheets.InfoFragment;
 import com.jonahbauer.qed.databinding.FragmentInfoPersonBinding;
 import com.jonahbauer.qed.databinding.ListItemBinding;
 import com.jonahbauer.qed.model.Person;
@@ -40,9 +37,11 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMaps;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
-public class PersonInfoFragment extends AbstractInfoFragment {
+public class PersonInfoFragment extends InfoFragment {
     private PersonViewModel mPersonViewModel;
     private FragmentInfoPersonBinding mBinding;
+
+    private boolean mHideTitle;
 
     private static final Object2IntMap<String> CONTACT_ICONS;
     private static final Object2ObjectMap<String, BiConsumer<Context, String>> CONTACT_ACTIONS;
@@ -101,22 +100,20 @@ public class PersonInfoFragment extends AbstractInfoFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        ViewModelStoreOwner owner = getParentFragment();
-        if (owner == null) owner = requireActivity();
-        mPersonViewModel = new ViewModelProvider(owner).get(PersonViewModel.class);
+        mPersonViewModel = getViewModelProvider().get(PersonViewModel.class);
     }
 
     @Nullable
     @Override
-    public ViewDataBinding onCreateContentView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mBinding = FragmentInfoPersonBinding.inflate(inflater, container, true);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        mBinding = FragmentInfoPersonBinding.inflate(inflater, container, false);
         mPersonViewModel.getPerson().observe(getViewLifecycleOwner(), personStatusWrapper -> {
             mBinding.setPerson(personStatusWrapper.getValue());
             mBinding.setLoading(personStatusWrapper.getCode() == StatusWrapper.STATUS_PRELOADED);
         });
         mBinding.setColor(getColor());
-        return mBinding;
+        if (mHideTitle) hideTitle();
+        return mBinding.getRoot();
     }
 
     @NonNull
@@ -129,7 +126,7 @@ public class PersonInfoFragment extends AbstractInfoFragment {
     }
 
     @Override
-    protected int getColor() {
+    public int getColor() {
         return Themes.colorful(getPerson().getId());
     }
 
@@ -173,6 +170,13 @@ public class PersonInfoFragment extends AbstractInfoFragment {
         button.setTitle(v.getContext().getString(visible ? R.string.event_show_more : R.string.event_show_less));
     }
 
+    @Override
+    public void hideTitle() {
+        mHideTitle = true;
+        if (mBinding != null) {
+            mBinding.titleLayout.setVisibility(View.GONE);
+        }
+    }
 
     @BindingAdapter("person_contacts")
     public static void bindContacts(ViewGroup parent, List<Pair<String, String>> contacts) {

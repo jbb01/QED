@@ -2,12 +2,11 @@
 <layout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".activities.sheets.AbstractInfoFragment">
+    tools:context=".activities.sheets.InfoBottomSheet">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="horizontal"
         android:clipChildren="false">
 
         <RelativeLayout
@@ -36,6 +35,7 @@
                 android:layout_height="0dp"
                 android:tintMode="multiply"
                 android:scaleType="centerCrop"
+                android:importantForAccessibility="no"
                 tools:src="@drawable/background_4"
                 tools:tint="@android:color/holo_green_light"/>
         </RelativeLayout>
@@ -47,8 +47,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scrollbars="vertical">
-            <LinearLayout
-                android:id="@+id/content_holder"
+            <androidx.fragment.app.FragmentContainerView
+                android:id="@+id/fragment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"/>

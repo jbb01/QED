@@ -5,16 +5,16 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.jonahbauer.qed.R;
-import com.jonahbauer.qed.activities.sheets.AbstractInfoBottomSheet;
-import com.jonahbauer.qed.activities.sheets.AbstractInfoFragment;
+import com.jonahbauer.qed.activities.sheets.InfoBottomSheet;
+import com.jonahbauer.qed.activities.sheets.InfoFragment;
 import com.jonahbauer.qed.model.Message;
 import com.jonahbauer.qed.model.viewmodel.MessageViewModel;
 import com.jonahbauer.qed.util.StatusWrapper;
+import com.jonahbauer.qed.util.Themes;
 
-public class MessageInfoBottomSheet extends AbstractInfoBottomSheet {
+public class MessageInfoBottomSheet extends InfoBottomSheet {
     private static final String ARGUMENT_MESSAGE = "message";
 
     private MessageViewModel mMessageViewModel;
@@ -44,7 +44,7 @@ public class MessageInfoBottomSheet extends AbstractInfoBottomSheet {
             return;
         }
 
-        mMessageViewModel = new ViewModelProvider(this).get(MessageViewModel.class);
+        mMessageViewModel = getViewModelProvider().get(MessageViewModel.class);
         mMessageViewModel.load(message);
     }
 
@@ -54,7 +54,13 @@ public class MessageInfoBottomSheet extends AbstractInfoBottomSheet {
     }
 
     @Override
-    public AbstractInfoFragment createFragment() {
+    public int getBackground() {
+        return Themes.pattern(getMessage().getId());
+    }
+
+    @NonNull
+    @Override
+    public InfoFragment createFragment() {
         return MessageInfoFragment.newInstance();
     }
 

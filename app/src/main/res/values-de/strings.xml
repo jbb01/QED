@@ -16,6 +16,7 @@
     <string name="retry">Erneut versuchen</string>
     <string name="hits">%,d Treffer</string>
     <string name="copied">Kopiert</string>
+    <string name="logout_success">Logout erfolgreich</string>
 
 
     <string name="cant_connect">Keine Verbindung zum Internet möglich</string>
@@ -39,17 +40,8 @@
     <string name="drawer_chat">Chat</string>
     <string name="drawer_chat_db">Datenbank</string>
     <string name="chat_database_id_hint">vonID-bisID</string>
-    <string name="title_activity_album">Album</string>
-    <string name="title_activity_image">Foto</string>
     <string name="title_fragment_chat_database">Datenbank</string>
-    <string name="title_fragment_events_database">Veranstaltungen</string>
-    <string name="title_fragment_gallery">Galerie</string>
     <string name="title_fragment_log">Log</string>
-    <string name="album_photographer_radio_button">Fotograph</string>
-    <string name="album_not_downloaded">Dieses Album ist nicht heruntergeladen.</string>
-    <string name="album_date_radio_button">Datum</string>
-    <string name="album_upload_radio_button">Upload</string>
-    <string name="album_category_radio_button">Kategorie</string>
     <string name="drawer_chat_heading">Chat</string>
     <string name="drawer_chat_log">Log</string>
     <string name="drawer_database_heading">Datenbank</string>
@@ -59,16 +51,7 @@
     <string name="drawer_logout">Abmelden</string>
     <string name="drawer_persons">Personen</string>
     <string name="drawer_settings">Einstellungen</string>
-    <string name="album_empty">Dieses Album scheint leer zu sein.</string>
     <string name="error">Fehler!</string>
-    <string name="gallery_empty">Die Galerie scheint leer zu sein.</string>
-    <string name="gallery_offline_mode">Verbinding fehlgeschlagen. Diese App ist offline.</string>
-    <string name="gallery_forced_offline_mode">Der Offline-Modus ist eingeschaltet.</string>
-    <string name="gallery_disable_offline_mode">Ausschalten</string>
-    <string name="image_already_original">Das ist bereits die Originaldatei, möchtest du sie erneut herunterladen?</string>
-    <string name="image_async_still_running">Es laufen noch Downloads. Wenn du jetzt zurückgehst werden sie abgebrochen. Möchtest du fortfahren?</string>
-    <string name="image_not_downloaded">Dieses Bild ist nicht heruntergeladen</string>
-    <string name="image_suffix_original">" (original)"</string>
     <string name="info">Details</string>
     <string name="log_action_save">In Datenbank speichern</string>
     <string name="log_wait_for_save">Bitte warte bis das Speichern abgeschlossen ist.</string>
@@ -79,7 +62,6 @@
     <string name="log_subtitle_date_interval">Posts von {0} bis {1}</string>
     <string name="log_subtitle_date_recent">Posts der letzten {0,choice,1#|2#{0} }Stunde{0,choice,1#|2#n}</string>
     <string name="log_subtitle_post_recent">Letzte{0,choice,1#r|2# {0}} Post{0,choice,1#|2#s}</string>
-    <string name="image_download_non_picture">Du bist im Begriff eine Audio- oder Video-Datei herunterzuladen. Eine WLAN-Verbindung wird empfohlen. Möchtest du fortfahren?</string>
     <string name="error_unknown">Ein unbekannter Fehler trat auf.</string>
     <string name="error_login">Login fehlgeschlagen.</string>
     <string name="error_network">Ein Netzwerk-Fehler trat auf.</string>
@@ -88,9 +70,6 @@
     <string name="error_empty">Diese Liste ist leer.</string>
     <string name="error_user">Fehler in Layer 8</string>
     <string name="offline_mode_not_available">Im Offline-Modus nicht verfügbar.</string>
-    <string name="album_invalid">Dieses Album existiert nicht.</string>
-    <string name="image_overwrite_offline_mode">Du befindest dich im Offline-Modus. Möchtest du das Bild trotzdem herunterladen?</string>
-    <string name="album_overwrite_offline_mode">Du befindest dich im Offline-Modus. Möchtest du das Album trotzdem herunterladen?</string>
     <string name="log_status_download_pending">Download ausstehend…</string>
     <string name="log_status_download_successful">Download erfolgreich. %.2f MiB</string>
     <string name="log_status_downloading">Download im Gange… %.2f MiB</string>
@@ -109,10 +88,6 @@
     <string name="log_subtitle_post_interval">Posts von #{0} bis #{1}</string>
     <string name="log_subtitle_since_own">Seit eigenem Post</string>
     <string name="log_subtitle_file">Datei</string>
-
-    <string name="image_info">@string/info</string>
-    <string name="image_open_with">Öffnen mit…</string>
-    <string name="image_download_original">Original herunterladen</string>
 
     <!-- Chat Fragment -->
     <string name="title_fragment_chat">Chat</string>
@@ -136,12 +111,47 @@
     <string name="message_reply_present">Antwort bereits eingefügt</string>
 
     <!-- Login Activity -->
-    <string name="title_activity_login">Anmelden</string>
+    <string name="title_fragment_login">Anmelden</string>
     <string name="login_action_sign_in">Anmelden</string>
     <string name="login_action_sign_in_short">Anmelden</string>
     <string name="login_error_incorrect_data">Logindaten sind ungültig</string>
     <string name="login_prompt_password">Passwort</string>
     <string name="login_prompt_username">Benutzername</string>
+
+    <!-- Gallery Fragment-->
+    <string name="title_fragment_gallery">Galerie</string>
+    <string name="gallery_empty">Die Galerie scheint leer zu sein.</string>
+    <string name="gallery_offline_mode">Verbinding fehlgeschlagen. Diese App ist offline.</string>
+    <string name="gallery_forced_offline_mode">Der Offline-Modus ist eingeschaltet.</string>
+    <string name="gallery_disable_offline_mode">Ausschalten</string>
+
+    <!-- Album Fragment -->
+    <string name="album_photographer_radio_button">Fotograph</string>
+    <string name="album_date_radio_button">Datum</string>
+    <string name="album_upload_radio_button">Upload</string>
+    <string name="album_category_radio_button">Kategorie</string>
+    <string name="album_photographer_unknown">Unbekannt</string>
+
+    <string name="title_fragment_album">Album</string>
+    <string name="album_empty">Dieses Album scheint leer zu sein.</string>
+    <string name="album_invalid">Dieses Album existiert nicht.</string>
+    <string name="album_not_downloaded">Dieses Album ist nicht heruntergeladen.</string>
+    <string name="album_overwrite_offline_mode">Du befindest dich im Offline-Modus. Möchtest du das Album trotzdem herunterladen?</string>
+
+    <string name="album_info">@string/info</string>
+
+    <!-- Image Activity -->
+    <string name="title_activity_image">Foto</string>
+    <string name="image_suffix_original">" (original)"</string>
+    <string name="image_already_original">Das ist bereits die Originaldatei, möchtest du sie erneut herunterladen?</string>
+    <string name="image_async_still_running">Es laufen noch Downloads. Wenn du jetzt zurückgehst werden sie abgebrochen. Möchtest du fortfahren?</string>
+    <string name="image_not_downloaded">Dieses Bild ist nicht heruntergeladen</string>
+    <string name="image_download_non_picture">Du bist im Begriff eine Audio- oder Video-Datei herunterzuladen. Eine WLAN-Verbindung wird empfohlen. Möchtest du fortfahren?</string>
+    <string name="image_overwrite_offline_mode">Du befindest dich im Offline-Modus. Möchtest du das Bild trotzdem herunterladen?</string>
+
+    <string name="image_info">@string/info</string>
+    <string name="image_open_with">Öffnen mit…</string>
+    <string name="image_download_original">Original herunterladen</string>
 
     <!-- Image Info Activity -->
     <string name="title_activity_image_info">Informationen</string>
@@ -172,8 +182,6 @@
     <string name="image_info_other_details">Sonstiges</string>
     <string name="image_info_path">Pfad</string>
 
-    <string name="album_info">@string/info</string>
-
     <string-array name="chat_database_max_entries_value_strings">
         <item>10.000</item>
         <item>20.000</item>
@@ -192,6 +200,8 @@
     <string name="message_info_title_bottag">Bottag</string>
     <string name="message_info_title_message">Nachricht</string>
 
+    <!-- Events Database Fragment -->
+    <string name="title_fragment_events_database">Veranstaltungen</string>
 
     <!-- Event Bottom Sheet -->
     <string name="event_section_information">Informationen</string>
@@ -235,6 +245,28 @@
     <string name="message_title_timestamp">{0}</string>
     <string name="message_subtitle_bottag">Bottag</string>
 
+    <!-- Registration -->
+    <string name="registration_orga">Orga</string>
+    <string name="registration_status_participated">teilgenommen</string>
+    <string name="registration_status_confirmed">bestätigt</string>
+    <string name="registration_status_open">offen</string>
+    <string name="registration_status_cancelled">abgemeldet</string>
+
+    <!-- Persons Database Fragment -->
+    <string name="title_fragment_persons_database">Personen</string>
+    <string name="persons_database_active_checkbox">Aktiv</string>
+    <string name="persons_database_firstName_checkbox">Vorname</string>
+    <string name="persons_database_firstName_hint">Vorname</string>
+    <string name="persons_database_lastName_checkbox">Nachname</string>
+    <string name="persons_database_lastName_hint">Nachname</string>
+    <string name="persons_database_member_checkbox">Mitglied</string>
+    <string name="persons_database_sort">Sortieren nach</string>
+    <string name="persons_database_sort_first_name">Vornamen</string>
+    <string name="persons_database_sort_last_name">Nachnamen</string>
+    <string name="persons_database_inactive">(inaktiv)</string>
+    <string name="persons_database_non_member">(kein Mitglied)</string>
+    <string name="persons_database_no_email"><i>privat</i></string>
+
     <!-- Person Bottom Sheet -->
     <string name="person_section_personal">Personendaten</string>
     <string name="person_section_additional">Weitere Informationen</string>
@@ -259,28 +291,6 @@
     <string name="person_subtitle_food">Essenswünsche</string>
     <string name="person_subtitle_notes">Anmerkungen</string>
 
-    <!-- Registration -->
-    <string name="registration_orga">Orga</string>
-    <string name="registration_status_participated">teilgenommen</string>
-    <string name="registration_status_confirmed">bestätigt</string>
-    <string name="registration_status_open">offen</string>
-    <string name="registration_status_cancelled">abgemeldet</string>
-
-    <!-- Persons Database Fragment -->
-    <string name="title_fragment_persons_database">Personen</string>
-    <string name="persons_database_active_checkbox">Aktiv</string>
-    <string name="persons_database_firstName_checkbox">Vorname</string>
-    <string name="persons_database_firstName_hint">Vorname</string>
-    <string name="persons_database_lastName_checkbox">Nachname</string>
-    <string name="persons_database_lastName_hint">Nachname</string>
-    <string name="persons_database_member_checkbox">Mitglied</string>
-    <string name="persons_database_sort">Sortieren nach</string>
-    <string name="persons_database_sort_first_name">Vornamen</string>
-    <string name="persons_database_sort_last_name">Nachnamen</string>
-    <string name="persons_database_inactive">(inaktiv)</string>
-    <string name="persons_database_non_member">(kein Mitglied)</string>
-    <string name="persons_database_no_email"><i>privat</i></string>
-
     <!-- Log Dialog Activity -->
     <string name="title_activity_log_dialog">Logs</string>
     <string name="log_dialog_mode_label">Mode</string>
@@ -303,7 +313,7 @@
     <string name="log_request_mode_file">file</string>
 
     <!-- Preference Activity -->
-    <string name="title_activity_settings">Einstellungen</string>
+    <string name="title_fragment_settings">Einstellungen</string>
     <string name="preferences_header_chat">Chat</string>
     <string name="preferences_header_gallery">Galerie</string>
     <string name="preferences_header_general">Allgemein</string>

@@ -3,15 +3,16 @@ package com.jonahbauer.qed.activities.mainFragments;
 import android.graphics.drawable.Animatable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.CompoundButton;
-import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.StyleRes;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.databinding.FragmentChatDatabaseBinding;
@@ -40,7 +41,7 @@ import java.util.stream.Collectors;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 
-public class ChatDatabaseFragment extends QEDFragment implements CompoundButton.OnCheckedChangeListener {
+public class ChatDatabaseFragment extends Fragment implements CompoundButton.OnCheckedChangeListener {
     private static final String LOG_TAG = ChatDatabaseFragment.class.getName();
 
     private MessageAdapter mMessageAdapter;
@@ -52,18 +53,6 @@ public class ChatDatabaseFragment extends QEDFragment implements CompoundButton.
     private MutableLiveData<LocalTime> mTimeTo;
 
     private FragmentChatDatabaseBinding mBinding;
-
-    @NonNull
-    public static ChatDatabaseFragment newInstance(@StyleRes int themeId) {
-        Bundle args = new Bundle();
-
-        args.putInt(ARGUMENT_THEME_ID, themeId);
-        args.putInt(ARGUMENT_LAYOUT_ID, R.layout.fragment_chat_database);
-
-        ChatDatabaseFragment fragment = new ChatDatabaseFragment();
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -93,11 +82,16 @@ public class ChatDatabaseFragment extends QEDFragment implements CompoundButton.
                   );
     }
 
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        mBinding = FragmentChatDatabaseBinding.inflate(inflater, container, false);
+        mMessageListViewModel = ViewUtils.getViewModelProvider(this).get(MessageListViewModel.class);
+        return mBinding.getRoot();
+    }
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        mBinding = FragmentChatDatabaseBinding.bind(view);
-        mMessageListViewModel = new ViewModelProvider(this).get(MessageListViewModel.class);
-
         mDateFrom = new MutableLiveData<>(LocalDate.now());
         mTimeFrom = new MutableLiveData<>(LocalTime.now());
         mDateTo = new MutableLiveData<>(LocalDate.now());
@@ -159,7 +153,15 @@ public class ChatDatabaseFragment extends QEDFragment implements CompoundButton.
      * @param value if the item is checked or not
      */
     private void setChecked(int position, boolean value) {
-        MessageUtils.setChecked(this, mBinding.messageListView, mMessageAdapter, position, value);
+        MessageUtils.setChecked(
+                this,
+                mBinding.messageListView,
+                mMessageAdapter,
+                msg -> NavHostFragment.findNavController(this)
+                                      .navigate(ChatDatabaseFragmentDirections.showMessage(msg)),
+                position,
+                value
+        );
     }
 
     @Override
@@ -271,9 +273,9 @@ public class ChatDatabaseFragment extends QEDFragment implements CompoundButton.
         if (mBinding.databaseIdCheckbox.isChecked()) {
             boolean idValid = checkId(mBinding.databaseIdEditText.getText().toString());
             valid = idValid;
-            setErrorDrawable(mBinding.databaseIdEditText, !idValid);
+            ViewUtils.setError(mBinding.databaseIdEditText, !idValid);
         } else {
-            setErrorDrawable(mBinding.databaseIdEditText, false);
+            ViewUtils.setError(mBinding.databaseIdEditText, false);
         }
 
         return valid;
@@ -302,11 +304,5 @@ public class ChatDatabaseFragment extends QEDFragment implements CompoundButton.
         }
 
         return true;
-    }
-    
-    private void setErrorDrawable(EditText editText, boolean error) {
-        editText.post(() -> {
-            editText.setCompoundDrawablesWithIntrinsicBounds(0, 0, error ? R.drawable.ic_error : 0, 0);
-        });
     }
 }

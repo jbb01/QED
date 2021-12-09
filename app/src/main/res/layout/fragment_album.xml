@@ -23,7 +23,7 @@
         android:orientation="vertical"
         android:clipToPadding="false"
         android:clipChildren="false"
-        tools:context="com.jonahbauer.qed.activities.GalleryAlbumActivity">
+        tools:context="com.jonahbauer.qed.activities.mainFragments.AlbumFragment">
 
         <include
             layout="@layout/gallery_offline_label"

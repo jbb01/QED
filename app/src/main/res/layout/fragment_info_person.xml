@@ -34,6 +34,7 @@
             style="?android:progressBarStyleHorizontal"/>
 
         <LinearLayout
+            android:id="@+id/title_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"

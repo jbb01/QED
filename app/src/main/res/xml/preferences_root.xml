@@ -3,21 +3,18 @@
     <Preference
         android:selectable="true"
         android:key="settings_header_general"
-        android:fragment="com.jonahbauer.qed.activities.settings.GeneralPreferenceFragment"
         android:icon="@drawable/ic_settings_general"
         android:title="@string/preferences_header_general" />
 
     <Preference
         android:selectable="true"
         android:key="settings_header_chat"
-        android:fragment="com.jonahbauer.qed.activities.settings.ChatPreferenceFragment"
         android:icon="@drawable/ic_settings_chat"
         android:title="@string/preferences_header_chat" />
 
     <Preference
         android:selectable="true"
         android:key="settings_header_gallery"
-        android:fragment="com.jonahbauer.qed.activities.settings.GalleryPreferenceFragment"
         android:icon="@drawable/ic_settings_gallery"
         android:title="@string/preferences_header_gallery" />
 

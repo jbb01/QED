@@ -13,12 +13,9 @@ import androidx.annotation.Nullable;
 import androidx.annotation.StyleRes;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.databinding.BindingAdapter;
-import androidx.databinding.ViewDataBinding;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelStoreOwner;
 
 import com.jonahbauer.qed.R;
-import com.jonahbauer.qed.activities.sheets.AbstractInfoFragment;
+import com.jonahbauer.qed.activities.sheets.InfoFragment;
 import com.jonahbauer.qed.databinding.FragmentInfoEventBinding;
 import com.jonahbauer.qed.databinding.ListItemBinding;
 import com.jonahbauer.qed.model.Event;
@@ -29,9 +26,11 @@ import com.jonahbauer.qed.util.Themes;
 
 import java.util.Map;
 
-public class EventInfoFragment extends AbstractInfoFragment {
+public class EventInfoFragment extends InfoFragment {
     private EventViewModel mEventViewModel;
     private FragmentInfoEventBinding mBinding;
+
+    private boolean mHideTitle;
 
     public static EventInfoFragment newInstance() {
         return new EventInfoFragment();
@@ -42,21 +41,19 @@ public class EventInfoFragment extends AbstractInfoFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        ViewModelStoreOwner owner = getParentFragment();
-        if (owner == null) owner = requireActivity();
-        mEventViewModel = new ViewModelProvider(owner).get(EventViewModel.class);
+        mEventViewModel = getViewModelProvider().get(EventViewModel.class);
     }
 
     @Override
-    protected ViewDataBinding onCreateContentView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mBinding = FragmentInfoEventBinding.inflate(inflater, container, true);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        mBinding = FragmentInfoEventBinding.inflate(inflater, container, false);
         mEventViewModel.getEvent().observe(getViewLifecycleOwner(), eventStatusWrapper -> {
             mBinding.setEvent(eventStatusWrapper.getValue());
             mBinding.setLoading(eventStatusWrapper.getCode() == StatusWrapper.STATUS_PRELOADED);
         });
         mBinding.setColor(getColor());
-        return mBinding;
+        if (mHideTitle) hideTitle();
+        return mBinding.getRoot();
     }
 
     @NonNull
@@ -69,7 +66,7 @@ public class EventInfoFragment extends AbstractInfoFragment {
     }
 
     @Override
-    protected int getColor() {
+    public int getColor() {
         return Themes.colorful(getEvent().getId());
     }
 
@@ -86,6 +83,14 @@ public class EventInfoFragment extends AbstractInfoFragment {
     @Override
     protected float getTitleBottom() {
         return mBinding.title.getBottom();
+    }
+
+    @Override
+    public void hideTitle() {
+        mHideTitle = true;
+        if (mBinding != null) {
+            mBinding.titleLayout.setVisibility(View.GONE);
+        }
     }
 
     @Override

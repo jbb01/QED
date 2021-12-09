@@ -4,17 +4,16 @@ import android.app.Activity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SoundEffectConstants;
 import android.widget.ListView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.view.ActionMode;
-
-import java.util.Locale;
+import androidx.fragment.app.Fragment;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.MainActivity;
-import com.jonahbauer.qed.activities.mainFragments.QEDFragment;
 import com.jonahbauer.qed.activities.mainFragments.ChatFragment;
 import com.jonahbauer.qed.model.Message;
 import com.jonahbauer.qed.model.adapter.MessageAdapter;
@@ -25,6 +24,8 @@ import java.time.Month;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Locale;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import lombok.experimental.UtilityClass;
@@ -40,9 +41,10 @@ public class MessageUtils {
      * @param position the position of the checked item in the {@link MessageAdapter}
      * @param value if the item is checked or not
      */
-    public static void setChecked(@NonNull QEDFragment fragment,
+    public static void setChecked(@NonNull Fragment fragment,
                                   @NonNull ListView listView,
                                   @NonNull MessageAdapter adapter,
+                                  @NonNull Consumer<Message> info,
                                   int position, boolean value) {
         listView.setItemChecked(position, value);
 
@@ -51,6 +53,7 @@ public class MessageUtils {
             MainActivity mainActivity = (MainActivity) activity;
 
             if (value) {
+                listView.playSoundEffect(SoundEffectConstants.CLICK);
                 Message msg = adapter.getItem(position);
                 if (msg == null) return;
 
@@ -58,9 +61,6 @@ public class MessageUtils {
                     @Override
                     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
                         mainActivity.getMenuInflater().inflate(R.menu.menu_message, menu);
-                        if (!(fragment instanceof ChatFragment)) {
-                            menu.findItem(R.id.message_reply).setVisible(false);
-                        }
                         return true;
                     }
 
@@ -72,7 +72,7 @@ public class MessageUtils {
                     @Override
                     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
                         if (item.getItemId() == R.id.message_info) {
-                            Actions.showInfoSheet(fragment, msg);
+                            info.accept(msg);
                             return true;
                         } else if (item.getItemId() == R.id.message_copy) {
                             Actions.copy(fragment.requireContext(), fragment.requireView(), msg.getName(), msg.getMessage());
@@ -99,7 +99,7 @@ public class MessageUtils {
 
                     @Override
                     public void onDestroyActionMode(ActionMode mode) {
-                        setChecked(fragment, listView, adapter, position, false);
+                        listView.setItemChecked(position, false);
                     }
                 };
 

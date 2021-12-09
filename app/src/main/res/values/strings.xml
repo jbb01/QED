@@ -16,6 +16,7 @@
     <string name="copied">Copied</string>
     <string name="hits">%,d Hits</string>
     <string name="empty" translatable="false"/>
+    <string name="logout_success">Logout successful</string>
 
     <string name="no_internet">Something went wrong. Please check your network connection.</string>
     <string name="not_official">This app is not related to the Quod Erat Demonstrandum e.V. in any official way.</string>
@@ -69,7 +70,7 @@
     <string name="message_info_title_message">Message</string>
 
     <!-- Login Activity -->
-    <string name="title_activity_login">Sign In</string>
+    <string name="title_fragment_login">Sign In</string>
     <string name="login_prompt_username">Username</string>
     <string name="login_prompt_password">Password</string>
     <string name="login_action_sign_in">Sign In</string>
@@ -104,6 +105,7 @@
         <item>500,000</item>
         <item>\u221E</item>
     </string-array>
+
     <!-- Persons Database Fragment -->
     <string name="title_fragment_persons_database">Persons</string>
     <string name="persons_database_firstName_checkbox">First Name</string>
@@ -118,8 +120,6 @@
     <string name="persons_database_inactive">(inactive)</string>
     <string name="persons_database_non_member">(no member)</string>
     <string name="persons_database_no_email"><i>private</i></string>
-    <!-- Events Database Fragment -->
-    <string name="title_fragment_events_database">Events</string>
 
     <!-- Person Bottom Sheet -->
     <string name="person_section_personal">Personal Data</string>
@@ -145,6 +145,8 @@
     <string name="person_subtitle_food">Food Preferences</string>
     <string name="person_subtitle_notes">Notes</string>
 
+    <!-- Events Database Fragment -->
+    <string name="title_fragment_events_database">Events</string>
 
     <!-- Event Bottom Sheet -->
     <string name="event_section_information">General</string>
@@ -211,7 +213,6 @@
 
     <string name="preferences_general_bug_report_key" translatable="false">general.bug_report</string>
     <string name="preferences_general_github_key" translatable="false">general.github</string>
-    <string name="preferences_general_drawer_selection_key" translatable="false">general.drawer_selection</string>
     <string name="preferences_general_remember_me_key" translatable="false">general.remember_me</string>
     <string name="preferences_general_night_mode_key" translatable="false">general.night_mode</string>
 
@@ -222,7 +223,7 @@
     <string name="preferences_gallery_delete_db_key" translatable="false">gallery.delete_db</string>
 
     <!-- Preference Activity -->
-    <string name="title_activity_settings">Settings</string>
+    <string name="title_fragment_settings">Settings</string>
     <string name="preferences_header_chat">Chat</string>
     <string name="preferences_header_gallery">Gallery</string>
     <string name="preferences_header_general">General</string>
@@ -325,7 +326,7 @@
     <string name="log_request_mode_sinceown">fromownpost</string>
     <string name="log_request_mode_file">file</string>
 
-    <!-- Album Fragment-->
+    <!-- Gallery Fragment-->
     <string name="gallery_folder_images" translatable="false">gallery/images</string>
 
     <string name="title_fragment_gallery">Gallery</string>
@@ -334,13 +335,14 @@
     <string name="gallery_forced_offline_mode">Offline mode is enabled.</string>
     <string name="gallery_disable_offline_mode">Disable</string>
 
-    <!-- Album Activity -->
+    <!-- Album Fragment -->
     <string name="album_photographer_radio_button">Photographer</string>
     <string name="album_date_radio_button">Date</string>
     <string name="album_upload_radio_button">Upload</string>
     <string name="album_category_radio_button">Category</string>
+    <string name="album_photographer_unknown">Unknown</string>
 
-    <string name="title_activity_album">Album</string>
+    <string name="title_fragment_album">Album</string>
     <string name="album_empty">This album seems to be empty</string>
     <string name="album_invalid">This album does not exist.</string>
     <string name="album_not_downloaded">This album is not downloaded</string>
