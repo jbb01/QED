@@ -4,7 +4,6 @@ import static com.jonahbauer.qed.networking.pages.QEDGalleryPages.Mode.NORMAL;
 import static com.jonahbauer.qed.networking.pages.QEDGalleryPages.Mode.ORIGINAL;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.util.Log;
@@ -43,6 +42,7 @@ import java.io.IOException;
 import java.util.Locale;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
@@ -106,31 +106,27 @@ public class ImageViewHolder extends RecyclerView.ViewHolder implements QEDPageR
         return root;
     }
 
-    private void cancel() {
-        mDisposable.clear();
-    }
-
-    void reset(Image image) {
+    public void load(Image image) {
         this.mMode = NORMAL;
         this.mTarget = null;
         this.mDownloadTmp = null;
         setImage(image);
     }
 
-    void setImage(Image image) {
+    private void setImage(Image image) {
         setImage(image, false);
     }
 
     /**
-     * If the image is available it will be shown.
-     * Otherwise it will be downloaded
-     *
-     * For non image resources a icon is shown if the file is available otherwise the user will be prompted to confirm the download
-     *
-     * If required (e.g. after launching the activity via deep link) additional information about the image is collected
+     * Loads and displays the given {@link Image}.
+     * <br><br>
+     * If the image is downloaded already and {@code forceDownload} is false the downloaded image
+     * (or an icon for non-image resources) will be displayed. Otherwise the image will be downloaded.
+     * @see #downloadImage(Image)
+     * @see #downloadNonImage(Image)
      */
-    void setImage(Image image, boolean force) {
-        cancel();
+    private void setImage(Image image, boolean forceDownload) {
+        mDisposable.clear();
 
         this.mBinding.setProgress(null);
         this.mBinding.setProgressText(null);
@@ -145,7 +141,7 @@ public class ImageViewHolder extends RecyclerView.ViewHolder implements QEDPageR
                                      img -> {
                                          image.set(img);
                                          image.setDatabaseLoaded(true);
-                                         setImage(image);
+                                         setImage(image, forceDownload);
                                      },
                                      err -> {
                                          if (err instanceof EmptyResultSetException) {
@@ -161,31 +157,26 @@ public class ImageViewHolder extends RecyclerView.ViewHolder implements QEDPageR
             return;
         }
 
-        String type = ImageActivity.getType(image);
-        if (!force && image.getPath() != null && new File(image.getPath()).exists()) {
+        Image.Type type = image.getType();
+        if (!forceDownload && image.getPath() != null && new File(image.getPath()).exists()) {
             switch (type) {
                 default:
-                case "image":
-                    Bitmap bitmap = BitmapFactory.decodeFile(image.getPath());
+                case IMAGE:
                     this.mStatus.setValue(StatusWrapper.loaded(image));
-                    if (bitmap != null) {
-                        this.mBinding.setDrawable(new BitmapDrawable(mContext.getResources(), bitmap));
-                    } else {
-                        this.mBinding.setDrawable(AppCompatResources.getDrawable(mContext, R.drawable.ic_gallery_image));
-                    }
+                    setImageFromFile(image.getPath());
                     break;
-                case "video":
+                case VIDEO:
                     this.mBinding.setDrawable(AppCompatResources.getDrawable(mContext, R.drawable.ic_gallery_video));
                     this.mStatus.setValue(StatusWrapper.loaded(image));
                     break;
-                case "audio":
+                case AUDIO:
                     this.mBinding.setDrawable(AppCompatResources.getDrawable(mContext, R.drawable.ic_gallery_audio));
                     this.mStatus.setValue(StatusWrapper.loaded(image));
                     break;
             }
         } else {
             this.mStatus.setValue(StatusWrapper.preloaded(image));
-            if ("image".equals(type)) {
+            if (type == Image.Type.IMAGE) {
                 downloadImage(image);
             } else {
                 downloadNonImage(image);
@@ -193,7 +184,22 @@ public class ImageViewHolder extends RecyclerView.ViewHolder implements QEDPageR
         }
     }
 
-    void downloadOriginal() {
+    private void setImageFromFile(String path) {
+        mDisposable.add(
+                Single.fromCallable(() -> BitmapFactory.decodeFile(path))
+                      .subscribeOn(Schedulers.io())
+                      .observeOn(AndroidSchedulers.mainThread())
+                      .subscribe(
+                              bitmap -> this.mBinding.setDrawable(new BitmapDrawable(mContext.getResources(), bitmap)),
+                              t -> this.mBinding.setDrawable(AppCompatResources.getDrawable(mContext, R.drawable.ic_gallery_image))
+                      )
+        );
+    }
+
+    /**
+     * Forces a re-download of the original version of the currently displayed image.
+     */
+    public void downloadOriginal() {
         if (mMode != ORIGINAL) {
             mMode = ORIGINAL;
 
@@ -216,7 +222,7 @@ public class ImageViewHolder extends RecyclerView.ViewHolder implements QEDPageR
     private void downloadImage(Image image) {
         // when in offline mode show confirmation dialog
         if (Preferences.gallery().isOfflineMode()) {
-            onError(image, Reason.USER, null);
+            onError(image, Reason.NETWORK, null);
             return;
         }
 
@@ -248,7 +254,7 @@ public class ImageViewHolder extends RecyclerView.ViewHolder implements QEDPageR
     private void downloadNonImage(final Image image) {
         // when in offline mode show confirmation dialog
         if (Preferences.gallery().isOfflineMode()) {
-            onError(image, Reason.USER, null);
+            onError(image, Reason.NETWORK, null);
             return;
         }
 
@@ -259,9 +265,7 @@ public class ImageViewHolder extends RecyclerView.ViewHolder implements QEDPageR
             image.setOriginal(true);
             downloadImage(image);
         });
-        builder.setNegativeButton(R.string.no, (dialog, which) -> {
-            onError(image, Reason.USER, null);
-        });
+        builder.setNegativeButton(R.string.no, (dialog, which) -> onError(image, Reason.USER, null));
         builder.setCancelable(false);
         showDialog(builder);
     }
@@ -312,21 +316,22 @@ public class ImageViewHolder extends RecyclerView.ViewHolder implements QEDPageR
                  .observeOn(AndroidSchedulers.mainThread())
                  .subscribe(() -> {}, err -> Log.e(LOG_TAG, "Could not save image path to database.", err));
 
-        switch (ImageActivity.getType(image)) {
-            case "image":
-                mBinding.setDrawable(new BitmapDrawable(mContext.getResources(), BitmapFactory.decodeFile(image.getPath())));
+        switch (image.getType()) {
+            case IMAGE:
+                setImageFromFile(image.getPath());
                 break;
-            case "video":
+            case VIDEO:
                 mBinding.setDrawable(AppCompatResources.getDrawable(mContext, R.drawable.ic_gallery_video));
                 break;
-            case "audio":
+            case AUDIO:
                 mBinding.setDrawable(AppCompatResources.getDrawable(mContext, R.drawable.ic_gallery_audio));
                 break;
         }
 
         mStatus.setValue(StatusWrapper.loaded(image));
 
-        onProgressUpdate(null, 0,0);
+        this.mBinding.setProgress(null);
+        this.mBinding.setProgressText(null);
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -337,19 +342,19 @@ public class ImageViewHolder extends RecyclerView.ViewHolder implements QEDPageR
 
         mStatus.setValue(StatusWrapper.error(image, reason));
 
-        switch (ImageActivity.getType(image)) {
+        switch (image.getType()) {
             default:
-            case "image":
+            case IMAGE:
                 if (image.getThumbnail() != null) {
                     mBinding.setDrawable(new BitmapDrawable(mContext.getResources(), image.getThumbnail()));
                 } else {
                     mBinding.setDrawable(AppCompatResources.getDrawable(mContext, R.drawable.ic_gallery_empty_image));
                 }
                 break;
-            case "audio":
+            case AUDIO:
                 mBinding.setDrawable(AppCompatResources.getDrawable(mContext, R.drawable.ic_gallery_empty_audio));
                 break;
-            case "video":
+            case VIDEO:
                 mBinding.setDrawable(AppCompatResources.getDrawable(mContext, R.drawable.ic_gallery_empty_video));
                 break;
         }

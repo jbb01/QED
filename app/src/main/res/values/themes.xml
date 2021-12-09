@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="Base.Theme.App" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
-<!--        <item name="android:ambientShadowAlpha">1</item>-->
-<!--        <item name="android:spotShadowAlpha">1</item>-->
+        <!--        <item name="android:ambientShadowAlpha">1</item>-->
+        <!--        <item name="android:spotShadowAlpha">1</item>-->
 
         <!-- Dialog Themes -->
         <item name="android:dialogTheme">@style/ThemeOverlay.App.Dialog</item>
@@ -22,6 +22,7 @@
         <item name="dividerStyle">@style/Widget.App.Divider</item>
         <item name="textInputStyle">@style/Widget.Design.TextInputLayout</item>
         <item name="actionModeStyle">@style/Widget.App.ActionMode</item>
+        <item name="android:dropDownListViewStyle">@style/Widget.App.ListView.DropDown</item>
 
         <!-- Text Appearances -->
         <item name="textAppearanceButton">@style/TextAppearance.App.Button</item>
@@ -29,6 +30,7 @@
         <item name="android:textColorPrimary">@color/text_color_primary</item>
         <item name="android:colorControlNormal">?android:textColorPrimary</item>
         <item name="android:textColorHint">@color/text_color_hint</item>
+        <item name="colorControlNormal">?android:colorControlNormal</item>
 
         <item name="divider">@drawable/divider</item>
         <item name="dividerHorizontal">?divider</item>
@@ -150,7 +152,5 @@
     <style name="ThemeOverlay.App.BottomSheetDialog" parent="@style/ThemeOverlay.MaterialComponents.BottomSheetDialog">
         <item name="android:windowIsFloating">false</item>
     </style>
-    <style name="ThemeOverlay.App.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar">
-
-    </style>
+    <style name="ThemeOverlay.App.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar"/>
 </resources>

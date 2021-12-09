@@ -362,7 +362,7 @@ public class ImageActivity extends AppCompatActivity {
         @Override
         public void onBindViewHolder(@NonNull ImageViewHolder holder, int position) {
             Image image = getItem(position);
-            holder.reset(image);
+            holder.load(image);
             mViewHolderCache.put(position, new SoftReference<>(holder));
         }
 

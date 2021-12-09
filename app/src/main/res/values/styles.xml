@@ -36,9 +36,11 @@
         <item name="android:layout_height">?android:dividerHeight</item>
         <item name="android:layout_width">match_parent</item>
     </style>
-
     <style name="Widget.App.ActionMode" parent="Widget.AppCompat.ActionMode">
         <item name="background">?colorPrimaryLight</item>
+    </style>
+    <style name="Widget.App.ListView.DropDown" parent="@style/Widget.AppCompat.ListView.DropDown">
+        <item name="android:dividerHeight">0dp</item>
     </style>
 
     <!-- TextAppearance -->

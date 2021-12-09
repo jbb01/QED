@@ -22,6 +22,7 @@ public class Debug {
         Person person = new Person(-1);
         person.setFirstName("Max");
         person.setLastName("Mustermann");
+        person.setUsername("MaxMustermann");
         person.setEmail("max.mustermann@example.org");
         person.setBirthday(LocalDate.of(2000, 1, 1));
         person.setBirthdayString("01.01.2000");
