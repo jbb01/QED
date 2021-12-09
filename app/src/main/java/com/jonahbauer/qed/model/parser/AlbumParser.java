@@ -26,18 +26,21 @@ public final class AlbumParser extends HtmlParser<Album> {
     private static final Pattern IMAGE_ID = Pattern.compile("id=(\\d+)");
     private static final Pattern BY_OWNER = Pattern.compile("byowner=(\\d+)");
     private static final Pattern BY_DAY = Pattern.compile("byday=(\\d+-\\d+-\\d+)");
+    private static final Pattern BY_UPLOAD = Pattern.compile("byupload=(\\d+-\\d+-\\d+)");
     private static final Pattern BY_CATEGORY = Pattern.compile("bycategory=([^&]*)");
-
-    private static final String TITLE_SUFFIX = " - Alle Bilder";
 
     private static final String FILTER_KEY_OWNER = "Nach Besitzer:";
     private static final String FILTER_KEY_DATE = "Nach Datum:";
+    private static final String FILTER_KEY_UPLOAD_DATE = "Nach Upload:";
     private static final String FILTER_KEY_CATEGORY = "Nach Kategorie:";
 
     private static final String FILTER_OWNER_PREFIX = "Bilder von ";
 
     private static final String INFO_KEY_OWNER = "Albumersteller:";
     private static final String INFO_KEY_CREATION_DATE = "Erstellt am:";
+    private static final String INFO_KEY_PERMISSIONS = "Rechte:";
+
+    private static final String PERMISSIONS_PRIVATE = "Dieses Album ist privat.";
 
     public static final AlbumParser INSTANCE = new AlbumParser();
 
@@ -50,8 +53,9 @@ public final class AlbumParser extends HtmlParser<Album> {
 
         // Album name
         String albumName = document.selectFirst("main h2").text();
-        if (albumName.endsWith(TITLE_SUFFIX)) {
-            albumName = albumName.substring(0, albumName.length() - TITLE_SUFFIX.length());
+        int suffixIndex = albumName.lastIndexOf(" - ");
+        if (suffixIndex != -1) {
+            albumName = albumName.substring(0, suffixIndex);
         }
         album.setName(albumName);
 
@@ -161,6 +165,25 @@ public final class AlbumParser extends HtmlParser<Album> {
                         });
                         break;
                     }
+                    case FILTER_KEY_UPLOAD_DATE: {
+                        //noinspection ConstantConditions
+                        value.select("a").forEach(a -> {
+                            try {
+                                // extract id
+                                String href = a.attr("href");
+                                Matcher matcher = BY_UPLOAD.matcher(href);
+                                if (matcher.find()) {
+                                    LocalDate date = parseLocalDate(matcher.group(1));
+                                    if (date != null) {
+                                        album.getUploadDates().add(date);
+                                    }
+                                }
+                            } catch (Exception e) {
+                                Log.e(LOG_TAG, "Error parsing album " + album.getId() + ".", e);
+                            }
+                        });
+                        break;
+                    }
                     case FILTER_KEY_CATEGORY: {
                         //noinspection ConstantConditions
                         value.select("a").forEach(a -> {
@@ -203,6 +226,12 @@ public final class AlbumParser extends HtmlParser<Album> {
                         //noinspection ConstantConditions
                         album.setCreationDate(th.nextElementSibling().text());
                         break;
+                    }
+                    case INFO_KEY_PERMISSIONS: {
+                        //noinspection ConstantConditions
+                        if (PERMISSIONS_PRIVATE.equals(th.nextElementSibling().text())) {
+                            album.setPrivate_(true);
+                        }
                     }
                 }
             } catch (Exception e) {

@@ -3,7 +3,6 @@ package com.jonahbauer.qed.model.adapter;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
-import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -19,6 +18,7 @@ import com.jonahbauer.qed.layoutStuff.views.MathView;
 import com.jonahbauer.qed.layoutStuff.views.MessageView;
 import com.jonahbauer.qed.model.Message;
 import com.jonahbauer.qed.util.Preferences;
+import com.jonahbauer.qed.util.ViewUtils;
 
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -73,13 +73,13 @@ public class MessageAdapter extends ArrayAdapter<Message> {
 
         if (mExtended && mKatexSet && mKatex) throw new IllegalArgumentException("Extended message views do not support Katex!");
 
-        mDp3 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3, context.getResources().getDisplayMetrics());
+        mDp3 = (int) ViewUtils.dpToPx(context, 3);
         obtainDefaultTextAppearance();
         reload();
     }
 
     private void obtainDefaultTextAppearance() {
-        mDefaultTextSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 14, mContext.getResources().getDisplayMetrics());
+        mDefaultTextSize = ViewUtils.spToPx(mContext, 14);
         mDefaultTextColor = Color.BLACK;
 
         TypedArray typedArray = mContext.obtainStyledAttributes(R.style.Widget_App_Message, R.styleable.MessageView);

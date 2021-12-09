@@ -172,6 +172,7 @@
     <string name="album_subtitle_creation_date">Creation Date</string>
     <string name="album_title_dates">{0} - {1}</string>
     <string name="album_subtitle_dates">Time</string>
+    <string name="album_subtitle_upload_dates">Upload</string>
     <string name="album_subtitle_image_count">Image Count</string>
     <string name="album_title_private">Private Album</string>
 
@@ -335,7 +336,8 @@
 
     <!-- Album Activity -->
     <string name="album_photographer_radio_button">Photographer</string>
-    <string name="album_date_radio_button">Dates</string>
+    <string name="album_date_radio_button">Date</string>
+    <string name="album_upload_radio_button">Upload</string>
     <string name="album_category_radio_button">Category</string>
 
     <string name="title_activity_album">Album</string>

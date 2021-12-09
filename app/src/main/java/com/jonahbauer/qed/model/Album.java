@@ -53,6 +53,9 @@ public class Album implements Parcelable {
     @ColumnInfo(name = "dates")
     private List<LocalDate> dates = new ArrayList<>();
 
+    @ColumnInfo(name = "upload_dates")
+    private List<LocalDate> uploadDates = new ArrayList<>();
+
     @ColumnInfo(name = "categories")
     private List<String> categories = new ArrayList<>();
 
@@ -84,6 +87,7 @@ public class Album implements Parcelable {
         entries.add("\"imageListDownloaded\": " + imageListDownloaded);
         if (!persons.isEmpty()) entries.add("\"persons\":" + persons);
         if (!dates.isEmpty()) entries.add("\"dates\":" + dates);
+        if (!uploadDates.isEmpty()) entries.add("\"upload_dates\":" + uploadDates);
         if (!categories.isEmpty()) entries.add("\"categories\":" + categories);
         return entries.stream().collect(Collectors.joining(", ", "{", "}"));
     }
@@ -103,6 +107,10 @@ public class Album implements Parcelable {
         dest.writeTypedList(persons);
         dest.writeInt(dates.size());
         for (LocalDate date : dates) {
+            dest.writeSerializable(date);
+        }
+        dest.writeInt(uploadDates.size());
+        for (LocalDate date : uploadDates) {
             dest.writeSerializable(date);
         }
         dest.writeStringList(categories);
@@ -126,6 +134,11 @@ public class Album implements Parcelable {
                 album.dates.add((LocalDate) source.readSerializable());
             }
 
+            int uploadDateSize = source.readInt();
+            for (int i = 0; i < uploadDateSize; i++) {
+                album.uploadDates.add((LocalDate) source.readSerializable());
+            }
+
             source.readStringList(album.categories);
             source.readTypedList(album.images, Image.CREATOR);
 
@@ -146,6 +159,8 @@ public class Album implements Parcelable {
         @Nullable
         private final LocalDate day;
         @Nullable
+        private final LocalDate upload;
+        @Nullable
         private final Person owner;
         @Nullable
         private final String category;
@@ -155,6 +170,9 @@ public class Album implements Parcelable {
             String out = "";
             if (day != null) {
                 out += "&byday=" + DateTimeFormatter.ISO_LOCAL_DATE.format(day);
+            }
+            if (upload != null) {
+                out += "&byupload=" + DateTimeFormatter.ISO_LOCAL_DATE.format(upload);
             }
             if (owner != null) {
                 out += "&byowner=" + owner.getId();
@@ -171,7 +189,7 @@ public class Album implements Parcelable {
         }
 
         public boolean isEmpty() {
-            return day == null && owner == null && category == null;
+            return day == null && upload == null && owner == null && category == null;
         }
     }
 }

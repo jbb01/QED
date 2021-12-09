@@ -98,6 +98,24 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
                     <CheckBox
+                        android:id="@+id/album_upload_check_box"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingEnd="8dp"
+                        android:text="@string/album_upload_radio_button"
+                        tools:ignore="RtlSymmetry" />
+                    <Spinner
+                        android:id="@+id/album_upload_spinner"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:spinnerMode="dialog" />
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <CheckBox
                         android:id="@+id/album_category_check_box"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"

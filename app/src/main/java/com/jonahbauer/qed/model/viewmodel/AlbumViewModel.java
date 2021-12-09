@@ -105,6 +105,7 @@ public class AlbumViewModel extends AndroidViewModel {
                                       album.setPersons(album0.getPersons());
                                       album.setCategories(album0.getCategories());
                                       album.setDates(album0.getDates());
+                                      album.setUploadDates(album0.getUploadDates());
                                       album.setPrivate_(album0.isPrivate_());
                                       album.getImages().clear();
                                       album.getImages().addAll(images);

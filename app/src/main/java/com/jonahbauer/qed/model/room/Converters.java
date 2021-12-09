@@ -152,7 +152,7 @@ public class Converters {
 
             for (int i = 0, length = json.length(); i < length; i += 2) {
                 Person person = new Person(json.getLong(i));
-                person.setFirstName(json.getString(i + 1));
+                person.setUsername(json.getString(i + 1));
                 out.add(person);
             }
 
@@ -167,7 +167,7 @@ public class Converters {
         JSONArray jsonArray = new JSONArray();
         list.forEach(person -> {
             jsonArray.put(person.getId());
-            jsonArray.put(person.getFirstName());
+            jsonArray.put(person.getUsername());
         });
         return jsonArray.toString();
     }

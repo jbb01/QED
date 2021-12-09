@@ -104,6 +104,7 @@ public class QEDGalleryPages extends QEDPages {
     }
 
     @NonNull
+    @CheckReturnValue
     public static Single<Optional<Bitmap>> getThumbnail(@NonNull Image image) {
         AsyncLoadQEDPageToImage network = new AsyncLoadQEDPageToImage(
                 Feature.GALLERY,

@@ -48,6 +48,7 @@
     <string name="album_photographer_radio_button">Fotograph</string>
     <string name="album_not_downloaded">Dieses Album ist nicht heruntergeladen.</string>
     <string name="album_date_radio_button">Datum</string>
+    <string name="album_upload_radio_button">Upload</string>
     <string name="album_category_radio_button">Kategorie</string>
     <string name="drawer_chat_heading">Chat</string>
     <string name="drawer_chat_log">Log</string>
@@ -218,6 +219,7 @@
     <string name="album_subtitle_creation_date">Erstelldatum</string>
     <string name="album_title_dates">{0} - {1}</string>
     <string name="album_subtitle_dates">Zeitraum</string>
+    <string name="album_subtitle_upload_dates">Upload-Zeitraum</string>
     <string name="album_subtitle_image_count">Anzahl der Bilder</string>
     <string name="album_title_private">Privates Album</string>
 

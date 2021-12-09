@@ -58,6 +58,7 @@ public class GalleryAlbumActivity extends AppCompatActivity implements CompoundB
     private ImageAdapter mImageAdapter;
     private ArrayAdapter<String> mAdapterCategory;
     private CustomArrayAdapter<LocalDate> mAdapterDate;
+    private CustomArrayAdapter<LocalDate> mAdapterUpload;
     private CustomArrayAdapter<Person> mAdapterPhotographer;
 
     private ActivityResultLauncher<Intent> mImageLauncher;
@@ -88,6 +89,7 @@ public class GalleryAlbumActivity extends AppCompatActivity implements CompoundB
         mBinding.expandCheckBox.setOnCheckedChangeListener(this);
         mBinding.albumPhotographerCheckBox.setOnCheckedChangeListener(this);
         mBinding.albumDateCheckBox.setOnCheckedChangeListener(this);
+        mBinding.albumUploadCheckBox.setOnCheckedChangeListener(this);
         mBinding.albumCategoryCheckBox.setOnCheckedChangeListener(this);
 
         mAdapterCategory = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, new ArrayList<>());
@@ -106,6 +108,12 @@ public class GalleryAlbumActivity extends AppCompatActivity implements CompoundB
         mAdapterDate.setDropDownViewResource(android.R.layout.simple_list_item_single_choice);
         mBinding.albumDateSpinner.setAdapter(mAdapterDate);
         mBinding.albumDateSpinner.setEnabled(false);
+
+        mAdapterUpload = new CustomArrayAdapter<>(this, android.R.layout.simple_spinner_item, new ArrayList<>());
+        mAdapterUpload.setToString(TimeUtils::format);
+        mAdapterUpload.setDropDownViewResource(android.R.layout.simple_list_item_single_choice);
+        mBinding.albumUploadSpinner.setAdapter(mAdapterUpload);
+        mBinding.albumUploadSpinner.setEnabled(false);
 
         mBinding.searchButton.setOnClickListener(view -> search());
 
@@ -161,6 +169,10 @@ public class GalleryAlbumActivity extends AppCompatActivity implements CompoundB
             LocalDate date = (LocalDate) mBinding.albumDateSpinner.getSelectedItem();
             builder.setDay(date);
         }
+        if (mBinding.albumUploadCheckBox.isChecked()) {
+            LocalDate date = (LocalDate) mBinding.albumUploadSpinner.getSelectedItem();
+            builder.setUpload(date);
+        }
         if (mBinding.albumPhotographerCheckBox.isChecked()) {
             Person person = (Person) mBinding.albumPhotographerSpinner.getSelectedItem();
             builder.setOwner(person);
@@ -205,6 +217,10 @@ public class GalleryAlbumActivity extends AppCompatActivity implements CompoundB
             mAdapterDate.clear();
             mAdapterDate.addAll(album.getDates());
             mAdapterDate.notifyDataSetChanged();
+
+            mAdapterUpload.clear();
+            mAdapterUpload.addAll(album.getUploadDates());
+            mAdapterUpload.notifyDataSetChanged();
 
             mImageAdapter.clear();
             mImageAdapter.addAll(images);
@@ -283,6 +299,8 @@ public class GalleryAlbumActivity extends AppCompatActivity implements CompoundB
             mBinding.albumCategorySpinner.setEnabled(isChecked);
         } else if (id == R.id.album_date_check_box) {
             mBinding.albumDateSpinner.setEnabled(isChecked);
+        } else if (id == R.id.album_upload_check_box) {
+            mBinding.albumUploadSpinner.setEnabled(isChecked);
         }
     }
 
