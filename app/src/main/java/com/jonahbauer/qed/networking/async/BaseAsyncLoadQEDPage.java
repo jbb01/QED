@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 import com.jonahbauer.qed.networking.Feature;
 import com.jonahbauer.qed.networking.NetworkUtils;
+import com.jonahbauer.qed.networking.cookies.QEDCookieHandler;
 import com.jonahbauer.qed.networking.exceptions.InvalidCredentialsException;
 import com.jonahbauer.qed.networking.login.QEDLogin;
 
@@ -42,6 +43,7 @@ abstract class BaseAsyncLoadQEDPage {
 
     @NonNull
     private HttpsURLConnection createConnection(String url) throws IOException {
+        QEDCookieHandler.await();
         HttpsURLConnection httpsURLConnection = (HttpsURLConnection) (new URL(url).openConnection());
         httpsURLConnection.setRequestMethod("GET");
         httpsURLConnection.setInstanceFollowRedirects(false);

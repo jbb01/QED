@@ -5,12 +5,17 @@ import android.content.SharedPreferences;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
 import java.net.CookieStore;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class QEDCookieHandler {
     private static CookieManager INSTANCE;
+
+    private static final ReentrantLock lock = new ReentrantLock();
+    private static final Condition ready = lock.newCondition();
 
     public void init(SharedPreferences sharedPreferences) {
         if (INSTANCE != null) {
@@ -24,7 +29,13 @@ public class QEDCookieHandler {
 
         CookieManager.setDefault(manager);
 
-        INSTANCE = manager;
+        lock.lock();
+        try {
+            INSTANCE = manager;
+            ready.signalAll();
+        } finally {
+            lock.unlock();
+        }
     }
 
     public void invalidate() {
@@ -32,10 +43,23 @@ public class QEDCookieHandler {
     }
 
     public CookieManager getInstance() {
-        if (INSTANCE == null) {
-            throw new IllegalStateException("cookie handler has not yet been initialized");
-        } else {
-            return INSTANCE;
+        await();
+        return INSTANCE;
+    }
+
+    public void await() {
+        if (INSTANCE != null) return;
+        lock.lock();
+        try {
+            while (INSTANCE == null) {
+                ready.await();
+            }
+        } catch (InterruptedException e) {
+            var e2 = new IllegalStateException("cookie handler has not yet been initialized");
+            e2.addSuppressed(e);
+            throw e2;
+        } finally {
+            lock.unlock();
         }
     }
 }

@@ -29,8 +29,10 @@ import java.security.GeneralSecurityException;
 import java.util.HashSet;
 import java.util.Set;
 
+import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.exceptions.UndeliverableException;
 import io.reactivex.rxjava3.plugins.RxJavaPlugins;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class Application extends android.app.Application implements android.app.Application.ActivityLifecycleCallbacks {
     private static final String LOG_TAG = Application.class.getName();
@@ -76,13 +78,16 @@ public class Application extends android.app.Application implements android.app.
             Log.e(LOG_TAG, "Undeliverable Exception", e);
         });
 
-        // Setup cookie handler
-        SharedPreferences cookieSharedPreferences = getEncryptedSharedPreferences(COOKIE_SHARED_PREFERENCE_FILE);
-        QEDCookieHandler.init(cookieSharedPreferences);
+        // handle encrypted shared preferences asynchronously
+        Observable.fromRunnable(() -> {
+            // Setup cookie handler
+            SharedPreferences cookieSharedPreferences = Application.this.getEncryptedSharedPreferences(COOKIE_SHARED_PREFERENCE_FILE);
+            QEDCookieHandler.init(cookieSharedPreferences);
 
-        // Setup password storage
-        EncryptedSharedPreferences passwordSharedPreferences = getEncryptedSharedPreferences(ENCRYPTED_SHARED_PREFERENCE_FILE);
-        PasswordStorage.init(passwordSharedPreferences);
+            // Setup password storage
+            EncryptedSharedPreferences passwordSharedPreferences = Application.this.getEncryptedSharedPreferences(ENCRYPTED_SHARED_PREFERENCE_FILE);
+            PasswordStorage.init(passwordSharedPreferences);
+        }).subscribeOn(Schedulers.computation()).subscribe();
 
         // Setup preferences
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);

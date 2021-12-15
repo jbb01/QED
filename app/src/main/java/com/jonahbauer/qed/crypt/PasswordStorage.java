@@ -4,6 +4,8 @@ import android.util.Pair;
 
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 import lombok.experimental.UtilityClass;
 
@@ -12,17 +14,25 @@ public class PasswordStorage {
     private static final String KEY_USERNAME = "username";
     private static final String KEY_PASSWORD = "password";
 
-    private EncryptedSharedPreferences mSharedPreferences;
-    private boolean mInitialized;
+    private static EncryptedSharedPreferences mSharedPreferences;
+
+    private static final ReentrantLock lock = new ReentrantLock();
+    private static final Condition ready = lock.newCondition();
 
     public void init(EncryptedSharedPreferences sharedPreferences) {
-        if (mInitialized) throw new IllegalStateException("PasswordStorage is already initialized.");
-        mSharedPreferences = sharedPreferences;
-        mInitialized = true;
+        if (mSharedPreferences != null) throw new IllegalStateException("PasswordStorage is already initialized.");
+
+        lock.lock();
+        try {
+            mSharedPreferences = sharedPreferences;
+            ready.signalAll();
+        } finally {
+            lock.unlock();
+        }
     }
 
     public boolean saveUsernameAndPassword(String username, char[] password) {
-        if (!mInitialized) throw new IllegalStateException("PasswordStorage is not initialized.");
+        awaitInit();
 
         try {
             mSharedPreferences.edit()
@@ -36,7 +46,7 @@ public class PasswordStorage {
     }
 
     public Pair<String, char[]> loadUsernameAndPassword() {
-        if (!mInitialized) throw new IllegalStateException("PasswordStorage is not initialized.");
+        awaitInit();
 
         String username = mSharedPreferences.getString(KEY_USERNAME, null);
         char[] password = Optional.ofNullable(mSharedPreferences.getByteArray(KEY_PASSWORD, null))
@@ -47,11 +57,28 @@ public class PasswordStorage {
     }
 
     public boolean clearCredentials() {
-        if (!mInitialized) throw new IllegalStateException("PasswordStorage is not initialized.");
+        awaitInit();
 
         return mSharedPreferences.edit()
                                  .remove(KEY_USERNAME)
                                  .remove(KEY_PASSWORD)
                                  .commit();
+    }
+
+    private void awaitInit() {
+        if (mSharedPreferences == null) {
+            lock.lock();
+            try {
+                while (mSharedPreferences == null) {
+                    ready.await();
+                }
+            } catch (InterruptedException e) {
+                var e2 = new IllegalStateException("PasswordStorage is not initialized.");
+                e2.addSuppressed(e);
+                throw e2;
+            } finally {
+                lock.unlock();
+            }
+        }
     }
 }
