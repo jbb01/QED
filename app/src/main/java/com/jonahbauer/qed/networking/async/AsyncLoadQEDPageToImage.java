@@ -6,7 +6,9 @@ import android.graphics.BitmapFactory;
 import androidx.annotation.NonNull;
 
 import com.jonahbauer.qed.networking.Feature;
+import com.jonahbauer.qed.networking.NetworkUtils;
 
+import java.io.IOException;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 
@@ -39,11 +41,17 @@ public final class AsyncLoadQEDPageToImage extends BaseAsyncLoadQEDPage implemen
             }
         }
 
-        Bitmap bitmap = BitmapFactory.decodeStream(httpsURLConnection.getInputStream());
+        byte[] data = NetworkUtils.readAllBytes(httpsURLConnection.getInputStream());
 
         httpsURLConnection.disconnect();
 
-        //noinspection OptionalAssignedToNull
-        return bitmap != null ? Optional.of(bitmap) : null;
+        Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+
+
+        if (bitmap == null) {
+            throw new IOException("Could not load image from " + mUrl + ".");
+        } else {
+            return Optional.of(bitmap);
+        }
     }
 }

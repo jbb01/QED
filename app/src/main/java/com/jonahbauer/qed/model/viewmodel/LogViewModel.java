@@ -10,7 +10,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.jonahbauer.qed.model.LogRequest;
-import com.jonahbauer.qed.model.LogRequest.*;
+import com.jonahbauer.qed.model.LogRequest.FileLogRequest;
 import com.jonahbauer.qed.model.Message;
 import com.jonahbauer.qed.networking.Reason;
 import com.jonahbauer.qed.networking.async.QEDPageStreamReceiver;
@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import it.unimi.dsi.fastutil.longs.LongLongImmutablePair;
@@ -70,7 +71,9 @@ public class LogViewModel extends AndroidViewModel {
     }
 
     public void load(@NonNull LogRequest logRequest) {
-        mLogRequest.setValue(logRequest);
+        if (!Objects.equals(mLogRequest.getValue(), logRequest)) {
+            mLogRequest.setValue(logRequest);
+        }
     }
 
     public LiveData<StatusWrapper<List<Message>>> getMessages() {

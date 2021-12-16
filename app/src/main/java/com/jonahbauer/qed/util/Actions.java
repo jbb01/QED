@@ -72,12 +72,20 @@ public class Actions {
     }
 
     public static void copy(@NonNull Context context, @Nullable View view, String label, String text) {
+        copy(context, view, null, label, text);
+    }
+
+    public static void copy(@NonNull Context context, @Nullable View view, @Nullable View anchorView, String label, String text) {
         ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
         ClipData clip = ClipData.newPlainText(label, text);
         clipboard.setPrimaryClip(clip);
 
         if (view != null) {
-            Snackbar.make(view, R.string.copied, Snackbar.LENGTH_SHORT).show();
+            var snackbar = Snackbar.make(view, R.string.copied, Snackbar.LENGTH_SHORT);
+            if (anchorView != null) {
+                snackbar.setAnchorView(anchorView);
+            }
+            snackbar.show();
         }
     }
 

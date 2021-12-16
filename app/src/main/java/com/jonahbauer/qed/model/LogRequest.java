@@ -1,6 +1,11 @@
 package com.jonahbauer.qed.model;
 
-import static com.jonahbauer.qed.model.LogRequest.Mode.*;
+import static com.jonahbauer.qed.model.LogRequest.Mode.DATE_INTERVAL;
+import static com.jonahbauer.qed.model.LogRequest.Mode.DATE_RECENT;
+import static com.jonahbauer.qed.model.LogRequest.Mode.FILE;
+import static com.jonahbauer.qed.model.LogRequest.Mode.POST_INTERVAL;
+import static com.jonahbauer.qed.model.LogRequest.Mode.POST_RECENT;
+import static com.jonahbauer.qed.model.LogRequest.Mode.SINCE_OWN;
 
 import android.content.res.Resources;
 import android.net.Uri;
@@ -32,6 +37,7 @@ import lombok.Getter;
 @Keep
 public abstract class LogRequest implements Serializable {
     private final Mode mode;
+    private final long timestamp = System.currentTimeMillis();
 
     protected LogRequest(Mode mode) {
         this.mode = mode;
@@ -43,6 +49,7 @@ public abstract class LogRequest implements Serializable {
 
     @Nullable
     @Contract("null -> null")
+    @SuppressWarnings("ConstantConditions")
     public static LogRequest parse(@Nullable Uri uri) {
         if (uri == null) return null;
 

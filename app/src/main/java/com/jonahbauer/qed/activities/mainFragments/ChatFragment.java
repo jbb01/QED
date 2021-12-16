@@ -392,7 +392,8 @@ public class ChatFragment extends Fragment implements NetworkListener, AbsListVi
                 msg -> NavHostFragment.findNavController(this)
                                       .navigate(ChatFragmentDirections.showMessage(msg)),
                 position,
-                value
+                value,
+                mBinding.editTextMessage
         );
     }
 

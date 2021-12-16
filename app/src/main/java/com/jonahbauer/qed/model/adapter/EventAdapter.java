@@ -69,7 +69,7 @@ public class EventAdapter extends ArrayAdapter<Event> implements SectionIndexer 
 
     private final Function<Event, String> mHeaderMap = event -> {
         if (event.getStart() != null)
-            return String.format("%1$tY", event.getStart());
+            return String.valueOf(event.getStart().getYear());
         else
             return "0000";
     };

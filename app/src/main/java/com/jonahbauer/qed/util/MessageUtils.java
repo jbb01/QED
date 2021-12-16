@@ -5,9 +5,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SoundEffectConstants;
+import android.view.View;
 import android.widget.ListView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.view.ActionMode;
 import androidx.fragment.app.Fragment;
 
@@ -24,6 +26,7 @@ import java.time.Month;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -32,7 +35,8 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class MessageUtils {
-    private static final String COPY_FORMAT = "%3$tm-%3$td %3$tH:%3$tM:%3$tS\t%4$s\t%1$s:\t%2$s";
+    private static final String COPY_FORMAT = "%3$s\t%4$s\t%1$s:\t%2$s";
+    private static final DateTimeFormatter COPY_TIME_FORMAT = DateTimeFormatter.ofPattern("MM-dd HH:mm:ss");
     private static final String LOG_TAG = MessageUtils.class.getName();
 
     /**
@@ -45,7 +49,8 @@ public class MessageUtils {
                                   @NonNull ListView listView,
                                   @NonNull MessageAdapter adapter,
                                   @NonNull Consumer<Message> info,
-                                  int position, boolean value) {
+                                  int position, boolean value,
+                                  @Nullable View anchorView) {
         listView.setItemChecked(position, value);
 
         Activity activity = fragment.getActivity();
@@ -75,20 +80,25 @@ public class MessageUtils {
                             info.accept(msg);
                             return true;
                         } else if (item.getItemId() == R.id.message_copy) {
-                            Actions.copy(fragment.requireContext(), fragment.requireView(), msg.getName(), msg.getMessage());
+                            Actions.copy(fragment.requireContext(), fragment.requireView(), anchorView, msg.getName(), msg.getMessage());
                             return true;
                         } else if (item.getItemId() == R.id.message_reply) {
                             if (fragment instanceof ChatFragment) {
                                 var chatFragment = (ChatFragment) fragment;
                                 var text = chatFragment.getText();
                                 var reply = MessageUtils.copyFormat(msg);
+                                Snackbar snackbar;
                                 if (!text.toString().startsWith(reply)) {
                                     text.insert(0, reply + "\n\n");
-                                    Snackbar.make(chatFragment.requireView(), R.string.message_reply_prepended, Snackbar.LENGTH_SHORT).show();
+                                    snackbar = Snackbar.make(chatFragment.requireView(), R.string.message_reply_prepended, Snackbar.LENGTH_SHORT);
                                     mainActivity.finishActionMode();
                                 } else {
-                                    Snackbar.make(chatFragment.requireView(), R.string.message_reply_present, Snackbar.LENGTH_SHORT).show();
+                                    snackbar = Snackbar.make(chatFragment.requireView(), R.string.message_reply_present, Snackbar.LENGTH_SHORT);
                                 }
+                                if (anchorView != null) {
+                                    snackbar.setAnchorView(anchorView);
+                                }
+                                snackbar.show();
                             } else {
                                 Log.e(LOG_TAG, "Reply button click received but not in ChatFragment.");
                             }
@@ -118,6 +128,17 @@ public class MessageUtils {
                 mainActivity.finishActionMode();
             }
         }
+    }
+
+    /**
+     * @see #setChecked(Fragment, ListView, MessageAdapter, Consumer, int, boolean, View)
+     */
+    public static void setChecked(@NonNull Fragment fragment,
+                                  @NonNull ListView listView,
+                                  @NonNull MessageAdapter adapter,
+                                  @NonNull Consumer<Message> info,
+                                  int position, boolean value) {
+        setChecked(fragment, listView, adapter, info, position, value, null);
     }
 
     /**
@@ -186,7 +207,7 @@ public class MessageUtils {
                 COPY_FORMAT,
                 message.getName(),
                 message.getMessage(),
-                ZonedDateTime.ofInstant(message.getDate(), NetworkConstants.SERVER_TIME_ZONE),
+                ZonedDateTime.ofInstant(message.getDate(), NetworkConstants.SERVER_TIME_ZONE).format(COPY_TIME_FORMAT),
                 message.getUserName() != null ? "✓" : ""
         );
     }
