@@ -11,62 +11,63 @@
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:elevation="2dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="5dp"
-        android:clipToPadding="false"
         android:layout_gravity="center"
         android:background="?colorSurface"
+        android:clipToPadding="false"
         android:descendantFocusability="blocksDescendants">
 
         <ImageView
             android:id="@+id/thumbnail"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@id/image_title"
-            app:layout_constraintTop_toTopOf="parent"
+            android:layout_gravity="center"
+            android:importantForAccessibility="no"
+            android:padding="0dp"
+            android:scaleType="centerCrop"
+            android:src="@{thumbnail}"
+            android:visibility="@{thumbnail != null ? View.VISIBLE : View.INVISIBLE}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="w,1:1"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintDimensionRatio="w,1:1"
-            android:padding="0dp"
-            android:layout_gravity="center"
-            android:scaleType="centerCrop"
-            android:importantForAccessibility="no"
-            android:visibility="@{thumbnail != null ? View.VISIBLE : View.INVISIBLE}"
-            android:src="@{thumbnail}"
+            app:layout_constraintTop_toTopOf="parent"
             tools:src="@drawable/ic_gallery_image"
             tools:tint="@android:color/holo_green_dark"
-            tools:visibility="visible"/>
-
-        <TextView
-            android:id="@+id/image_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="@id/thumbnail"
-            app:layout_constraintEnd_toEndOf="@id/thumbnail"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:textAlignment="center"
-            android:singleLine="true"
-            android:ellipsize="middle"
-            android:text="@{image.name}"
-            android:textAppearance="?textAppearanceListItem"
-            tools:text="test.png"/>
+            tools:visibility="visible" />
 
         <ProgressBar
-            app:layout_constraintBottom_toTopOf="@id/image_title"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintWidth_percent="0.5"
-            app:layout_constraintDimensionRatio="w,1:1"
+            style="?android:attr/progressBarStyleLarge"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_gravity="center_horizontal"
             android:gravity="center_horizontal"
             android:visibility="@{thumbnail == null ? View.VISIBLE : View.GONE}"
-            style="?android:attr/progressBarStyleLarge"
-            tools:visibility="visible"/>
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="w,1:1"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_percent="0.5"
+            tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/image_title"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="#80000000"
+            android:textColor="@android:color/white"
+            android:ellipsize="middle"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="16dp"
+            android:singleLine="true"
+            android:text="@{image.name}"
+            android:textAppearance="?textAppearanceSubtitle1"
+            app:layout_constraintBottom_toBottomOf="@id/thumbnail"
+            app:layout_constraintEnd_toEndOf="@id/thumbnail"
+            app:layout_constraintStart_toStartOf="@id/thumbnail"
+            tools:text="test.png" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
