@@ -18,7 +18,7 @@ public interface QEDPageReceiver<T> extends Callback<T> {
     @CallSuper
     @MainThread
     default void onError(T out, @NonNull Reason reason, @Nullable Throwable cause) {
-        Log.e(getClass().getName(), out + ":" + reason, cause);
+        Log.e(getClass().getName(), "An error occurred. reason=" + reason + " data=" + out, cause);
     }
 
     @MainThread

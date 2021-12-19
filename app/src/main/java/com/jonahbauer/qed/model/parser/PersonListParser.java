@@ -8,7 +8,6 @@ import com.jonahbauer.qed.model.Person;
 import com.jonahbauer.qed.networking.parser.HtmlParser;
 
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.List;
@@ -31,22 +30,66 @@ public final class PersonListParser extends HtmlParser<List<Person>> {
                     try {
                         Elements columns = tr.select("td");
 
-                        String firstName = columns.get(1).select("a").text();
-                        String lastName = columns.get(2).select("a").text();
-                        Element emailElement = columns.get(5).select("a").first();
-                        String email = emailElement != null ? emailElement.text() : null;
                         long id = Long.parseLong(columns.get(8).text());
-                        String username = columns.get(9).text();
-                        boolean active = "Ja".equals(columns.get(10).text());
-                        boolean member = "Ja".equals(columns.get(11).text());
-
                         Person person = new Person(id);
-                        person.setUsername(username);
-                        person.setFirstName(firstName);
-                        person.setLastName(lastName);
-                        person.setEmail(email);
-                        person.setActive(active);
-                        person.setMember(member);
+
+                        firstName: try {
+                            var element = columns.get(1).selectFirst("a");
+                            if (element == null) break firstName;
+                            person.setFirstName(element.text());
+                        } catch (Exception ignored) {}
+
+                        lastName: try {
+                            var element = columns.get(2).selectFirst("a");
+                            if (element == null) break lastName;
+                            person.setLastName(element.text());
+                        } catch (Exception ignored) {}
+
+                        birthday: try {
+                            var element = columns.get(4).selectFirst("time");
+                            if (element == null) break birthday;
+                            person.setBirthdayString(element.text());
+                            person.setBirthday(parseLocalDate(element.attr("datetime")));
+                        } catch (Exception ignored) {}
+
+                        email: try {
+                            var element = columns.get(5).selectFirst("a");
+                            if (element == null) break email;
+                            person.setEmail(element.text());
+                        } catch (Exception ignored) {}
+
+                        username: try {
+                            var element = columns.get(9);
+                            if (element == null) break username;
+                            person.setUsername(element.text());
+                        } catch (Exception ignored) {}
+
+                        active: try {
+                            var element = columns.get(10);
+                            if (element == null) break active;
+                            person.setActive("Ja".equals(element.text()));
+                        } catch (Exception ignored) {}
+
+                        member: try {
+                            var element = columns.get(11);
+                            if (element == null) break member;
+                            person.setMember("Ja".equals(element.text()));
+                        } catch (Exception ignored) {}
+
+                        dateOfJoining: try {
+                            var element = columns.get(12).selectFirst("time");
+                            if (element == null) break dateOfJoining;
+                            person.setDateOfJoiningString(element.text());
+                            person.setDateOfJoining(parseLocalDate(element.attr("datetime")));
+                        } catch (Exception ignored) {}
+
+
+                        leavingDate: try {
+                            var element = columns.get(13).selectFirst("time");
+                            if (element == null) break leavingDate;
+                            person.setLeavingDateString(element.text());
+                            person.setLeavingDate(parseLocalDate(element.attr("datetime")));
+                        } catch (Exception ignored) {}
 
                         return person;
                     } catch (Exception e) {

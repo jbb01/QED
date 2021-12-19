@@ -10,13 +10,16 @@ import com.jonahbauer.qed.networking.parser.HtmlParser;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public final class EventListParser extends HtmlParser<List<Event>> {
     private static final String LOG_TAG = EventListParser.class.getName();
     public static final EventListParser INSTANCE = new EventListParser();
+
+    private static final Pattern COST_PATTERN = Pattern.compile("(\\d+(?:,\\d+))\\s*€");
 
     private EventListParser() {}
 
@@ -31,21 +34,55 @@ public final class EventListParser extends HtmlParser<List<Event>> {
                     try {
                         Elements columns = tr.select("td");
 
-                        String title = columns.get(1).select("a").text();
-                        String startString = columns.get(2).select("time").text();
-                        String endString = columns.get(3).select("time").text();
-
-                        LocalDate start = parseLocalDate(columns.get(2).select("time").attr("datetime"));
-                        LocalDate end = parseLocalDate(columns.get(3).select("time").attr("datetime"));
-
                         long id = Long.parseLong(columns.get(1).select("a").attr("href").substring("/events/".length()));
-
                         Event event = new Event(id);
-                        event.setTitle(title);
-                        event.setStartString(startString);
-                        event.setEndString(endString);
-                        event.setStart(start);
-                        event.setEnd(end);
+
+                        title: try {
+                            var element = columns.get(1).selectFirst("a");
+                            if (element == null) break title;
+                            event.setTitle(element.text());
+                        } catch (Exception ignored) {}
+
+                        start: try {
+                            var element = columns.get(2).selectFirst("time");
+                            if (element == null) break start;
+                            event.setStartString(element.text());
+                            event.setStart(parseLocalDate(element.attr("datetime")));
+                        } catch (Exception ignored) {}
+
+                        end: try {
+                            var element = columns.get(3).selectFirst("time");
+                            if (element == null) break end;
+                            event.setEndString(element.text());
+                            event.setEnd(parseLocalDate(element.attr("datetime")));
+                        } catch (Exception ignored) {}
+
+                        deadline: try {
+                            var element = columns.get(5).selectFirst("time");
+                            if (element == null) break deadline;
+                            event.setDeadlineString(element.text());
+                            event.setDeadline(parseLocalDate(element.attr("datetime")));
+                        } catch (Exception ignored) {}
+
+                        cost: try {
+                            var element = columns.get(6).selectFirst("cost");
+                            if (element == null) break cost;
+                            String costText = element.text();
+                            Matcher costMatcher = COST_PATTERN.matcher(costText);
+                            if (costMatcher.find()) {
+                                String match = costMatcher.group(1);
+                                if (match != null) {
+                                    match = match.replace(',', '.');
+                                    event.setCost((int) Double.parseDouble(match));
+                                }
+                            }
+                        } catch (Exception ignored) {}
+
+                        maxParticipants: try {
+                            var element = columns.get(7);
+                            if (element == null) break maxParticipants;
+                            event.setMaxParticipants(Integer.parseInt(element.text()));
+                        } catch (NumberFormatException ignored) {}
 
                         return event;
                     } catch (Exception e) {
