@@ -7,9 +7,9 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.MenuItem;
 import android.view.ViewParent;
 import android.widget.Toast;
-
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
@@ -26,7 +26,6 @@ import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
-
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.jonahbauer.qed.BuildConfig;
@@ -35,17 +34,15 @@ import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.databinding.ActivityMainBinding;
 import com.jonahbauer.qed.networking.NetworkListener;
 import com.jonahbauer.qed.networking.login.QEDLogout;
-
-import java.util.List;
-
 import it.unimi.dsi.fastutil.ints.IntSet;
 import lombok.Getter;
+
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements NetworkListener, NavController.OnDestinationChangedListener {
     private static final String LOG_TAG = MainActivity.class.getName();
 
     private ActivityMainBinding mBinding;
-    private boolean mDoubleBackToExit;
 
     private final IntSet mTopLevelDestinations = IntSet.of(
             R.id.nav_chat, R.id.nav_chat_log, R.id.nav_chat_db,
@@ -54,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements NetworkListener, 
             R.id.nav_login
     );
     private AppBarConfiguration mAppBarConfiguration;
+    private NavController mNavController;
 
     private ActionMode mActionMode;
 
@@ -70,66 +68,22 @@ public class MainActivity extends AppCompatActivity implements NetworkListener, 
         DrawerLayout drawerLayout = mBinding.drawerLayout;
         NavigationView navigationView = mBinding.navView;
 
-        NavController navController = Navigation.findNavController(this, R.id.nav_host);
+        mNavController = Navigation.findNavController(this, R.id.nav_host);
 
         mAppBarConfiguration = new AppBarConfiguration.Builder(mTopLevelDestinations)
                 .setOpenableLayout(drawerLayout)
                 .build();
-        NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
-        NavigationUI.setupWithNavController(navigationView, navController);
+        NavigationUI.setupActionBarWithNavController(this, mNavController, mAppBarConfiguration);
+        NavigationUI.setupWithNavController(navigationView, mNavController);
 
-        navController.addOnDestinationChangedListener(this);
+        mNavController.addOnDestinationChangedListener(this);
 
         navigationView.getMenu()
                       .findItem(R.id.nav_logout)
-                      .setOnMenuItemClickListener(item -> {
-                          QEDLogout.logoutAsync(success -> {
-                              if (!success) {
-                                  Log.e(LOG_TAG, "An error occured during logout.");
-                              } else {
-                                  Snackbar.make(mBinding.getRoot(), R.string.logout_success, Snackbar.LENGTH_SHORT)
-                                          .show();
-                              }
-                          });
-
-                          navController.navigate(MainDirections.login());
-                          ViewParent viewParent = mBinding.navView.getParent();
-                          if (viewParent instanceof Openable) {
-                              ((Openable) viewParent).close();
-                          }
-                          return true;
-                      });
+                      .setOnMenuItemClickListener(this::onLogout);
 
         // double tap to exit
-        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                NavBackStackEntry currentEntry = navController.getCurrentBackStackEntry();
-                if (currentEntry != null) {
-                    if (mTopLevelDestinations.contains(currentEntry.getDestination().getId())) {
-                        if (mDoubleBackToExit) {
-                            finish();
-                        } else {
-                            mDoubleBackToExit = true;
-                            Toast.makeText(MainActivity.this, R.string.double_back_to_exit_toast, Toast.LENGTH_SHORT).show();
-                            new Handler(Looper.getMainLooper()).postDelayed(() -> mDoubleBackToExit = false, 2000);
-                        }
-                        return;
-                    }
-                }
-
-                NavBackStackEntry previousEntry = navController.getPreviousBackStackEntry();
-                if (mDoubleBackToExit || (previousEntry != null )) {
-                    this.setEnabled(false);
-                    getOnBackPressedDispatcher().onBackPressed();
-                    this.setEnabled(true);
-                } else {
-                    mDoubleBackToExit = true;
-                    Toast.makeText(MainActivity.this, R.string.double_back_to_exit_toast, Toast.LENGTH_SHORT).show();
-                    new Handler(Looper.getMainLooper()).postDelayed(() -> mDoubleBackToExit = false, 2000);
-                }
-            }
-        });
+        getOnBackPressedDispatcher().addCallback(this, new BackPressedCallback());
     }
 
     @Override
@@ -148,6 +102,24 @@ public class MainActivity extends AppCompatActivity implements NetworkListener, 
             }
         }
         return null;
+    }
+
+    private boolean onLogout(MenuItem item) {
+        QEDLogout.logoutAsync(success -> {
+            if (!success) {
+                Log.e(LOG_TAG, "An error occured during logout.");
+            } else {
+                Snackbar.make(mBinding.getRoot(), R.string.logout_success, Snackbar.LENGTH_SHORT)
+                        .show();
+            }
+        });
+
+        mNavController.navigate(MainDirections.login());
+        ViewParent viewParent = mBinding.navView.getParent();
+        if (viewParent instanceof Openable) {
+            ((Openable) viewParent).close();
+        }
+        return true;
     }
 
     //<editor-fold desc="Action Modes" defaultstate="collapsed">
@@ -252,6 +224,44 @@ public class MainActivity extends AppCompatActivity implements NetworkListener, 
                 }
             }
             return defaultValue;
+        }
+    }
+
+    private class BackPressedCallback extends OnBackPressedCallback {
+        private boolean mDoubleBackToExit = false;
+
+        public BackPressedCallback() {
+            super(true);
+        }
+
+        @Override
+        public void handleOnBackPressed() {
+            NavBackStackEntry currentEntry = mNavController.getCurrentBackStackEntry();
+            if (currentEntry != null) {
+                if (mTopLevelDestinations.contains(currentEntry.getDestination().getId())) {
+                    if (mDoubleBackToExit) {
+                        finish();
+                    } else {
+                        pressAgain();
+                    }
+                    return;
+                }
+            }
+
+            NavBackStackEntry previousEntry = mNavController.getPreviousBackStackEntry();
+            if (mDoubleBackToExit || (previousEntry != null)) {
+                this.setEnabled(false);
+                getOnBackPressedDispatcher().onBackPressed();
+                this.setEnabled(true);
+            } else {
+                pressAgain();
+            }
+        }
+
+        private void pressAgain() {
+            mDoubleBackToExit = true;
+            Toast.makeText(MainActivity.this, R.string.double_back_to_exit_toast, Toast.LENGTH_SHORT).show();
+            new Handler(Looper.getMainLooper()).postDelayed(() -> mDoubleBackToExit = false, 2000);
         }
     }
 }
