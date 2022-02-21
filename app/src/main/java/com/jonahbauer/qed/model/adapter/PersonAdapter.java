@@ -110,6 +110,17 @@ public class PersonAdapter extends FixedHeaderAdapter<Person, Character> {
         this.mSort = sort;
     }
 
+    @Override
+    public long getItemId(int position) {
+        var item = getItem(position);
+        return item != null ? item.getId() : -1;
+    }
+
+    @Override
+    public boolean hasStableIds() {
+        return true;
+    }
+
     public enum SortMode {
         FIRST_NAME, LAST_NAME
     }

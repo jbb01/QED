@@ -29,4 +29,24 @@
 
     <color name="dateBannerBackground">#E0E0FF</color>
 
+    <color name="accent_charm_purple_dark">#ff9798d8</color>
+    <color name="accent_charm_purple_light">#ff9066af</color>
+    <color name="accent_default_dark">#ff7ca1cc</color>
+    <color name="accent_default_light">#ff55759b</color>
+    <color name="accent_fashion_pink_dark">#ffce81ab</color>
+    <color name="accent_fashion_pink_light">#ffae5083</color>
+    <color name="accent_golden_dark">#ffcc9c6b</color>
+    <color name="accent_golden_light">#ffc2864e</color>
+    <color name="accent_grass_green_dark">#ff5de55c</color>
+    <color name="accent_grass_green_light">#ff789d3e</color>
+    <color name="accent_lemon_yellow_dark">#ffd2be72</color>
+    <color name="accent_lemon_yellow_light">#ffbb9658</color>
+    <color name="accent_material_dark">@color/material_deep_teal_200</color>
+    <color name="accent_material_light">@color/material_deep_teal_500</color>
+    <color name="accent_sky_blue_dark">#ff66bfd4</color>
+    <color name="accent_sky_blue_light">#ff3794ac</color>
+    <color name="accent_star_wars">#ffff2837</color>
+    <color name="accent_vigour_red_dark">#ffd88e89</color>
+    <color name="accent_vigour_red_light">#ffa04a43</color>
+
 </resources>

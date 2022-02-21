@@ -161,4 +161,15 @@ public class ImageAdapter extends ArrayAdapter<Image> {
     public List<Image> getImages() {
         return mImageList;
     }
+
+    @Override
+    public long getItemId(int position) {
+        var item = getItem(position);
+        return item != null ? item.getId() : -1;
+    }
+
+    @Override
+    public boolean hasStableIds() {
+        return true;
+    }
 }

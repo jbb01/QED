@@ -41,4 +41,15 @@ public class AlbumAdapter extends ArrayAdapter<Album> {
         binding.setAlbum(album);
         return binding.getRoot();
     }
+
+    @Override
+    public long getItemId(int position) {
+        var item = getItem(position);
+        return item != null ? item.getId() : -1;
+    }
+
+    @Override
+    public boolean hasStableIds() {
+        return true;
+    }
 }

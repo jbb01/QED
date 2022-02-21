@@ -122,4 +122,15 @@ public class EventAdapter extends ArrayAdapter<Event> implements SectionIndexer 
         return mSectionForPosition[position];
     }
     //</editor-fold>
+
+    @Override
+    public long getItemId(int position) {
+        var item = getItem(position);
+        return item != null ? item.getId() : -1;
+    }
+
+    @Override
+    public boolean hasStableIds() {
+        return true;
+    }
 }

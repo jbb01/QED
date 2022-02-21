@@ -222,6 +222,11 @@ public class MainActivity extends AppCompatActivity implements NetworkListener, 
         if (drawerSelection != null) {
             mBinding.navView.setCheckedItem(drawerSelection.getMenuItemId());
         }
+
+        var lockMode = mTopLevelDestinations.contains(destination.getId())
+                ? DrawerLayout.LOCK_MODE_UNLOCKED
+                : DrawerLayout.LOCK_MODE_LOCKED_CLOSED;
+        mBinding.drawerLayout.setDrawerLockMode(lockMode);
     }
 
     @Getter

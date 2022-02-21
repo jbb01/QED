@@ -25,6 +25,10 @@ import com.jonahbauer.qed.model.viewmodel.ImageInfoViewModel;
 import com.jonahbauer.qed.util.StatusWrapper;
 import com.jonahbauer.qed.util.ViewUtils;
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Single;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import org.jetbrains.annotations.Contract;
 
 import java.io.File;
@@ -81,6 +85,8 @@ public class ImageInfoFragment extends Fragment {
     private FragmentImageInfoBinding mBinding;
     private ImageInfoViewModel mImageInfoViewModel;
 
+    private final CompositeDisposable mDisposable = new CompositeDisposable();
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -125,6 +131,7 @@ public class ImageInfoFragment extends Fragment {
     @Override
     public void onStop() {
         ViewUtils.resetActionStatusBarColor(this);
+        mDisposable.clear();
         super.onStop();
     }
 
@@ -135,16 +142,7 @@ public class ImageInfoFragment extends Fragment {
 
         // histogram
         if (image.getPath() != null) {
-            File file = new File(image.getPath());
-            if (file.exists()) {
-                Bitmap bitmap = BitmapFactory.decodeFile(image.getPath());
-                if (bitmap != null) {
-                    image.getData().put(Image.DATA_KEY_RESOLUTION, bitmap.getWidth() + "x" + bitmap.getHeight());
-
-                    mBinding.histogram.setBitmap(bitmap);
-                    mBinding.histogramLayout.setVisibility(View.VISIBLE);
-                }
-            }
+            asyncLoadHistogramm(image);
         }
 
         // image info
@@ -213,6 +211,36 @@ public class ImageInfoFragment extends Fragment {
              });
     }
 
+    private void asyncLoadHistogramm(Image image) {
+        mBinding.histogramLayout.setVisibility(View.VISIBLE);
+
+        var bitmapSingle = Single.fromCallable(() -> {
+            File file = new File(image.getPath());
+            if (file.exists()) {
+                Bitmap bitmap = BitmapFactory.decodeFile(image.getPath());
+                if (bitmap != null) {
+                    return bitmap;
+                }
+            }
+            throw new NullPointerException();
+        });
+
+        mDisposable.add(
+                bitmapSingle.subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(
+                                    bitmap -> {
+                                        image.getData().put(Image.DATA_KEY_RESOLUTION, bitmap.getWidth() + "x" + bitmap.getHeight());
+
+                                        mBinding.histogram.setBitmap(bitmap);
+                                        mBinding.histogramLayout.setVisibility(View.VISIBLE);
+                                    },
+                                    throwable -> {
+                                        mBinding.histogramLayout.setVisibility(View.GONE);
+                                    }
+                            )
+        );
+    }
 
     private void addLine(@StringRes int resId, String value, LinearLayout container) {
         addLine(getString(resId), value, container);

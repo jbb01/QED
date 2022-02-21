@@ -73,7 +73,7 @@ public class GalleryFragment extends Fragment implements AdapterView.OnItemClick
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Album album = mAlbumAdapter.getItem((int) id);
+        Album album = mAlbumAdapter.getItem(position);
 
         if (album == null) return;
         if (isOnline() || album.getImageListDownloaded() != null) {

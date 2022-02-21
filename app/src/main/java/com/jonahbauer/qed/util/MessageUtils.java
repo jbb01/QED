@@ -65,7 +65,7 @@ public class MessageUtils {
                 var actionModeCallBack = new ActionMode.Callback() {
                     @Override
                     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-                        mainActivity.getMenuInflater().inflate(R.menu.menu_message, menu);
+                        mode.getMenuInflater().inflate(R.menu.menu_message, menu);
                         return true;
                     }
 
