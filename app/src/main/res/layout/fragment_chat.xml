@@ -11,12 +11,11 @@
     </data>
 
     <RelativeLayout
+        android:id="@+id/fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".activities.mainFragments.ChatFragment"
-        android:id="@+id/fragment"
-        android:clipToPadding="false"
-        android:clipChildren="false">
+        android:clipChildren="false"
+        tools:context=".activities.mainFragments.ChatFragment" >
 
         <LinearLayout
             android:id="@+id/math_preload"
@@ -25,23 +24,23 @@
             android:visibility="invisible"
             android:orientation="vertical"
             android:clickable="false"
-            android:focusable="false"/>
+            android:focusable="false" />
 
         <ListView
             android:id="@+id/list"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_above="@id/strip"
+            android:layout_alignParentTop="true"
             android:layout_alignParentStart="true"
+            android:background="@android:color/transparent"
             android:choiceMode="singleChoice"
-            android:clipChildren="false"
-            android:clipToPadding="false"
             android:divider="@android:color/transparent"
             android:dividerHeight="0dp"
-            android:listSelector="#0000"
-            android:paddingEnd="?android:attr/scrollbarSize"
-            android:scrollbarStyle="outsideOverlay"
+            android:listSelector="@android:color/transparent"
+            android:scrollbarStyle="outsideInset"
             android:transcriptMode="normal"
+            android:transitionGroup="true"
             android:visibility="@{loading ? View.GONE : View.VISIBLE}"
             tools:ignore="RtlSymmetry"
             tools:visibility="visible" />
@@ -64,7 +63,7 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/message_padding_vertical"
             android:background="@android:color/transparent"
-            android:layout_above="@id/editText_message"/>
+            android:layout_above="@id/editText_message" />
 
         <EditText
             android:id="@+id/editText_message"

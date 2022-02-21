@@ -11,11 +11,9 @@
     </data>
 
     <RelativeLayout
+        android:id="@+id/fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/fragment"
-        android:clipToPadding="false"
-        android:clipChildren="false"
         tools:context=".activities.mainFragments.ChatDatabaseFragment">
 
         <LinearLayout
@@ -240,18 +238,19 @@
 
         <ListView
             android:id="@+id/message_list_view"
-            android:layout_below="@id/database_search_filters"
-            android:layout_alignParentBottom="true"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:choiceMode="singleChoice"
-            android:listSelector="#0000"
+            android:layout_below="@id/database_search_filters"
+            android:layout_alignParentBottom="true"
             android:background="@android:color/transparent"
-            android:divider="#00ffffff"
+            android:choiceMode="singleChoice"
+            android:divider="@android:color/transparent"
             android:dividerHeight="0dp"
-            android:scrollbarStyle="outsideInset"
             android:fastScrollAlwaysVisible="true"
             android:fastScrollEnabled="true"
+            android:listSelector="@android:color/transparent"
+            android:scrollbarStyle="outsideInset"
+            android:transitionGroup="true"
             android:visibility="@{status == StatusWrapper.STATUS_LOADED ? View.VISIBLE : View.GONE}" />
 
     </RelativeLayout>

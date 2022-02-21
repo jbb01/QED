@@ -49,4 +49,6 @@
     <color name="accent_vigour_red_dark">#ffd88e89</color>
     <color name="accent_vigour_red_light">#ffa04a43</color>
 
+    <color name="statusBarScrim">#40000000</color>
+
 </resources>

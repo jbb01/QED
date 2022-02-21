@@ -7,13 +7,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.MutableLiveData;
 import androidx.navigation.fragment.NavHostFragment;
-
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.databinding.FragmentChatDatabaseBinding;
 import com.jonahbauer.qed.model.Message;
@@ -25,20 +23,15 @@ import com.jonahbauer.qed.util.MessageUtils;
 import com.jonahbauer.qed.util.Preferences;
 import com.jonahbauer.qed.util.StatusWrapper;
 import com.jonahbauer.qed.util.ViewUtils;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import io.reactivex.rxjava3.schedulers.Schedulers;
 
 
 public class ChatDatabaseFragment extends Fragment implements CompoundButton.OnCheckedChangeListener {
@@ -92,6 +85,8 @@ public class ChatDatabaseFragment extends Fragment implements CompoundButton.OnC
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        ViewUtils.setFitsSystemWindowsBottom(view);
+
         mDateFrom = new MutableLiveData<>(LocalDate.now());
         mTimeFrom = new MutableLiveData<>(LocalTime.now());
         mDateTo = new MutableLiveData<>(LocalDate.now());

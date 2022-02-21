@@ -11,32 +11,28 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
-
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.databinding.FragmentImageInfoBinding;
 import com.jonahbauer.qed.model.Image;
 import com.jonahbauer.qed.model.viewmodel.ImageInfoViewModel;
 import com.jonahbauer.qed.util.StatusWrapper;
 import com.jonahbauer.qed.util.ViewUtils;
-
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMaps;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.jetbrains.annotations.Contract;
 
 import java.io.File;
 import java.util.Comparator;
-
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.Object2IntMaps;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 
 public class ImageInfoFragment extends Fragment {
     private static final Object2IntMap<String> INFO_PRIORITY;
@@ -105,6 +101,8 @@ public class ImageInfoFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        ViewUtils.setFitsSystemWindowsBottom(view);
+
         mImageInfoViewModel.getImage().observe(getViewLifecycleOwner(), status -> {
             if (status.getCode() == StatusWrapper.STATUS_ERROR) {
                 Toast.makeText(requireContext(), status.getReason().getStringRes(), Toast.LENGTH_SHORT).show();
@@ -124,13 +122,13 @@ public class ImageInfoFragment extends Fragment {
     @Override
     public void onStart() {
         mImageInfoViewModel.load(mImage);
-        ViewUtils.setActionStatusBarColor(this, Color.BLACK);
+        ViewUtils.setActionBarColor(this, Color.BLACK);
         super.onStart();
     }
 
     @Override
     public void onStop() {
-        ViewUtils.resetActionStatusBarColor(this);
+        ViewUtils.resetActionBarColor(this);
         mDisposable.clear();
         super.onStop();
     }

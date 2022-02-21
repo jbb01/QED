@@ -5,12 +5,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
-
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.databinding.FragmentEventsDatabaseBinding;
 import com.jonahbauer.qed.model.Event;
@@ -38,6 +36,8 @@ public class EventDatabaseFragment extends Fragment implements AdapterView.OnIte
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        ViewUtils.setFitsSystemWindowsBottom(view);
+
         mEventAdapter = new EventAdapter(getContext(), new ArrayList<>());
         mBinding.list.setOnItemClickListener(this);
         mBinding.list.setAdapter(mEventAdapter);

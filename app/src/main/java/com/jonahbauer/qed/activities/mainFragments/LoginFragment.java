@@ -5,13 +5,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
-
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.databinding.FragmentLoginBinding;
 import com.jonahbauer.qed.networking.Feature;
@@ -22,7 +20,6 @@ import com.jonahbauer.qed.networking.exceptions.InvalidCredentialsException;
 import com.jonahbauer.qed.networking.login.QEDLogin;
 import com.jonahbauer.qed.util.Preferences;
 import com.jonahbauer.qed.util.ViewUtils;
-
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 
 public class LoginFragment extends Fragment implements NetworkListener, QEDPageReceiver<Boolean> {
@@ -52,6 +49,8 @@ public class LoginFragment extends Fragment implements NetworkListener, QEDPageR
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        ViewUtils.setFitsSystemWindowsBottom(view);
+
         mBinding.rememberMeCheckbox.setChecked(Preferences.general().isRememberMe());
         mBinding.rememberMeCheckbox.setOnCheckedChangeListener(
                 (buttonView, isChecked) -> Preferences.general().edit().setRememberMe(isChecked).apply()

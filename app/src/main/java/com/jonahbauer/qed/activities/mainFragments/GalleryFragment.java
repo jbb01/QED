@@ -5,12 +5,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
-
 import com.google.android.material.snackbar.Snackbar;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.databinding.FragmentGalleryBinding;
@@ -40,6 +38,8 @@ public class GalleryFragment extends Fragment implements AdapterView.OnItemClick
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        ViewUtils.setFitsSystemWindowsBottom(view);
+
         mAlbumAdapter = new AlbumAdapter(getContext(), new ArrayList<>());
         mBinding.list.setOnItemClickListener(this);
         mBinding.list.setAdapter(mAlbumAdapter);

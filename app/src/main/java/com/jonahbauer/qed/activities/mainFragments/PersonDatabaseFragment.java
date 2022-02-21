@@ -8,12 +8,10 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.CompoundButton;
 import android.widget.RadioButton;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
-
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.databinding.FragmentPersonsDatabaseBinding;
 import com.jonahbauer.qed.layoutStuff.views.CheckBoxTriStates;
@@ -45,6 +43,8 @@ public class PersonDatabaseFragment extends Fragment implements CompoundButton.O
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        ViewUtils.setFitsSystemWindowsBottom(view);
+
         mPersonAdapter = new PersonAdapter(getContext(), new ArrayList<>(), PersonAdapter.SortMode.FIRST_NAME, mBinding.fixedHeader.getRoot());
         mBinding.list.setOnItemClickListener(this);
         mBinding.list.setOnScrollListener(mPersonAdapter);

@@ -5,24 +5,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.ContextThemeWrapper;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
+import android.view.*;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.FileProvider;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
@@ -31,27 +25,24 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.viewpager2.widget.ViewPager2;
-
 import com.jonahbauer.qed.R;
+import com.jonahbauer.qed.activities.MainActivity;
 import com.jonahbauer.qed.activities.imageActivity.ImageViewHolder;
 import com.jonahbauer.qed.databinding.FragmentImageBinding;
 import com.jonahbauer.qed.model.Image;
 import com.jonahbauer.qed.util.Preferences;
 import com.jonahbauer.qed.util.StatusWrapper;
 import com.jonahbauer.qed.util.ViewUtils;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 import java.io.File;
 import java.lang.ref.SoftReference;
 import java.util.Collections;
 import java.util.List;
 
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-
 public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickListener {
     private FragmentImageBinding mBinding;
-
-    private View mWindowDecor;
 
     private Image mImage; // currently shown image
     private ImageViewHolder mImageViewHolder; // currently show view holder
@@ -70,9 +61,6 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-
-        Window window = requireActivity().getWindow();
-        mWindowDecor = window.getDecorView();
 
         mImageAdapter = new ImageAdapter();
 
@@ -126,6 +114,12 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
         Context context = new ContextThemeWrapper(requireContext(), R.style.Theme_App_Dark);
         inflater = inflater.cloneInContext(context);
 
+        var activity = (MainActivity) requireActivity();
+        var controller = activity.getWindowInsetsController();
+        ViewUtils.setTransparentSystemBars(this);
+        ViewUtils.hideSupportActionBar(this);
+        controller.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_BARS_BY_SWIPE);
+
         mBinding = FragmentImageBinding.inflate(inflater, container, false);
 
         mBinding.toolbar.setNavigationIcon(R.drawable.ic_arrow_back);
@@ -135,12 +129,26 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
         mOpenWithButton = menu.findItem(R.id.image_open_with);
         mDownloadButton = menu.findItem(R.id.image_download_original);
         mInfoButton = menu.findItem(R.id.image_info);
+        mBinding.toolbar.setVisibility(View.GONE);
 
+        toggleExtended(mExtended);
         return mBinding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        ViewCompat.setOnApplyWindowInsetsListener(mBinding.toolbar, (v, insets) -> {
+            var systemInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            ViewUtils.setPaddingTop(v, systemInsets.top);
+            return insets;
+        });
+
+        ViewCompat.setOnApplyWindowInsetsListener(mBinding.overlayBottom, (v, insets) -> {
+            var systemInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            ViewUtils.setPaddingBottom(v, (int) (ViewUtils.dpToPx(v, 24) + systemInsets.bottom));
+            return insets;
+        });
+
         // prepare view pager
         mBinding.viewPager.setOnClickListener(v -> toggleExtended());
         mBinding.viewPager.setAdapter(mImageAdapter);
@@ -189,35 +197,19 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
     }
 
     @Override
-    public void onStart() {
-        // hide status bar and default action bar
-        ViewUtils.hideSupportActionBar(this);
-        ViewUtils.setStatusBarColor(this, Color.TRANSPARENT);
-
-        int paddingBottom = ViewUtils.getNavigationBarHeight(mBinding.getRoot())
-                + (int) ViewUtils.dpToPx(this, 24);
-        ViewUtils.setPaddingBottom(mBinding.overlayBottom, paddingBottom);
-
-        int paddingTop = ViewUtils.getStatusBarHeight(mBinding.getRoot());
-        ViewUtils.setPaddingTop(mBinding.toolbar, paddingTop);
-
-        super.onStart();
-    }
-
-    @Override
     public void onResume() {
         toggleExtended(mExtended);
         super.onResume();
     }
 
     @Override
-    public void onStop() {
-        // reset fullscreen
+    public void onDestroyView() {
+        var activity = (MainActivity) requireActivity();
+        var controller = activity.getWindowInsetsController();
+        controller.show(WindowInsetsCompat.Type.systemBars());
+        ViewUtils.resetTransparentSystemBars(this);
         ViewUtils.showSupportActionBar(this);
-        ViewUtils.resetActionStatusBarColor(this);
-        mWindowDecor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
-
-        super.onStop();
+        super.onDestroyView();
     }
 
     @Override
@@ -283,20 +275,12 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
     private void toggleExtended(boolean extended) {
         this.mExtended = extended;
 
+        var controller = ((MainActivity) requireActivity()).getWindowInsetsController();
         if (extended) {
-            mWindowDecor.setSystemUiVisibility(
-                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-            );
+            controller.show(WindowInsetsCompat.Type.systemBars());
             mBinding.setExtended(true);
         } else {
-            mWindowDecor.setSystemUiVisibility(
-                    View.SYSTEM_UI_FLAG_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+            controller.hide(WindowInsetsCompat.Type.systemBars());
             mBinding.setExtended(false);
         }
     }

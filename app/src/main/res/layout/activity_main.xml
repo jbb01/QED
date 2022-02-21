@@ -3,42 +3,66 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:openDrawer="start">
+    android:layout_height="match_parent">
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/app_bar_layout"
+            android:fitsSystemWindows="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:theme="@style/ThemeOverlay.App.AppBarOverlay">
+            style="@style/Widget.MaterialComponents.AppBarLayout.PrimarySurface">
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:elevation="0dp"
+                style="@style/Widget.MaterialComponents.Toolbar.PrimarySurface"/>
         </com.google.android.material.appbar.AppBarLayout>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/action_mode_app_bar_layout"
+            android:fitsSystemWindows="true"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-            <fragment
-                android:id="@+id/nav_host"
-                android:name="androidx.navigation.fragment.NavHostFragment"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:background="?colorPrimaryLight"
+            style="@style/Widget.MaterialComponents.AppBarLayout.PrimarySurface">
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/action_mode_toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:defaultNavHost="true"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:navGraph="@navigation/main"
-                tools:ignore="FragmentTagUsage" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:elevation="0dp"
+                style="@style/Widget.MaterialComponents.Toolbar.PrimarySurface"/>
+        </com.google.android.material.appbar.AppBarLayout>
 
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:layout_below="@id/app_bar_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <fragment
+                    android:id="@+id/nav_host"
+                    android:name="androidx.navigation.fragment.NavHostFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:defaultNavHost="true"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:navGraph="@navigation/main"
+                    tools:ignore="FragmentTagUsage" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+    </RelativeLayout>
 
     <!-- Container for contents of drawer - use NavigationView to make configuration easier -->
     <com.google.android.material.navigation.NavigationView
@@ -47,6 +71,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:background="@color/colorSurface"
+        android:fitsSystemWindows="true"
         app:menu="@menu/menu_drawer"
         app:headerLayout="@layout/navigation_drawer_header"/>
 

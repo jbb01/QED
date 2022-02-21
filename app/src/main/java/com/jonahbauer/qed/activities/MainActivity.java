@@ -1,13 +1,13 @@
 package com.jonahbauer.qed.activities;
 
-import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import android.util.TypedValue;
+import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewParent;
 import android.widget.Toast;
 import androidx.activity.OnBackPressedCallback;
@@ -16,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
+import androidx.core.view.*;
 import androidx.customview.widget.Openable;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
@@ -26,18 +27,21 @@ import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.jonahbauer.qed.BuildConfig;
 import com.jonahbauer.qed.MainDirections;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.databinding.ActivityMainBinding;
+import com.jonahbauer.qed.layoutStuff.CustomActionMode;
 import com.jonahbauer.qed.networking.NetworkListener;
 import com.jonahbauer.qed.networking.login.QEDLogout;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import lombok.Getter;
 
 import java.util.List;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements NetworkListener, NavController.OnDestinationChangedListener {
     private static final String LOG_TAG = MainActivity.class.getName();
@@ -53,7 +57,10 @@ public class MainActivity extends AppCompatActivity implements NetworkListener, 
     private AppBarConfiguration mAppBarConfiguration;
     private NavController mNavController;
 
+    private WindowInsetsControllerCompat mWindowInsetsController;
+
     private ActionMode mActionMode;
+    private ViewPropertyAnimatorCompat mActionModeFade;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +91,9 @@ public class MainActivity extends AppCompatActivity implements NetworkListener, 
 
         // double tap to exit
         getOnBackPressedDispatcher().addCallback(this, new BackPressedCallback());
+
+        mWindowInsetsController = new WindowInsetsControllerCompat(getWindow(), mBinding.getRoot());
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
     }
 
     @Override
@@ -122,29 +132,62 @@ public class MainActivity extends AppCompatActivity implements NetworkListener, 
         return true;
     }
 
-    //<editor-fold desc="Action Modes" defaultstate="collapsed">
-    @Override
-    public void onSupportActionModeStarted(@NonNull ActionMode mode) {
-        super.onSupportActionModeStarted(mode);
-        mActionMode = mode;
-
-        var colorPrimary = new TypedValue();
-        getTheme().resolveAttribute(R.attr.colorPrimary, colorPrimary, true);
-        var anim = ObjectAnimator.ofArgb(getWindow(), "statusBarColor", colorPrimary.data);
-        anim.setDuration(300);
-        anim.start();
+    public WindowInsetsControllerCompat getWindowInsetsController() {
+        return mWindowInsetsController;
     }
 
-    @Override
-    public void onSupportActionModeFinished(@NonNull ActionMode mode) {
-        super.onSupportActionModeFinished(mode);
-        mActionMode = null;
+    public AppBarLayout getAppBarLayout() {
+        return mBinding.appBarLayout;
+    }
 
-        var colorPrimaryDark = new TypedValue();
-        getTheme().resolveAttribute(R.attr.colorPrimaryDark, colorPrimaryDark, true);
-        var anim = ObjectAnimator.ofArgb(getWindow(), "statusBarColor", colorPrimaryDark.data);
-        anim.setDuration(300);
-        anim.start();
+    //<editor-fold desc="Action Modes" defaultstate="collapsed">
+    @Nullable
+    @Override
+    public ActionMode onWindowStartingSupportActionMode(@NonNull ActionMode.Callback callback) {
+        Objects.requireNonNull(callback);
+
+        if (mActionMode != null) {
+            mActionMode.finish();
+            mActionMode = null;
+        }
+
+        var toolbar = mBinding.actionModeToolbar;
+        var appBarLayout = mBinding.actionModeAppBarLayout;
+
+        toolbar.setNavigationIcon(R.drawable.ic_arrow_back);
+        mBinding.actionModeToolbar.setNavigationOnClickListener(v -> finishActionMode());
+
+        var actionMode = new CustomActionMode(
+                mBinding.actionModeToolbar,
+                new ActionModeCallbackWrapper(callback)
+        );
+
+        if (callback.onCreateActionMode(actionMode, actionMode.getMenu())) {
+            if (mActionModeFade != null) mActionModeFade.cancel();
+            appBarLayout.setAlpha(0f);
+            mActionModeFade = ViewCompat.animate(appBarLayout).alpha(1f);
+            mActionModeFade.setListener(new ViewPropertyAnimatorListenerAdapter() {
+                @Override
+                public void onAnimationStart(View view) {
+                    appBarLayout.setVisibility(View.VISIBLE);
+                    ViewCompat.requestApplyInsets(appBarLayout);
+                }
+
+                @Override
+                public void onAnimationEnd(View view) {
+                    appBarLayout.setAlpha(1f);
+                    mActionModeFade.setListener(null);
+                    mActionModeFade = null;
+                }
+            });
+            mActionModeFade.start();
+
+            appBarLayout.setVisibility(View.VISIBLE);
+            onSupportActionModeStarted(actionMode);
+            mActionMode = actionMode;
+        }
+
+        return mActionMode;
     }
 
     public void finishActionMode() {
@@ -224,6 +267,46 @@ public class MainActivity extends AppCompatActivity implements NetworkListener, 
                 }
             }
             return defaultValue;
+        }
+    }
+
+    private class ActionModeCallbackWrapper implements ActionMode.Callback {
+        private final ActionMode.Callback mWrapped;
+
+        private ActionModeCallbackWrapper(ActionMode.Callback mWrapped) {
+            this.mWrapped = mWrapped;
+        }
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            return mWrapped.onCreateActionMode(mode, menu);
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return mWrapped.onPrepareActionMode(mode, menu);
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            return mWrapped.onActionItemClicked(mode, item);
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            mWrapped.onDestroyActionMode(mode);
+            mActionMode = null;
+
+            if (mActionModeFade != null) mActionModeFade.cancel();
+            mActionModeFade = ViewCompat.animate(mBinding.actionModeAppBarLayout).alpha(0f);
+            mActionModeFade.setListener(new ViewPropertyAnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(View view) {
+                    mBinding.actionModeAppBarLayout.setVisibility(View.GONE);
+                    mActionModeFade.setListener(null);
+                    mActionModeFade = null;
+                }
+            });
+            mActionModeFade.start();
         }
     }
 

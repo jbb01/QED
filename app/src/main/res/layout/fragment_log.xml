@@ -23,7 +23,6 @@
         android:id="@+id/fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
         tools:context=".activities.mainFragments.LogFragment">
 
         <ProgressBar
@@ -186,15 +185,15 @@
             android:layout_alignParentStart="true"
             android:layout_alignParentBottom="true"
             android:background="@android:color/transparent"
-            android:divider="@android:color/transparent"
-            android:listSelector="@android:color/transparent"
-            android:dividerHeight="@dimen/message_divider"
-            android:clipToPadding="false"
-            android:visibility="@{status == StatusWrapper.STATUS_LOADED ? View.VISIBLE : View.GONE}"
             android:choiceMode="singleChoice"
-            android:scrollbarStyle="outsideInset"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="0dp"
             android:fastScrollAlwaysVisible="true"
             android:fastScrollEnabled="true"
+            android:listSelector="@android:color/transparent"
+            android:scrollbarStyle="outsideInset"
+            android:transitionGroup="true"
+            android:visibility="@{status == StatusWrapper.STATUS_LOADED ? View.VISIBLE : View.GONE}"
             tools:visibility="visible"
             tools:ignore="RtlSymmetry" />
     </RelativeLayout>

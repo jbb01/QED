@@ -4,13 +4,11 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentOnAttachListener;
-
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.sheets.InfoFragment;
 import com.jonahbauer.qed.activities.sheets.event.EventInfoFragment;
@@ -44,11 +42,13 @@ public class EventFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        ViewUtils.setFitsSystemWindowsBottom(view);
+
         mEventViewModel.getEvent().observe(getViewLifecycleOwner(), wrapper -> {
             Event value = wrapper.getValue();
             if (value != null) {
                 ViewUtils.setActionBarText(this, value.getTitle());
-                ViewUtils.setActionStatusBarColor(this, Themes.colorful(value.getId()));
+                ViewUtils.setActionBarColor(this, Themes.colorful(value.getId()));
             }
         });
 
@@ -67,8 +67,8 @@ public class EventFragment extends Fragment {
     }
 
     @Override
-    public void onDetach() {
-        ViewUtils.resetActionStatusBarColor(this);
-        super.onDetach();
+    public void onDestroyView() {
+        ViewUtils.resetActionBarColor(this);
+        super.onDestroyView();
     }
 }
