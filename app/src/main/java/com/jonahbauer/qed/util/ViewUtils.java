@@ -41,6 +41,9 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import static androidx.core.view.WindowInsetsCompat.Type.ime;
+import static androidx.core.view.WindowInsetsCompat.Type.systemBars;
+
 @UtilityClass
 @SuppressWarnings("unused")
 public class ViewUtils {
@@ -317,11 +320,12 @@ public class ViewUtils {
     }
 
     public static void setFitsSystemWindowsBottom(View view) {
-        ViewCompat.setOnApplyWindowInsetsListener(view, (v, insets) -> {
-            var systemInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            setPaddingBottom(v, systemInsets.bottom);
-            return new WindowInsetsCompat.Builder(insets)
-                    .setInsets(WindowInsetsCompat.Type.systemBars(), Insets.of(systemInsets.left, systemInsets.top, systemInsets.right, 0))
+        ViewCompat.setOnApplyWindowInsetsListener(view, (v, windowInsets) -> {
+            var mask = systemBars() | ime();
+            var insets = windowInsets.getInsets(mask);
+            setPaddingBottom(v, insets.bottom);
+            return new WindowInsetsCompat.Builder(windowInsets)
+                    .setInsets(mask, Insets.of(insets.left, insets.top, insets.right, 0))
                     .build();
         });
     }
