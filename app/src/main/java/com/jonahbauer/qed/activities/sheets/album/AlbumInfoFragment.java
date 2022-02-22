@@ -5,12 +5,10 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.databinding.BindingAdapter;
-
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.sheets.InfoFragment;
 import com.jonahbauer.qed.databinding.FragmentInfoAlbumBinding;
@@ -66,7 +64,7 @@ public class AlbumInfoFragment extends InfoFragment {
 
     @Override
     public int getColor() {
-        return Themes.colorful(getAlbum().getId());
+        return Themes.colorful(requireContext(), getAlbum().getId());
     }
 
     @Override

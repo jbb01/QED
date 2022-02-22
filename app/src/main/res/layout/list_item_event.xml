@@ -26,7 +26,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:tint="@{Themes.colorful(event.id)}"
+            app:tint="@{Themes.colorful(context, event.id)}"
             tools:tint="@android:color/holo_green_dark" />
 
         <TextView

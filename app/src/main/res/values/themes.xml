@@ -58,7 +58,7 @@
 
         <item name="colorOnPrimary">@android:color/white</item>
 
-        <item name="colorAccent">@color/colorSecondary</item>
+        <item name="colorAccent">?colorSecondary</item>
         <item name="colorSecondary">@color/colorSecondary</item>
         <item name="colorOnSecondary">@android:color/black</item>
 
@@ -83,13 +83,15 @@
         <item name="accentColor7">@color/accentColor7</item>
         <item name="accentColor8">@color/accentColor8</item>
         <item name="accentColor9">@color/accentColor9</item>
-        <item name="colorOnAccentColor">@color/colorOnAccentColor</item>
+        <item name="colorOnAccentColor">@android:color/white</item>
     </style>
 
     <style name="Theme.App.Dark">
-        <item name="android:colorBackground">@color/colorBackground</item>
+        <item name="android:colorBackground">@android:color/black</item>
         <item name="colorOnBackground">@android:color/white</item>
         <item name="colorOnBackgroundVariant">@android:color/darker_gray</item>
+
+        <item name="colorSecondary">@color/colorAccent2</item>
 
         <item name="colorSurface">@color/colorSurface</item>
         <item name="colorOnSurface">@android:color/white</item>

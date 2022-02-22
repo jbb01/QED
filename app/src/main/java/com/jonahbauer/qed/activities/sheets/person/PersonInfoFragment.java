@@ -7,14 +7,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StyleRes;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.util.Pair;
 import androidx.databinding.BindingAdapter;
-
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.sheets.InfoFragment;
 import com.jonahbauer.qed.databinding.FragmentInfoPersonBinding;
@@ -25,17 +23,11 @@ import com.jonahbauer.qed.model.viewmodel.PersonViewModel;
 import com.jonahbauer.qed.util.Actions;
 import com.jonahbauer.qed.util.StatusWrapper;
 import com.jonahbauer.qed.util.Themes;
+import it.unimi.dsi.fastutil.objects.*;
 
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
-
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.Object2IntMaps;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectMaps;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 public class PersonInfoFragment extends InfoFragment {
     private PersonViewModel mPersonViewModel;
@@ -127,7 +119,7 @@ public class PersonInfoFragment extends InfoFragment {
 
     @Override
     public int getColor() {
-        return Themes.colorful(getPerson().getId());
+        return Themes.colorful(requireContext(), getPerson().getId());
     }
 
     @Override

@@ -18,7 +18,6 @@
     <color name="accentColor7">#ffbb33</color>
     <color name="accentColor8">#ff8800</color>
     <color name="accentColor9">#00ddff</color>
-    <color name="colorOnAccentColor">@android:color/white</color>
 
     <color name="colorAccent2">#009688</color>
     <color name="colorAccentDark2">#00675B</color>

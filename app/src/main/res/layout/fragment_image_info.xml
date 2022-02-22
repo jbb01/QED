@@ -7,8 +7,9 @@
         android:id="@+id/fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#000"
         android:orientation="vertical"
+        android:theme="@style/Theme.App.Dark"
+        android:background="?android:colorBackground"
         tools:context=".activities.mainFragments.ImageInfoFragment">
 
         <View
@@ -43,7 +44,7 @@
                         android:text="@string/image_info_details"
                         android:textAllCaps="true"
                         android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-                        android:textColor="@color/colorAccent2" />
+                        android:textColor="?colorAccent" />
 
                     <LinearLayout
                         android:id="@+id/image_info"
@@ -70,7 +71,7 @@
                         android:text="@string/image_info_histogram"
                         android:textAllCaps="true"
                         android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-                        android:textColor="@color/colorAccent2" />
+                        android:textColor="?colorAccent" />
 
                     <com.jonahbauer.qed.layoutStuff.views.Histogram
                         android:id="@+id/histogram"
@@ -96,7 +97,7 @@
                         android:text="@string/image_info_qed_details"
                         android:textAllCaps="true"
                         android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-                        android:textColor="@color/colorAccent2" />
+                        android:textColor="?colorAccent" />
 
                     <LinearLayout
                         android:id="@+id/qed_infos"
@@ -122,7 +123,7 @@
                         android:text="@string/image_info_other_details"
                         android:textAllCaps="true"
                         android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-                        android:textColor="@color/colorAccent2" />
+                        android:textColor="?colorAccent" />
 
                     <LinearLayout
                         android:id="@+id/other_infos"

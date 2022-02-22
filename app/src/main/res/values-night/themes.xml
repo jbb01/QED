@@ -9,7 +9,6 @@
 
         <item name="colorOnPrimary">@android:color/white</item>
 
-        <item name="colorAccent">@color/colorSecondary</item>
         <item name="colorSecondary">@color/colorSecondary</item>
         <item name="colorOnSecondary">@android:color/black</item>
 
@@ -23,6 +22,7 @@
 
         <item name="colorError">@android:color/holo_red_light</item>
         <item name="colorOnError">@android:color/white</item>
+
         <item name="accentColor0">@color/accentColor0</item>
         <item name="accentColor1">@color/accentColor1</item>
         <item name="accentColor2">@color/accentColor2</item>
@@ -33,7 +33,7 @@
         <item name="accentColor7">@color/accentColor7</item>
         <item name="accentColor8">@color/accentColor8</item>
         <item name="accentColor9">@color/accentColor9</item>
-        <item name="colorOnAccentColor">@color/colorOnAccentColor</item>
+        <item name="colorOnAccentColor">@android:color/white</item>
 
         <item name="elevationOverlayEnabled">false</item>
     </style>

@@ -2,10 +2,8 @@ package com.jonahbauer.qed.activities.sheets.event;
 
 import android.os.Bundle;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.sheets.InfoBottomSheet;
 import com.jonahbauer.qed.activities.sheets.InfoFragment;
@@ -50,7 +48,7 @@ public class EventInfoBottomSheet extends InfoBottomSheet {
 
     @Override
     public int getColor() {
-        return Themes.colorful(getEvent().getId());
+        return Themes.colorful(requireContext(), getEvent().getId());
     }
 
     @Override

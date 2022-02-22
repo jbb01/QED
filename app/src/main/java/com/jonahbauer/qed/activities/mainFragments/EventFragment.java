@@ -48,7 +48,7 @@ public class EventFragment extends Fragment {
             Event value = wrapper.getValue();
             if (value != null) {
                 ViewUtils.setActionBarText(this, value.getTitle());
-                ViewUtils.setActionBarColor(this, Themes.colorful(value.getId()));
+                ViewUtils.setActionBarColor(this, Themes.colorful(requireContext(), value.getId()));
             }
         });
 

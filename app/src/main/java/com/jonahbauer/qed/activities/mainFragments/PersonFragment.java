@@ -48,7 +48,7 @@ public class PersonFragment extends Fragment {
             Person value = wrapper.getValue();
             if (value != null) {
                 ViewUtils.setActionBarText(this, value.getFullName());
-                ViewUtils.setActionBarColor(this, Themes.colorful(value.getId()));
+                ViewUtils.setActionBarColor(this, Themes.colorful(requireContext(), value.getId()));
             }
         });
 

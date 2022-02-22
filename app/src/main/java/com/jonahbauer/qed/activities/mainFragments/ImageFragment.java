@@ -1,7 +1,6 @@
 package com.jonahbauer.qed.activities.mainFragments;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -111,8 +110,7 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Context context = new ContextThemeWrapper(requireContext(), R.style.Theme_App_Dark);
-        inflater = inflater.cloneInContext(context);
+        var context = requireContext();
 
         var activity = (MainActivity) requireActivity();
         var controller = activity.getWindowInsetsController();
