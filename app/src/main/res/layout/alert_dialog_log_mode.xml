@@ -39,7 +39,7 @@
                 android:minHeight="40dp"/>
         </TableRow>
 
-        <TableRow android:visibility="@{mode == Mode.POST_RECENT ? View.VISIBLE : View.GONE}">
+        <TableRow android:visibility="@{(mode == null || mode == Mode.POST_RECENT) ? View.VISIBLE : View.GONE}">
 
             <TextView
                 android:layout_width="wrap_content"

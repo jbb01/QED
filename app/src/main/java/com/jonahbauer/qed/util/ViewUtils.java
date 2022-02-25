@@ -1,11 +1,15 @@
 package com.jonahbauer.qed.util;
 
+import static androidx.core.view.WindowInsetsCompat.Type.ime;
+import static androidx.core.view.WindowInsetsCompat.Type.systemBars;
+
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
+import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +17,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.EditText;
+
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
@@ -26,10 +31,11 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavBackStackEntry;
 import androidx.navigation.fragment.NavHostFragment;
+
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.MainActivity;
 import com.jonahbauer.qed.databinding.AlertDialogEditTextBinding;
-import lombok.experimental.UtilityClass;
+
 import org.jetbrains.annotations.Contract;
 
 import java.time.LocalDate;
@@ -41,8 +47,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import static androidx.core.view.WindowInsetsCompat.Type.ime;
-import static androidx.core.view.WindowInsetsCompat.Type.systemBars;
+import lombok.experimental.UtilityClass;
 
 @UtilityClass
 @SuppressWarnings("unused")
@@ -230,8 +235,12 @@ public class ViewUtils {
     }
 
     //<editor-fold desc="Conversions" defaultstate="collapsed">
+    public static float spToPx(@NonNull DisplayMetrics displayMetrics, float sp) {
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp, displayMetrics);
+    }
+
     public static float spToPx(@NonNull Resources resources, float sp) {
-        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp, resources.getDisplayMetrics());
+        return spToPx(resources.getDisplayMetrics(), sp);
     }
 
     public static float spToPx(@NonNull Context context, float sp) {
@@ -242,8 +251,12 @@ public class ViewUtils {
         return spToPx(view.getResources(), sp);
     }
 
+    public static float dpToPx(@NonNull DisplayMetrics displayMetrics, float dp) {
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, displayMetrics);
+    }
+
     public static float dpToPx(@NonNull Resources resources, float dp) {
-        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, resources.getDisplayMetrics());
+        return dpToPx(resources.getDisplayMetrics(), dp);
     }
 
     public static float dpToPx(@NonNull Context context, float dp) {

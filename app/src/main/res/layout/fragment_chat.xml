@@ -17,34 +17,6 @@
         android:clipChildren="false"
         tools:context=".activities.mainFragments.ChatFragment" >
 
-        <LinearLayout
-            android:id="@+id/math_preload"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="invisible"
-            android:orientation="vertical"
-            android:clickable="false"
-            android:focusable="false" />
-
-        <ListView
-            android:id="@+id/list"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_above="@id/strip"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentStart="true"
-            android:background="@android:color/transparent"
-            android:choiceMode="singleChoice"
-            android:divider="@android:color/transparent"
-            android:dividerHeight="0dp"
-            android:listSelector="@android:color/transparent"
-            android:scrollbarStyle="outsideInset"
-            android:transcriptMode="normal"
-            android:transitionGroup="true"
-            android:visibility="@{loading ? View.GONE : View.VISIBLE}"
-            tools:ignore="RtlSymmetry"
-            tools:visibility="visible" />
-
         <ProgressBar
             android:id="@+id/progress_bar"
             android:layout_alignParentStart="true"
@@ -58,121 +30,151 @@
             style="?android:attr/progressBarStyleLarge"
             android:visibility="@{loading ? View.VISIBLE : View.GONE}" />
 
-        <View
-            android:id="@+id/strip"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/message_padding_vertical"
-            android:background="@android:color/transparent"
-            android:layout_above="@id/editText_message" />
-
-        <EditText
-            android:id="@+id/editText_message"
+        <LinearLayout
+            android:id="@+id/math_preload"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/button_send"
-            android:layout_marginStart="6dp"
-            android:layout_toStartOf="@+id/button_send"
-            android:background="@drawable/background_send"
-            android:clickable="true"
-            android:elevation="6dp"
-            android:focusable="true"
-            android:gravity="center_vertical"
-            android:hint="@string/chat_message_hint"
-            android:importantForAutofill="no"
-            android:inputType="textMultiLine"
-            android:maxLines="5"
-            android:minHeight="48dp"
-            android:paddingStart="12dp"
-            android:paddingTop="3dp"
-            android:paddingEnd="12dp"
-            android:paddingBottom="3dp"
-            android:scrollbars="vertical"
-            android:selectAllOnFocus="false"
-            android:enabled="@{ready}"
-            android:singleLine="false" />
+            android:visibility="invisible"
+            android:orientation="vertical"
+            android:clickable="false"
+            android:focusable="false" />
 
-        <View
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
             android:layout_width="match_parent"
-            android:layout_height="6dp"
-            android:layout_alignParentBottom="true"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:layout_above="@id/input_layout">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="fill" >
+                <ListView
+                    android:id="@+id/list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent"
+                    android:choiceMode="singleChoice"
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
+                    android:divider="@android:color/transparent"
+                    android:dividerHeight="0dp"
+                    android:listSelector="@android:color/transparent"
+                    android:paddingVertical="3dp"
+                    android:scrollbarStyle="outsideInset"
+                    android:transcriptMode="normal"
+                    android:transitionGroup="true"
+                    android:visibility="@{loading ? View.GONE : View.VISIBLE}" />
+            </FrameLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:clipToPadding="false"
+                android:gravity="end"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="0dp"
+                app:layout_dodgeInsetEdges="bottom">
+
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/scroll_down_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="6dp"
+                    android:contentDescription="@string/chat_scroll_down_button_content_description"
+                    android:src="@drawable/ic_double_arrow_down"
+                    android:tint="?colorOnSurfaceVariant"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toTopOf="@id/quick_settings"
+                    app:fabSize="mini" />
+
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/quick_settings"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="6dp"
+                    android:contentDescription="@string/chat_quick_settings"
+                    android:src="@drawable/ic_drawer_settings"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:fabSize="mini" />
+
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/quick_settings_channel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="6dp"
+                    android:contentDescription="@string/chat_quick_settings_channel"
+                    android:src="@drawable/ic_quick_settings_channel"
+                    android:visibility="invisible"
+                    app:layout_constraintEnd_toStartOf="@id/quick_settings"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:fabSize="mini" />
+
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/quick_settings_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="6dp"
+                    android:contentDescription="@string/chat_quick_settings_name"
+                    android:src="@drawable/ic_quick_settings_name"
+                    android:visibility="invisible"
+                    app:layout_constraintEnd_toStartOf="@id/quick_settings_channel"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:fabSize="mini" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+        <LinearLayout
+            android:id="@+id/input_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_alignParentEnd="true"
-            android:background="?android:colorBackground" />
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/button_send"
-            android:layout_width="@dimen/send_button_size"
-            android:layout_height="@dimen/send_button_size"
-            android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
-            android:layout_marginStart="6dp"
-            android:layout_marginEnd="6dp"
-            android:layout_marginBottom="6dp"
-            android:contentDescription="@string/chat_button_send"
-            android:src="@drawable/ic_send"
-            android:enabled="@{ready}"
-            app:fabCustomSize="48dp" />
-
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignEnd="@id/button_send"
-            android:layout_alignStart="@id/button_send"
-            android:layout_above="@id/quick_settings_layout"
-            android:orientation="vertical"
             android:clipToPadding="false"
-            android:clipChildren="false"
-            android:gravity="center">
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/scroll_down_Button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:tint="?colorOnSurfaceVariant"
-                android:src="@drawable/ic_double_arrow_down"
-                android:contentDescription="@string/chat_scroll_down_button_content_description"
-                android:visibility="visible"
-                android:clipToPadding="false"
-                android:clipChildren="false"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/quick_settings_layout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignEnd="@id/button_send"
-            android:layout_above="@id/button_send"
             android:orientation="horizontal"
-            android:paddingBottom="1dp"
-            android:layout_marginEnd="3dp"
-            android:clipToPadding="false"
-            android:clipChildren="false"
-            android:gravity="center">
+            android:padding="6dp" >
+
+            <EditText
+                android:id="@+id/message_input"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/background_send"
+                android:clickable="true"
+                android:elevation="6dp"
+                android:enabled="@{ready}"
+                android:focusable="true"
+                android:hint="@string/chat_message_hint"
+                android:importantForAutofill="no"
+                android:inputType="textMultiLine"
+                android:maxLines="5"
+                android:minHeight="48dp"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="3dp"
+                android:scrollbars="vertical"
+                android:selectAllOnFocus="false"
+                android:singleLine="false" />
+
+            <Space
+                android:layout_width="6dp"
+                android:layout_height="match_parent"/>
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/quick_settings_name"
+                android:id="@+id/button_send"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="3dp"
-                android:contentDescription="@string/chat_quick_settings_name"
-                android:src="@drawable/ic_quick_settings_name" />
-
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/quick_settings_channel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="3dp"
-                android:contentDescription="@string/chat_quick_settings_channel"
-                android:src="@drawable/ic_quick_settings_channel"/>
-
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/quick_settings"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="3dp"
-                android:contentDescription="@string/chat_quick_settings"
-                android:src="@drawable/ic_drawer_settings" />
-
+                android:layout_gravity="bottom"
+                android:contentDescription="@string/chat_button_send"
+                android:enabled="@{ready}"
+                android:src="@drawable/ic_send"
+                app:fabCustomSize="48dp" />
         </LinearLayout>
 
     </RelativeLayout>

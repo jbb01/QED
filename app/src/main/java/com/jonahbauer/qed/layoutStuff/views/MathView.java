@@ -8,11 +8,9 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.util.AttributeSet;
-import android.util.SparseArray;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.ViewGroup;
-import android.view.ViewParent;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.LinearLayout;
@@ -26,15 +24,15 @@ import androidx.annotation.Px;
 import androidx.annotation.StyleRes;
 
 import com.jonahbauer.qed.R;
-import com.jonahbauer.qed.util.Triple;
 import com.jonahbauer.qed.util.ViewUtils;
 import com.x5.template.Chunk;
 import com.x5.template.Theme;
 import com.x5.template.providers.AndroidTemplates;
 
 import java.lang.ref.SoftReference;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -42,10 +40,9 @@ public class MathView extends LinearLayout {
     @SuppressWarnings("RegExpRedundantEscape")
     private static final String LATEX = "((?<=\\\\\\])|(?=\\\\\\[)|(?<=\\\\\\))|(?=\\\\\\())";
 
-    private final Context mContext;
-
-    private final List<TextView> mTextViews = new LinkedList<>();
-    private final List<Triple<String, Integer, Long>> mInternalMathViews = new LinkedList<>();
+    private final List<TextView> mTextViews = new ArrayList<>();
+    private final List<InternalMathView> mInternalMathViews = new ArrayList<>();
+    private WeakReference<LinearLayout> mMathPreload;
 
     private String mText;
     private int mTextStyle;
@@ -66,7 +63,6 @@ public class MathView extends LinearLayout {
 
     public MathView(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        this.mContext = context;
         this.setOrientation(VERTICAL);
 
         setup(context, attrs, defStyleAttr, defStyleRes);
@@ -80,18 +76,9 @@ public class MathView extends LinearLayout {
         mTextSize = ViewUtils.spToPx(this, 14);
         mTextColor = Color.BLACK;
 
-        int textAppearanceResId = typedArray.getResourceId(R.styleable.MathView_android_textAppearance, -1);
-        if (textAppearanceResId != -1) {
-            @SuppressLint("CustomViewStyleable")
-            TypedArray textAppearance = context.obtainStyledAttributes(
-                    textAppearanceResId,
-                    new int[] {android.R.attr.textSize, android.R.attr.textColor, android.R.attr.textStyle}
-            );
-            mTextSize = textAppearance.getDimension(0, mTextSize);
-            mTextColor = textAppearance.getColor(1, mTextColor);
-            mTextStyle = textAppearance.getInt(2, 0);
-
-            textAppearance.recycle();
+        int textAppearanceResId = typedArray.getResourceId(R.styleable.MathView_android_textAppearance, 0);
+        if (textAppearanceResId != 0) {
+            loadTextAppearance(textAppearanceResId);
         }
 
         mTextSize = typedArray.getDimension(R.styleable.MathView_android_textSize, mTextSize);
@@ -104,11 +91,11 @@ public class MathView extends LinearLayout {
         setText(mText);
     }
 
-    public void setText(@Nullable String text) {
-        this.setText(text, -1);
+    public void setMathPreload(LinearLayout linearLayout) {
+        mMathPreload = new WeakReference<>(linearLayout);
     }
 
-    public void setText(@Nullable String text, long id) {
+    public void setText(@Nullable String text) {
         if (Objects.equals(text, mText)) return;
 
         release();
@@ -119,28 +106,32 @@ public class MathView extends LinearLayout {
         mText = text;
         if (text == null) return;
 
-        String[] laTeX = getLaTeX(text);
+        String[] latex = getLaTeX(text);
 
-        for (int i = 0; i < laTeX.length; i++) {
-            String str = laTeX[i];
-            boolean inline = str.startsWith("\\(") && str.endsWith("\\)");
-            boolean displayed = str.startsWith("\\[") && str.endsWith("\\]");
+        int position = 0;
+        for (String part : latex) {
+            boolean inline = part.startsWith("\\(") && part.endsWith("\\)");
+            boolean displayed = part.startsWith("\\[") && part.endsWith("\\]");
+
             if (displayed || inline) {
                 // add as math view
-                str = "\\[" + str.substring(2, str.length() - 2) + "\\]";
-                InternalMathView mathView = InternalMathView.getInternalMathView(mContext, null, str, (int) mTextSize, mTextColor, inline, i, id,this);
+                part = "\\[" + part.substring(2, part.length() - 2) + "\\]";
+
+                var mathView = InternalMathView.getInternalMathView(
+                        getContext(), text, part, position++, inline
+                );
                 mathView.setTextSize((int) mTextSize);
                 mathView.setTextColor(mTextColor);
                 mathView.load();
 
-                mInternalMathViews.add(new Triple<>(str, i, id));
+                mInternalMathViews.add(mathView);
 
                 this.addView(mathView);
             } else {
                 // add as text view
-                TextView textView = new TextView(mContext);
+                TextView textView = new TextView(getContext());
 
-                textView.setText(str);
+                textView.setText(part);
                 mTextViews.add(textView);
 
                 textView.setTypeface(textView.getTypeface(), mTextStyle);
@@ -152,34 +143,84 @@ public class MathView extends LinearLayout {
         }
     }
 
+    //<editor-fold desc="Style" defaulstate="collapsed">
+    private void loadTextAppearance(@StyleRes int textAppearance) {
+        TypedArray array = getContext().obtainStyledAttributes(
+                textAppearance,
+                new int[] {android.R.attr.textSize, android.R.attr.textColor, android.R.attr.textStyle}
+        );
+        mTextSize = array.getDimension(0, mTextSize);
+        mTextColor = array.getColor(1, mTextColor);
+        mTextStyle = array.getInt(2, 0);
+
+        array.recycle();
+    }
+
+    private void updateTextStyle() {
+        mTextViews.forEach(t -> t.setTypeface(t.getTypeface(), mTextStyle));
+    }
+
+    private void updateTextSize() {
+        mTextViews.forEach(t -> t.setTextSize(TypedValue.COMPLEX_UNIT_PX, mTextSize));
+        mInternalMathViews.forEach(t -> t.setTextSize((int) mTextSize));
+    }
+
+    private void updateTextColor() {
+        mTextViews.forEach(t -> t.setTextColor(mTextColor));
+        mInternalMathViews.forEach(t -> t.setTextColor(mTextColor));
+    }
+
     @SuppressWarnings("unused")
     public void setTextStyle(int textStyle) {
-        mTextViews.forEach(t -> t.setTypeface(t.getTypeface(), textStyle));
+        mTextStyle = textStyle;
+        updateTextStyle();
     }
 
     public void setTextSize(@Dimension(unit = Dimension.SP) float size) {
         this.setTextSize(TypedValue.COMPLEX_UNIT_SP, size);
     }
+
     public void setTextSize(int unit, float size) {
-        mTextViews.forEach(t -> t.setTextSize(unit, size));
+        mTextSize = TypedValue.applyDimension(unit, size, getResources().getDisplayMetrics());
+        updateTextSize();
     }
 
     public void setTextColor(@ColorInt int color) {
-        mTextViews.forEach(t -> t.setTextColor(color));
+        mTextColor = color;
+        updateTextColor();
     }
 
     public void setTextAppearance(@StyleRes int resId) {
-        mTextViews.forEach(t -> t.setTextAppearance(resId));
+        loadTextAppearance(resId);
+
+        updateTextSize();
+        updateTextSize();
+        updateTextStyle();
+    }
+    //</editor-fold>
+
+    /**
+     * Release all {@code InternalMathView}s associated with this view
+     * so that they can be claimed by other {@code MathView}s.
+     */
+    public void release() {
+        var preloadLayout = mMathPreload != null ? mMathPreload.get() : null;
+        for (int i = 0; i < mInternalMathViews.size(); i++) {
+            var mathView = mInternalMathViews.get(i);
+            InternalMathView.release(mText, mathView.getText(), i, mathView, preloadLayout);
+        }
+        mInternalMathViews.clear();
+        mText = null;
     }
 
     @NonNull
-    private static String[] getLaTeX(@NonNull String str) {
-        String[] split = str.split(LATEX);
+    private static String[] getLaTeX(@NonNull String message) {
+        String[] parts = message.split(LATEX);
 
         ArrayList<String> out = new ArrayList<>();
         int depth = 0;
         StringBuilder tmp = new StringBuilder();
-        for (String s : split) {
+        for (String s : parts) {
             boolean start = s.startsWith("\\["), startInline = s.startsWith("\\(");
             boolean end = s.endsWith("\\]"), endInline = s.endsWith("\\)");
             if (!(start || end || startInline || endInline)) out.add(s);
@@ -209,169 +250,78 @@ public class MathView extends LinearLayout {
     }
 
     /**
-     * Release all {@code InternalMathView}s associated with this view
-     * so that they can be claimed by other {@code MathView}s.
-     */
-    public void release() {
-        for (Triple<String, Integer, Long> internalMathView : mInternalMathViews) {
-            InternalMathView.release(internalMathView.first, internalMathView.second, internalMathView.third, this);
-        }
-    }
-
-    /**
      * Clear {@code InternalMathView} cache.
      */
     public static void clearCache() {
-        InternalMathView.cache.clear();
+        InternalMathView.CACHE.clear();
     }
 
-    /**
-     * Extract all latex components of the given text, create {@code InternalMathView}s for them and preload them.
-     * @param context a context for view creation
-     * @param text a text possibly containing latex
-     * @param id message id (used for caching)
-     * @param preloadLayout a layout for the view to preload
-     */
     public static void extractAndPreload(
-            Context context,
-            @Nullable AttributeSet attrs,
-            String text,
+            @NonNull Context context, @NonNull String message,
             @Dimension @Px int textSize, @ColorInt int textColor,
-            long id, @Nullable LinearLayout preloadLayout) {
-        String[] split = getLaTeX(text);
-        for (int i = 0; i < split.length; i++) {
-            boolean inline = split[i].startsWith("\\(") && split[i].endsWith("\\)");
-            boolean displayed = split[i].startsWith("\\[") && split[i].endsWith("\\]");
-            String latex = null;
+            @Nullable LinearLayout preloadLayout
+    ) {
+        var parts = getLaTeX(message);
+        int position = 0;
 
-            if (inline) {
-                latex = "\\[" + split[i].substring(2, split[i].length() - 2) + "\\]";
-            } else if (displayed) {
-                latex = split[i];
-            }
+        for (String part : parts) {
+            boolean inline = part.startsWith("\\(") && part.endsWith("\\)");
+            boolean displayed = part.startsWith("\\[") && part.endsWith("\\]");
 
-            if (latex != null) {
-                InternalMathView.preload(
-                        context, attrs, latex,
-                        textSize, textColor, inline,
-                        preloadLayout, i, id
-                );
+            if (displayed || inline) {
+                part = "\\[" + part.substring(2, part.length() - 2) + "\\]";
+
+                InternalMathView.preload(context, message, part, position++, textSize, textColor, inline, preloadLayout);
             }
         }
     }
 
     private static class InternalMathView extends WebView {
-        /**
-         * Owned InternalMathView:      Objects.hash(laTeX, index, id, owner)
-         * Unowned InternalMathView:    Objects.hash(laTeX, index, id)
-         *
-         * laTeX: displayed LaTeX literal
-         * index: part index of complete message
-         * id:    message id
-         * owner: displaying MathView
-         */
-        private static final SparseArray<SoftReference<InternalMathView>> cache = new SparseArray<>();
+        private static final HashMap<CacheKey, SoftReference<InternalMathView>> CACHE = new HashMap<>();
 
-        /**
-         * @param context a context for view creation
-         * @param attrs a attribute set used for creating a new InternalMathView
-         * @param laTeX the latex literal to be displayed
-         * @param inline inline or displayed latex
-         * @param index part index as part of whole message (used for caching)
-         * @param id message id (used for caching)
-         * @param owner displaying MathView
-         */
-        public static InternalMathView getInternalMathView(
-                Context context,
-                @Nullable AttributeSet attrs,
-                String laTeX,
-                @Dimension @Px int textSize, @ColorInt int textColor, boolean inline,
-                int index, long id, MathView owner) {
-            int cachePos = Objects.hash(laTeX, index, id, owner);
+        public static synchronized InternalMathView getInternalMathView(Context context, String message, String part, int position, boolean inline) {
+            var cacheKey = new CacheKey(message, part, position);
 
-            // load owned math view
-            SoftReference<InternalMathView> ref = cache.get(cachePos);
+            var ref = CACHE.remove(cacheKey);
             if (ref != null) {
-                InternalMathView mathView = ref.get();
+                var mathView = ref.get();
                 if (mathView != null) {
-                    ViewParent parent = mathView.getParent();
-                    if (parent != null) ((ViewGroup)parent).removeView(mathView);
-
+                    var parent = mathView.getParent();
+                    if (parent instanceof ViewGroup) ((ViewGroup) parent).removeView(mathView);
+                    mathView.setInline(inline);
                     return mathView;
                 }
             }
 
-            // load unowned math view
-            int preloadedCachePos = Objects.hash(laTeX, index, id);
-            SoftReference<InternalMathView> preloadedRef = cache.get(preloadedCachePos);
-            if (preloadedRef != null) {
-                InternalMathView mathView = preloadedRef.get();
-                if (mathView != null) {
-                    ViewParent parent = mathView.getParent();
-                    if (parent != null) ((ViewGroup)parent).removeView(mathView);
-
-                    // take ownership
-                    cache.remove(preloadedCachePos);
-                    cache.put(cachePos, preloadedRef);
-
-                    return mathView;
-                }
-            }
-
-            InternalMathView internalMathView = new InternalMathView(context, attrs, laTeX, inline);
-            internalMathView.setTextSize(textSize);
-            internalMathView.setTextColor(textColor);
-            internalMathView.setInline(inline);
+            InternalMathView internalMathView = new InternalMathView(context, part, inline);
             internalMathView.load();
-            cache.put(cachePos, new SoftReference<>(internalMathView));
             return internalMathView;
         }
 
-        /**
-         * @param context a context for view creation
-         * @param laTeX a latex literal to be displayed
-         * @param inline inline or displayed latex
-         * @param preloadLayout a layout for the view to preload
-         * @param index part index as part of whole message (used for caching)
-         * @param id message id (used for caching)
-         */
-        public static void preload(
-                Context context,
-                @Nullable AttributeSet attrs,
-                String laTeX,
-                @Dimension @Px int textSize, @ColorInt int textColor, boolean inline,
-                @Nullable LinearLayout preloadLayout,
-                int index, long id) {
-            InternalMathView mathView = new InternalMathView(context, attrs, laTeX, inline);
+        public static synchronized void preload(Context context, String message, String part, int position,
+                                   @Dimension @Px int textSize, @ColorInt int textColor, boolean inline,
+                                   @Nullable LinearLayout preloadLayout) {
+            InternalMathView mathView = new InternalMathView(context, part, inline);
             mathView.setTextSize(textSize);
             mathView.setTextColor(textColor);
-            mathView.setInline(inline);
             mathView.load();
+
             if (preloadLayout != null) {
                 preloadLayout.addView(mathView);
             }
 
-            cache.put(Objects.hash(laTeX, index, id), new SoftReference<>(mathView));
+            CACHE.put(new CacheKey(message, part, position), new SoftReference<>(mathView));
         }
 
-        /**
-         * Give up ownership for a {@code InternalMathView} so that it can be claimed by other {@code MathView}s.
-         * @param laTeX a latex literal to be displayed
-         * @param index part index as part of whole message (used for caching)
-         * @param id message id (used for caching)
-         * @param owner the current owner of the {@code InternalMathView}
-         */
-        public static void release(String laTeX, int index, long id, MathView owner) {
-            int ownedPos = Objects.hash(laTeX, index, id, owner);
+        public static synchronized void release(String message, String part, int position, InternalMathView mathView, @Nullable LinearLayout preloadLayout) {
+            var parent = mathView.getParent();
+            if (parent instanceof ViewGroup) ((ViewGroup) parent).removeView(mathView);
 
-            SoftReference<InternalMathView> ref = cache.get(ownedPos);
-            if (ref != null && ref.get() != null) {
-                int unownedPos = Objects.hash(laTeX, index, id);
-                cache.remove(ownedPos);
-                cache.put(unownedPos, ref);
+            var previous = CACHE.putIfAbsent(new CacheKey(message, part, position), new SoftReference<>(mathView));
+            if (previous == null && preloadLayout != null) {
+                preloadLayout.addView(mathView);
             }
         }
-
 
         private String laTeX;
         private float startX;
@@ -386,10 +336,9 @@ public class MathView extends LinearLayout {
 
         private boolean dirty = true;
 
-
         @SuppressLint("SetJavaScriptEnabled")
-        public InternalMathView(Context context, AttributeSet attrs, String laTeX, boolean inline) {
-            super(context, attrs);
+        public InternalMathView(Context context, String laTeX, boolean inline) {
+            super(context);
 
             this.inline = inline;
 
@@ -488,6 +437,33 @@ public class MathView extends LinearLayout {
             chunk.set("textColor", hexColor);
 
             this.loadDataWithBaseURL(null, chunk.toString(), "text/html", "utf-8", "about:blank");
+        }
+
+        private static class CacheKey {
+            public String message;
+            public String part;
+            public int position;
+
+            public CacheKey(String message, String part, int position) {
+                this.message = message;
+                this.part = part;
+                this.position = position;
+            }
+
+            @Override
+            public boolean equals(Object o) {
+                if (this == o) return true;
+                if (o == null || getClass() != o.getClass()) return false;
+                CacheKey cacheKey = (CacheKey) o;
+                return position == cacheKey.position
+                       && Objects.equals(message, cacheKey.message)
+                       && Objects.equals(part, cacheKey.part);
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(message, part, position);
+            }
         }
     }
 }

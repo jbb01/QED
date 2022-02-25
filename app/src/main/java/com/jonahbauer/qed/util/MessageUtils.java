@@ -1,22 +1,19 @@
 package com.jonahbauer.qed.util;
 
-import android.app.Activity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SoundEffectConstants;
-import android.view.View;
 import android.widget.ListView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.fragment.app.Fragment;
 
-import com.google.android.material.snackbar.Snackbar;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.MainActivity;
-import com.jonahbauer.qed.activities.mainFragments.ChatFragment;
 import com.jonahbauer.qed.model.Message;
 import com.jonahbauer.qed.model.adapter.MessageAdapter;
 import com.jonahbauer.qed.networking.NetworkConstants;
@@ -28,7 +25,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 import lombok.experimental.UtilityClass;
@@ -42,20 +39,25 @@ public class MessageUtils {
     /**
      * Sets the checked item in the list and shows an appropriate toolbar.
      *
+     * @param fragment a fragment for context
+     * @param listView the list view
+     * @param adapter the list adapter
+     * @param infoCallback a callback for when the action mode's info button is pressed
+     * @param replyCallback a callback for when the action mode's reply button is pressed
      * @param position the position of the checked item in the {@link MessageAdapter}
      * @param value if the item is checked or not
      */
     public static void setChecked(@NonNull Fragment fragment,
                                   @NonNull ListView listView,
                                   @NonNull MessageAdapter adapter,
-                                  @NonNull Consumer<Message> info,
-                                  int position, boolean value,
-                                  @Nullable View anchorView) {
+                                  @Nullable BiConsumer<ActionMode, Message> infoCallback,
+                                  @Nullable BiConsumer<ActionMode, Message> replyCallback,
+                                  int position, boolean value) {
         listView.setItemChecked(position, value);
 
-        Activity activity = fragment.getActivity();
-        if (activity instanceof MainActivity) {
-            MainActivity mainActivity = (MainActivity) activity;
+        var activity = fragment.getActivity();
+        if (activity instanceof AppCompatActivity) {
+            var appCompatActivity = (AppCompatActivity) activity;
 
             if (value) {
                 listView.playSoundEffect(SoundEffectConstants.CLICK);
@@ -66,6 +68,13 @@ public class MessageUtils {
                     @Override
                     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
                         mode.getMenuInflater().inflate(R.menu.menu_message, menu);
+
+                        var reply = menu.findItem(R.id.message_reply);
+                        if (reply != null) reply.setVisible(replyCallback != null);
+
+                        var info = menu.findItem(R.id.message_info);
+                        if (info != null) info.setVisible(infoCallback != null);
+
                         return true;
                     }
 
@@ -77,32 +86,18 @@ public class MessageUtils {
                     @Override
                     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
                         if (item.getItemId() == R.id.message_info) {
-                            info.accept(msg);
-                            return true;
+                            if (infoCallback != null) {
+                                infoCallback.accept(mode, msg);
+                                return true;
+                            }
                         } else if (item.getItemId() == R.id.message_copy) {
-                            Actions.copy(fragment.requireContext(), fragment.requireView(), anchorView, msg.getName(), msg.getMessage());
+                            Actions.copy(fragment.requireContext(), listView, msg.getName(), msg.getMessage());
                             return true;
                         } else if (item.getItemId() == R.id.message_reply) {
-                            if (fragment instanceof ChatFragment) {
-                                var chatFragment = (ChatFragment) fragment;
-                                var text = chatFragment.getText();
-                                var reply = MessageUtils.copyFormat(msg);
-                                Snackbar snackbar;
-                                if (!text.toString().startsWith(reply)) {
-                                    text.insert(0, reply + "\n\n");
-                                    snackbar = Snackbar.make(chatFragment.requireView(), R.string.message_reply_prepended, Snackbar.LENGTH_SHORT);
-                                    mainActivity.finishActionMode();
-                                } else {
-                                    snackbar = Snackbar.make(chatFragment.requireView(), R.string.message_reply_present, Snackbar.LENGTH_SHORT);
-                                }
-                                if (anchorView != null) {
-                                    snackbar.setAnchorView(anchorView);
-                                }
-                                snackbar.show();
-                            } else {
-                                Log.e(LOG_TAG, "Reply button click received but not in ChatFragment.");
+                            if (replyCallback != null) {
+                                replyCallback.accept(mode, msg);
+                                return true;
                             }
-                            return true;
                         }
                         return false;
                     }
@@ -113,7 +108,7 @@ public class MessageUtils {
                     }
                 };
 
-                var actionMode = mainActivity.startSupportActionMode(actionModeCallBack);
+                var actionMode = appCompatActivity.startSupportActionMode(actionModeCallBack);
                 if (actionMode == null) {
                     Log.e(LOG_TAG, "Unexpected null value for action mode");
                 } else {
@@ -123,22 +118,10 @@ public class MessageUtils {
                         actionMode.setTitle(msg.getName());
                     }
                 }
-
-            } else {
-                mainActivity.finishActionMode();
+            } else if (appCompatActivity instanceof MainActivity) {
+                ((MainActivity) appCompatActivity).finishActionMode();
             }
         }
-    }
-
-    /**
-     * @see #setChecked(Fragment, ListView, MessageAdapter, Consumer, int, boolean, View)
-     */
-    public static void setChecked(@NonNull Fragment fragment,
-                                  @NonNull ListView listView,
-                                  @NonNull MessageAdapter adapter,
-                                  @NonNull Consumer<Message> info,
-                                  int position, boolean value) {
-        setChecked(fragment, listView, adapter, info, position, value, null);
     }
 
     /**

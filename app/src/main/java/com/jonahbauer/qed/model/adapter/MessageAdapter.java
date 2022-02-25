@@ -1,10 +1,11 @@
 package com.jonahbauer.qed.model.adapter;
 
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.graphics.Color;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 
@@ -14,18 +15,22 @@ import androidx.annotation.Nullable;
 import androidx.annotation.Px;
 
 import com.jonahbauer.qed.R;
+import com.jonahbauer.qed.databinding.ListItemMessageBinding;
+import com.jonahbauer.qed.layoutStuff.views.ExtendedMessageView;
 import com.jonahbauer.qed.layoutStuff.views.MathView;
-import com.jonahbauer.qed.layoutStuff.views.MessageView;
+import com.jonahbauer.qed.layoutStuff.views.SimpleMessageView;
 import com.jonahbauer.qed.model.Message;
 import com.jonahbauer.qed.util.Preferences;
 import com.jonahbauer.qed.util.ViewUtils;
 
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 public class MessageAdapter extends ArrayAdapter<Message> {
     private final Context mContext;
@@ -35,8 +40,6 @@ public class MessageAdapter extends ArrayAdapter<Message> {
     private final DateTimeFormatter mDateBannerFormat = DateTimeFormatter
             .ofLocalizedDate(FormatStyle.MEDIUM)
             .withZone(ZoneId.systemDefault());
-
-    private final int mDp3;
 
     // Settings
     private boolean mLinkify;
@@ -48,7 +51,7 @@ public class MessageAdapter extends ArrayAdapter<Message> {
     private final boolean mLinkifySet;
 
     @Px
-    private float mDefaultTextSize;
+    private int mDefaultTextSize;
     @ColorInt
     private int mDefaultTextColor;
     private final LinearLayout mathPreload;
@@ -73,63 +76,101 @@ public class MessageAdapter extends ArrayAdapter<Message> {
 
         if (mExtended && mKatexSet && mKatex) throw new IllegalArgumentException("Extended message views do not support Katex!");
 
-        mDp3 = (int) ViewUtils.dpToPx(context, 3);
         obtainDefaultTextAppearance();
         reload();
     }
 
     private void obtainDefaultTextAppearance() {
-        mDefaultTextSize = ViewUtils.spToPx(mContext, 14);
+        mDefaultTextSize = (int) ViewUtils.spToPx(mContext, 14);
         mDefaultTextColor = Color.BLACK;
 
-        TypedArray typedArray = mContext.obtainStyledAttributes(R.style.Widget_App_Message, R.styleable.MessageView);
-        int textAppearanceResId = typedArray.getResourceId(R.styleable.MessageView_messageTextAppearance, -1);
-        if (textAppearanceResId != -1) {
-            TypedArray textAppearance = mContext.obtainStyledAttributes(textAppearanceResId, new int[] {android.R.attr.textSize, android.R.attr.textColor});
-            mDefaultTextSize = textAppearance.getDimension(0, mDefaultTextSize);
-            mDefaultTextColor = textAppearance.getColor(1, mDefaultTextColor);
-            textAppearance.recycle();
-        }
-        mDefaultTextSize = typedArray.getDimension(R.styleable.MessageView_messageTextSize, mDefaultTextSize);
-        mDefaultTextColor = typedArray.getColor(R.styleable.MessageView_messageTextColor, mDefaultTextColor);
+        var styleable = mExtended
+                ? R.styleable.ExtendedMessageView_messageTextAppearance
+                : R.styleable.SimpleMessageView_messageTextAppearance;
+        var defStyleAttr = mExtended
+                ? R.attr.extendedMessageStyle
+                : R.attr.messageStyle;
+        var defStyleRes = mExtended
+                ? R.style.Widget_App_Message_Extended
+                : R.style.Widget_App_Message;
 
-        typedArray.recycle();
+        var array = mContext.obtainStyledAttributes(null, new int[] {styleable}, defStyleAttr, defStyleRes);
+        var textAppearance = array.getResourceId(styleable, 0);
+        array.recycle();
+
+        if (textAppearance != 0) {
+            var taArray = mContext.obtainStyledAttributes(textAppearance, new int[] {R.styleable.TextAppearance_android_textColor, R.styleable.TextAppearance_android_textSize});
+            mDefaultTextSize = taArray.getDimensionPixelSize(R.styleable.TextAppearance_android_textSize, mDefaultTextSize);
+            mDefaultTextColor = taArray.getColor(R.styleable.TextAppearance_android_textColor, mDefaultTextColor);
+            taArray.recycle();
+        }
+    }
+
+    private ExtendedMessageView getExtendedView(View convertView) {
+        if (convertView instanceof ExtendedMessageView) {
+            var messageView = (ExtendedMessageView) convertView;
+            if (!messageView.isColorful() || mColorful) return messageView;
+        }
+        return new ExtendedMessageView(mContext);
+    }
+
+    private SimpleMessageView getSimpleView(View convertView, int position, Message message) {
+        ListItemMessageBinding binding = null;
+
+        if (convertView != null && convertView.getTag() instanceof ListItemMessageBinding) {
+            binding = (ListItemMessageBinding) convertView.getTag();
+            var messageView = binding.message;
+            if (messageView.isColorful() && !mColorful) binding = null;
+        }
+
+        if (binding == null) {
+            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            binding = ListItemMessageBinding.inflate(inflater, null, false);
+            binding.getRoot().setTag(binding);
+        }
+
+        var lp = binding.message.getLayoutParams();
+        lp.width = mKatex ? LayoutParams.MATCH_PARENT : LayoutParams.WRAP_CONTENT;
+        binding.message.setLayoutParams(lp);
+
+        if (position == 0 || message.getLocalDate().isAfter(getItem(position - 1).getLocalDate())) {
+            binding.messageDateBanner.setVisibility(View.VISIBLE);
+            binding.messageDateBanner.setText(formatBanner(message.getLocalDate()));
+        } else {
+            binding.messageDateBanner.setVisibility(View.GONE);
+        }
+
+        return binding.message;
     }
 
     @NonNull
     @Override
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
-        final Message message = mMessageList.get(position);
+        final Message message = getItem(position);
 
-        MessageView view = null;
-        if (convertView instanceof MessageView) {
-            view = (MessageView) convertView;
-            if (view.isExtended() != mExtended) {
-                view = null;
-            }
-        }
+        var view = mExtended
+                ? getExtendedView(convertView)
+                : getSimpleView(convertView, position, message);
 
-        if (view == null) {
-            view = new MessageView(mContext, mExtended);
-        }
-
-        boolean hasBanner = (position == 0)
-                || (message.getLocalDate().isAfter(mMessageList.get(position - 1).getLocalDate()));
-
-        view.setPadding(mDp3, mDp3, mDp3, mDp3);
-        view.setKatex(mKatex);
-        view.setMessage(message);
-        view.setFocusable(false);
-        view.setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
-        view.setDateBanner(hasBanner ? mDateBannerFormat.format(message.getLocalDate()) : null);
-        view.setLinkify(mLinkify);
         view.setColorful(mColorful);
 
+        if (view instanceof SimpleMessageView) {
+            var simple = (SimpleMessageView) view;
+            simple.setKatex(mKatex);
+            simple.setMathPreload(mathPreload);
+        }
+
+        view.setMessage(message);
+        view.setLinkify(mLinkify);
+        view.setFocusable(false);
+        view.setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
+
+        if (!mExtended) return (View) view.getParent();
         return view;
     }
 
     public List<Message> getData() {
-        return new LinkedList<>(mMessageList);
+        return new ArrayList<>(mMessageList);
     }
 
     @Override
@@ -137,7 +178,7 @@ public class MessageAdapter extends ArrayAdapter<Message> {
         super.add(message);
 
         if (mKatex) {
-            MathView.extractAndPreload(mContext, null, message.getMessage(), (int) mDefaultTextSize, mDefaultTextColor, message.getId(), mathPreload);
+            preloadMath(message);
         }
     }
 
@@ -147,14 +188,9 @@ public class MessageAdapter extends ArrayAdapter<Message> {
 
         if (mKatex) {
             for (Message message : collection) {
-                MathView.extractAndPreload(mContext, null, message.getMessage(), (int) mDefaultTextSize, mDefaultTextColor, message.getId(), mathPreload);
+                preloadMath(message);
             }
         }
-    }
-
-    @Override
-    public int getCount() {
-        return mMessageList.size();
     }
 
     @Override
@@ -163,11 +199,22 @@ public class MessageAdapter extends ArrayAdapter<Message> {
     }
 
     @Override
+    @NonNull
+    @SuppressWarnings("ConstantConditions")
+    public Message getItem(int position) {
+        return super.getItem(position);
+    }
+
+    @Override
     public long getItemId(int position) {
-        if (position < mMessageList.size())
-            return mMessageList.get(position).getId();
-        else
-            return -1;
+        Objects.checkIndex(position, getCount());
+        return getItem(position).getId();
+    }
+
+    @Override
+    public void clear() {
+        super.clear();
+        reload();
     }
 
     public void reload() {
@@ -181,7 +228,7 @@ public class MessageAdapter extends ArrayAdapter<Message> {
         if (mathPreload != null) mathPreload.removeAllViews();
         if (mKatex && !mExtended) {
             for (Message message : mMessageList) {
-                MathView.extractAndPreload(mContext, null, message.getMessage(), (int) mDefaultTextSize, mDefaultTextColor, message.getId(), mathPreload);
+                preloadMath(message);
             }
         }
     }
@@ -193,9 +240,17 @@ public class MessageAdapter extends ArrayAdapter<Message> {
         reload();
     }
 
-    @Override
-    public void clear() {
-        super.clear();
-        reload();
+    private void preloadMath(Message message) {
+        MathView.extractAndPreload(
+                mContext,
+                message.getMessage(),
+                (int) mDefaultTextSize,
+                mColorful ? message.getTransformedColor() : mDefaultTextColor,
+                mathPreload
+        );
+    }
+
+    private String formatBanner(LocalDate date) {
+        return mDateBannerFormat.format(date);
     }
 }

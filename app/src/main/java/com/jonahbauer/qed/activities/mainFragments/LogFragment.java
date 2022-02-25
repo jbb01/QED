@@ -1,10 +1,18 @@
 package com.jonahbauer.qed.activities.mainFragments;
 
+import static com.jonahbauer.qed.model.LogRequest.DateRecentLogRequest;
+
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.*;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -12,6 +20,7 @@ import androidx.navigation.NavBackStackEntry;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
+
 import com.google.android.material.snackbar.Snackbar;
 import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.R;
@@ -25,18 +34,17 @@ import com.jonahbauer.qed.util.MessageUtils;
 import com.jonahbauer.qed.util.Preferences;
 import com.jonahbauer.qed.util.StatusWrapper;
 import com.jonahbauer.qed.util.ViewUtils;
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.schedulers.Schedulers;
 
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-import static com.jonahbauer.qed.model.LogRequest.DateRecentLogRequest;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class LogFragment extends Fragment {
     public static final String LOG_REQUEST_KEY = "logRequest";
-    private static final LogRequest DEFAULT_REQUEST = new DateRecentLogRequest(Preferences.chat().getChannel(), 24, TimeUnit.HOURS);
+    private final LogRequest DEFAULT_REQUEST = new DateRecentLogRequest(Preferences.chat().getChannel(), 24, TimeUnit.HOURS);
 
     private static final int STATUS_PENDING = 0;
     private static final int STATUS_RUNNING = 1;
@@ -183,8 +191,9 @@ public class LogFragment extends Fragment {
                 this,
                 mBinding.list,
                 mMessageAdapter,
-                msg -> NavHostFragment.findNavController(this)
-                                      .navigate(LogFragmentDirections.showMessage(msg)),
+                (mode, msg) -> NavHostFragment.findNavController(this)
+                                              .navigate(LogFragmentDirections.showMessage(msg)),
+                null,
                 position,
                 value
         );

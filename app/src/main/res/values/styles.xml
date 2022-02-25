@@ -17,20 +17,22 @@
     <style name="Widget.App.Button.Small">
         <item name="android:minHeight">36dp</item>
     </style>
+
     <style name="Widget.App.Message" parent="">
-        <item name="android:colorBackground">@color/message_background</item>
-        <item name="android:colorPressedHighlight">@color/message_highlight</item>
+        <item name="android:backgroundTint">@color/message_background</item>
 
         <item name="nameTextAppearance">@style/TextAppearance.App.Message.Name</item>
         <item name="messageTextAppearance">@style/TextAppearance.App.Message.Message</item>
-        <item name="dateTextAppearance">@style/TextAppearance.App.Message.Date</item>
-        <item name="dataTextAppearance">@style/TextAppearance.App.Message.Data</item>
-
-        <item name="dateBannerTextAppearance">@style/TextAppearance.App.Message.DateBanner</item>
-        <item name="dateBannerBackgroundTint">@color/dateBannerBackground</item>
+        <item name="dataTextAppearance">@style/TextAppearance.App.Message.Date</item>
 
         <item name="android:elevation">3dp</item>
     </style>
+    <style name="Widget.App.Message.Extended">
+        <item name="android:backgroundTint">@color/message_background</item>
+        <item name="dataTextAppearance">@style/TextAppearance.App.Message.Data</item>
+        <item name="android:elevation">1dp</item>
+    </style>
+
     <style name="Widget.App.Divider" parent="">
         <item name="android:background">?divider</item>
         <item name="android:layout_height">?android:dividerHeight</item>
@@ -66,8 +68,8 @@
         <item name="android:textColor">?colorOnSurfaceVariant</item>
     </style>
     <style name="TextAppearance.App.Message.Data">
-        <item name="android:textSize">15sp</item>
-        <item name="android:textColor">?colorOnSurface</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">?colorOnSurfaceVariant</item>
     </style>
     <style name="TextAppearance.App.Message.DateBanner">
         <item name="android:textSize">12sp</item>

@@ -1,6 +1,5 @@
 package com.jonahbauer.qed.activities.mainFragments;
 
-import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -9,14 +8,22 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.text.Editable;
 import android.util.Log;
-import android.view.*;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AbsListView;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.view.ActionMode;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
+
+import com.google.android.material.snackbar.Snackbar;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.MainActivity;
 import com.jonahbauer.qed.databinding.FragmentChatBinding;
@@ -32,14 +39,15 @@ import com.jonahbauer.qed.networking.login.QEDLogin;
 import com.jonahbauer.qed.util.MessageUtils;
 import com.jonahbauer.qed.util.Preferences;
 import com.jonahbauer.qed.util.ViewUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class ChatFragment extends Fragment implements NetworkListener, AbsListView.OnScrollListener {
     private static final String LOG_TAG = ChatFragment.class.getName();
@@ -57,6 +65,8 @@ public class ChatFragment extends Fragment implements NetworkListener, AbsListVi
 
     private long mTopPosition = Long.MAX_VALUE;
     private long mLastPostId;
+
+    private boolean mQuickSettingsShown = false;
 
     @Nullable
     private MenuItem mRefreshButton;
@@ -79,16 +89,12 @@ public class ChatFragment extends Fragment implements NetworkListener, AbsListVi
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         ViewUtils.setFitsSystemWindowsBottom(view);
 
-        mBinding.editTextMessage.setOnClickListener(v -> {
+        mBinding.messageInput.setOnClickListener(v -> {
             if (mBinding.list.getLastVisiblePosition() >= mMessageAdapter.getCount() - 1) {
                 mHandler.postDelayed(() -> mBinding.list.setSelection(mMessageAdapter.getCount() - 1), 100);
             }
         });
         mBinding.buttonSend.setOnClickListener(v -> send());
-
-        mBinding.quickSettingsName.hide();
-        mBinding.quickSettingsChannel.hide();
-        mBinding.quickSettings.setAlpha(0.35f);
 
         Context context = requireContext();
         // setup quick settings
@@ -111,35 +117,15 @@ public class ChatFragment extends Fragment implements NetworkListener, AbsListVi
                     }
             );
         });
-        mBinding.quickSettings.setOnClickListener(new View.OnClickListener() {
-            private boolean mShowQuickSettings = false;
-            private final Runnable mFabFade = () -> {
-                ObjectAnimator animation = ObjectAnimator.ofFloat(mBinding.quickSettings, "alpha", 0.35f);
-                animation.setDuration(1000);
-                animation.start();
-            };
-
-            @Override
-            public void onClick(View v) {
-                if (mShowQuickSettings) {
-                    mBinding.quickSettings.postDelayed(mFabFade, 5000);
-                    mBinding.quickSettingsName.hide();
-                    mBinding.quickSettingsChannel.hide();
-                } else {
-                    mBinding.quickSettings.removeCallbacks(mFabFade);
-                    mBinding.quickSettings.setAlpha(1f);
-                    mBinding.quickSettingsName.show();
-                    mBinding.quickSettingsChannel.show();
-                }
-                mShowQuickSettings = !mShowQuickSettings;
-            }
-        });
+        mBinding.quickSettings.setOnClickListener(this::toggleQuickSettings);
 
         var messageBox = mBinding.list;
         mMessageAdapter = new MessageAdapter(view.getContext(), new ArrayList<>(), mBinding.mathPreload);
         messageBox.setAdapter(mMessageAdapter);
         messageBox.setOnScrollListener(this);
-        messageBox.setOnItemClickListener((parent, v, position, id) -> setChecked(position, false));
+        messageBox.setOnItemClickListener((parent, v, position, id) -> {
+            setChecked(position, false);
+        });
         messageBox.setOnItemLongClickListener((parent, v, position, id) -> {
             if (!messageBox.isItemChecked(position)) {
                 int checked = messageBox.getCheckedItemPosition();
@@ -240,7 +226,7 @@ public class ChatFragment extends Fragment implements NetworkListener, AbsListVi
         );
 
         mBinding.setReady(true);
-        ViewUtils.setError(mBinding.editTextMessage, false);
+        ViewUtils.setError(mBinding.messageInput, false);
 
         mMessageAdapter.notifyDataSetChanged();
 
@@ -262,7 +248,7 @@ public class ChatFragment extends Fragment implements NetworkListener, AbsListVi
     private void send(boolean force) {
         assert getContext() != null;
 
-        String message = mBinding.editTextMessage.getText().toString();
+        String message = mBinding.messageInput.getText().toString();
 
         if (!force && message.trim().isEmpty()) {
             AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getContext());
@@ -282,11 +268,11 @@ public class ChatFragment extends Fragment implements NetworkListener, AbsListVi
                 Preferences.chat().isPublicId()
         );
         if (success) {
-            ViewUtils.setError(mBinding.editTextMessage, false);
-            mBinding.editTextMessage.setText("");
-            mBinding.editTextMessage.requestFocus();
+            ViewUtils.setError(mBinding.messageInput, false);
+            mBinding.messageInput.setText("");
+            mBinding.messageInput.requestFocus();
         } else {
-            ViewUtils.setError(mBinding.editTextMessage, true);
+            ViewUtils.setError(mBinding.messageInput, true);
         }
     }
 
@@ -350,6 +336,30 @@ public class ChatFragment extends Fragment implements NetworkListener, AbsListVi
         });
     }
 
+    private void reply(@NonNull ActionMode actionMode, @NonNull Message message) {
+        var reply = MessageUtils.copyFormat(message);
+        var text = mBinding.messageInput.getEditableText();
+
+        if (!text.toString().startsWith(reply)) {
+            text.insert(0, reply + "\n\n");
+            Snackbar.make(mBinding.list, R.string.message_reply_prepended, Snackbar.LENGTH_SHORT).show();
+            actionMode.finish();
+        } else {
+            Snackbar.make(mBinding.list, R.string.message_reply_present, Snackbar.LENGTH_SHORT).show();
+        }
+    }
+
+    private void toggleQuickSettings(View view) {
+        if (mQuickSettingsShown) {
+            mBinding.quickSettingsName.hide();
+            mBinding.quickSettingsChannel.hide();
+        } else {
+            mBinding.quickSettingsName.show();
+            mBinding.quickSettingsChannel.show();
+        }
+        mQuickSettingsShown = !mQuickSettingsShown;
+    }
+
     @Override
     public void onScrollStateChanged(AbsListView view, int scrollState) {}
 
@@ -383,11 +393,11 @@ public class ChatFragment extends Fragment implements NetworkListener, AbsListVi
                 this,
                 mBinding.list,
                 mMessageAdapter,
-                msg -> NavHostFragment.findNavController(this)
-                                      .navigate(ChatFragmentDirections.showMessage(msg)),
+                (mode, msg) -> NavHostFragment.findNavController(this)
+                                              .navigate(ChatFragmentDirections.showMessage(msg)),
+                this::reply,
                 position,
-                value,
-                mBinding.editTextMessage
+                value
         );
     }
 
@@ -408,10 +418,6 @@ public class ChatFragment extends Fragment implements NetworkListener, AbsListVi
 
         mBinding.setReady(false);
         mBinding.setLoading(false);
-    }
-
-    public Editable getText() {
-        return mBinding.editTextMessage.getEditableText();
     }
     //</editor-fold>
 }

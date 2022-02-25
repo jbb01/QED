@@ -1,81 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:parentTag="RelativeLayout"
-    tools:theme="@style/Widget.App.Message"
+    tools:parentTag="android.widget.LinearLayout"
+    tools:orientation="vertical"
     tools:background="@android:color/darker_gray">
 
-<!--
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-    -->
+<!--    <LinearLayout-->
+<!--        android:id="@+id/message_layout"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:orientation="vertical">-->
 
-    <TableLayout
-        android:id="@+id/message_layout"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/message_extended_background_ripple"
-        android:orientation="vertical"
-        android:elevation="1dp">
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <TextView
-                android:id="@+id/message_channel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textAppearance="@style/TextAppearance.App.Message.Data"
-                android:textStyle="italic"
-                tools:text="(main)"/>
+        android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/message_id"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="3dp"
-                android:textAppearance="@style/TextAppearance.App.Message.Data"
-                android:textAlignment="textEnd"
-                tools:text="#2185476"/>
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <TextView
-                android:id="@+id/message_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textAppearance="@style/TextAppearance.App.Message.Name"
-                android:clickable="false"
-                android:focusable="false"
-                tools:text="Max Mustermann" />
-
-            <TextView
-                android:id="@+id/message_date"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAlignment="textEnd"
-                android:clickable="false"
-                android:focusable="false"
-                android:layout_marginStart="3dp"
-                android:textAppearance="@style/TextAppearance.App.Message.Data"
-                tools:text="2019-11-02 13:37:00"/>
-        </TableRow>
         <TextView
-            android:id="@+id/message_message"
-            android:layout_width="match_parent"
+            android:id="@+id/message_channel"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.App.Message.Message"
+            android:layout_weight="1"
+            android:textAppearance="@style/TextAppearance.App.Message.Data"
+            android:textStyle="italic"
+            tools:text="(main)"/>
+
+        <Space
+            android:layout_width="4dp"
+            android:layout_height="0dp"/>
+
+        <TextView
+            android:id="@+id/message_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.App.Message.Data"
+            android:textAlignment="textEnd"
+            tools:text="#2185476"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/message_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:clickable="false"
             android:focusable="false"
-            tools:text="Musternachricht             " />
-    </TableLayout>
-<!--
-</RelativeLayout>
--->
+            android:textAppearance="@style/TextAppearance.App.Message.Name"
+            tools:text="@tools:sample/full_names" />
+
+        <Space
+            android:layout_width="4dp"
+            android:layout_height="0dp" />
+
+        <TextView
+            android:id="@+id/message_timestamp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="false"
+            android:focusable="false"
+            android:textAlignment="textEnd"
+            android:textAppearance="@style/TextAppearance.App.Message.Data"
+            tools:text="2019-11-02 13:37:00" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/message_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.App.Message.Message"
+        android:clickable="false"
+        android:focusable="false"
+        tools:text="@tools:sample/lorem/random" />
+<!--    </LinearLayout>-->
 </merge>

@@ -18,7 +18,6 @@
         <item name="materialButtonStyle">@style/Widget.App.Button</item>
         <item name="floatingActionButtonStyle">@style/Widget.App.FloatingActionButton</item>
         <item name="toolbarStyle">@style/Widget.MaterialComponents.Toolbar.Primary</item>
-        <item name="messageStyle">@style/Widget.App.Message</item>
         <item name="triCheckboxStyle">?checkboxStyle</item>
         <item name="dividerStyle">@style/Widget.App.Divider</item>
         <item name="textInputStyle">@style/Widget.Design.TextInputLayout</item>
@@ -48,6 +47,12 @@
 
         <item name="android:statusBarColor">@color/statusBarScrim</item>
         <item name="android:navigationBarColor">@android:color/black</item>
+
+        <!-- Messages -->
+        <item name="messageStyle">@style/Widget.App.Message</item>
+        <item name="extendedMessageStyle">@style/Widget.App.Message.Extended</item>
+        <item name="dateBannerTextAppearance">@style/TextAppearance.App.Message.DateBanner</item>
+        <item name="dateBannerBackgroundTint">@color/dateBannerBackground</item>
     </style>
 
     <style name="Theme.App" parent="Base.Theme.App">
@@ -143,6 +148,8 @@
         <item name="buttonStyle">@style/Widget.App.Button</item>
         <item name="buttonBarButtonStyle">@style/Widget.App.Button</item>
         <item name="android:colorBackground">@color/colorSurface</item>
+
+        <item name="android:colorControlNormal">?android:textColorSecondary</item>
     </style>
     <style name="ThemeOverlay.App.Dialog.Alert" parent="ThemeOverlay.MaterialComponents.Dialog.Alert">
         <item name="buttonStyle">@style/Widget.App.Button</item>
