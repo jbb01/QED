@@ -116,7 +116,7 @@
         <argument
             android:name="album"
             app:argType="com.jonahbauer.qed.model.Album"
-            app:nullable="false"/>
+            app:nullable="true"/>
         <deepLink
             android:id="@+id/deep_link_chat_log"
             app:uri="qedgallery.qed-verein.de/album_view.php" />

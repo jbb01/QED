@@ -1,6 +1,7 @@
 package com.jonahbauer.qed.activities.mainFragments;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -10,6 +11,7 @@ import android.view.*;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.StyleRes;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.FileProvider;
@@ -41,6 +43,8 @@ import java.util.Collections;
 import java.util.List;
 
 public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickListener {
+    private static final @StyleRes int THEME = R.style.Theme_App_Dark;
+
     private FragmentImageBinding mBinding;
 
     private Image mImage; // currently shown image
@@ -111,6 +115,7 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         var context = requireContext();
+        inflater = inflater.cloneInContext(context);
 
         var activity = (MainActivity) requireActivity();
         var controller = activity.getWindowInsetsController();
@@ -303,6 +308,15 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
         }
 
         return null;
+    }
+
+    @Nullable
+    @Override
+    public Context getContext() {
+        var context = super.getContext();
+        if (context == null) return null;
+
+        return new ContextThemeWrapper(context, THEME);
     }
 
     private class ImageAdapter extends ListAdapter<Image, ImageViewHolder> {

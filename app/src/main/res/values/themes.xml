@@ -109,6 +109,7 @@
         <item name="actionBarPopupTheme">@style/ThemeOverlay.MaterialComponents.Dark</item>
         <item name="popupTheme">@style/ThemeOverlay.MaterialComponents.Dark</item>
         <item name="android:popupTheme">@style/ThemeOverlay.MaterialComponents.Dark</item>
+        <item name="android:actionBarPopupTheme">@style/ThemeOverlay.MaterialComponents.Dark</item>
 
         <!-- Dialog Themes -->
         <item name="android:dialogTheme">@style/ThemeOverlay.App.Dialog.Dark</item>
