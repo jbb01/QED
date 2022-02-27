@@ -1,54 +1,56 @@
 package com.jonahbauer.qed.model.adapter;
 
 import android.content.Context;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.SectionIndexer;
-
 import androidx.annotation.NonNull;
-
 import com.jonahbauer.qed.R;
-import com.jonahbauer.qed.databinding.ListItemEventBinding;
+import com.jonahbauer.qed.layoutStuff.views.MaterialListItem;
 import com.jonahbauer.qed.model.Event;
-
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Function;
-
+import com.jonahbauer.qed.util.Themes;
+import com.jonahbauer.qed.util.TimeUtils;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 
+import java.text.MessageFormat;
+import java.util.*;
+import java.util.function.Function;
+
 public class EventAdapter extends ArrayAdapter<Event> implements SectionIndexer {
-    private final Context mContext;
     private final List<Event> mEventList;
 
     public EventAdapter(Context context, List<Event> eventList) {
-        super(context, R.layout.list_item_event, eventList);
-        this.mContext = context;
+        super(context, 0, eventList);
         this.mEventList = eventList;
     }
 
     @NonNull
     @Override
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
+        var context = getContext();
         final Event event = mEventList.get(position);
 
-        ListItemEventBinding binding;
-        if (convertView != null) {
-            binding = (ListItemEventBinding) convertView.getTag();
+        MaterialListItem item;
+        if (convertView instanceof MaterialListItem) {
+            item = (MaterialListItem) convertView;
         } else {
-            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            binding = ListItemEventBinding.inflate(inflater, parent, false);
-            binding.getRoot().setTag(binding);
+            item = new MaterialListItem(context);
+            item.setIcon(R.drawable.ic_event_icon);
         }
 
-        binding.setEvent(event);
-        return binding.getRoot();
+        String subtitle = MessageFormat.format(
+                context.getString(R.string.event_title_time),
+                event.getStart() != null ? TimeUtils.format(event.getStart()) : event.getStartString(),
+                event.getEnd() != null ? TimeUtils.format(event.getEnd()) : event.getEndString()
+        );
+
+        item.setTitle(event.getTitle());
+        item.setSubtitle(subtitle);
+        item.setIconTint(Themes.colorful(getContext(), event.getId()));
+
+        return item;
     }
 
     @Override

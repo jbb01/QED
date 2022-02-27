@@ -79,6 +79,23 @@
     <attr name="messageStyle" format="reference"/>
     <attr name="extendedMessageStyle" format="reference"/>
 
+    <declare-styleable name="MaterialListItem">
+        <attr name="title" format="string"/>
+        <attr name="subtitle" format="string" />
+        <attr name="icon" format="reference"/>
+        <attr name="iconText" format="string" />
+
+        <attr name="titleTextAppearance" format="reference" />
+        <attr name="subtitleTextAppearance" format="reference" />
+        <attr name="iconTextAppearance" format="reference" />
+        <attr name="iconTint" format="color"/>
+        <attr name="iconMode" format="enum">
+            <enum value="0" name="round"/>
+            <enum value="1" name="square"/>
+            <enum value="2" name="wide"/>
+        </attr>
+    </declare-styleable>
+
     <attr name="dividerStyle" format="reference"/>
     <attr name="triCheckboxStyle" format="reference"/>
 

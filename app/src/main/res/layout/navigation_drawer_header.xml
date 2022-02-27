@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/nav_header_height"
+    android:layout_height="200dp"
     android:gravity="bottom"
-    android:orientation="vertical"
-    android:background="?attr/colorPrimaryDark"
-    android:theme="@style/ThemeOverlay.AppCompat.Dark">
+    android:background="?attr/colorPrimaryDark">
 
     <ImageView
         android:layout_width="300dp"
@@ -15,13 +12,13 @@
         android:translationY="90.5dp"
         android:src="@drawable/radial_gradient"
         android:layout_gravity="start|bottom"
-        tools:ignore="ContentDescription" />
+        android:importantForAccessibility="no" />
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="start|bottom"
         android:src="@drawable/ic_qed_logo"
-        android:padding="@dimen/nav_header_vertical_spacing"
-        tools:ignore="ContentDescription" />
+        android:padding="16dp"
+        android:importantForAccessibility="no" />
 </FrameLayout>

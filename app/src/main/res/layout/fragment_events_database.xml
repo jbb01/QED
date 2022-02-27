@@ -40,8 +40,7 @@
             android:fastScrollAlwaysVisible="true"
             android:fastScrollEnabled="true"
             android:scrollbarStyle="outsideInset"
-            android:visibility="@{status == StatusWrapper.STATUS_LOADED ? View.VISIBLE : View.GONE}"
-            tools:listitem="@layout/list_item_event" />
+            android:visibility="@{status == StatusWrapper.STATUS_LOADED ? View.VISIBLE : View.GONE}" />
 
         <TextView
             android:layout_width="match_parent"

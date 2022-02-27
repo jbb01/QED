@@ -57,7 +57,6 @@
             android:scrollbarStyle="outsideInset"
             android:visibility="@{status == StatusWrapper.STATUS_LOADED ? View.VISIBLE : View.GONE}"
             tools:ignore="RtlSymmetry"
-            tools:listitem="@layout/list_item_album"
             tools:visibility="visible" />
 
 

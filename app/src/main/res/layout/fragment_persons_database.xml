@@ -234,9 +234,7 @@
 
             <include
                 android:id="@+id/fixed_header"
-                layout="@layout/list_item_person"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                layout="@layout/list_item_person" />
         </LinearLayout>
 
     </RelativeLayout>

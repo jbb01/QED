@@ -48,9 +48,19 @@
         <item name="android:maxWidth">@null</item>
     </style>
 
+    <style name="Widget.App.MaterialListItem" parent="">
+        <item name="titleTextAppearance">?textAppearanceSubtitle1</item>
+        <item name="subtitleTextAppearance">?textAppearanceCaption</item>
+        <item name="iconTextAppearance">@style/TextAppearance.App.MaterialListItem.Icon</item>
+    </style>
+
     <!-- TextAppearance -->
     <style name="TextAppearance.App.Button" parent="android:TextAppearance.Material.Button">
         <item name="android:textColor">?colorSecondary</item>
+    </style>
+    <style name="TextAppearance.App.MaterialListItem.Icon" parent="android:TextAppearance.Material.Body1">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">?colorOnAccentColor</item>
     </style>
 
     <style name="TextAppearance.App.Message" parent="android:TextAppearance.Material.Body1"/>

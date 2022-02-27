@@ -1,26 +1,22 @@
 package com.jonahbauer.qed.model.adapter;
 
 import android.content.Context;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-
 import androidx.annotation.NonNull;
-
 import com.jonahbauer.qed.R;
-import com.jonahbauer.qed.databinding.ListItemAlbumBinding;
+import com.jonahbauer.qed.layoutStuff.views.MaterialListItem;
 import com.jonahbauer.qed.model.Album;
+import com.jonahbauer.qed.util.Themes;
 
 import java.util.List;
 
 public class AlbumAdapter extends ArrayAdapter<Album> {
-    private final Context mContext;
     private final List<Album> mAlbumList;
 
     public AlbumAdapter(Context context, List<Album> albumList) {
-        super(context, R.layout.list_item_event, albumList);
-        this.mContext = context;
+        super(context, 0, albumList);
         this.mAlbumList = albumList;
     }
 
@@ -29,17 +25,18 @@ public class AlbumAdapter extends ArrayAdapter<Album> {
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         final Album album = mAlbumList.get(position);
 
-        ListItemAlbumBinding binding;
-        if (convertView != null) {
-            binding = (ListItemAlbumBinding) convertView.getTag();
+        MaterialListItem item;
+        if (convertView instanceof MaterialListItem) {
+            item = (MaterialListItem) convertView;
         } else {
-            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            binding = ListItemAlbumBinding.inflate(inflater, parent, false);
-            binding.getRoot().setTag(binding);
+            item = new MaterialListItem(getContext());
+            item.setIcon(R.drawable.ic_gallery_icon);
         }
 
-        binding.setAlbum(album);
-        return binding.getRoot();
+        item.setTitle(album.getName());
+        item.setIconTint(Themes.colorful(getContext(), album.getId()));
+
+        return item;
     }
 
     @Override

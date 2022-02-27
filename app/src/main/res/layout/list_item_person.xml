@@ -11,113 +11,37 @@
         <variable name="invertedInitials" type="boolean" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:id="@+id/person"
         android:layout_width="match_parent"
         android:layout_height="72dp"
         android:descendantFocusability="blocksDescendants"
-        android:padding="16dp">
+        android:orientation="horizontal">
 
         <TextView
             android:id="@+id/header"
             android:layout_width="12dp"
-            android:layout_height="40dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="16dp"
             android:gravity="center"
             android:textAppearance="?textAppearanceBody1"
             android:textColor="?colorOnBackground"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
             tools:text="M" />
 
-        <ImageView
-            android:id="@+id/person_initials_circle"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginStart="16dp"
-            android:importantForAccessibility="no"
-            android:src="@drawable/person_initials_circle"
-            android:visibility="@{person != null ? View.VISIBLE : View.INVISIBLE}"
-            app:layout_constraintStart_toEndOf="@id/header"
-            app:layout_constraintTop_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="@{Themes.colorful(context, person.id)}"
-            tools:tint="@android:color/holo_green_dark" />
-
-        <TextView
-            android:id="@+id/person_initials"
-            android:layout_width="wrap_content"
+        <com.jonahbauer.qed.layoutStuff.views.MaterialListItem
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="@{person.getInitials(invertedInitials)}"
-            android:textColor="?colorOnAccentColor"
-            android:textStyle="bold"
-            android:visibility="@{person != null ? View.VISIBLE : View.INVISIBLE}"
-            app:layout_constraintBottom_toBottomOf="@id/person_initials_circle"
-            app:layout_constraintEnd_toEndOf="@id/person_initials_circle"
-            app:layout_constraintStart_toStartOf="@id/person_initials_circle"
-            app:layout_constraintTop_toTopOf="@id/person_initials_circle"
-            tools:text="MM" />
-
-        <TextView
-            android:id="@+id/person_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:text="@{person.getFullName(invertedInitials)}"
-            android:textAppearance="?textAppearanceSubtitle1"
-            android:visibility="@{person != null ? View.VISIBLE : View.INVISIBLE}"
-            app:layout_constraintBaseline_toBaselineOf="@id/line1"
-            app:layout_constraintStart_toEndOf="@id/person_initials_circle"
-            tools:text="Max Mustermann" />
-
-        <TextView
-            android:id="@+id/person_active"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingStart="5dp"
-            android:paddingEnd="0dp"
-            android:text="@{!person.active ? @string/persons_database_inactive : !person.member ? @string/persons_database_non_member : ``}"
-            android:textAppearance="?textAppearanceBody1"
-            android:visibility="@{person != null ? View.VISIBLE : View.INVISIBLE}"
-            app:layout_constraintBaseline_toBaselineOf="@id/person_name"
-            app:layout_constraintStart_toEndOf="@id/person_name"
-            tools:text="(inaktiv)" />
-
-        <TextView
-            android:id="@+id/person_email"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:text="@{person.email ?? @string/persons_database_no_email}"
-            android:textAppearance="?textAppearanceCaption"
-            android:visibility="@{person != null ? View.VISIBLE : View.INVISIBLE}"
-            app:layout_constraintBaseline_toBaselineOf="@id/line2"
-            app:layout_constraintStart_toEndOf="@id/person_initials_circle"
-            tools:text="max.mustermann@email.com" />
-
-        <TextView
-            android:id="@+id/line1"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginTop="16dp"
-            android:orientation="horizontal"
-            android:textSize="0sp"
-            android:visibility="invisible"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/line2"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginTop="20dp"
-            android:orientation="horizontal"
-            android:textSize="0sp"
-            android:visibility="invisible"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/line1" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            android:visibility="@{person != null ? View.VISIBLE : View.GONE}"
+            app:icon="@drawable/person_initials_circle"
+            app:iconTint="@{Themes.colorful(context, person.id)}"
+            app:iconText="@{person.getInitials(invertedInitials)}"
+            app:title="@{person.getFullName(invertedInitials) + ` ` + (!person.active ? @string/persons_database_inactive : !person.member ? @string/persons_database_non_member : ``)}"
+            app:subtitle="@{person.email ?? @string/persons_database_no_email}"
+            tools:visibility="gone"
+            tools:title="Max Mustermann (inaktiv)"
+            tools:subtitle="max.mustermann@email.com"
+            tools:iconText="MM"
+            tools:iconTint="@android:color/holo_green_dark"/>
+    </LinearLayout>
 </layout>
