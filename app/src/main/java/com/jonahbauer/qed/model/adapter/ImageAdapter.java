@@ -1,8 +1,5 @@
 package com.jonahbauer.qed.model.adapter;
 
-import static com.jonahbauer.qed.model.Image.AUDIO_FILE_EXTENSIONS;
-import static com.jonahbauer.qed.model.Image.VIDEO_FILE_EXTENSIONS;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -12,10 +9,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.content.res.AppCompatResources;
-
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.databinding.ListItemImageBinding;
 import com.jonahbauer.qed.model.Image;
@@ -23,12 +18,14 @@ import com.jonahbauer.qed.model.room.AlbumDao;
 import com.jonahbauer.qed.model.room.Database;
 import com.jonahbauer.qed.networking.pages.QEDGalleryPages;
 import com.jonahbauer.qed.util.Preferences;
-
-import java.util.List;
-
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+
+import java.util.List;
+
+import static com.jonahbauer.qed.model.Image.AUDIO_FILE_EXTENSIONS;
+import static com.jonahbauer.qed.model.Image.VIDEO_FILE_EXTENSIONS;
 
 public class ImageAdapter extends ArrayAdapter<Image> {
     private static final String LOG_TAG = ImageAdapter.class.getName();
@@ -37,7 +34,7 @@ public class ImageAdapter extends ArrayAdapter<Image> {
     private final AlbumDao mAlbumDao;
 
     private final List<Image> mImageList;
-    private final boolean mOfflineMode;
+    private boolean mOfflineMode;
 
     public ImageAdapter(Context context, List<Image> imageList) {
         super(context, R.layout.list_item_image, imageList);
@@ -171,5 +168,9 @@ public class ImageAdapter extends ArrayAdapter<Image> {
     @Override
     public boolean hasStableIds() {
         return true;
+    }
+
+    public void setOfflineMode(boolean offlineMode) {
+        this.mOfflineMode = offlineMode;
     }
 }

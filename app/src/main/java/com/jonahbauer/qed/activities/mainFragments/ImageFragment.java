@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.*;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
@@ -43,6 +44,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickListener {
+    private static final String LOG_TAG = ImageFragment.class.getSimpleName();
     private static final @StyleRes int THEME = R.style.Theme_App_Dark;
 
     private FragmentImageBinding mBinding;
@@ -52,7 +54,7 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
     private LiveData<StatusWrapper<Image>> mImageStatus; // currently shown status
 
     private ImageAdapter mImageAdapter;
-    private Observer<StatusWrapper<Image>> mStatusObserver;
+    private final Observer<StatusWrapper<Image>> mStatusObserver = this::updateOverlay;
 
     private MenuItem mOpenWithButton;
     private MenuItem mDownloadButton;
@@ -66,26 +68,6 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
         setHasOptionsMenu(true);
 
         mImageAdapter = new ImageAdapter();
-
-        mStatusObserver = statusWrapper -> {
-            Image image = statusWrapper.getValue();
-            int code = statusWrapper.getCode();
-
-            if (image != null) {
-                mBinding.setTitle(image.getName());
-            }
-
-            if (code == StatusWrapper.STATUS_ERROR) {
-                mBinding.setError(getResources().getString(statusWrapper.getReason().getStringRes()));
-            } else {
-                mBinding.setError(null);
-            }
-
-            // update buttons
-            mOpenWithButton.setEnabled(image != null && image.getPath() != null);
-            mDownloadButton.setEnabled(image != null);
-            mInfoButton.setEnabled(image != null);
-        };
 
         Bundle args = getArguments();
         if (args != null) {
@@ -160,25 +142,7 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
         ViewPager2.OnPageChangeCallback pageChangeCallback = new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position) {
-                // remove old listeners
-                if (mImageStatus != null) {
-                    mImageStatus.removeObserver(mStatusObserver);
-                }
-                if (mImageViewHolder != null) {
-                    mImageViewHolder.onVisibilityChange(false);
-                }
-
-                // add new listeners
-                ImageViewHolder viewHolder = mImageAdapter.getViewHolderByPosition(position);
-                if (viewHolder != null) {
-                    mImageStatus = viewHolder.getStatus();
-                    mImageStatus.observe(getViewLifecycleOwner(), mStatusObserver);
-
-                    mImageViewHolder = viewHolder;
-                    mImageViewHolder.onVisibilityChange(true);
-                }
-
-                mImage = mImageAdapter.getCurrentList().get(position);
+                ImageFragment.this.onPageSelected(position);
             }
         };
         mBinding.viewPager.registerOnPageChangeCallback(pageChangeCallback);
@@ -213,19 +177,6 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
         ViewUtils.resetTransparentSystemBars(this);
         ViewUtils.showSupportActionBar(this);
         super.onDestroyView();
-    }
-
-    @Override
-    public void onDestroy() {
-        // send selected image to album fragment
-        try {
-            NavHostFragment.findNavController(this)
-                           .getBackStackEntry(R.id.nav_album)
-                           .getSavedStateHandle()
-                           .set(AlbumFragment.IMAGE_ID_KEY, mImage.getId());
-        } catch (IllegalArgumentException ignored) {}
-
-        super.onDestroy();
     }
 
     @Override
@@ -271,6 +222,58 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
             return true;
         }
         return false;
+    }
+
+    private void updateOverlay(StatusWrapper<Image> statusWrapper) {
+        Image image = statusWrapper.getValue();
+        int code = statusWrapper.getCode();
+
+        if (image != null) {
+            mBinding.setTitle(image.getName());
+        }
+
+        if (code == StatusWrapper.STATUS_ERROR) {
+            mBinding.setError(getResources().getString(statusWrapper.getReason().getStringRes()));
+        } else {
+            mBinding.setError(null);
+        }
+
+        // update buttons
+        mOpenWithButton.setEnabled(image != null && image.getPath() != null);
+        mDownloadButton.setEnabled(image != null);
+        mInfoButton.setEnabled(image != null);
+    }
+
+    private void onPageSelected(int position) {
+        // remove old listeners
+        if (mImageStatus != null) {
+            mImageStatus.removeObserver(mStatusObserver);
+        }
+        if (mImageViewHolder != null) {
+            mImageViewHolder.onVisibilityChange(false);
+        }
+
+        // add new listeners
+        ImageViewHolder viewHolder = mImageAdapter.getViewHolderByPosition(position);
+        if (viewHolder != null) {
+            mImageStatus = viewHolder.getStatus();
+            mImageStatus.observe(getViewLifecycleOwner(), mStatusObserver);
+
+            mImageViewHolder = viewHolder;
+            mImageViewHolder.onVisibilityChange(true);
+        }
+
+        mImage = mImageAdapter.getCurrentList().get(position);
+
+        // save image id on back stack
+        try {
+            NavHostFragment.findNavController(this)
+                           .getBackStackEntry(R.id.nav_album)
+                           .getSavedStateHandle()
+                           .set(AlbumFragment.IMAGE_ID_KEY, mImage.getId());
+        } catch (Exception e) {
+            Log.e(LOG_TAG, "Could not save image id on backstack.", e);
+        }
     }
 
     private void toggleExtended() { toggleExtended(!mExtended); }

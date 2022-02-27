@@ -2,7 +2,6 @@ package com.jonahbauer.qed.util;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.util.TypedValue;
 import androidx.annotation.AttrRes;
 import androidx.annotation.ColorInt;
 import androidx.annotation.DrawableRes;
@@ -32,10 +31,7 @@ public class Themes {
 
     @ColorInt
     public static int colorful(Resources.Theme theme, long seed) {
-        @AttrRes int color = colorful(seed);
-        TypedValue value = new TypedValue();
-        theme.resolveAttribute(color, value, true);
-        return value.data;
+        return Colors.getColor(theme, colorful(seed));
     }
 
     @AttrRes

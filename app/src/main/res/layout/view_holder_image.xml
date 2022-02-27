@@ -55,7 +55,7 @@
             android:padding="100dp"
             android:progress="@{progress ?? 0}"
             android:progressDrawable="@drawable/circular_progress_bar"
-            android:progressTint="@color/colorSecondary"
+            android:progressTint="?colorSecondary"
             android:secondaryProgress="100"
             android:secondaryProgressTint="#333"
             android:visibility="@{(drawable == null &amp;&amp; progress != null) ? View.VISIBLE : View.GONE}"/>

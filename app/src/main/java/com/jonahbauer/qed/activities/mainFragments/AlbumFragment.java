@@ -136,6 +136,7 @@ public class AlbumFragment extends Fragment implements CompoundButton.OnCheckedC
         mBinding.setOnOfflineClick(v -> {
             if (Preferences.gallery().isOfflineMode()) {
                 Preferences.gallery().edit().setOfflineMode(false).apply();
+                mImageAdapter.setOfflineMode(false);
             }
             search();
         });

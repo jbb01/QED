@@ -1,8 +1,5 @@
 package com.jonahbauer.qed.activities.imageActivity;
 
-import static com.jonahbauer.qed.networking.pages.QEDGalleryPages.Mode.NORMAL;
-import static com.jonahbauer.qed.networking.pages.QEDGalleryPages.Mode.ORIGINAL;
-
 import android.content.Context;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
@@ -12,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.RelativeLayout;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.content.res.AppCompatResources;
@@ -21,7 +17,6 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.rxjava3.EmptyResultSetException;
 import androidx.viewpager2.widget.ViewPager2;
-
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.databinding.ViewHolderImageBinding;
 import com.jonahbauer.qed.model.Image;
@@ -34,6 +29,10 @@ import com.jonahbauer.qed.networking.pages.QEDGalleryPages;
 import com.jonahbauer.qed.networking.pages.QEDGalleryPages.Mode;
 import com.jonahbauer.qed.util.Preferences;
 import com.jonahbauer.qed.util.StatusWrapper;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Single;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -41,10 +40,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Locale;
 
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.core.Single;
-import io.reactivex.rxjava3.disposables.CompositeDisposable;
-import io.reactivex.rxjava3.schedulers.Schedulers;
+import static com.jonahbauer.qed.networking.pages.QEDGalleryPages.Mode.NORMAL;
+import static com.jonahbauer.qed.networking.pages.QEDGalleryPages.Mode.ORIGINAL;
 
 public class ImageViewHolder extends RecyclerView.ViewHolder implements QEDPageReceiver<Image>, QEDPageStreamReceiver<Image> {
     private static final String LOG_TAG = ImageViewHolder.class.getName();
@@ -162,8 +159,7 @@ public class ImageViewHolder extends RecyclerView.ViewHolder implements QEDPageR
             switch (type) {
                 default:
                 case IMAGE:
-                    this.mStatus.setValue(StatusWrapper.loaded(image));
-                    setImageFromFile(image.getPath());
+                    setImageFromFile(image);
                     break;
                 case VIDEO:
                     this.mBinding.setDrawable(AppCompatResources.getDrawable(mContext, R.drawable.ic_gallery_video));
@@ -184,13 +180,16 @@ public class ImageViewHolder extends RecyclerView.ViewHolder implements QEDPageR
         }
     }
 
-    private void setImageFromFile(String path) {
+    private void setImageFromFile(Image image) {
         mDisposable.add(
-                Single.fromCallable(() -> BitmapFactory.decodeFile(path))
+                Single.fromCallable(() -> BitmapFactory.decodeFile(image.getPath()))
                       .subscribeOn(Schedulers.io())
                       .observeOn(AndroidSchedulers.mainThread())
                       .subscribe(
-                              bitmap -> this.mBinding.setDrawable(new BitmapDrawable(mContext.getResources(), bitmap)),
+                              bitmap -> {
+                                  mStatus.setValue(StatusWrapper.loaded(image));
+                                  this.mBinding.setDrawable(new BitmapDrawable(mContext.getResources(), bitmap));
+                              },
                               t -> this.mBinding.setDrawable(AppCompatResources.getDrawable(mContext, R.drawable.ic_gallery_image))
                       )
         );
@@ -318,17 +317,17 @@ public class ImageViewHolder extends RecyclerView.ViewHolder implements QEDPageR
 
         switch (image.getType()) {
             case IMAGE:
-                setImageFromFile(image.getPath());
+                setImageFromFile(image);
                 break;
             case VIDEO:
                 mBinding.setDrawable(AppCompatResources.getDrawable(mContext, R.drawable.ic_gallery_video));
+                mStatus.setValue(StatusWrapper.loaded(image));
                 break;
             case AUDIO:
                 mBinding.setDrawable(AppCompatResources.getDrawable(mContext, R.drawable.ic_gallery_audio));
+                mStatus.setValue(StatusWrapper.loaded(image));
                 break;
         }
-
-        mStatus.setValue(StatusWrapper.loaded(image));
 
         this.mBinding.setProgress(null);
         this.mBinding.setProgressText(null);
