@@ -122,9 +122,7 @@
             app:uri="qedgallery.qed-verein.de/album_view.php" />
         <action
             android:id="@+id/show_image"
-            app:destination="@id/nav_image"
-            app:enterAnim="@null"
-            app:exitAnim="@null"/>
+            app:destination="@id/nav_image"/>
         <action
             android:id="@+id/show_album_info"
             app:destination="@id/nav_bottom_sheet_album" />

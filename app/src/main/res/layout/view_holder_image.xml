@@ -24,6 +24,7 @@
             android:scaleType="matrix"
             android:visibility="@{drawable != null ? View.VISIBLE : View.GONE}"
             android:src="@{drawable}"
+            android:transitionName="@string/transition_name_image_fragment_image"
             tools:ignore="ContentDescription"
             tools:src="@tools:sample/backgrounds/scenic"
             tools:visibility="visible" />

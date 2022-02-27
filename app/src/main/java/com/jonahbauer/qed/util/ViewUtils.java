@@ -1,8 +1,5 @@
 package com.jonahbauer.qed.util;
 
-import static androidx.core.view.WindowInsetsCompat.Type.ime;
-import static androidx.core.view.WindowInsetsCompat.Type.systemBars;
-
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
@@ -17,8 +14,6 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.EditText;
-
-import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.ActionBar;
@@ -31,11 +26,9 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavBackStackEntry;
 import androidx.navigation.fragment.NavHostFragment;
-
 import com.jonahbauer.qed.R;
-import com.jonahbauer.qed.activities.MainActivity;
 import com.jonahbauer.qed.databinding.AlertDialogEditTextBinding;
-
+import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.Contract;
 
 import java.time.LocalDate;
@@ -47,7 +40,8 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import lombok.experimental.UtilityClass;
+import static androidx.core.view.WindowInsetsCompat.Type.ime;
+import static androidx.core.view.WindowInsetsCompat.Type.systemBars;
 
 @UtilityClass
 @SuppressWarnings("unused")
@@ -272,29 +266,12 @@ public class ViewUtils {
     }
     //</editor-fold>
 
-    public static void setActionBarText(@NonNull Fragment fragment, @StringRes int title) {
-        setActionBarText(fragment, fragment.getText(title));
-    }
-
     public static void setActionBarText(@NonNull Fragment fragment, CharSequence title) {
         AppCompatActivity activity = (AppCompatActivity) fragment.requireActivity();
         ActionBar actionBar = activity.getSupportActionBar();
         if (actionBar != null) {
             actionBar.setTitle(title);
         }
-    }
-
-    public static void setActionBarColor(@NonNull Fragment fragment, @ColorInt int color) {
-        var activity = (MainActivity) fragment.requireActivity();
-        activity.getAppBarLayout().setBackgroundColor(color);
-    }
-
-    public static void resetActionBarColor(@NonNull Fragment fragment) {
-        TypedValue typedValue = new TypedValue();
-        fragment.requireContext().getTheme().resolveAttribute(R.attr.colorPrimary, typedValue, true);
-        int colorPrimary = typedValue.data;
-
-        setActionBarColor(fragment, colorPrimary);
     }
 
     public static void setTransparentSystemBars(@NonNull Fragment fragment) {
@@ -305,10 +282,11 @@ public class ViewUtils {
     }
 
     public static void resetTransparentSystemBars(@NonNull Fragment fragment) {
+        var theme = fragment.requireContext().getTheme();
         TypedValue statusBarColor = new TypedValue();
-        fragment.requireContext().getTheme().resolveAttribute(android.R.attr.statusBarColor, statusBarColor, true);
+        theme.resolveAttribute(android.R.attr.statusBarColor, statusBarColor, true);
         TypedValue navigationBarColor = new TypedValue();
-        fragment.requireContext().getTheme().resolveAttribute(android.R.attr.navigationBarColor, navigationBarColor, true);
+        theme.resolveAttribute(android.R.attr.navigationBarColor, navigationBarColor, true);
 
         var activity = fragment.requireActivity();
         var window = activity.getWindow();
@@ -316,23 +294,11 @@ public class ViewUtils {
         window.setNavigationBarColor(navigationBarColor.data);
     }
 
-    public static void hideSupportActionBar(@NonNull Fragment fragment) {
-        AppCompatActivity activity = (AppCompatActivity)fragment.requireActivity();
-        ActionBar actionBar = activity.getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.hide();
-        }
-    }
+    public static void setFitsSystemWindows(View view) {
+        var lp = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
+        lp.topMargin = (int) dpToPx(view, 80);
+        view.setLayoutParams(lp);
 
-    public static void showSupportActionBar(@NonNull Fragment fragment) {
-        AppCompatActivity activity = (AppCompatActivity)fragment.requireActivity();
-        ActionBar actionBar = activity.getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.show();
-        }
-    }
-
-    public static void setFitsSystemWindowsBottom(View view) {
         ViewCompat.setOnApplyWindowInsetsListener(view, (v, windowInsets) -> {
             var mask = systemBars() | ime();
             var insets = windowInsets.getInsets(mask);

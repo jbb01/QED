@@ -16,7 +16,9 @@
         android:layout_width="match_parent"
         android:layout_height="72dp"
         android:descendantFocusability="blocksDescendants"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:transitionGroup="true"
+        android:transitionName="@{@string/transition_name_person(person.id)}" >
 
         <TextView
             android:id="@+id/header"

@@ -3,29 +3,26 @@ package com.jonahbauer.qed.activities.settings;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.preference.Preference;
-import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 import androidx.preference.SwitchPreference;
-
 import com.google.android.material.snackbar.Snackbar;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.layoutStuff.SeekBarPreference;
 import com.jonahbauer.qed.model.room.Database;
 import com.jonahbauer.qed.util.Preferences;
-
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
-public class ChatPreferenceFragment extends PreferenceFragmentCompat implements PreferenceFragment, Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
+public class ChatPreferenceFragment extends AbstractPreferenceFragment implements PreferenceFragment, Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
+    private static final int[] MAX_SHOWN_ROWS_VALUES = {10_000, 20_000, 50_000, 100_000, 200_000, 500_000, Integer.MAX_VALUE};
+    private static final String[] MAX_SHOWN_ROWS_STRING_VALUES = {"10.000", "20.000", "50.000", "100.000", "200.000", "500.000", "\u221E"};
+
     private Preference deleteDatabase;
     private SwitchPreference katex;
     private SwitchPreference links;
-
-    public static final int[] maxShownRowsValues = {10_000, 20_000, 50_000, 100_000, 200_000, 500_000, Integer.MAX_VALUE};
-    private static final String[] maxShownRowsStringValues = {"10.000", "20.000", "50.000", "100.000", "200.000", "500.000", "\u221E"};
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -46,11 +43,11 @@ public class ChatPreferenceFragment extends PreferenceFragmentCompat implements 
 
         SeekBarPreference maxShownRows = findPreference(Preferences.chat().keys().dbMaxResults());
         assert maxShownRows != null;
-        maxShownRows.setExternalValues(maxShownRowsValues, maxShownRowsStringValues);
+        maxShownRows.setExternalValues(MAX_SHOWN_ROWS_VALUES, MAX_SHOWN_ROWS_STRING_VALUES);
     }
 
     @Override
-    public boolean onPreferenceClick(Preference preference) {
+    public boolean onPreferenceClick(@NonNull Preference preference) {
         Context context = getActivity();
         if (context == null) return false;
 
@@ -75,7 +72,7 @@ public class ChatPreferenceFragment extends PreferenceFragmentCompat implements 
     }
 
     @Override
-    public boolean onPreferenceChange(Preference preference, Object newValue) {
+    public boolean onPreferenceChange(@NonNull Preference preference, Object newValue) {
         if (preference == katex) {
             if (!(newValue instanceof Boolean)) return false;
             boolean value = (Boolean) newValue;

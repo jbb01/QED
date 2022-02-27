@@ -53,13 +53,18 @@ public class ImageAdapter extends ArrayAdapter<Image> {
 
         ListItemImageBinding binding;
         if (convertView != null) {
-            binding = (ListItemImageBinding) convertView.getTag();
+            binding = (ListItemImageBinding) convertView.getTag(R.id.dataBinding);
         } else {
             LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             binding = ListItemImageBinding.inflate(inflater, parent, false);
             binding.setDisposable(new CompositeDisposable());
-            binding.getRoot().setTag(binding);
+            binding.getRoot().setTag(R.id.dataBinding, binding);
         }
+
+        Long imageId = image != null ? image.getId() : null;
+        binding.getRoot().setTag(imageId);
+        // must set transition name programmatically for view bindings introduce additional delay
+        binding.thumbnail.setTransitionName(imageId != null ? getContext().getString(R.string.transition_name_image_thumbnail, imageId) : null);
 
         binding.setImage(image);
         setThumbnail(image, binding);
@@ -70,12 +75,17 @@ public class ImageAdapter extends ArrayAdapter<Image> {
     private void setThumbnail(Image image, ListItemImageBinding binding) {
         binding.getDisposable().clear();
 
-        if (image.getThumbnail() != null) {
-            binding.setThumbnail(getThumbnail(image, false));
+        if (image == null) {
+            applyThumbnail(binding, AppCompatResources.getDrawable(getContext(), R.drawable.ic_gallery_image));
             return;
         }
 
-        binding.setThumbnail(null);
+        if (image.getThumbnail() != null) {
+            applyThumbnail(binding, getThumbnail(image, false));
+            return;
+        }
+
+        applyThumbnail(binding, null);
         binding.getDisposable().add(
                 mAlbumDao.findImageById(image.getId())
                          .subscribeOn(Schedulers.io())
@@ -89,18 +99,22 @@ public class ImageAdapter extends ArrayAdapter<Image> {
                                          if (image.getThumbnail() == null && !mOfflineMode) {
                                              downloadThumbnail(image, binding);
                                          } else {
-                                             binding.setThumbnail(getThumbnail(image, false));
+                                             applyThumbnail(binding, getThumbnail(image, false));
                                          }
                                  },
                                  err -> {
                                      if (!mOfflineMode) {
                                          downloadThumbnail(image, binding);
                                      } else {
-                                         binding.setThumbnail(getThumbnail(image, true));
+                                         applyThumbnail(binding, getThumbnail(image, true));
                                      }
                                  }
                          )
         );
+    }
+
+    private void applyThumbnail(ListItemImageBinding binding, Drawable drawable) {
+        binding.setThumbnail(drawable);
     }
 
     private void downloadThumbnail(Image image, ListItemImageBinding binding) {
@@ -110,11 +124,11 @@ public class ImageAdapter extends ArrayAdapter<Image> {
                                .subscribe(
                                        optional -> {
                                            image.setThumbnail(optional.orElse(null));
-                                           binding.setThumbnail(getThumbnail(image, false));
+                                           applyThumbnail(binding, getThumbnail(image, false));
                                        },
                                        err -> {
                                            Log.e(LOG_TAG, "Error loading thumbnail for image " + image.getId() + ".", err);
-                                           binding.setThumbnail(getThumbnail(image, true));
+                                           applyThumbnail(binding, getThumbnail(image, true));
                                        }
                                )
         );

@@ -23,18 +23,20 @@ public class AlbumAdapter extends ArrayAdapter<Album> {
     @NonNull
     @Override
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
+        var context = getContext();
         final Album album = mAlbumList.get(position);
 
         MaterialListItem item;
         if (convertView instanceof MaterialListItem) {
             item = (MaterialListItem) convertView;
         } else {
-            item = new MaterialListItem(getContext());
+            item = new MaterialListItem(context);
             item.setIcon(R.drawable.ic_gallery_icon);
         }
 
         item.setTitle(album.getName());
-        item.setIconTint(Themes.colorful(getContext(), album.getId()));
+        item.setIconTint(Themes.colorful(context, album.getId()));
+        item.setTransitionName(context.getString(R.string.transition_name_album, album.getId()));
 
         return item;
     }

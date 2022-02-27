@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.FragmentNavigator;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.databinding.FragmentPersonsDatabaseBinding;
 import com.jonahbauer.qed.layoutStuff.views.CheckBoxTriStates;
@@ -20,6 +21,7 @@ import com.jonahbauer.qed.model.adapter.PersonAdapter;
 import com.jonahbauer.qed.model.viewmodel.PersonListViewModel;
 import com.jonahbauer.qed.networking.Reason;
 import com.jonahbauer.qed.util.StatusWrapper;
+import com.jonahbauer.qed.util.TransitionUtils;
 import com.jonahbauer.qed.util.ViewUtils;
 
 import java.util.ArrayList;
@@ -33,6 +35,13 @@ public class PersonDatabaseFragment extends Fragment implements CompoundButton.O
 
     private boolean mSortLastName = false;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        TransitionUtils.setupDefaultTransitions(this);
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -43,7 +52,8 @@ public class PersonDatabaseFragment extends Fragment implements CompoundButton.O
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        ViewUtils.setFitsSystemWindowsBottom(view);
+        ViewUtils.setFitsSystemWindows(view);
+        TransitionUtils.postponeEnterAnimationToPreDraw(this, view);
 
         mPersonAdapter = new PersonAdapter(getContext(), new ArrayList<>(), PersonAdapter.SortMode.FIRST_NAME, mBinding.fixedHeader.getRoot());
         mBinding.list.setOnItemClickListener(this);
@@ -154,8 +164,13 @@ public class PersonDatabaseFragment extends Fragment implements CompoundButton.O
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Person person = mPersonAdapter.getItem(position);
         if (person != null) {
+            var extras = new FragmentNavigator.Extras.Builder()
+                    .addSharedElement(view, getString(R.string.transition_name_single_fragment))
+                    .build();
             var action = PersonDatabaseFragmentDirections.showPerson(person);
-            Navigation.findNavController(view).navigate(action);
+            Navigation.findNavController(view).navigate(action, extras);
+
+            TransitionUtils.setupReenterElevationScale(this);
         }
     }
 }

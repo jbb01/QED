@@ -1,17 +1,14 @@
 package com.jonahbauer.qed.activities.settings;
 
 import android.os.Bundle;
-
 import androidx.annotation.Nullable;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.preference.Preference;
-import androidx.preference.PreferenceFragmentCompat;
-
 import com.jonahbauer.qed.R;
 
-public class RootPreferenceFragment extends PreferenceFragmentCompat {
+public class RootPreferenceFragment extends AbstractPreferenceFragment {
     private static final String KEY_GENERAL = "settings_header_general";
     private static final String KEY_CHAT = "settings_header_chat";
     private static final String KEY_GALLERY = "settings_header_gallery";

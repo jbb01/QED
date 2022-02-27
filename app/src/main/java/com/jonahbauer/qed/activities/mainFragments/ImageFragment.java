@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,6 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.StyleRes;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.SharedElementCallback;
 import androidx.core.content.FileProvider;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -26,14 +28,18 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
+import androidx.transition.*;
 import androidx.viewpager2.widget.ViewPager2;
+import com.google.android.material.transition.Hold;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.MainActivity;
 import com.jonahbauer.qed.activities.imageActivity.ImageViewHolder;
 import com.jonahbauer.qed.databinding.FragmentImageBinding;
+import com.jonahbauer.qed.layoutStuff.transition.ActionBarAnimation;
 import com.jonahbauer.qed.model.Image;
 import com.jonahbauer.qed.util.Preferences;
 import com.jonahbauer.qed.util.StatusWrapper;
+import com.jonahbauer.qed.util.TransitionUtils;
 import com.jonahbauer.qed.util.ViewUtils;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -42,6 +48,8 @@ import java.io.File;
 import java.lang.ref.SoftReference;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickListener {
     private static final String LOG_TAG = ImageFragment.class.getSimpleName();
@@ -91,6 +99,42 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
             mImage = new Image(0);
             mImageAdapter.submitList(Collections.singletonList(mImage));
         }
+
+        setupTransitions();
+    }
+
+    private void setupTransitions() {
+        var duration = TransitionUtils.getTransitionDuration(this);
+
+        var sharedEnterTransition = (TransitionSet) TransitionInflater.from(requireContext()).inflateTransition(R.transition.image_fragment_enter);
+        sharedEnterTransition.addListener(new ActionBarAnimation(this, Color.BLACK, false));
+        sharedEnterTransition.setDuration(duration);
+        setSharedElementEnterTransition(sharedEnterTransition);
+
+        var enterTransition = new Hold();
+        enterTransition.addListener(new ActionBarAnimation(this, Color.BLACK, false));
+        enterTransition.setDuration(duration);
+        setEnterTransition(enterTransition);
+
+        var returnTransition = (TransitionSet) TransitionInflater.from(requireContext()).inflateTransition(R.transition.image_fragment_return);
+        returnTransition.setDuration(duration);
+        returnTransition.addListener(new TransitionListenerAdapter() {
+            @Override
+            public void onTransitionStart(@NonNull Transition transition) {
+                ViewUtils.resetTransparentSystemBars(ImageFragment.this);
+            }
+        });
+        setSharedElementReturnTransition(returnTransition);
+        setReturnTransition(new Fade());
+
+        var exitTransition = new Fade(Fade.MODE_OUT);
+        exitTransition.setDuration(duration);
+        setExitTransition(exitTransition);
+
+        var reenterTransition = new Hold();
+        reenterTransition.setDuration(duration);
+        reenterTransition.addListener(new ActionBarAnimation(this, Color.BLACK, false));
+        setReenterTransition(reenterTransition);
     }
 
     @Nullable
@@ -102,7 +146,6 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
         var activity = (MainActivity) requireActivity();
         var controller = activity.getWindowInsetsController();
         ViewUtils.setTransparentSystemBars(this);
-        ViewUtils.hideSupportActionBar(this);
         controller.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_BARS_BY_SWIPE);
 
         mBinding = FragmentImageBinding.inflate(inflater, container, false);
@@ -132,6 +175,24 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
             var systemInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             ViewUtils.setPaddingBottom(v, (int) (ViewUtils.dpToPx(v, 24) + systemInsets.bottom));
             return insets;
+        });
+        postponeEnterTransition(500, TimeUnit.MILLISECONDS);
+        setEnterSharedElementCallback(new SharedElementCallback() {
+            @Override
+            public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
+                super.onMapSharedElements(names, sharedElements);
+
+                var imageTransitionName = getString(R.string.transition_name_image_fragment_image);
+                if (!names.contains(imageTransitionName)) return;
+
+                var viewHolder = mImageAdapter.getViewHolderByPosition(mBinding.viewPager.getCurrentItem());
+                if (viewHolder == null) return;
+
+                var itemView = viewHolder.itemView;
+                var target = itemView.findViewById(R.id.gallery_image);
+                target.setTransitionName(imageTransitionName);
+                sharedElements.put(imageTransitionName, target);
+            }
         });
 
         // prepare view pager
@@ -175,7 +236,6 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
         var controller = activity.getWindowInsetsController();
         controller.show(WindowInsetsCompat.Type.systemBars());
         ViewUtils.resetTransparentSystemBars(this);
-        ViewUtils.showSupportActionBar(this);
         super.onDestroyView();
     }
 
@@ -230,6 +290,10 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
 
         if (image != null) {
             mBinding.setTitle(image.getName());
+        }
+
+        if (statusWrapper.getCode() != StatusWrapper.STATUS_PRELOADED) {
+            startPostponedEnterTransition();
         }
 
         if (code == StatusWrapper.STATUS_ERROR) {

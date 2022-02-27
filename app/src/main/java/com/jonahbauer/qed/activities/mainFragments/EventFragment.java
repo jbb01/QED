@@ -15,8 +15,12 @@ import com.jonahbauer.qed.activities.sheets.event.EventInfoFragment;
 import com.jonahbauer.qed.databinding.SingleFragmentBinding;
 import com.jonahbauer.qed.model.Event;
 import com.jonahbauer.qed.model.viewmodel.EventViewModel;
+import com.jonahbauer.qed.util.StatusWrapper;
 import com.jonahbauer.qed.util.Themes;
+import com.jonahbauer.qed.util.TransitionUtils;
 import com.jonahbauer.qed.util.ViewUtils;
+
+import java.util.concurrent.TimeUnit;
 
 public class EventFragment extends Fragment {
 
@@ -31,6 +35,10 @@ public class EventFragment extends Fragment {
 
         mEventViewModel = ViewUtils.getViewModelProvider(this).get(EventViewModel.class);
         mEventViewModel.load(event);
+
+        var color = Themes.colorful(requireContext(), event.getId());
+        TransitionUtils.setupDefaultTransitions(this, color);
+        TransitionUtils.setupEnterContainerTransform(this, color);
     }
 
     @Nullable
@@ -42,13 +50,17 @@ public class EventFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        ViewUtils.setFitsSystemWindowsBottom(view);
+        ViewUtils.setFitsSystemWindows(view);
+        postponeEnterTransition(200, TimeUnit.MILLISECONDS);
 
         mEventViewModel.getEvent().observe(getViewLifecycleOwner(), wrapper -> {
             Event value = wrapper.getValue();
             if (value != null) {
                 ViewUtils.setActionBarText(this, value.getTitle());
-                ViewUtils.setActionBarColor(this, Themes.colorful(requireContext(), value.getId()));
+            }
+
+            if (wrapper.getCode() != StatusWrapper.STATUS_PRELOADED) {
+                startPostponedEnterTransition();
             }
         });
 
@@ -64,11 +76,5 @@ public class EventFragment extends Fragment {
 
         EventInfoFragment fragment = EventInfoFragment.newInstance();
         getChildFragmentManager().beginTransaction().replace(R.id.fragment, fragment).commit();
-    }
-
-    @Override
-    public void onDestroyView() {
-        ViewUtils.resetActionBarColor(this);
-        super.onDestroyView();
     }
 }

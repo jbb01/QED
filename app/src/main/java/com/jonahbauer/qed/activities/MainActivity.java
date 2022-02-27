@@ -11,9 +11,8 @@ import android.view.View;
 import android.view.ViewParent;
 import android.widget.Toast;
 import androidx.activity.OnBackPressedCallback;
-import androidx.annotation.IdRes;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import androidx.annotation.*;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.core.view.*;
@@ -27,7 +26,6 @@ import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
-import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.jonahbauer.qed.BuildConfig;
@@ -37,6 +35,7 @@ import com.jonahbauer.qed.databinding.ActivityMainBinding;
 import com.jonahbauer.qed.layoutStuff.CustomActionMode;
 import com.jonahbauer.qed.networking.NetworkListener;
 import com.jonahbauer.qed.networking.login.QEDLogout;
+import com.jonahbauer.qed.util.Colors;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import lombok.Getter;
 
@@ -61,6 +60,10 @@ public class MainActivity extends AppCompatActivity implements NetworkListener, 
 
     private ActionMode mActionMode;
     private ViewPropertyAnimatorCompat mActionModeFade;
+
+    private @ColorInt int mActionBarColor;
+    private @FloatRange(from = 0, to = 1) float mActionBarAlpha = 1;
+    private @ColorInt int mBackgroundColor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,12 +97,13 @@ public class MainActivity extends AppCompatActivity implements NetworkListener, 
 
         mWindowInsetsController = new WindowInsetsControllerCompat(getWindow(), mBinding.getRoot());
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+
+        mActionBarColor = Colors.getPrimaryColor(this);
     }
 
     @Override
     public boolean onSupportNavigateUp() {
-        NavController navController = Navigation.findNavController(this, R.id.nav_host);
-        return NavigationUI.navigateUp(navController, mAppBarConfiguration) || super.onSupportNavigateUp();
+        return NavigationUI.navigateUp(mNavController, mAppBarConfiguration) || super.onSupportNavigateUp();
     }
 
     private Fragment getFragment() {
@@ -119,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements NetworkListener, 
             if (!success) {
                 Log.e(LOG_TAG, "An error occured during logout.");
             } else {
-                Snackbar.make(mBinding.getRoot(), R.string.logout_success, Snackbar.LENGTH_SHORT)
+                Snackbar.make(mBinding.coordinator, R.string.logout_success, Snackbar.LENGTH_SHORT)
                         .show();
             }
         });
@@ -136,8 +140,43 @@ public class MainActivity extends AppCompatActivity implements NetworkListener, 
         return mWindowInsetsController;
     }
 
-    public AppBarLayout getAppBarLayout() {
-        return mBinding.appBarLayout;
+    @Keep
+    public @ColorInt int getActionBarColor() {
+        return mActionBarColor;
+    }
+
+    @Keep
+    public void setActionBarColor(@ColorInt int actionBarColor) {
+        mActionBarColor = actionBarColor;
+        mBinding.appBarLayout.setBackgroundColor(actionBarColor);
+    }
+
+    @Keep
+    public float getActionBarAlpha() {
+        return mActionBarAlpha;
+    }
+
+    @Keep
+    public void setActionBarAlpha(@FloatRange(from = 0, to = 1) float alpha) {
+        mActionBarAlpha = alpha;
+        mBinding.appBarLayout.setAlpha(alpha);
+    }
+
+    @Keep
+    public @ColorInt int getBackgroundColor() {
+        return mBackgroundColor;
+    }
+
+    @Keep
+    public void setBackgroundColor(@ColorInt int color) {
+        this.mBackgroundColor = color;
+        this.mBinding.contentRoot.setBackgroundColor(color);
+    }
+
+    @NonNull
+    @Override
+    public ActionBar getSupportActionBar() {
+        return Objects.requireNonNull(super.getSupportActionBar(), "getSupportActionBar() unexpectedly returned null");
     }
 
     //<editor-fold desc="Action Modes" defaultstate="collapsed">

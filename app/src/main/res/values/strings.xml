@@ -39,6 +39,17 @@
     <string name="no_file_explorer">No file explorer was found.</string>
     <string name="master_key_error">Password could not be saved.</string>
 
+    <!-- Transitions -->
+    <string name="transition_name_person" translatable="false">person_%d</string>
+    <string name="transition_name_album" translatable="false">album_%d</string>
+    <string name="transition_name_event" translatable="false">event_%d</string>
+    <string name="transition_name_event_database_fragment" translatable="false">event_database</string>
+    <string name="transition_name_person_database_fragment" translatable="false">event_database</string>
+    <string name="transition_name_image_thumbnail" translatable="false">image_thumb_%d</string>
+    <string name="transition_name_single_fragment" translatable="false">fragment_content</string>
+    <string name="transition_name_album_fragment" translatable="false">album_content</string>
+    <string name="transition_name_image_fragment_image" translatable="false">image_content_image</string>
+
     <!-- Chat Fragment -->
     <string name="title_fragment_chat">Chat</string>
     <string name="chat_button_send">Send</string>

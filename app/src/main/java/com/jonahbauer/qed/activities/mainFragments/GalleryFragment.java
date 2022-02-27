@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.FragmentNavigator;
 import com.google.android.material.snackbar.Snackbar;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.databinding.FragmentGalleryBinding;
@@ -18,6 +19,7 @@ import com.jonahbauer.qed.model.viewmodel.AlbumListViewModel;
 import com.jonahbauer.qed.networking.Reason;
 import com.jonahbauer.qed.util.Preferences;
 import com.jonahbauer.qed.util.StatusWrapper;
+import com.jonahbauer.qed.util.TransitionUtils;
 import com.jonahbauer.qed.util.ViewUtils;
 
 import java.util.ArrayList;
@@ -27,6 +29,13 @@ public class GalleryFragment extends Fragment implements AdapterView.OnItemClick
     private FragmentGalleryBinding mBinding;
 
     private AlbumListViewModel mAlbumListViewModel;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        TransitionUtils.setupDefaultTransitions(this);
+    }
 
     @Nullable
     @Override
@@ -38,7 +47,8 @@ public class GalleryFragment extends Fragment implements AdapterView.OnItemClick
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        ViewUtils.setFitsSystemWindowsBottom(view);
+        ViewUtils.setFitsSystemWindows(view);
+        TransitionUtils.postponeEnterAnimationToPreDraw(this, view);
 
         mAlbumAdapter = new AlbumAdapter(getContext(), new ArrayList<>());
         mBinding.list.setOnItemClickListener(this);
@@ -77,8 +87,13 @@ public class GalleryFragment extends Fragment implements AdapterView.OnItemClick
 
         if (album == null) return;
         if (isOnline() || album.getImageListDownloaded() != null) {
+            var extras = new FragmentNavigator.Extras.Builder()
+                    .addSharedElement(view, getString(R.string.transition_name_album_fragment))
+                    .build();
             var action = GalleryFragmentDirections.showAlbum(album);
-            Navigation.findNavController(view).navigate(action);
+            Navigation.findNavController(view).navigate(action, extras);
+
+            TransitionUtils.setupReenterElevationScale(this);
         } else {
             Snackbar.make(mBinding.getRoot(), getString(R.string.album_not_downloaded), Snackbar.LENGTH_SHORT).show();
         }

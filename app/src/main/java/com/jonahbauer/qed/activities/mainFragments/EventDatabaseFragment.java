@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.FragmentNavigator;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.databinding.FragmentEventsDatabaseBinding;
 import com.jonahbauer.qed.model.Event;
@@ -16,6 +17,7 @@ import com.jonahbauer.qed.model.adapter.EventAdapter;
 import com.jonahbauer.qed.model.viewmodel.EventListViewModel;
 import com.jonahbauer.qed.networking.Reason;
 import com.jonahbauer.qed.util.StatusWrapper;
+import com.jonahbauer.qed.util.TransitionUtils;
 import com.jonahbauer.qed.util.ViewUtils;
 
 import java.util.ArrayList;
@@ -25,6 +27,13 @@ public class EventDatabaseFragment extends Fragment implements AdapterView.OnIte
     private FragmentEventsDatabaseBinding mBinding;
 
     private EventListViewModel mEventListViewModel;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        TransitionUtils.setupDefaultTransitions(this);
+    }
 
     @Nullable
     @Override
@@ -36,7 +45,8 @@ public class EventDatabaseFragment extends Fragment implements AdapterView.OnIte
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        ViewUtils.setFitsSystemWindowsBottom(view);
+        ViewUtils.setFitsSystemWindows(view);
+        TransitionUtils.postponeEnterAnimationToPreDraw(this, view);
 
         mEventAdapter = new EventAdapter(getContext(), new ArrayList<>());
         mBinding.list.setOnItemClickListener(this);
@@ -60,8 +70,13 @@ public class EventDatabaseFragment extends Fragment implements AdapterView.OnIte
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Event event = mEventAdapter.getItem(position);
         if (event != null) {
+            var extras = new FragmentNavigator.Extras.Builder()
+                    .addSharedElement(view, getString(R.string.transition_name_single_fragment))
+                    .build();
             var action = EventDatabaseFragmentDirections.showEvent(event);
-            Navigation.findNavController(view).navigate(action);
+            Navigation.findNavController(view).navigate(action, extras);
+
+            TransitionUtils.setupReenterElevationScale(this);
         }
     }
 }

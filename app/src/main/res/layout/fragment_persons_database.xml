@@ -15,8 +15,9 @@
         android:id="@+id/fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:clipChildren="false"
+        android:background="?android:colorBackground"
+        android:transitionGroup="true"
+        android:transitionName="@string/transition_name_person_database_fragment"
         tools:context=".activities.mainFragments.PersonDatabaseFragment">
 
         <LinearLayout

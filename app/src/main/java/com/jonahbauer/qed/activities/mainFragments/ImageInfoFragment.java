@@ -16,11 +16,15 @@ import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
+import androidx.transition.Fade;
+import com.google.android.material.transition.Hold;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.databinding.FragmentImageInfoBinding;
+import com.jonahbauer.qed.layoutStuff.transition.ActionBarAnimation;
 import com.jonahbauer.qed.model.Image;
 import com.jonahbauer.qed.model.viewmodel.ImageInfoViewModel;
 import com.jonahbauer.qed.util.StatusWrapper;
+import com.jonahbauer.qed.util.TransitionUtils;
 import com.jonahbauer.qed.util.ViewUtils;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Single;
@@ -89,6 +93,15 @@ public class ImageInfoFragment extends Fragment {
 
         ImageInfoFragmentArgs args = ImageInfoFragmentArgs.fromBundle(getArguments());
         mImage = args.getImage();
+
+        var enterTransition = new Hold();
+        enterTransition.addListener(new ActionBarAnimation(this, Color.BLACK, true, Color.BLACK));
+        enterTransition.setDuration(TransitionUtils.getTransitionDuration(this));
+        setEnterTransition(enterTransition);
+
+        var returnTransition = new Fade();
+        returnTransition.setDuration(TransitionUtils.getTransitionDuration(this));
+        setReturnTransition(returnTransition);
     }
 
     @Nullable
@@ -101,7 +114,7 @@ public class ImageInfoFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        ViewUtils.setFitsSystemWindowsBottom(view);
+        ViewUtils.setFitsSystemWindows(view);
 
         mImageInfoViewModel.getImage().observe(getViewLifecycleOwner(), status -> {
             if (status.getCode() == StatusWrapper.STATUS_ERROR) {
@@ -122,13 +135,11 @@ public class ImageInfoFragment extends Fragment {
     @Override
     public void onStart() {
         mImageInfoViewModel.load(mImage);
-        ViewUtils.setActionBarColor(this, Color.BLACK);
         super.onStart();
     }
 
     @Override
     public void onStop() {
-        ViewUtils.resetActionBarColor(this);
         mDisposable.clear();
         super.onStop();
     }

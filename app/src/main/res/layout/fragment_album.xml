@@ -21,6 +21,9 @@
         android:id="@+id/fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="?android:colorBackground"
+        android:transitionGroup="true"
+        android:transitionName="@string/transition_name_album_fragment"
         tools:context="com.jonahbauer.qed.activities.mainFragments.AlbumFragment">
 
         <include

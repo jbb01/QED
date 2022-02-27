@@ -1,17 +1,14 @@
 package com.jonahbauer.qed.activities.settings;
 
 import android.os.Bundle;
-
 import androidx.annotation.NonNull;
 import androidx.preference.Preference;
-import androidx.preference.PreferenceFragmentCompat;
-
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.sheets.album.AlbumInfoBottomSheet;
 import com.jonahbauer.qed.util.Actions;
 import com.jonahbauer.qed.util.Debug;
 
-public class DebugPreferenceFragment extends PreferenceFragmentCompat implements PreferenceFragment, Preference.OnPreferenceClickListener {
+public class DebugPreferenceFragment extends AbstractPreferenceFragment implements PreferenceFragment, Preference.OnPreferenceClickListener {
     private Preference mPersonInfoSheet;
     private Preference mEventInfoSheet;
     private Preference mAlbumInfoSheet;

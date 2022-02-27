@@ -19,6 +19,7 @@ import com.jonahbauer.qed.networking.async.QEDPageReceiver;
 import com.jonahbauer.qed.networking.exceptions.InvalidCredentialsException;
 import com.jonahbauer.qed.networking.login.QEDLogin;
 import com.jonahbauer.qed.util.Preferences;
+import com.jonahbauer.qed.util.TransitionUtils;
 import com.jonahbauer.qed.util.ViewUtils;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 
@@ -38,6 +39,8 @@ public class LoginFragment extends Fragment implements NetworkListener, QEDPageR
             LoginFragmentArgs args = LoginFragmentArgs.fromBundle(arguments);
             mFeature = args.getFeature();
         }
+
+        TransitionUtils.setupDefaultTransitions(this);
     }
 
     @Nullable
@@ -49,7 +52,7 @@ public class LoginFragment extends Fragment implements NetworkListener, QEDPageR
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        ViewUtils.setFitsSystemWindowsBottom(view);
+        ViewUtils.setFitsSystemWindows(view);
 
         mBinding.rememberMeCheckbox.setChecked(Preferences.general().isRememberMe());
         mBinding.rememberMeCheckbox.setOnCheckedChangeListener(

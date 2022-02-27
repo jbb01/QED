@@ -49,6 +49,7 @@ public class EventAdapter extends ArrayAdapter<Event> implements SectionIndexer 
         item.setTitle(event.getTitle());
         item.setSubtitle(subtitle);
         item.setIconTint(Themes.colorful(getContext(), event.getId()));
+        item.setTransitionName(context.getString(R.string.transition_name_event, event.getId()));
 
         return item;
     }

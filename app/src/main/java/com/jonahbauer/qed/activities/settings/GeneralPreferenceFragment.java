@@ -1,19 +1,16 @@
 package com.jonahbauer.qed.activities.settings;
 
 import android.os.Bundle;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.preference.Preference;
-import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.SwitchPreference;
-
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.networking.NetworkConstants;
 import com.jonahbauer.qed.util.Actions;
 import com.jonahbauer.qed.util.Preferences;
 
-public class GeneralPreferenceFragment extends PreferenceFragmentCompat implements PreferenceFragment, Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
+public class GeneralPreferenceFragment extends AbstractPreferenceFragment implements PreferenceFragment, Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
     private Preference bugReport;
     private Preference github;
     private SwitchPreference nightMode;
@@ -49,7 +46,7 @@ public class GeneralPreferenceFragment extends PreferenceFragmentCompat implemen
     }
 
     @Override
-    public boolean onPreferenceChange(Preference preference, Object newValue) {
+    public boolean onPreferenceChange(@NonNull Preference preference, Object newValue) {
         if (preference == nightMode) {
             if (!(newValue instanceof Boolean)) return false;
             boolean value = (Boolean) newValue;

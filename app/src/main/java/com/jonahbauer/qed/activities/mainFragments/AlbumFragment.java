@@ -2,6 +2,7 @@ package com.jonahbauer.qed.activities.mainFragments;
 
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.graphics.drawable.Animatable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -11,16 +12,21 @@ import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.SharedElementCallback;
 import androidx.core.util.Pair;
+import androidx.core.view.OneShotPreDrawListener;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.NavBackStackEntry;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.FragmentNavigator;
 import androidx.navigation.fragment.NavHostFragment;
+import androidx.transition.Fade;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.transition.Hold;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.databinding.FragmentAlbumBinding;
 import com.jonahbauer.qed.layoutStuff.CustomArrayAdapter;
+import com.jonahbauer.qed.layoutStuff.transition.ActionBarAnimation;
 import com.jonahbauer.qed.model.Album;
 import com.jonahbauer.qed.model.Album.Filter;
 import com.jonahbauer.qed.model.Image;
@@ -28,20 +34,15 @@ import com.jonahbauer.qed.model.Person;
 import com.jonahbauer.qed.model.adapter.ImageAdapter;
 import com.jonahbauer.qed.model.viewmodel.AlbumViewModel;
 import com.jonahbauer.qed.networking.Reason;
-import com.jonahbauer.qed.util.Preferences;
-import com.jonahbauer.qed.util.StatusWrapper;
-import com.jonahbauer.qed.util.TimeUtils;
-import com.jonahbauer.qed.util.ViewUtils;
+import com.jonahbauer.qed.util.*;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class AlbumFragment extends Fragment implements CompoundButton.OnCheckedChangeListener, AdapterView.OnItemClickListener {
     public static final String IMAGE_ID_KEY = "imageId";
@@ -53,6 +54,7 @@ public class AlbumFragment extends Fragment implements CompoundButton.OnCheckedC
     private FragmentAlbumBinding mBinding;
 
     private ImageAdapter mImageAdapter;
+    private boolean mDummiesLoaded = false;
     private ArrayAdapter<String> mAdapterCategory;
     private CustomArrayAdapter<LocalDate> mAdapterDate;
     private CustomArrayAdapter<LocalDate> mAdapterUpload;
@@ -84,6 +86,9 @@ public class AlbumFragment extends Fragment implements CompoundButton.OnCheckedC
         if (mAlbum == null) {
             mAlbum = new Album(0);
         }
+
+        TransitionUtils.setupDefaultTransitions(this);
+        TransitionUtils.setupEnterContainerTransform(this, Colors.getPrimaryColor(requireContext()));
     }
 
     @Nullable
@@ -96,11 +101,45 @@ public class AlbumFragment extends Fragment implements CompoundButton.OnCheckedC
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        ViewUtils.setFitsSystemWindowsBottom(view);
+        ViewUtils.setFitsSystemWindows(view);
+        postponeEnterTransition(200, TimeUnit.MILLISECONDS);
+        setExitSharedElementCallback(new SharedElementCallback() {
+            @Override
+            public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
+                var selectedImageId = getSelectedItemId();
+                if (selectedImageId != null) {
+                    var itemView = mBinding.imageContainer.findViewWithTag(selectedImageId);
+                    if (itemView != null) {
+                        var thumbnail = itemView.findViewById(R.id.thumbnail);
+                        sharedElements.put(names.get(0), thumbnail);
+                    }
+                }
+            }
+        });
 
         mImageAdapter = new ImageAdapter(requireContext(), new ArrayList<>());
         mBinding.imageContainer.setAdapter(mImageAdapter);
         mBinding.imageContainer.setOnItemClickListener(this);
+        mBinding.imageContainer.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                mBinding.imageContainer.removeOnLayoutChangeListener(this);
+
+                // scroll selected image into view
+                var selectedImageId = getSelectedItemId();
+                if (selectedImageId != null) {
+                    var selectedView = mBinding.imageContainer.findViewWithTag(selectedImageId);
+                    if (selectedView == null) {
+                        var position = mImageAdapter.getImages().indexOf(new Image(selectedImageId));
+                        mBinding.imageContainer.setSelection(position);
+                    } else if (selectedView.getTop() < 0) {
+                        mBinding.imageContainer.scrollListBy(selectedView.getTop());
+                    } else if (selectedView.getBottom() > mBinding.imageContainer.getHeight()) {
+                        mBinding.imageContainer.scrollListBy(- mBinding.imageContainer.getHeight() + selectedView.getBottom());
+                    }
+                }
+            }
+        });
 
         mBinding.expandCheckBox.setOnCheckedChangeListener(this);
         mBinding.albumPhotographerCheckBox.setOnCheckedChangeListener(this);
@@ -155,24 +194,6 @@ public class AlbumFragment extends Fragment implements CompoundButton.OnCheckedC
         super.onStart();
         if (mAlbumViewModel.getAlbum().getValue() == null) {
             load();
-        }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        NavController navController = NavHostFragment.findNavController(this);
-        NavBackStackEntry entry = navController.getCurrentBackStackEntry();
-        if (entry != null) {
-            Long imageId = entry.getSavedStateHandle()
-                                .get(IMAGE_ID_KEY);
-            if (imageId != null) {
-                int index = mImageAdapter.getImages().indexOf(new Image(imageId));
-                if (index != -1) {
-                    mBinding.imageContainer.smoothScrollToPosition(index);
-                }
-            }
         }
     }
 
@@ -242,10 +263,6 @@ public class AlbumFragment extends Fragment implements CompoundButton.OnCheckedC
             mAdapterUpload.addAll(album.getUploadDates());
             mAdapterUpload.notifyDataSetChanged();
 
-            mImageAdapter.clear();
-            mImageAdapter.addAll(images);
-            mImageAdapter.notifyDataSetChanged();
-
             // apply filters to ui
             if (mFilter != null && !mFilter.isEmpty()) {
                 // category
@@ -302,24 +319,36 @@ public class AlbumFragment extends Fragment implements CompoundButton.OnCheckedC
             }
         }
 
+        if (albumStatusWrapper.getCode() == StatusWrapper.STATUS_LOADED) {
+            mImageAdapter.clear();
+            mImageAdapter.addAll(images);
+            mImageAdapter.notifyDataSetChanged();
+            mDummiesLoaded = false;
+        } else if (!mDummiesLoaded) {
+            // by using dummy images while the album is not yet loaded the lag spike
+            // caused by view inflation for incoming images during fragment transition is reduced
+            mImageAdapter.clear();
+            mImageAdapter.addAll(Collections.nCopies(20, null));
+            mImageAdapter.notifyDataSetChanged();
+            mDummiesLoaded = true;
+        }
+
+        if (albumStatusWrapper.getCode() != StatusWrapper.STATUS_PRELOADED) {
+            OneShotPreDrawListener.add(mBinding.imageContainer, this::startPostponedEnterTransition);
+        }
+
         if (albumStatusWrapper.getCode() == StatusWrapper.STATUS_ERROR) {
             mImageAdapter.clear();
             Reason reason = albumStatusWrapper.getReason();
             mBinding.setError(getString(reason == Reason.EMPTY ? R.string.album_empty : reason.getStringRes()));
         }
 
-        int hits = mImageAdapter.getImages().size();
+        int hits = mDummiesLoaded ? 0 : mImageAdapter.getImages().size();
         if (hits > 0) {
             mBinding.setHits(getString(R.string.hits, hits));
         } else {
             mBinding.setHits("");
         }
-    }
-
-    @Override
-    public void onConfigurationChanged(@NonNull Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        adjustColumnCount(newConfig);
     }
 
     private void adjustColumnCount(@NonNull Configuration configuration) {
@@ -378,8 +407,29 @@ public class AlbumFragment extends Fragment implements CompoundButton.OnCheckedC
             return;
         }
 
-        NavHostFragment.findNavController(this)
-                       .navigate(AlbumFragmentDirections.showImage(image, mAlbum));
+        // save image id to backstack
+        try {
+            NavHostFragment.findNavController(this)
+                           .getBackStackEntry(R.id.nav_album)
+                           .getSavedStateHandle()
+                           .set(AlbumFragment.IMAGE_ID_KEY, id);
+        } catch (IllegalArgumentException ignored) {}
+
+        var extras = new FragmentNavigator.Extras.Builder()
+                .addSharedElement(view.findViewById(R.id.thumbnail), getString(R.string.transition_name_image_fragment_image))
+                .build();
+        var action = AlbumFragmentDirections.showImage(image, mAlbum);
+        Navigation.findNavController(view).navigate(action, extras);
+
+        // TODO oneshot transitions
+        var exitTransition = new Fade(Fade.MODE_OUT);
+        exitTransition.setDuration(TransitionUtils.getTransitionDuration(this));
+        setExitTransition(exitTransition);
+
+        var reenterTransition = new Hold();
+        reenterTransition.addListener(new ActionBarAnimation(this, Colors.getPrimaryColor(requireContext()), true, Color.BLACK));
+        reenterTransition.setDuration(TransitionUtils.getTransitionDuration(this));
+        setReenterTransition(reenterTransition);
     }
 
     private Pair<Album, Filter> parseIntent(Intent intent) {
@@ -442,6 +492,16 @@ public class AlbumFragment extends Fragment implements CompoundButton.OnCheckedC
             return null;
         } else {
             return Pair.create(album, builder.build());
+        }
+    }
+
+    private Long getSelectedItemId() {
+        var navController = NavHostFragment.findNavController(this);
+        var entry = navController.getCurrentBackStackEntry();
+        if (entry != null) {
+            return entry.getSavedStateHandle().get(IMAGE_ID_KEY);
+        } else {
+            return null;
         }
     }
 }
