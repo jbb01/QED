@@ -10,7 +10,8 @@ val localProperties = gradleLocalProperties(rootDir)
 android {
     signingConfigs {
         create("release") {
-            storeFile = file(localProperties.getProperty("KEY_STORE_FILE"))
+            val keyStoreFile = localProperties.getProperty("KEY_STORE_FILE")
+            storeFile = if (keyStoreFile != null) file(keyStoreFile) else null
             storePassword = localProperties.getProperty("KEY_STORE_PASSWORD")
             keyAlias = localProperties.getProperty("KEY_ALIAS")
             keyPassword = localProperties.getProperty("KEY_PASSWORD")
