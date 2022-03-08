@@ -5,6 +5,7 @@ import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -42,7 +43,7 @@ public class Event implements Comparable<Event>, Parcelable {
     // hash code of participants map for calculated organizers
     private int organizersValid = 0;
 
-    private boolean loaded;
+    private Instant loaded;
 
     @Override
     @NonNull
@@ -108,7 +109,7 @@ public class Event implements Comparable<Event>, Parcelable {
             dest.writeString(entry.getKey());
             dest.writeLong(entry.getValue().getId());
         }
-        dest.writeByte((byte)(loaded ? 1 : 0));
+        dest.writeLong(loaded != null ? loaded.toEpochMilli() : Long.MIN_VALUE);
     }
 
     public static final Parcelable.Creator<Event> CREATOR = new Parcelable.Creator<>() {
@@ -135,7 +136,8 @@ public class Event implements Comparable<Event>, Parcelable {
                 );
             }
 
-            event.loaded = source.readByte() != 0;
+            var loaded = source.readLong();
+            event.loaded = loaded == Long.MIN_VALUE ? null : Instant.ofEpochMilli(loaded);
 
             return event;
         }

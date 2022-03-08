@@ -61,7 +61,6 @@ public class Debug {
         registration.setOrganizer(true);
         person.getEvents().put("Testseminar", registration);
 
-        person.setLoaded(true);
         return person;
     }
 
@@ -108,7 +107,6 @@ public class Debug {
             event.getParticipants().put("Testteilnehmer " + i, registration);
         }
 
-        event.setLoaded(true);
         return event;
     }
 

@@ -164,16 +164,11 @@
                 android:textColor="?colorOnSurface"
                 android:text="@string/person_section_addresses"/>
 
-            <include layout="@layout/list_item"
-                app:onClick="@{(view) -> Actions.showOnMap(view.context, person.addresses[0])}"
-                app:icon="@{@drawable/ic_person_location}"
-                app:title="@{person.addresses[0]}"/>
-
-            <include layout="@layout/list_item"
-                android:visibility="@{person.addresses.size() > 1 ? View.VISIBLE : View.GONE}"
-                app:onClick="@{(view) -> Actions.showOnMap(view.context, person.addresses[1])}"
-                app:icon="@{@drawable/ic_person_location}"
-                app:title="@{person.addresses[1]}"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:person_addresses="@{person.addresses}"/>
         </LinearLayout>
 
         <View

@@ -1,7 +1,12 @@
 package com.jonahbauer.qed.activities.mainFragments;
 
+import android.graphics.drawable.Animatable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -10,6 +15,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.FragmentNavigator;
+
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.databinding.FragmentEventsDatabaseBinding;
 import com.jonahbauer.qed.model.Event;
@@ -25,12 +31,14 @@ import java.util.ArrayList;
 public class EventDatabaseFragment extends Fragment implements AdapterView.OnItemClickListener {
     private EventAdapter mEventAdapter;
     private FragmentEventsDatabaseBinding mBinding;
+    private MenuItem mRefresh;
 
     private EventListViewModel mEventListViewModel;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
 
         TransitionUtils.setupDefaultTransitions(this);
     }
@@ -55,6 +63,10 @@ public class EventDatabaseFragment extends Fragment implements AdapterView.OnIte
         mEventListViewModel.getEvents().observe(getViewLifecycleOwner(), events -> {
             mBinding.setStatus(events.getCode());
 
+            if (mRefresh != null) {
+                mRefresh.setEnabled(events.getCode() != StatusWrapper.STATUS_PRELOADED);
+            }
+
             mEventAdapter.clear();
             if (events.getCode() == StatusWrapper.STATUS_LOADED) {
                 mEventAdapter.addAll(events.getValue());
@@ -78,5 +90,24 @@ public class EventDatabaseFragment extends Fragment implements AdapterView.OnIte
 
             TransitionUtils.setupReenterElevationScale(this);
         }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_event_database, menu);
+        mRefresh = menu.findItem(R.id.menu_refresh);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.menu_refresh) {
+            mEventListViewModel.load();
+
+            Drawable icon = mRefresh.getIcon();
+            if (icon instanceof Animatable) ((Animatable) icon).start();
+
+            return true;
+        }
+        return false;
     }
 }

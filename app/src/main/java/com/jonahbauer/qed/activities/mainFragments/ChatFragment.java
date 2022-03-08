@@ -152,16 +152,15 @@ public class ChatFragment extends Fragment implements NetworkListener, AbsListVi
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.menu_chat, menu);
-        mRefreshButton = menu.findItem(R.id.chat_refresh);
+        mRefreshButton = menu.findItem(R.id.menu_refresh);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.chat_refresh) {
+        if (item.getItemId() == R.id.menu_refresh) {
             mRefreshButton = item;
             item.setEnabled(false);
-            item.setChecked(true);
 
             Drawable icon = mRefreshButton.getIcon();
             if (icon instanceof Animatable) ((Animatable) icon).start();

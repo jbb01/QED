@@ -1,7 +1,12 @@
 package com.jonahbauer.qed.activities.mainFragments;
 
+import android.graphics.drawable.Animatable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -27,12 +32,14 @@ import java.util.ArrayList;
 public class GalleryFragment extends Fragment implements AdapterView.OnItemClickListener {
     private AlbumAdapter mAlbumAdapter;
     private FragmentGalleryBinding mBinding;
+    private MenuItem mRefresh;
 
     private AlbumListViewModel mAlbumListViewModel;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
 
         TransitionUtils.setupDefaultTransitions(this);
     }
@@ -63,6 +70,10 @@ public class GalleryFragment extends Fragment implements AdapterView.OnItemClick
 
         mAlbumListViewModel.getAlbums().observe(getViewLifecycleOwner(), albums -> {
             mBinding.setStatus(albums.getCode());
+
+            if (mRefresh != null) {
+                mRefresh.setEnabled(albums.getCode() != StatusWrapper.STATUS_PRELOADED);
+            }
 
             mAlbumAdapter.clear();
             if (albums.getCode() == StatusWrapper.STATUS_LOADED) {
@@ -102,5 +113,24 @@ public class GalleryFragment extends Fragment implements AdapterView.OnItemClick
     private boolean isOnline() {
         Boolean offline = mAlbumListViewModel.getOffline().getValue();
         return offline != null && !offline;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_gallery, menu);
+        mRefresh = menu.findItem(R.id.menu_refresh);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.menu_refresh) {
+            mAlbumListViewModel.load();
+
+            Drawable icon = mRefresh.getIcon();
+            if (icon instanceof Animatable) ((Animatable) icon).start();
+
+            return true;
+        }
+        return false;
     }
 }

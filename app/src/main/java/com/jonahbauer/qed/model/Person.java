@@ -6,13 +6,16 @@ import android.os.Parcelable;
 import androidx.annotation.NonNull;
 import androidx.core.util.Pair;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import lombok.AccessLevel;
@@ -73,11 +76,11 @@ public class Person implements Parcelable {
     private String leavingDateString;
     private LocalDate leavingDate;
 
-    private boolean loaded;
+    private Instant loaded;
 
     // Pair of type and number/name
-    private ArrayList<Pair<String, String>> contacts = new ArrayList<>();
-    private ArrayList<String> addresses = new ArrayList<>();
+    private Set<Pair<String, String>> contacts = new LinkedHashSet<>();
+    private Set<String> addresses = new LinkedHashSet<>();
     private Map<String, Registration> events = new LinkedHashMap<>();
 
     public String getFullName() {
@@ -161,7 +164,7 @@ public class Person implements Parcelable {
             dest.writeString(number.first);
             dest.writeString(number.second);
         }
-        dest.writeStringList(addresses);
+        dest.writeStringList(new ArrayList<>(addresses));
         dest.writeInt(events.size());
         for (Map.Entry<String, Registration> event : events.entrySet()) {
             dest.writeString(event.getKey());
@@ -169,7 +172,7 @@ public class Person implements Parcelable {
         }
         dest.writeString(food);
         dest.writeString(notes);
-        dest.writeByte((byte)(loaded ? 1 : 0));
+        dest.writeLong(loaded != null ? loaded.toEpochMilli() : Long.MIN_VALUE);
     }
 
     public static final Parcelable.Creator<Person> CREATOR = new Parcelable.Creator<>() {
@@ -201,7 +204,9 @@ public class Person implements Parcelable {
                 ));
             }
 
-            source.readStringList(person.addresses);
+            var addresses = new ArrayList<String>();
+            source.readStringList(addresses);
+            person.addresses.addAll(addresses);
 
             int eventCount = source.readInt();
             for (int i = 0; i < eventCount; i++) {
@@ -214,7 +219,8 @@ public class Person implements Parcelable {
             person.food = source.readString();
             person.notes = source.readString();
 
-            person.loaded = source.readByte() != 0;
+            var loaded = source.readLong();
+            person.loaded = loaded == Long.MIN_VALUE ? null : Instant.ofEpochMilli(loaded);
 
             return person;
         }

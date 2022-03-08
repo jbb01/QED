@@ -25,8 +25,8 @@ import com.jonahbauer.qed.util.StatusWrapper;
 import com.jonahbauer.qed.util.Themes;
 import it.unimi.dsi.fastutil.objects.*;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.BiConsumer;
 
 public class PersonInfoFragment extends InfoFragment {
@@ -170,8 +170,25 @@ public class PersonInfoFragment extends InfoFragment {
         }
     }
 
+    @BindingAdapter("person_addresses")
+    public static void bindAddresses(ViewGroup parent, Set<String> addresses) {
+        Context context = parent.getContext();
+        parent.removeAllViews();
+        addresses.forEach((address) -> {
+            ListItemBinding item = ListItemBinding.inflate(LayoutInflater.from(context), parent, true);
+            item.setIcon(AppCompatResources.getDrawable(context, R.drawable.ic_person_location));
+            item.setTitle(address);
+
+            item.setOnClick(v -> Actions.showOnMap(context, address));
+            item.setOnLongClick(v -> {
+                Actions.copy(context, parent.getRootView(), address, address);
+                return true;
+            });
+        });
+    }
+
     @BindingAdapter("person_contacts")
-    public static void bindContacts(ViewGroup parent, List<Pair<String, String>> contacts) {
+    public static void bindContacts(ViewGroup parent, Set<Pair<String, String>> contacts) {
         Context context = parent.getContext();
         parent.removeAllViews();
         contacts.forEach((contact) -> {

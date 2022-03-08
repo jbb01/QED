@@ -12,6 +12,8 @@ import com.jonahbauer.qed.networking.async.QEDPageReceiver;
 import com.jonahbauer.qed.networking.pages.QEDDBPages;
 import com.jonahbauer.qed.util.StatusWrapper;
 
+import java.time.Instant;
+
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 
 public class PersonViewModel extends ViewModel implements QEDPageReceiver<Person> {
@@ -19,14 +21,10 @@ public class PersonViewModel extends ViewModel implements QEDPageReceiver<Person
     private final CompositeDisposable mDisposable = new CompositeDisposable();
 
     public void load(@NonNull Person person) {
-        if (!person.isLoaded()) {
-            this.mPerson.setValue(StatusWrapper.preloaded(person));
-            mDisposable.add(
-                    QEDDBPages.getPerson(person, this)
-            );
-        } else {
-            onResult(person);
-        }
+        this.mPerson.setValue(StatusWrapper.preloaded(person));
+        mDisposable.add(
+                QEDDBPages.getPerson(person, this)
+        );
     }
 
     public LiveData<StatusWrapper<Person>> getPerson() {
@@ -35,7 +33,7 @@ public class PersonViewModel extends ViewModel implements QEDPageReceiver<Person
 
     @Override
     public void onResult(@NonNull Person out) {
-        out.setLoaded(true);
+        out.setLoaded(Instant.now());
         this.mPerson.setValue(StatusWrapper.loaded(out));
     }
 
