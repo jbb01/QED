@@ -5,14 +5,11 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.content.res.AppCompatResources;
-import androidx.databinding.BindingAdapter;
+
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.sheets.InfoFragment;
 import com.jonahbauer.qed.databinding.FragmentInfoAlbumBinding;
-import com.jonahbauer.qed.databinding.ListItemBinding;
+import com.jonahbauer.qed.layoutStuff.views.ListItem;
 import com.jonahbauer.qed.model.Album;
 import com.jonahbauer.qed.model.Person;
 import com.jonahbauer.qed.model.viewmodel.AlbumViewModel;
@@ -22,6 +19,10 @@ import com.jonahbauer.qed.util.Themes;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Collection;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.databinding.BindingAdapter;
 
 public class AlbumInfoFragment extends InfoFragment {
     private AlbumViewModel mAlbumViewModel;
@@ -100,13 +101,14 @@ public class AlbumInfoFragment extends InfoFragment {
         Context context = parent.getContext();
         parent.removeAllViews();
         categories.forEach((category) -> {
-            ListItemBinding item = ListItemBinding.inflate(LayoutInflater.from(context), parent, true);
-            item.setIcon(AppCompatResources.getDrawable(context, R.drawable.ic_album_category));
+            ListItem item = new ListItem(context);
+            item.setIcon(R.drawable.ic_album_category);
             String title = category;
             try {
                 title = URLDecoder.decode(category, "UTF-8");
             } catch (UnsupportedEncodingException ignored) {}
             item.setTitle(title);
+            parent.addView(item);
         });
     }
 
@@ -115,9 +117,10 @@ public class AlbumInfoFragment extends InfoFragment {
         Context context = parent.getContext();
         parent.removeAllViews();
         persons.forEach((person) -> {
-            ListItemBinding item = ListItemBinding.inflate(LayoutInflater.from(context), parent, true);
-            item.setIcon(AppCompatResources.getDrawable(context, R.drawable.ic_album_person));
+            ListItem item = new ListItem(context);
+            item.setIcon(R.drawable.ic_album_person);
             item.setTitle(person.getUsername());
+            parent.addView(item);
         });
     }
 }

@@ -55,49 +55,57 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
             <TextView
-                android:paddingVertical="@dimen/activity_vertical_margin"
-                android:paddingHorizontal="@dimen/activity_horizontal_margin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAllCaps="true"
-                android:textStyle="bold"
-                android:textColor="?colorOnSurface"
-                android:text="@string/person_section_personal"/>
+                android:text="@string/person_section_personal"
+                style="@style/Widget.App.TextView.SectionHeading"/>
 
-            <include layout="@layout/list_item"
+            <com.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:visibility="@{person.email != null ? View.VISIBLE : View.GONE}"
-                app:onClick="@{(view) -> Actions.sendTo(view.context, person.email)}"
-                app:icon="@{@drawable/ic_person_mail}"
+                android:onClick="@{(view) -> Actions.sendTo(view.context, person.email)}"
+                app:icon="@drawable/ic_person_mail"
                 app:title="@{person.email}"
-                app:subtitle="@{@string/person_subtitle_mail}"/>
+                app:subtitle="@string/person_subtitle_mail"/>
 
-            <include layout="@layout/list_item"
+            <com.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:visibility="@{(person.birthday != null || person.birthdayString != null) ? View.VISIBLE : View.GONE}"
-                app:icon="@{@drawable/ic_person_birthday}"
+                app:icon="@drawable/ic_person_birthday"
                 app:title="@{person.birthday != null ? MessageFormat.format(@string/person_title_birthday, TimeUtils.format(person.birthday)) : person.birthdayString}"
-                app:subtitle="@{@string/person_subtitle_birthday}"/>
+                app:subtitle="@string/person_subtitle_birthday"/>
 
-            <include layout="@layout/list_item"
+            <com.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:visibility="@{(person.dateOfJoining != null || person.dateOfJoiningString != null) ? View.VISIBLE : View.GONE}"
-                app:icon="@{@drawable/ic_person_date_of_joining}"
+                app:icon="@drawable/ic_person_date_of_joining"
                 app:title="@{person.dateOfJoining != null ? MessageFormat.format(@string/person_title_date_of_joining, TimeUtils.format(person.dateOfJoining)) : person.dateOfJoiningString}"
-                app:subtitle="@{@string/person_subtitle_date_of_joining}"/>
+                app:subtitle="@string/person_subtitle_date_of_joining"/>
 
-            <include layout="@layout/list_item"
+            <com.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:visibility="@{(person.leavingDate != null || person.leavingDateString != null) ? View.VISIBLE : View.GONE}"
-                app:icon="@{@drawable/ic_person_leaving_date}"
+                app:icon="@drawable/ic_person_leaving_date"
                 app:title="@{person.leavingDate != null ? MessageFormat.format(@string/person_title_leaving_date, TimeUtils.format(person.leavingDate)) : person.leavingDateString}"
-                app:subtitle="@{@string/person_subtitle_leaving_date}"/>
+                app:subtitle="@string/person_subtitle_leaving_date"/>
 
-            <include layout="@layout/list_item"
-                app:icon="@{@drawable/ic_person_member}"
+            <com.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_person_member"
                 app:title="@{person.member ? @string/person_title_member_true : @string/person_title_member_false}"
-                app:subtitle="@{@string/person_subtitle_member}"/>
+                app:subtitle="@string/person_subtitle_member"/>
 
-            <include layout="@layout/list_item"
-                app:icon="@{@drawable/ic_person_active}"
+            <com.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_person_active"
                 app:title="@{person.active ? @string/person_title_active_true : @string/person_title_active_false}"
-                app:subtitle="@{@string/person_subtitle_active}"/>
+                app:subtitle="@string/person_subtitle_active"/>
         </LinearLayout>
 
         <View
@@ -111,38 +119,42 @@
             android:orientation="vertical">
 
             <TextView
-                android:paddingHorizontal="@dimen/activity_horizontal_margin"
-                android:paddingVertical="@dimen/activity_vertical_margin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAllCaps="true"
-                android:textStyle="bold"
-                android:textColor="?colorOnSurface"
-                android:text="@string/person_section_additional"/>
+                android:text="@string/person_section_additional"
+                style="@style/Widget.App.TextView.SectionHeading"/>
 
-            <include layout="@layout/list_item"
+            <com.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:visibility="@{person.homeStation != null ? View.VISIBLE : View.GONE}"
-                app:icon="@{@drawable/ic_person_train}"
+                app:icon="@drawable/ic_person_train"
                 app:title="@{person.homeStation}"
-                app:subtitle="@{@string/person_subtitle_station}" />
+                app:subtitle="@string/person_subtitle_station" />
 
-            <include layout="@layout/list_item"
+            <com.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:visibility="@{person.railcard != null ? View.VISIBLE : View.GONE}"
-                app:icon="@{@drawable/ic_person_railcard}"
+                app:icon="@drawable/ic_person_railcard"
                 app:title="@{person.railcard}"
-                app:subtitle="@{@string/person_subtitle_railcard}" />
+                app:subtitle="@string/person_subtitle_railcard" />
 
-            <include layout="@layout/list_item"
+            <com.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:visibility="@{person.food != null ? View.VISIBLE : View.GONE}"
-                app:icon="@{@drawable/ic_person_food}"
+                app:icon="@drawable/ic_person_food"
                 app:title="@{person.food}"
-                app:subtitle="@{@string/person_subtitle_food}" />
+                app:subtitle="@string/person_subtitle_food" />
 
-            <include layout="@layout/list_item"
+            <com.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:visibility="@{person.notes != null ? View.VISIBLE : View.GONE}"
-                app:icon="@{@drawable/ic_person_notes}"
+                app:icon="@drawable/ic_person_notes"
                 app:title="@{person.notes}"
-                app:subtitle="@{@string/person_subtitle_notes}" />
+                app:subtitle="@string/person_subtitle_notes" />
         </LinearLayout>
 
         <View
@@ -155,14 +167,10 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
             <TextView
-                android:paddingHorizontal="@dimen/activity_horizontal_margin"
-                android:paddingVertical="@dimen/activity_vertical_margin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAllCaps="true"
-                android:textStyle="bold"
-                android:textColor="?colorOnSurface"
-                android:text="@string/person_section_addresses"/>
+                android:text="@string/person_section_addresses"
+                style="@style/Widget.App.TextView.SectionHeading"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -181,14 +189,10 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
             <TextView
-                android:paddingHorizontal="@dimen/activity_horizontal_margin"
-                android:paddingVertical="@dimen/activity_vertical_margin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAllCaps="true"
-                android:textStyle="bold"
-                android:textColor="?colorOnSurface"
-                android:text="@string/person_section_contacts"/>
+                android:text="@string/person_section_contacts"
+                style="@style/Widget.App.TextView.SectionHeading"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -207,14 +211,10 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
             <TextView
-                android:paddingHorizontal="@dimen/activity_horizontal_margin"
-                android:paddingVertical="@dimen/activity_vertical_margin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAllCaps="true"
-                android:textStyle="bold"
-                android:textColor="?colorOnSurface"
-                android:text="@string/person_section_registrations"/>
+                android:text="@string/person_section_registrations"
+                style="@style/Widget.App.TextView.SectionHeading"/>
 
             <LinearLayout
                 android:visibility="gone"
@@ -229,11 +229,13 @@
             android:visibility="@{person.events.isEmpty() ? View.GONE : View.VISIBLE}"
             style="?dividerStyle"/>
 
-        <include layout="@layout/list_item"
+        <com.jonahbauer.qed.layoutStuff.views.ListItem
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:visibility="@{person.events.isEmpty() ? View.GONE : View.VISIBLE}"
             android:id="@+id/toggle_events_button"
-            app:icon="@{@drawable/ic_arrow_down_accent}"
-            app:title="@{@string/event_show_more}"/>
+            app:icon="@drawable/ic_arrow_down_accent"
+            app:title="@string/event_show_more"/>
 
         <View style="?dividerStyle"/>
     </LinearLayout>

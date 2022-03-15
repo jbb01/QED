@@ -40,7 +40,6 @@
             app:iconText="@{person.getInitials(invertedInitials)}"
             app:title="@{person.getFullName(invertedInitials) + ` ` + (!person.active ? @string/persons_database_inactive : !person.member ? @string/persons_database_non_member : ``)}"
             app:subtitle="@{person.email ?? @string/persons_database_no_email}"
-            tools:visibility="gone"
             tools:title="Max Mustermann (inaktiv)"
             tools:subtitle="max.mustermann@email.com"
             tools:iconText="MM"

@@ -7,27 +7,33 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.StyleRes;
-import androidx.appcompat.content.res.AppCompatResources;
-import androidx.core.util.Pair;
-import androidx.databinding.BindingAdapter;
+
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.sheets.InfoFragment;
 import com.jonahbauer.qed.databinding.FragmentInfoPersonBinding;
-import com.jonahbauer.qed.databinding.ListItemBinding;
+import com.jonahbauer.qed.layoutStuff.views.ListItem;
 import com.jonahbauer.qed.model.Person;
 import com.jonahbauer.qed.model.Registration;
 import com.jonahbauer.qed.model.viewmodel.PersonViewModel;
 import com.jonahbauer.qed.util.Actions;
 import com.jonahbauer.qed.util.StatusWrapper;
 import com.jonahbauer.qed.util.Themes;
-import it.unimi.dsi.fastutil.objects.*;
 
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StyleRes;
+import androidx.core.util.Pair;
+import androidx.databinding.BindingAdapter;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMaps;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMaps;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 public class PersonInfoFragment extends InfoFragment {
     private PersonViewModel mPersonViewModel;
@@ -141,25 +147,25 @@ public class PersonInfoFragment extends InfoFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mBinding.toggleEventsButton.setOnClick(this::toggleEvents);
-        mBinding.toggleEventsButton.icon.setColorFilter(getColor());
+        mBinding.toggleEventsButton.setOnClickListener(this::toggleEvents);
+        mBinding.toggleEventsButton.setIconTint(getColor());
 
         TypedValue typedValue = new TypedValue();
         requireContext().getTheme().resolveAttribute(R.attr.textAppearanceButton, typedValue, true);
         @StyleRes int textAppearanceButton = typedValue.data;
 
-        mBinding.toggleEventsButton.title.setTextAppearance(textAppearanceButton);
-        mBinding.toggleEventsButton.title.setTextColor(getColor());
+        mBinding.toggleEventsButton.setTitleTextAppearance(textAppearanceButton);
+        mBinding.toggleEventsButton.setTitleTextColor(getColor());
     }
 
     public void toggleEvents(View v) {
         LinearLayout list = mBinding.registrationList;
-        ListItemBinding button = mBinding.toggleEventsButton;
+        ListItem button = mBinding.toggleEventsButton;
 
         boolean visible = list.getVisibility() == View.VISIBLE;
         list.setVisibility(visible ? View.GONE : View.VISIBLE);
-        button.setIcon(AppCompatResources.getDrawable(v.getContext(), visible ? R.drawable.ic_arrow_down : R.drawable.ic_arrow_up));
-        button.setTitle(v.getContext().getString(visible ? R.string.event_show_more : R.string.event_show_less));
+        button.setIcon(visible ? R.drawable.ic_arrow_down : R.drawable.ic_arrow_up);
+        button.setTitle(visible ? R.string.event_show_more : R.string.event_show_less);
     }
 
     @Override
@@ -175,15 +181,15 @@ public class PersonInfoFragment extends InfoFragment {
         Context context = parent.getContext();
         parent.removeAllViews();
         addresses.forEach((address) -> {
-            ListItemBinding item = ListItemBinding.inflate(LayoutInflater.from(context), parent, true);
-            item.setIcon(AppCompatResources.getDrawable(context, R.drawable.ic_person_location));
+            ListItem item = new ListItem(context);
+            item.setIcon(R.drawable.ic_person_location);
             item.setTitle(address);
-
-            item.setOnClick(v -> Actions.showOnMap(context, address));
-            item.setOnLongClick(v -> {
+            item.setOnClickListener(v -> Actions.showOnMap(context, address));
+            item.setOnLongClickListener(v -> {
                 Actions.copy(context, parent.getRootView(), address, address);
                 return true;
             });
+            parent.addView(item);
         });
     }
 
@@ -192,21 +198,22 @@ public class PersonInfoFragment extends InfoFragment {
         Context context = parent.getContext();
         parent.removeAllViews();
         contacts.forEach((contact) -> {
-            ListItemBinding item = ListItemBinding.inflate(LayoutInflater.from(context), parent, true);
-            int icon = CONTACT_ICONS.getInt(contact.first.toLowerCase());
-            item.setIcon(AppCompatResources.getDrawable(context, icon));
+            ListItem item = new ListItem(context);
+            item.setIcon(CONTACT_ICONS.getInt(contact.first.toLowerCase()));
             item.setTitle(contact.second);
             item.setSubtitle(contact.first);
 
             BiConsumer<Context, String> action = CONTACT_ACTIONS.get(contact.first.toLowerCase());
             if (action != null) {
-                item.setOnClick(v -> action.accept(context, contact.second));
+                item.setOnClickListener(v -> action.accept(context, contact.second));
             }
 
-            item.setOnLongClick(v -> {
+            item.setOnLongClickListener(v -> {
                 Actions.copy(context, parent.getRootView(), contact.first, contact.second);
                 return true;
             });
+
+            parent.addView(item);
         });
     }
 
@@ -215,10 +222,11 @@ public class PersonInfoFragment extends InfoFragment {
         Context context = parent.getContext();
         parent.removeAllViews();
         registrations.forEach((title, registration) -> {
-            ListItemBinding item = ListItemBinding.inflate(LayoutInflater.from(context), parent, true);
-            item.setIcon(AppCompatResources.getDrawable(context, R.drawable.ic_person_event));
+            ListItem item = new ListItem(context);
+            item.setIcon(R.drawable.ic_person_event);
             item.setTitle(title);
-            item.setSubtitle(context.getString(registration.getStatus().toStringRes()));
+            item.setSubtitle(registration.getStatus().toStringRes());
+            parent.addView(item);
             // TODO subtitle orga
         });
     }

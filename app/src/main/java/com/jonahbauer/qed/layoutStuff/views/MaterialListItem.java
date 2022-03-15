@@ -10,9 +10,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import androidx.annotation.*;
+
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.util.ViewUtils;
+
+import androidx.annotation.AttrRes;
+import androidx.annotation.ColorInt;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.IntDef;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.Px;
+import androidx.annotation.StyleRes;
+import androidx.appcompat.content.res.AppCompatResources;
 
 /**
  * A material styled one or two lined list item with an optional icon.
@@ -46,6 +56,11 @@ public class MaterialListItem extends ViewGroup {
     private final TextView mSubtitleTextView;
     private final ImageView mIconView;
     private final TextView mIconTextView;
+
+    private boolean mPaddingLeftOverride;
+    private boolean mPaddingTopOverride;
+    private boolean mPaddingRightOverride;
+    private boolean mPaddingBottomOverride;
 
     public MaterialListItem(@NonNull Context context) {
         this(context, null);
@@ -91,6 +106,52 @@ public class MaterialListItem extends ViewGroup {
             saveAttributeDataForStyleable(context, R.styleable.MaterialListItem, attrs, array, defStyleAttr, defStyleRes);
         }
 
+        // analyze padding overrides
+        if (array.hasValue(R.styleable.MaterialListItem_android_padding)) {
+            mPaddingLeftOverride = true;
+            mPaddingRightOverride = true;
+            mPaddingTopOverride = true;
+            mPaddingBottomOverride = true;
+        } else {
+            if (array.hasValue(R.styleable.MaterialListItem_android_paddingHorizontal)) {
+                mPaddingLeftOverride = true;
+                mPaddingRightOverride = true;
+            } else {
+                if (array.hasValue(R.styleable.MaterialListItem_android_paddingLeft)) {
+                    mPaddingLeftOverride = true;
+                }
+                if (array.hasValue(R.styleable.MaterialListItem_android_paddingRight)) {
+                    mPaddingRightOverride = true;
+                }
+                if (array.hasValue(R.styleable.MaterialListItem_android_paddingStart)) {
+                    if (getLayoutDirection() == LAYOUT_DIRECTION_RTL) {
+                        mPaddingRightOverride = true;
+                    } else {
+                        mPaddingLeftOverride = true;
+                    }
+                }
+                if (array.hasValue(R.styleable.MaterialListItem_android_paddingEnd)) {
+                    if (getLayoutDirection() == LAYOUT_DIRECTION_RTL) {
+                        mPaddingLeftOverride = true;
+                    } else {
+                        mPaddingRightOverride = true;
+                    }
+                }
+            }
+
+            if (array.hasValue(R.styleable.MaterialListItem_android_paddingVertical)) {
+                mPaddingTopOverride = true;
+                mPaddingBottomOverride = true;
+            } else {
+                if (array.hasValue(R.styleable.MaterialListItem_android_paddingTop)) {
+                    mPaddingTopOverride = true;
+                }
+                if (array.hasValue(R.styleable.MaterialListItem_android_paddingBottom)) {
+                    mPaddingBottomOverride = true;
+                }
+            }
+        }
+
         if (array.hasValue(R.styleable.MaterialListItem_title)) {
             setTitle(array.getText(R.styleable.MaterialListItem_title));
         }
@@ -128,38 +189,21 @@ public class MaterialListItem extends ViewGroup {
         }
 
         array.recycle();
+
+        updatePadding(false);
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         var width = getDefaultSize(getSuggestedMinimumWidth(), widthMeasureSpec);
 
-        int heightDp;
-        if (mIcon == null) {
-            heightDp = mSubtitle == null ? 48 : 64;
-        } else if (mIconMode == ICON_ROUND) {
-            heightDp = mSubtitle == null ? 56 : 72;
-        } else if (mIconMode == ICON_SQUARE || mIconMode == ICON_WIDE) {
-            heightDp = 72;
-        } else {
-            throw new IllegalArgumentException("Unknown icon mode " + mIconMode + ".");
-        }
-
         var widthMode = MeasureSpec.getMode(widthMeasureSpec);
         if (widthMode == MeasureSpec.EXACTLY || widthMode == MeasureSpec.AT_MOST) {
             var targetWidth = MeasureSpec.getSize(widthMeasureSpec);
-            var paddingDp = 32;
+            targetWidth -= getPaddingLeft() + getPaddingRight();
             if (mIcon != null) {
-                paddingDp += 16;
-                if (mIconMode == ICON_ROUND) {
-                    paddingDp += 40;
-                } else if (mIconMode == ICON_SQUARE) {
-                    paddingDp += (mSubtitle == null ? 56 : 40);
-                } else if (mIconMode == ICON_WIDE) {
-                    paddingDp += 84;
-                }
+                targetWidth -= getIconWidth() + (int) ViewUtils.dpToPx(this, 16);
             }
-            targetWidth -= ViewUtils.dpToPx(this, paddingDp);
 
             var childWidthMeasureSpec = MeasureSpec.makeMeasureSpec(targetWidth, MeasureSpec.AT_MOST);
             var childHeightMeasureSpec = MeasureSpec.UNSPECIFIED;
@@ -172,19 +216,13 @@ public class MaterialListItem extends ViewGroup {
         }
 
         if (mIcon != null && mIconText != null) {
-            var targetWidthDp = mIconMode == ICON_ROUND ? 40
-                    : mIconMode == ICON_SQUARE ? (mSubtitle == null ? 56 : 40)
-                    : mIconMode == ICON_WIDE ? 100
-                    : 0;
-            var targetHeightDp = (mIconMode == ICON_WIDE || mIconMode == ICON_SQUARE && mSubtitle == null) ? 56 : 40;
-
             mIconTextView.measure(
-                    MeasureSpec.makeMeasureSpec((int) ViewUtils.dpToPx(this, targetWidthDp), MeasureSpec.AT_MOST),
-                    MeasureSpec.makeMeasureSpec((int) ViewUtils.dpToPx(this, targetHeightDp), MeasureSpec.AT_MOST)
+                    MeasureSpec.makeMeasureSpec(getIconWidth(), MeasureSpec.AT_MOST),
+                    MeasureSpec.makeMeasureSpec(getIconHeight(), MeasureSpec.AT_MOST)
             );
         }
 
-        var height = (int) ViewUtils.dpToPx(this, heightDp);
+        int height = getPaddingTop() + getPaddingBottom() + getContentHeight();
         setMeasuredDimension(width, height);
     }
 
@@ -193,76 +231,68 @@ public class MaterialListItem extends ViewGroup {
         var width = r - l;
         var height = b - t;
 
+        var ps = getPaddingStart();
+        var pe = getPaddingEnd();
+        var pt = getPaddingTop();
+        var iconWidth = getIconWidth();
+        var iconHeight = getIconHeight();
+        var iconPadding = (int) ViewUtils.dpToPx(this, 16);
+
         var dp4 = ViewUtils.dpToPx(this, 4);
 
         if (mIcon == null) {
             if (mSubtitle == null) {
-                layoutCenter((int) (4 * dp4), (int) (width - 4 * dp4), width, height, mTitleTextView);
+                layoutCenter(ps, width - pe, width, height, mTitleTextView);
             } else {
-                layoutBaseline((int) (4 * dp4), (int) (width - 4 * dp4), (int) (7 * dp4), width, mTitleTextView);
-                layoutBaseline((int) (4 * dp4), (int) (width - 4 * dp4), (int) (12 * dp4), width, mSubtitleTextView);
-            }
-        } else if (mIconMode == ICON_ROUND) {
-            if (mSubtitle == null) {
-                layoutIcon((int) (4 * dp4), (int) (2 * dp4), (int) (14 * dp4), (int) (12 * dp4), width);
-                layoutCenter((int) (18 * dp4), (int) (width - 4 * dp4), width, height, mTitleTextView);
-            } else {
-                layoutIcon((int) (4 * dp4), (int) (4 * dp4), (int) (14 * dp4), (int) (14 * dp4), width);
-                layoutBaseline((int) (18 * dp4), (int) (width - 4 * dp4), (int) (8 * dp4), width, mTitleTextView);
-                layoutBaseline((int) (18 * dp4), (int) (width - 4 * dp4), (int) (13 * dp4), width, mSubtitleTextView);
-            }
-        } else if (mIconMode == ICON_SQUARE) {
-            if (mSubtitle == null) {
-                layoutIcon((int) (4 * dp4), (int) (2 * dp4), (int) (18 * dp4), (int) (16 * dp4), width);
-                layoutCenter((int) (22 * dp4), (int) (width - 4 * dp4), width, height, mTitleTextView);
-            } else {
-                layoutIcon((int) (4 * dp4), (int) (4 * dp4), (int) (14 * dp4), (int) (14 * dp4), width);
-                layoutBaseline((int) (18 * dp4), (int) (width - 4 * dp4), (int) (8 * dp4), width, mTitleTextView);
-                layoutBaseline((int) (18 * dp4), (int) (width - 4 * dp4), (int) (13 * dp4), width, mSubtitleTextView);
-            }
-        } else if (mIconMode == ICON_WIDE) {
-            if (mSubtitle == null) {
-                layoutIcon(0, (int) (2 * dp4), (int) (25 * dp4), (int) (16 * dp4), width);
-                layoutCenter((int) (29 * dp4), (int) (width - 4 * dp4), width, height, mTitleTextView);
-            } else {
-                layoutIcon(0, (int) (2 * dp4), (int) (25 * dp4), (int) (16 * dp4), width);
-                layoutBaseline((int) (29 * dp4), (int) (width - 4 * dp4), (int) (8 * dp4), width, mTitleTextView);
-                layoutBaseline((int) (29 * dp4), (int) (width - 4 * dp4), (int) (13 * dp4), width, mSubtitleTextView);
+                layoutBaseline(ps, pe, height / 2 - (int) dp4, width, mTitleTextView);
+                layoutBaseline(ps, pe, height / 2 + (int) (4 * dp4), width, mSubtitleTextView);
             }
         } else {
-            throw new IllegalArgumentException("Unknown icon mode " + mIconMode + ".");
+            layoutIcon(ps, pt, ps + iconWidth, pt + iconHeight, width);
+            if (mSubtitle == null) {
+                layoutCenter(ps + iconWidth + iconPadding, width - pe, width, height, mTitleTextView);
+            } else {
+                layoutBaseline(ps + iconWidth + iconPadding, width - pe, height / 2 - (int) dp4, width, mTitleTextView);
+                layoutBaseline(ps + iconWidth + iconPadding, width - pe, height / 2 + (int) (4 * dp4), width, mSubtitleTextView);
+            }
         }
     }
 
-    private void layoutBaseline(int l, int r, int baseline, int width, TextView textView) {
+    private void layoutBaseline(int start, int end, int baseline, int width, TextView textView) {
+        int l, r;
         if (getLayoutDirection() == LAYOUT_DIRECTION_RTL) {
-            var tmpL = width - r;
-            var tmpR = width - l;
-            l = tmpL;
-            r = tmpR;
+            l = width - end;
+            r = width - start;
+        } else {
+            l = start;
+            r = end;
         }
         var textBaseline = textView.getBaseline();
         var textHeight = textView.getMeasuredHeight();
         textView.layout(l, baseline - textBaseline, r, baseline - textBaseline + textHeight);
     }
 
-    private void layoutCenter(int l, int r, int width, int height, TextView textView) {
+    private void layoutCenter(int start, int end, int width, int height, TextView textView) {
+        int l, r;
         if (getLayoutDirection() == LAYOUT_DIRECTION_RTL) {
-            var tmpL = width - r;
-            var tmpR = width - l;
-            l = tmpL;
-            r = tmpR;
+            l = width - end;
+            r = width - start;
+        } else {
+            l = start;
+            r = end;
         }
         var textHeight = textView.getMeasuredHeight();
         textView.layout(l, (height - textHeight) / 2, r, (height + textHeight) / 2);
     }
 
-    private void layoutIcon(int l, int t, int r, int b, int width) {
+    private void layoutIcon(int start, int t, int end, int b, int width) {
+        int l, r;
         if (getLayoutDirection() == LAYOUT_DIRECTION_RTL) {
-            var tmpL = width - r;
-            var tmpR = width - l;
-            l = tmpL;
-            r = tmpR;
+            l = width - end;
+            r = width - start;
+        } else {
+            l = start;
+            r = end;
         }
         mIconView.layout(l, t, r, b);
         if (mIconText != null) {
@@ -272,6 +302,100 @@ public class MaterialListItem extends ViewGroup {
             var textHeight = mIconTextView.getMeasuredHeight();
             mIconTextView.layout(l + (iconWidth - textWidth) / 2, t + (iconHeight - textHeight) / 2, l + (iconWidth + textWidth) / 2, t + (iconHeight + textHeight) / 2);
         }
+    }
+
+    @Override
+    public void setPadding(int left, int top, int right, int bottom) {
+        mPaddingLeftOverride = true;
+        mPaddingTopOverride = true;
+        mPaddingRightOverride = true;
+        mPaddingBottomOverride = true;
+        super.setPadding(left, top, right, bottom);
+    }
+
+    /*
+        lines | icon   | start | end | vertical
+        ---------------------------------------
+        1     | none   | 16    | 16  | 0
+        1     | round  | 16    | 16  | 8
+        1     | square | 16    | 16  | 8
+        1     | wide   | 0     | 16  | 8
+        ---------------------------------------
+        2     | none   | 16    | 16  | 0
+        2     | round  | 16    | 16  | 16
+        2     | square | 16    | 16  | 16
+        2     | wide   | 0     | 16  | 8
+     */
+    private void updatePadding(boolean force) {
+        int left, right, top, bottom;
+
+        var dp16 = (int) ViewUtils.dpToPx(this, 16);
+        var dp8 = (int) ViewUtils.dpToPx(this, 8);
+
+        // horizontal padding
+        if (mIcon == null || mIconMode != ICON_WIDE) {
+            left = right = dp16;
+        } else if (getLayoutDirection() == LAYOUT_DIRECTION_LTR) {
+            left = 0;
+            right = dp16;
+        } else {
+            left = dp16;
+            right = 0;
+        }
+
+        if (mIcon == null) {
+            top = bottom = 0;
+        } else if (mIconMode == ICON_WIDE || mSubtitle == null) {
+            top = bottom = dp8;
+        } else {
+            top = bottom = dp16;
+        }
+
+        if (!force) {
+            if (mPaddingLeftOverride) left = getPaddingLeft();
+            if (mPaddingRightOverride) right = getPaddingRight();
+            if (mPaddingTopOverride) top = getPaddingTop();
+            if (mPaddingBottomOverride) bottom = getPaddingBottom();
+        } else {
+            mPaddingLeftOverride = false;
+            mPaddingTopOverride = false;
+            mPaddingRightOverride = false;
+            mPaddingBottomOverride = false;
+        }
+
+        super.setPadding(left, top, right, bottom);
+    }
+
+    private @Px int getIconHeight() {
+        if (mIconMode == ICON_WIDE || mIconMode == ICON_SQUARE && mSubtitle == null) {
+            return (int) ViewUtils.dpToPx(this, 56);
+        } else {
+            return (int) ViewUtils.dpToPx(this, 40);
+        }
+    }
+
+    private @Px int getIconWidth() {
+        if (mIconMode == ICON_WIDE) {
+            return (int) ViewUtils.dpToPx(this, 100);
+        } else if (mIconMode == ICON_SQUARE && mSubtitle == null) {
+            return (int) ViewUtils.dpToPx(this, 56);
+        } else {
+            return (int) ViewUtils.dpToPx(this, 40);
+        }
+    }
+
+    private @Px int getContentHeight() {
+        if (mIcon != null) {
+            return getIconHeight();
+        } else if (mSubtitle == null) {
+            return (int) ViewUtils.dpToPx(this, 40);
+        } else {
+            return (int) ViewUtils.dpToPx(this, 56);
+        }
+    }
+
+    public void useDefaultPadding() {
+        updatePadding(true);
     }
 
     //<editor-fold desc="Getter/Setter" defaultstate="collapsed">
@@ -299,9 +423,12 @@ public class MaterialListItem extends ViewGroup {
     }
 
     public void setSubtitle(CharSequence subtitle) {
+        var nullChange = mSubtitle == null ^ subtitle == null;
         this.mSubtitle = subtitle;
         this.mSubtitleTextView.setText(subtitle);
         this.mSubtitleTextView.setVisibility(subtitle != null ? View.VISIBLE : View.GONE);
+        if (nullChange) updatePadding(false);
+        invalidate();
     }
 
     public Drawable getIcon() {
@@ -309,13 +436,16 @@ public class MaterialListItem extends ViewGroup {
     }
 
     public void setIcon(Drawable icon) {
+        var nullChange = mIcon == null ^ icon == null;
         this.mIcon = icon;
         this.mIconView.setImageDrawable(icon);
         this.mIconView.setVisibility(icon != null ? View.VISIBLE : View.GONE);
+        if (nullChange) updatePadding(false);
+        invalidate();
     }
 
     public void setIcon(@DrawableRes int icon) {
-        setIcon(getContext().getDrawable(icon));
+        setIcon(AppCompatResources.getDrawable(getContext(), icon));
     }
 
     public void setTitleTextAppearance(@StyleRes int textAppearance) {
@@ -331,8 +461,11 @@ public class MaterialListItem extends ViewGroup {
     }
 
     public void setIconMode(@IconMode int iconMode) {
-        this.mIconMode = iconMode;
-        invalidate();
+        if (mIconMode != iconMode) {
+            this.mIconMode = iconMode;
+            updatePadding(false);
+            invalidate();
+        }
     }
 
     public int getIconMode() {

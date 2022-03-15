@@ -7,15 +7,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.StyleRes;
-import androidx.appcompat.content.res.AppCompatResources;
-import androidx.databinding.BindingAdapter;
+
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.sheets.InfoFragment;
 import com.jonahbauer.qed.databinding.FragmentInfoEventBinding;
-import com.jonahbauer.qed.databinding.ListItemBinding;
+import com.jonahbauer.qed.layoutStuff.views.ListItem;
 import com.jonahbauer.qed.model.Event;
 import com.jonahbauer.qed.model.Registration;
 import com.jonahbauer.qed.model.viewmodel.EventViewModel;
@@ -23,6 +19,11 @@ import com.jonahbauer.qed.util.StatusWrapper;
 import com.jonahbauer.qed.util.Themes;
 
 import java.util.Map;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StyleRes;
+import androidx.databinding.BindingAdapter;
 
 public class EventInfoFragment extends InfoFragment {
     private EventViewModel mEventViewModel;
@@ -95,25 +96,25 @@ public class EventInfoFragment extends InfoFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mBinding.toggleParticipantsButton.setOnClick(this::toggleParticipants);
-        mBinding.toggleParticipantsButton.icon.setColorFilter(getColor());
+        mBinding.toggleParticipantsButton.setOnClickListener(this::toggleParticipants);
+        mBinding.toggleParticipantsButton.setIconTint(getColor());
 
         TypedValue typedValue = new TypedValue();
         requireContext().getTheme().resolveAttribute(R.attr.textAppearanceButton, typedValue, true);
         @StyleRes int textAppearanceButton = typedValue.data;
 
-        mBinding.toggleParticipantsButton.title.setTextAppearance(textAppearanceButton);
-        mBinding.toggleParticipantsButton.title.setTextColor(getColor());
+        mBinding.toggleParticipantsButton.setTitleTextAppearance(textAppearanceButton);
+        mBinding.toggleParticipantsButton.setTitleTextColor(getColor());
     }
 
     public void toggleParticipants(View v) {
         LinearLayout list = mBinding.participantList;
-        ListItemBinding button = mBinding.toggleParticipantsButton;
+        ListItem button = mBinding.toggleParticipantsButton;
 
         boolean visible = list.getVisibility() == View.VISIBLE;
         list.setVisibility(visible ? View.GONE : View.VISIBLE);
-        button.setIcon(AppCompatResources.getDrawable(v.getContext(), visible ? R.drawable.ic_arrow_down : R.drawable.ic_arrow_up));
-        button.setTitle(v.getContext().getString(visible ? R.string.event_show_more : R.string.event_show_less));
+        button.setIcon(visible ? R.drawable.ic_arrow_down : R.drawable.ic_arrow_up);
+        button.setTitle(visible ? R.string.event_show_more : R.string.event_show_less);
     }
 
     @BindingAdapter("event_organizers")
@@ -121,10 +122,11 @@ public class EventInfoFragment extends InfoFragment {
         Context context = parent.getContext();
         parent.removeAllViews();
         organizers.forEach((name, registration) -> {
-            ListItemBinding item = ListItemBinding.inflate(LayoutInflater.from(context), parent, true);
-            item.setIcon(AppCompatResources.getDrawable(context, R.drawable.ic_event_orga));
+            ListItem item = new ListItem(context);
+            item.setIcon(R.drawable.ic_event_orga);
             item.setTitle(name);
-            item.setSubtitle(context.getString(R.string.registration_orga));
+            item.setSubtitle(R.string.registration_orga);
+            parent.addView(item);
         });
     }
 
@@ -134,10 +136,11 @@ public class EventInfoFragment extends InfoFragment {
         parent.removeAllViews();
         participants.forEach((name, registration) -> {
             if (registration.isOrganizer()) return;
-            ListItemBinding item = ListItemBinding.inflate(LayoutInflater.from(context), parent, true);
-            item.setIcon(AppCompatResources.getDrawable(context, registration.getStatus().toDrawableRes()));
+            ListItem item = new ListItem(context);
+            item.setIcon(registration.getStatus().toDrawableRes());
             item.setTitle(name);
-            item.setSubtitle(context.getString(registration.getStatus().toStringRes()));
+            item.setSubtitle(registration.getStatus().toStringRes());
+            parent.addView(item);
         });
     }
 }
