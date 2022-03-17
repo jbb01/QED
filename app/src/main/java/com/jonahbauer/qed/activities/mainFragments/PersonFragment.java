@@ -7,10 +7,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentOnAttachListener;
 import com.jonahbauer.qed.R;
-import com.jonahbauer.qed.activities.sheets.InfoFragment;
 import com.jonahbauer.qed.activities.sheets.person.PersonInfoFragment;
 import com.jonahbauer.qed.databinding.SingleFragmentBinding;
 import com.jonahbauer.qed.model.Person;
@@ -64,17 +61,11 @@ public class PersonFragment extends Fragment {
             }
         });
 
-        getChildFragmentManager().addFragmentOnAttachListener(new FragmentOnAttachListener() {
-            @Override
-            public void onAttachFragment(@NonNull FragmentManager fragmentManager, @NonNull Fragment f) {
-                if (f instanceof InfoFragment) {
-                    ((InfoFragment) f).hideTitle();
-                    getChildFragmentManager().removeFragmentOnAttachListener(this);
-                }
-            }
-        });
-
-        PersonInfoFragment fragment = PersonInfoFragment.newInstance();
-        getChildFragmentManager().beginTransaction().replace(R.id.fragment, fragment).commit();
+        var manager = getChildFragmentManager();
+        if (!(manager.findFragmentById(R.id.fragment) instanceof PersonInfoFragment)) {
+            PersonInfoFragment fragment = PersonInfoFragment.newInstance();
+            fragment.hideTitle();
+            manager.beginTransaction().replace(R.id.fragment, fragment).commit();
+        }
     }
 }

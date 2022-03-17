@@ -26,10 +26,13 @@ import androidx.annotation.StyleRes;
 import androidx.databinding.BindingAdapter;
 
 public class EventInfoFragment extends InfoFragment {
+    private static final String SAVED_EXPANDED = "expanded";
+
     private EventViewModel mEventViewModel;
     private FragmentInfoEventBinding mBinding;
 
     private boolean mHideTitle;
+    private boolean mExpanded;
 
     public static EventInfoFragment newInstance() {
         return new EventInfoFragment();
@@ -96,7 +99,7 @@ public class EventInfoFragment extends InfoFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mBinding.toggleParticipantsButton.setOnClickListener(this::toggleParticipants);
+        mBinding.toggleParticipantsButton.setOnClickListener(this::toggleParticipantsExpanded);
         mBinding.toggleParticipantsButton.setIconTint(getColor());
 
         TypedValue typedValue = new TypedValue();
@@ -105,16 +108,31 @@ public class EventInfoFragment extends InfoFragment {
 
         mBinding.toggleParticipantsButton.setTitleTextAppearance(textAppearanceButton);
         mBinding.toggleParticipantsButton.setTitleTextColor(getColor());
+
+        if (savedInstanceState != null) {
+            mExpanded = savedInstanceState.getBoolean(SAVED_EXPANDED);
+        }
+        setParticipantsExpanded(mExpanded);
     }
 
-    public void toggleParticipants(View v) {
+    public void toggleParticipantsExpanded(@Nullable View view) {
+        setParticipantsExpanded(!mExpanded);
+    }
+
+    public void setParticipantsExpanded(boolean expanded) {
+        mExpanded = expanded;
         LinearLayout list = mBinding.participantList;
         ListItem button = mBinding.toggleParticipantsButton;
 
-        boolean visible = list.getVisibility() == View.VISIBLE;
-        list.setVisibility(visible ? View.GONE : View.VISIBLE);
-        button.setIcon(visible ? R.drawable.ic_arrow_down : R.drawable.ic_arrow_up);
-        button.setTitle(visible ? R.string.event_show_more : R.string.event_show_less);
+        list.setVisibility(mExpanded ? View.VISIBLE : View.GONE);
+        button.setIcon(mExpanded ? R.drawable.ic_arrow_up : R.drawable.ic_arrow_down);
+        button.setTitle(mExpanded ? R.string.event_show_less : R.string.event_show_more);
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(SAVED_EXPANDED, mExpanded);
     }
 
     @BindingAdapter("event_organizers")

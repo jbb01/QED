@@ -7,8 +7,8 @@
         <!-- Dialog Themes -->
         <item name="android:dialogTheme">@style/ThemeOverlay.App.Dialog</item>
         <item name="android:alertDialogTheme">@style/ThemeOverlay.App.Dialog.Alert</item>
-        <item name="android:datePickerDialogTheme">@style/ThemeOverlay.App.Dialog</item>
-        <item name="android:timePickerDialogTheme">@style/ThemeOverlay.App.Dialog</item>
+        <item name="android:datePickerDialogTheme">?android:dialogTheme</item>
+        <item name="android:timePickerDialogTheme">?android:dialogTheme</item>
         <item name="dialogTheme">?android:dialogTheme</item>
         <item name="alertDialogTheme">?android:alertDialogTheme</item>
         <item name="materialAlertDialogTheme">?android:alertDialogTheme</item>
@@ -31,6 +31,7 @@
         <item name="android:colorControlNormal">?android:textColorPrimary</item>
         <item name="android:textColorHint">@color/text_color_hint</item>
         <item name="colorControlNormal">?android:colorControlNormal</item>
+        <item name="colorBackgroundFloating">?android:colorBackgroundFloating</item>
 
         <item name="divider">@drawable/divider</item>
         <item name="dividerHorizontal">?divider</item>
@@ -68,6 +69,7 @@
         <item name="colorOnSecondary">@android:color/black</item>
 
         <item name="android:colorBackground">@color/colorBackground</item>
+        <item name="android:colorBackgroundFloating">@color/colorSurface</item>
         <item name="colorOnBackground">@android:color/black</item>
         <item name="colorOnBackgroundVariant">#808080</item>
 
@@ -148,14 +150,10 @@
     <style name="ThemeOverlay.App.Dialog" parent="ThemeOverlay.MaterialComponents.Dialog">
         <item name="buttonStyle">@style/Widget.App.Button</item>
         <item name="buttonBarButtonStyle">@style/Widget.App.Button</item>
-        <item name="android:colorBackground">@color/colorSurface</item>
-
-        <item name="android:colorControlNormal">?android:textColorSecondary</item>
     </style>
     <style name="ThemeOverlay.App.Dialog.Alert" parent="ThemeOverlay.MaterialComponents.Dialog.Alert">
         <item name="buttonStyle">@style/Widget.App.Button</item>
         <item name="buttonBarButtonStyle">@style/Widget.App.Button</item>
-        <item name="android:colorBackground">@color/colorSurface</item>
     </style>
     <style name="ThemeOverlay.App.Dialog.Dark">
         <item name="android:colorBackground">#2F3136</item>

@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Spinner;
@@ -17,12 +16,12 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.navigation.fragment.NavHostFragment;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.databinding.AlertDialogLogModeBinding;
 import com.jonahbauer.qed.layoutStuff.CustomArrayAdapter;
@@ -80,7 +79,7 @@ public class LogDialog extends DialogFragment implements AdapterView.OnItemSelec
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext());
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setTitle(R.string.title_activity_log_dialog);
         builder.setCancelable(true);
         builder.setPositiveButton(R.string.ok, this);
@@ -91,7 +90,7 @@ public class LogDialog extends DialogFragment implements AdapterView.OnItemSelec
 
     @NonNull
     public View createView(@NonNull Context context) {
-        mBinding = AlertDialogLogModeBinding.inflate(LayoutInflater.from(context));
+        mBinding = AlertDialogLogModeBinding.inflate(getLayoutInflater());
 
         // setup mode spinner
         var adapter = new CustomArrayAdapter<>(context, android.R.layout.simple_spinner_item, Mode.values());

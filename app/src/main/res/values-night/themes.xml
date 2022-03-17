@@ -2,21 +2,24 @@
 <resources>
     <!-- Themes -->
     <style name="Theme.App" parent="Base.Theme.App">
+        <item name="navigationViewStyle">@style/Widget.App.NavigationView</item>
+
         <!-- Color Palette -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryLight">@color/colorPrimaryLight</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorPrimary">@color/colorPrimaryNight</item>
+        <item name="colorPrimaryLight">@color/colorPrimaryLightNight</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDarkNight</item>
 
         <item name="colorOnPrimary">@android:color/white</item>
 
-        <item name="colorSecondary">@color/colorSecondary</item>
+        <item name="colorSecondary">@color/colorSecondaryNight</item>
         <item name="colorOnSecondary">@android:color/black</item>
 
-        <item name="android:colorBackground">@color/colorBackground</item>
+        <item name="android:colorBackground">@color/colorBackgroundNight</item>
+        <item name="android:colorBackgroundFloating">@color/colorBackgroundNight</item>
         <item name="colorOnBackground">@android:color/white</item>
         <item name="colorOnBackgroundVariant">@android:color/darker_gray</item>
 
-        <item name="colorSurface">@color/colorSurface</item>
+        <item name="colorSurface">@color/colorSurfaceNight</item>
         <item name="colorOnSurface">@android:color/white</item>
         <item name="colorOnSurfaceVariant">@android:color/darker_gray</item>
 
@@ -36,19 +39,7 @@
         <item name="colorOnAccentColor">@android:color/white</item>
 
         <item name="elevationOverlayEnabled">false</item>
-    </style>
 
-    <!-- ThemeOverlays -->
-    <style name="ThemeOverlay.App.Dialog" parent="ThemeOverlay.MaterialComponents.Dialog">
-        <item name="buttonStyle">@style/Widget.App.Button</item>
-        <item name="buttonBarButtonStyle">@style/Widget.App.Button</item>
-        <item name="android:colorBackground">@color/colorBackground</item>
-        <item name="android:windowBackground">@color/colorBackground</item>
-    </style>
-    <style name="ThemeOverlay.App.Dialog.Alert" parent="ThemeOverlay.MaterialComponents.Dialog.Alert">
-        <item name="buttonStyle">@style/Widget.App.Button</item>
-        <item name="buttonBarButtonStyle">@style/Widget.App.Button</item>
-        <item name="android:colorBackground">@color/colorBackground</item>
-        <item name="android:windowBackground">@color/colorBackground</item>
+        <item name="dateBannerBackgroundTint">@color/dateBannerBackgroundNight</item>
     </style>
 </resources>

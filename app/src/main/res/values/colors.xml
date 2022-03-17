@@ -50,4 +50,17 @@
 
     <color name="statusBarScrim">#40000000</color>
 
+    <!-- Night Mode -->
+    <color name="colorPrimaryNight">#202225</color>
+    <color name="colorPrimaryDarkNight">#000000</color>
+    <color name="colorPrimaryLightNight">#47494d</color>
+
+    <color name="colorSecondaryNight">#52c7b8</color>
+    <color name="colorSecondaryDarkNight">#019688</color>
+    <color name="colorSecondaryLightNight">#88faea</color>
+
+    <color name="dateBannerBackgroundNight">@color/colorSurfaceNight</color>
+
+    <color name="colorBackgroundNight">#2F3136</color>
+    <color name="colorSurfaceNight">#36393f</color>
 </resources>

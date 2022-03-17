@@ -1,6 +1,5 @@
 package com.jonahbauer.qed.util;
 
-import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
@@ -13,10 +12,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -27,6 +28,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavBackStackEntry;
 import androidx.navigation.fragment.NavHostFragment;
 import com.jonahbauer.qed.R;
+import com.jonahbauer.qed.activities.MainActivity;
 import com.jonahbauer.qed.databinding.AlertDialogEditTextBinding;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.Contract;
@@ -212,8 +214,13 @@ public class ViewUtils {
         AlertDialog.Builder dialog = new AlertDialog.Builder(context);
         dialog.setTitle(title);
 
-        var binding = AlertDialogEditTextBinding.inflate(LayoutInflater.from(dialog.getContext()));
+        var binding = AlertDialogEditTextBinding.inflate(LayoutInflater.from(context));
         binding.input.setText(getter.get());
+        binding.input.requestFocus();
+        binding.input.setSelection(binding.input.getText().length());
+
+        var imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,0);
 
         dialog.setView(binding.getRoot());
         dialog.setPositiveButton(R.string.ok, (d, which) -> {

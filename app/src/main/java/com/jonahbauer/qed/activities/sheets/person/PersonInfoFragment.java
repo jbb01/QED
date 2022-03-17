@@ -36,10 +36,13 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectMaps;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 public class PersonInfoFragment extends InfoFragment {
+    private static final String SAVED_EXPANDED = "expanded";
+
     private PersonViewModel mPersonViewModel;
     private FragmentInfoPersonBinding mBinding;
 
     private boolean mHideTitle;
+    private boolean mExpanded;
 
     private static final Object2IntMap<String> CONTACT_ICONS;
     private static final Object2ObjectMap<String, BiConsumer<Context, String>> CONTACT_ACTIONS;
@@ -147,7 +150,7 @@ public class PersonInfoFragment extends InfoFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mBinding.toggleEventsButton.setOnClickListener(this::toggleEvents);
+        mBinding.toggleEventsButton.setOnClickListener(this::toggleEventsExpanded);
         mBinding.toggleEventsButton.setIconTint(getColor());
 
         TypedValue typedValue = new TypedValue();
@@ -156,16 +159,32 @@ public class PersonInfoFragment extends InfoFragment {
 
         mBinding.toggleEventsButton.setTitleTextAppearance(textAppearanceButton);
         mBinding.toggleEventsButton.setTitleTextColor(getColor());
+
+        if (savedInstanceState != null) {
+            mExpanded = savedInstanceState.getBoolean(SAVED_EXPANDED);
+        }
+        setEventsExpanded(mExpanded);
     }
 
-    public void toggleEvents(View v) {
+
+    public void toggleEventsExpanded(@Nullable View view) {
+        setEventsExpanded(!mExpanded);
+    }
+
+    public void setEventsExpanded(boolean expanded) {
+        mExpanded = expanded;
         LinearLayout list = mBinding.registrationList;
         ListItem button = mBinding.toggleEventsButton;
 
-        boolean visible = list.getVisibility() == View.VISIBLE;
-        list.setVisibility(visible ? View.GONE : View.VISIBLE);
-        button.setIcon(visible ? R.drawable.ic_arrow_down : R.drawable.ic_arrow_up);
-        button.setTitle(visible ? R.string.event_show_more : R.string.event_show_less);
+        list.setVisibility(mExpanded ? View.VISIBLE : View.GONE);
+        button.setIcon(mExpanded ? R.drawable.ic_arrow_up : R.drawable.ic_arrow_down);
+        button.setTitle(mExpanded ? R.string.event_show_less : R.string.event_show_more);
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(SAVED_EXPANDED, mExpanded);
     }
 
     @Override

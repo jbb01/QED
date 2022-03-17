@@ -1,7 +1,6 @@
 package com.jonahbauer.qed.activities.mainFragments;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
@@ -13,6 +12,7 @@ import android.view.*;
 import android.widget.AbsListView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.view.ActionMode;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
@@ -112,7 +112,8 @@ public class ChatFragment extends Fragment implements NetworkListener, AbsListVi
                     }
             );
         });
-        mBinding.quickSettings.setOnClickListener(this::toggleQuickSettings);
+        mBinding.quickSettings.setOnClickListener(this::toggleQuickSettingsShown);
+        setQuickSettingsShown(mQuickSettingsShown);
 
         var messageBox = mBinding.list;
         mMessageAdapter = new MessageAdapter(view.getContext(), new ArrayList<>(), mBinding.mathPreload);
@@ -343,15 +344,19 @@ public class ChatFragment extends Fragment implements NetworkListener, AbsListVi
         }
     }
 
-    private void toggleQuickSettings(View view) {
-        if (mQuickSettingsShown) {
-            mBinding.quickSettingsName.hide();
-            mBinding.quickSettingsChannel.hide();
-        } else {
+    private void toggleQuickSettingsShown(@Nullable View view) {
+        setQuickSettingsShown(!mQuickSettingsShown);
+    }
+
+    private void setQuickSettingsShown(boolean shown) {
+        mQuickSettingsShown = shown;
+        if (shown) {
             mBinding.quickSettingsName.show();
             mBinding.quickSettingsChannel.show();
+        } else {
+            mBinding.quickSettingsName.hide();
+            mBinding.quickSettingsChannel.hide();
         }
-        mQuickSettingsShown = !mQuickSettingsShown;
     }
 
     @Override
