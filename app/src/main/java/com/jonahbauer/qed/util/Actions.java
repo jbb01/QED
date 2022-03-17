@@ -71,7 +71,7 @@ public class Actions {
         return tryStartActivity(context, intent);
     }
 
-    public static void copy(@NonNull Context context, @Nullable View view, String label, String text) {
+    public static boolean copy(@NonNull Context context, @Nullable View view, String label, String text) {
         ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
         ClipData clip = ClipData.newPlainText(label, text);
         clipboard.setPrimaryClip(clip);
@@ -80,6 +80,7 @@ public class Actions {
             var snackbar = Snackbar.make(view, R.string.copied, Snackbar.LENGTH_SHORT);
             snackbar.show();
         }
+        return true;
     }
 
     public static boolean open(@NonNull Context context, String url) {

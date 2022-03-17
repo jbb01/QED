@@ -6,7 +6,6 @@
         <import type="android.view.View"/>
         <import type="com.jonahbauer.qed.util.Actions"/>
         <import type="com.jonahbauer.qed.util.TimeUtils"/>
-        <import type="java.text.MessageFormat"/>
 
         <variable name="loading" type="boolean" />
         <variable name="color" type="int" />
@@ -63,8 +62,9 @@
             <com.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{person.email != null ? View.VISIBLE : View.GONE}"
-                android:onClick="@{(view) -> Actions.sendTo(view.context, person.email)}"
+                android:visibility="@{person.email != null}"
+                android:onClick="@{v -> Actions.sendTo(context, person.email)}"
+                android:onLongClick="@{v -> Actions.copy(context, v, person.fullName, person.email)}"
                 app:icon="@drawable/ic_person_mail"
                 app:title="@{person.email}"
                 app:subtitle="@string/person_subtitle_mail"/>
@@ -72,25 +72,25 @@
             <com.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{(person.birthday != null || person.birthdayString != null) ? View.VISIBLE : View.GONE}"
+                android:visibility="@{person.birthday != null || person.birthdayString != null}"
                 app:icon="@drawable/ic_person_birthday"
-                app:title="@{person.birthday != null ? MessageFormat.format(@string/person_title_birthday, TimeUtils.format(person.birthday)) : person.birthdayString}"
+                app:title="@{@string/person_title_birthday(TimeUtils.format(person.birthday) ?? person.birthdayString)}"
                 app:subtitle="@string/person_subtitle_birthday"/>
 
             <com.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{(person.dateOfJoining != null || person.dateOfJoiningString != null) ? View.VISIBLE : View.GONE}"
+                android:visibility="@{person.dateOfJoining != null || person.dateOfJoiningString != null}"
                 app:icon="@drawable/ic_person_date_of_joining"
-                app:title="@{person.dateOfJoining != null ? MessageFormat.format(@string/person_title_date_of_joining, TimeUtils.format(person.dateOfJoining)) : person.dateOfJoiningString}"
+                app:title="@{@string/person_title_date_of_joining(TimeUtils.format(person.dateOfJoining) ?? person.dateOfJoiningString)}"
                 app:subtitle="@string/person_subtitle_date_of_joining"/>
 
             <com.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{(person.leavingDate != null || person.leavingDateString != null) ? View.VISIBLE : View.GONE}"
+                android:visibility="@{person.leavingDate != null || person.leavingDateString != null}"
                 app:icon="@drawable/ic_person_leaving_date"
-                app:title="@{person.leavingDate != null ? MessageFormat.format(@string/person_title_leaving_date, TimeUtils.format(person.leavingDate)) : person.leavingDateString}"
+                app:title="@{@string/person_title_leaving_date(TimeUtils.format(person.leavingDate) ?? person.leavingDateString)}"
                 app:subtitle="@string/person_subtitle_leaving_date"/>
 
             <com.jonahbauer.qed.layoutStuff.views.ListItem
@@ -109,11 +109,11 @@
         </LinearLayout>
 
         <View
-            android:visibility="@{person.hasAdditionalInformation() ? View.VISIBLE : View.GONE}"
+            android:visibility="@{person.hasAdditionalInformation()}"
             style="?dividerStyle"/>
 
         <LinearLayout
-            android:visibility="@{person.hasAdditionalInformation() ? View.VISIBLE : View.GONE}"
+            android:visibility="@{person.hasAdditionalInformation()}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
@@ -127,7 +127,7 @@
             <com.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{person.homeStation != null ? View.VISIBLE : View.GONE}"
+                android:visibility="@{person.homeStation != null}"
                 app:icon="@drawable/ic_person_train"
                 app:title="@{person.homeStation}"
                 app:subtitle="@string/person_subtitle_station" />
@@ -135,7 +135,7 @@
             <com.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{person.railcard != null ? View.VISIBLE : View.GONE}"
+                android:visibility="@{person.railcard != null}"
                 app:icon="@drawable/ic_person_railcard"
                 app:title="@{person.railcard}"
                 app:subtitle="@string/person_subtitle_railcard" />
@@ -143,7 +143,7 @@
             <com.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{person.food != null ? View.VISIBLE : View.GONE}"
+                android:visibility="@{person.food != null}"
                 app:icon="@drawable/ic_person_food"
                 app:title="@{person.food}"
                 app:subtitle="@string/person_subtitle_food" />
@@ -151,18 +151,18 @@
             <com.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{person.notes != null ? View.VISIBLE : View.GONE}"
+                android:visibility="@{person.notes != null}"
                 app:icon="@drawable/ic_person_notes"
                 app:title="@{person.notes}"
                 app:subtitle="@string/person_subtitle_notes" />
         </LinearLayout>
 
         <View
-            android:visibility="@{person.addresses.size() > 0 ? View.VISIBLE : View.GONE}"
+            android:visibility="@{!person.addresses.empty}"
             style="?dividerStyle"/>
 
         <LinearLayout
-            android:visibility="@{person.addresses.size() > 0 ? View.VISIBLE : View.GONE}"
+            android:visibility="@{!person.addresses.empty}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
@@ -180,11 +180,11 @@
         </LinearLayout>
 
         <View
-            android:visibility="@{person.contacts.size() > 0 ? View.VISIBLE : View.GONE}"
+            android:visibility="@{!person.contacts.empty}"
             style="?dividerStyle"/>
 
         <LinearLayout
-            android:visibility="@{person.contacts.size() > 0 ? View.VISIBLE : View.GONE}"
+            android:visibility="@{!person.contacts.empty}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
@@ -202,11 +202,11 @@
         </LinearLayout>
 
         <View
-            android:visibility="@{person.events.isEmpty() ? View.GONE : View.VISIBLE}"
+            android:visibility="@{!person.events.empty}"
             style="?dividerStyle"/>
 
         <LinearLayout
-            android:visibility="@{person.events.isEmpty() ? View.GONE : View.VISIBLE}"
+            android:visibility="@{!person.events.empty}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
@@ -226,13 +226,13 @@
         </LinearLayout>
 
         <View
-            android:visibility="@{person.events.isEmpty() ? View.GONE : View.VISIBLE}"
+            android:visibility="@{!person.events.empty}"
             style="?dividerStyle"/>
 
         <com.jonahbauer.qed.layoutStuff.views.ListItem
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="@{person.events.isEmpty() ? View.GONE : View.VISIBLE}"
+            android:visibility="@{!person.events.empty}"
             android:id="@+id/toggle_events_button"
             app:icon="@drawable/ic_arrow_down_accent"
             app:title="@string/event_show_more"/>

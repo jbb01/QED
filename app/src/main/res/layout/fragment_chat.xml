@@ -4,8 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <import type="android.view.View"/>
-
         <variable name="loading" type="boolean" />
         <variable name="ready" type="boolean" />
     </data>
@@ -29,7 +27,7 @@
             android:paddingTop="15dp"
             android:gravity="center_horizontal"
             style="?android:attr/progressBarStyleLarge"
-            android:visibility="@{loading ? View.VISIBLE : View.GONE}" />
+            android:visibility="@{loading}" />
 
         <LinearLayout
             android:id="@+id/math_preload"
@@ -67,7 +65,7 @@
                     android:scrollbarStyle="outsideInset"
                     android:transcriptMode="normal"
                     android:transitionGroup="true"
-                    android:visibility="@{loading ? View.GONE : View.VISIBLE}" />
+                    android:visibility="@{!loading}" />
             </FrameLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout

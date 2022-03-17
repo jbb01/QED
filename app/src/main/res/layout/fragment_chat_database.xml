@@ -3,7 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <import type="android.view.View"/>
         <import type="com.jonahbauer.qed.util.StatusWrapper"/>
 
         <variable name="status" type="int" />
@@ -235,7 +234,7 @@
             android:gravity="center_horizontal"
             android:id="@+id/search_progress"
             style="?android:attr/progressBarStyleLarge"
-            android:visibility="@{status == StatusWrapper.STATUS_PRELOADED ? View.VISIBLE : View.GONE}" />
+            android:visibility="@{status == StatusWrapper.STATUS_PRELOADED}" />
 
         <ListView
             android:id="@+id/message_list_view"
@@ -255,7 +254,7 @@
             android:listSelector="@android:color/transparent"
             android:scrollbarStyle="outsideInset"
             android:transitionGroup="true"
-            android:visibility="@{status == StatusWrapper.STATUS_LOADED ? View.VISIBLE : View.GONE}" />
+            android:visibility="@{status == StatusWrapper.STATUS_LOADED}" />
 
     </RelativeLayout>
 </layout>

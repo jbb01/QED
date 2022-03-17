@@ -19,7 +19,7 @@ public final class EventListParser extends HtmlParser<List<Event>> {
     private static final String LOG_TAG = EventListParser.class.getName();
     public static final EventListParser INSTANCE = new EventListParser();
 
-    private static final Pattern COST_PATTERN = Pattern.compile("(\\d+(?:,\\d+))\\s*€");
+    private static final Pattern COST_PATTERN = Pattern.compile("(\\d+(?:,\\d+)?)\\s*€");
 
     private EventListParser() {}
 
@@ -47,21 +47,21 @@ public final class EventListParser extends HtmlParser<List<Event>> {
                             var element = columns.get(2).selectFirst("time");
                             if (element == null) break start;
                             event.setStartString(element.text());
-                            event.setStart(parseLocalDate(element.attr("datetime")));
+                            event.setStart(parseLocalDate(element));
                         } catch (Exception ignored) {}
 
                         end: try {
                             var element = columns.get(3).selectFirst("time");
                             if (element == null) break end;
                             event.setEndString(element.text());
-                            event.setEnd(parseLocalDate(element.attr("datetime")));
+                            event.setEnd(parseLocalDate(element));
                         } catch (Exception ignored) {}
 
                         deadline: try {
                             var element = columns.get(5).selectFirst("time");
                             if (element == null) break deadline;
                             event.setDeadlineString(element.text());
-                            event.setDeadline(parseLocalDate(element.attr("datetime")));
+                            event.setDeadline(parseLocalDate(element));
                         } catch (Exception ignored) {}
 
                         cost: try {
@@ -73,7 +73,7 @@ public final class EventListParser extends HtmlParser<List<Event>> {
                                 String match = costMatcher.group(1);
                                 if (match != null) {
                                     match = match.replace(',', '.');
-                                    event.setCost((int) Double.parseDouble(match));
+                                    event.setCost(Double.parseDouble(match));
                                 }
                             }
                         } catch (Exception ignored) {}

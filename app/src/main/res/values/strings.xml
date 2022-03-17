@@ -139,17 +139,17 @@
     <string name="person_section_contacts">Contact Information</string>
     <string name="person_section_registrations">Registrations</string>
     <string name="person_subtitle_mail">Email Address</string>
-    <string name="person_title_birthday">{0}</string>
+    <string name="person_title_birthday">%s</string>
     <string name="person_subtitle_birthday">Birthday</string>
-    <string name="person_title_date_of_joining">{0}</string>
+    <string name="person_title_date_of_joining">%s</string>
     <string name="person_subtitle_date_of_joining">Date of Joining</string>
-    <string name="person_title_leaving_date">{0}</string>
+    <string name="person_title_leaving_date">%s</string>
     <string name="person_subtitle_leaving_date">Leaving Date</string>
-    <string name="person_title_member_true">Yes</string>
-    <string name="person_title_member_false">No</string>
+    <string name="person_title_member_true">@string/yes</string>
+    <string name="person_title_member_false">@string/no</string>
     <string name="person_subtitle_member">Currently Member</string>
-    <string name="person_title_active_true">Yes</string>
-    <string name="person_title_active_false">No</string>
+    <string name="person_title_active_true">@string/yes</string>
+    <string name="person_title_active_false">@string/no</string>
     <string name="person_subtitle_active">Active Profile</string>
     <string name="person_subtitle_station">Train Station</string>
     <string name="person_subtitle_railcard">Railcard</string>
@@ -163,12 +163,13 @@
     <string name="event_section_information">General</string>
     <string name="event_section_organization">Organizers</string>
     <string name="event_section_participants">Participants</string>
-    <string name="event_title_time">{0} - {1}</string>
+    <string name="event_title_time">%s - %s</string>
     <string name="event_subtitle_time">Time Frame</string>
-    <string name="event_title_deadline">{0}</string>
+    <string name="event_title_deadline">%s</string>
     <string name="event_subtitle_deadline">Registration Deadline</string>
     <string name="event_subtitle_hotel">Venue</string>
     <string name="event_subtitle_hotel_address">Venue Address</string>
+    <string name="event_title_cost">%.2f €</string>
     <string name="event_subtitle_cost">Costs</string>
     <string name="event_subtitle_max_participants">Maximum Number of Participants</string>
     <string name="event_subtitle_notes">Notes</string>
@@ -183,7 +184,7 @@
     <string name="album_section_categories">Categories</string>
     <string name="album_subtitle_owner">Owner</string>
     <string name="album_subtitle_creation_date">Creation Date</string>
-    <string name="album_title_dates">{0} - {1}</string>
+    <string name="album_title_dates">%s - %s</string>
     <string name="album_subtitle_dates">Time</string>
     <string name="album_subtitle_upload_dates">Upload</string>
     <string name="album_subtitle_image_count">Image Count</string>
@@ -194,11 +195,11 @@
     <string name="message_section_message">Message</string>
     <string name="message_subtitle_id">ID</string>
     <string name="message_subtitle_name">Name</string>
-    <string name="message_title_username">{0} ({1})</string>
+    <string name="message_title_username">%s (%d)</string>
     <string name="message_subtitle_username">Username</string>
     <string name="message_subtitle_channel">Channel</string>
     <string name="message_subtitle_timestamp">Timestamp</string>
-    <string name="message_title_timestamp">{0}</string>
+    <string name="message_title_timestamp">%s</string>
     <string name="message_subtitle_bottag">Bottag</string>
 
     <!-- Registration -->

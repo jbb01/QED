@@ -19,7 +19,7 @@ import lombok.Data;
 public class Event implements Comparable<Event>, Parcelable {
     private final long id;
     private String title;
-    private int cost;
+    private Double cost;
     private String notes;
     private int maxParticipants;
 
@@ -53,7 +53,7 @@ public class Event implements Comparable<Event>, Parcelable {
         if (startString != null) entries.add( "\"start\":\"" + startString + "\"");
         if (endString != null) entries.add( "\"end\":\"" + endString + "\"");
         if (deadlineString != null) entries.add( "\"deadline\":\"" + deadlineString + "\"");
-        if (cost != -1) entries.add( "\"cost\":" + cost);
+        if (cost != null) entries.add( "\"cost\":" + cost);
         if (maxParticipants != -1) entries.add( "\"maxMember\":" + maxParticipants);
         if (id != -1) entries.add( "\"id\":" + id);
         if (hotel != null) entries.add( "\"hotel\":\"" + hotel + "\"");
@@ -99,7 +99,7 @@ public class Event implements Comparable<Event>, Parcelable {
         dest.writeSerializable(end);
         dest.writeString(deadlineString);
         dest.writeSerializable(deadline);
-        dest.writeInt(cost);
+        dest.writeSerializable(cost);
         dest.writeInt(maxParticipants);
         dest.writeString(hotel);
         dest.writeString(notes);
@@ -123,7 +123,7 @@ public class Event implements Comparable<Event>, Parcelable {
             event.end = (LocalDate) source.readSerializable();
             event.deadlineString = source.readString();
             event.deadline = (LocalDate) source.readSerializable();
-            event.cost = source.readInt();
+            event.cost = (Double) source.readSerializable();
             event.maxParticipants = source.readInt();
             event.hotel = source.readString();
             event.notes = source.readString();

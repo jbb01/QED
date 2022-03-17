@@ -6,7 +6,6 @@
         <import type="android.view.View"/>
         <import type="com.jonahbauer.qed.util.Actions"/>
         <import type="com.jonahbauer.qed.util.TimeUtils"/>
-        <import type="java.text.MessageFormat"/>
 
         <variable name="loading" type="boolean" />
         <variable name="color" type="int" />
@@ -64,21 +63,21 @@
                 android:layout_height="wrap_content"
                 android:onClick="@{(view) -> Actions.recordToCalendar(view.context, event)}"
                 app:icon="@drawable/ic_event_time"
-                app:title="@{(event.start != null &amp;&amp; event.end != null) ? MessageFormat.format(@string/event_title_time, TimeUtils.format(event.start), TimeUtils.format(event.end)) : event.startString + ` - ` + event.endString }"
+                app:title="@{@string/event_title_time(TimeUtils.format(event.start) ?? event.startString, TimeUtils.format(event.end) ?? event.endString)}"
                 app:subtitle="@string/event_subtitle_time"/>
 
             <com.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{(event.deadline != null || event.deadlineString != null) ? View.VISIBLE : View.GONE}"
+                android:visibility="@{event.deadline != null || event.deadlineString != null}"
                 app:icon="@drawable/ic_event_deadline"
-                app:title="@{event.deadline != null ? MessageFormat.format(@string/event_title_deadline, TimeUtils.format(event.deadline)) : event.deadlineString}"
+                app:title="@{@string/event_title_deadline(TimeUtils.format(event.deadline) ?? event.deadlineString)}"
                 app:subtitle="@string/event_subtitle_deadline"/>
 
             <com.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{event.hotel != null ? View.VISIBLE : View.GONE}"
+                android:visibility="@{event.hotel != null}"
                 app:icon="@drawable/ic_event_hotel"
                 app:title="@{event.hotel}"
                 app:subtitle="@string/event_subtitle_hotel"/>
@@ -86,7 +85,7 @@
             <com.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{event.hotelAddress != null ? View.VISIBLE : View.GONE}"
+                android:visibility="@{event.hotelAddress != null}"
                 android:onClick="@{(view) -> Actions.showOnMap(view.context, event.hotelAddress)}"
                 app:icon="@drawable/ic_event_hotel_address"
                 app:title="@{event.hotelAddress}"
@@ -95,15 +94,15 @@
             <com.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{event.cost != 0 ? View.VISIBLE : View.GONE}"
+                android:visibility="@{event.cost != null}"
                 app:icon="@drawable/ic_event_cost"
-                app:title="@{String.valueOf(event.cost)}"
+                app:title="@{@string/event_title_cost(event.cost)}"
                 app:subtitle="@string/event_subtitle_cost"/>
 
             <com.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{event.maxParticipants != 0 ? View.VISIBLE : View.GONE}"
+                android:visibility="@{event.maxParticipants != 0}"
                 app:icon="@drawable/ic_event_max_member"
                 app:title="@{String.valueOf(event.maxParticipants)}"
                 app:subtitle="@string/event_subtitle_max_participants"/>
@@ -111,7 +110,7 @@
             <com.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{event.notes != null ? View.VISIBLE : View.GONE}"
+                android:visibility="@{event.notes != null}"
                 app:icon="@drawable/ic_event_notes"
                 app:title="@{event.notes}"
                 app:subtitle="@string/event_subtitle_notes"/>
@@ -134,7 +133,7 @@
             <com.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{event.emailOrga != null ? View.VISIBLE : View.GONE}"
+                android:visibility="@{event.emailOrga != null}"
                 android:onClick="@{(view) -> Actions.sendTo(view.context, event.emailOrga)}"
                 app:icon="@drawable/ic_event_mail"
                 app:title="@{event.emailOrga}"
@@ -148,7 +147,7 @@
         </LinearLayout>
 
         <View
-            android:visibility="@{event.participants.size() == event.organizers.size() ? View.GONE : View.VISIBLE}"
+            android:visibility="@{event.participants.size() != event.organizers.size()}"
             style="?dividerStyle"/>
 
         <LinearLayout
@@ -164,7 +163,7 @@
             <com.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{event.emailAll != null ? View.VISIBLE : View.GONE}"
+                android:visibility="@{event.emailAll != null}"
                 android:onClick="@{(view) -> Actions.sendTo(view.context, event.emailAll)}"
                 app:icon="@drawable/ic_event_mail"
                 app:title="@{event.emailAll}"
@@ -180,14 +179,14 @@
         </LinearLayout>
 
         <View
-            android:visibility="@{event.participants.size() == event.organizers.size() ? View.GONE : View.VISIBLE}"
+            android:visibility="@{event.participants.size() != event.organizers.size()}"
             style="?dividerStyle"/>
 
         <com.jonahbauer.qed.layoutStuff.views.ListItem
             android:id="@+id/toggle_participants_button"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="@{event.participants.size() == event.organizers.size() ? View.GONE : View.VISIBLE}"
+            android:visibility="@{event.participants.size() != event.organizers.size()}"
             app:icon="@drawable/ic_arrow_down_accent"
             app:title="@string/event_show_more" />
 

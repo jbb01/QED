@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 public final class EventParser extends HtmlParser<Event> {
     private static final String LOG_TAG = EventParser.class.getName();
     
-    private static final Pattern COST_PATTERN = Pattern.compile("(\\d+(?:,\\d+))\\s*€");
+    private static final Pattern COST_PATTERN = Pattern.compile("(\\d+(?:,\\d+)?)\\s*€");
     private static final Pattern NUMBER_PATTERN = Pattern.compile("\\d+");
 
     private static final String GENERAL_KEY_START = "Beginn:";
@@ -65,19 +65,19 @@ public final class EventParser extends HtmlParser<Event> {
                            case GENERAL_KEY_START: {
                                Element time = value.child(0);
                                event.setStartString(time.text());
-                               event.setStart(parseLocalDate(time.attr("datetime")));
+                               event.setStart(parseLocalDate(time));
                                break;
                            }
                            case GENERAL_KEY_END: {
                                Element time = value.child(0);
                                event.setEndString(time.text());
-                               event.setEnd(parseLocalDate(time.attr("datetime")));
+                               event.setEnd(parseLocalDate(time));
                                break;
                            }
                            case GENERAL_KEY_DEADLINE: {
                                Element time = value.child(0);
                                event.setDeadlineString(time.text());
-                               event.setDeadline(parseLocalDate(time.attr("datetime")));
+                               event.setDeadline(parseLocalDate(time));
                                break;
                            }
                            case GENERAL_KEY_COST: {
@@ -85,7 +85,7 @@ public final class EventParser extends HtmlParser<Event> {
                                Matcher matcher = COST_PATTERN.matcher(cost);
                                if (matcher.find()) {
                                    //noinspection ConstantConditions
-                                   event.setCost((int) Double.parseDouble(matcher.group(1).replace(',', '.')));
+                                   event.setCost(Double.parseDouble(matcher.group(1).replace(',', '.')));
                                }
                                break;
                            }

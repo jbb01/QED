@@ -45,11 +45,17 @@ public final class PersonListParser extends HtmlParser<List<Person>> {
                             person.setLastName(element.text());
                         } catch (Exception ignored) {}
 
+                        gender: try {
+                            var element = columns.get(3);
+                            if (element == null) break gender;
+                            person.setGender(element.text());
+                        } catch (Exception ignored) {}
+
                         birthday: try {
                             var element = columns.get(4).selectFirst("time");
                             if (element == null) break birthday;
                             person.setBirthdayString(element.text());
-                            person.setBirthday(parseLocalDate(element.attr("datetime")));
+                            person.setBirthday(parseLocalDate(element));
                         } catch (Exception ignored) {}
 
                         email: try {
@@ -67,20 +73,20 @@ public final class PersonListParser extends HtmlParser<List<Person>> {
                         active: try {
                             var element = columns.get(10);
                             if (element == null) break active;
-                            person.setActive("Ja".equals(element.text()));
+                            person.setActive(parseBoolean(element));
                         } catch (Exception ignored) {}
 
                         member: try {
                             var element = columns.get(11);
                             if (element == null) break member;
-                            person.setMember("Ja".equals(element.text()));
+                            person.setMember(parseBoolean(element));
                         } catch (Exception ignored) {}
 
                         dateOfJoining: try {
                             var element = columns.get(12).selectFirst("time");
                             if (element == null) break dateOfJoining;
                             person.setDateOfJoiningString(element.text());
-                            person.setDateOfJoining(parseLocalDate(element.attr("datetime")));
+                            person.setDateOfJoining(parseLocalDate(element));
                         } catch (Exception ignored) {}
 
 
@@ -88,7 +94,7 @@ public final class PersonListParser extends HtmlParser<List<Person>> {
                             var element = columns.get(13).selectFirst("time");
                             if (element == null) break leavingDate;
                             person.setLeavingDateString(element.text());
-                            person.setLeavingDate(parseLocalDate(element.attr("datetime")));
+                            person.setLeavingDate(parseLocalDate(element));
                         } catch (Exception ignored) {}
 
                         return person;

@@ -3,10 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
     <data>
-        <import type="android.view.View"/>
         <import type="com.jonahbauer.qed.util.Actions"/>
         <import type="com.jonahbauer.qed.util.TimeUtils"/>
-        <import type="java.text.MessageFormat"/>
 
         <variable name="color" type="int" />
         <variable name="message" type="com.jonahbauer.qed.model.Message" />
@@ -46,9 +44,9 @@
             <com.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{message.userId != -1 ? View.VISIBLE : View.GONE}"
+                android:visibility="@{message.userId != -1}"
                 app:icon="@drawable/ic_message_username"
-                app:title="@{MessageFormat.format(@string/message_title_username, message.userName, message.userId)}"
+                app:title="@{@string/message_title_username(message.userName, message.userId)}"
                 app:subtitle="@string/message_subtitle_username"/>
 
             <com.jonahbauer.qed.layoutStuff.views.ListItem
@@ -62,7 +60,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:icon="@drawable/ic_message_timestamp"
-                app:title="@{MessageFormat.format(@string/message_title_timestamp, TimeUtils.format(message.date))}"
+                app:title="@{@string/message_title_timestamp(TimeUtils.format(message.date))}"
                 app:subtitle="@string/message_subtitle_timestamp"/>
 
             <com.jonahbauer.qed.layoutStuff.views.ListItem

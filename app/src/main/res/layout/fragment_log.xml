@@ -35,7 +35,7 @@
             android:minHeight="0dp"
             android:layout_marginTop="-4dp"
             android:layout_marginBottom="-4dp"
-            android:visibility="@{saving ? View.VISIBLE : View.GONE}"
+            android:visibility="@{saving}"
             style="?android:progressBarStyleHorizontal"/>
 
         <TextView
@@ -64,7 +64,7 @@
             android:layout_alignParentBottom="true"
             android:gravity="center_vertical"
             android:padding="16dp"
-            android:visibility="@{status == StatusWrapper.STATUS_PRELOADED ? View.VISIBLE : View.GONE}">
+            android:visibility="@{status == StatusWrapper.STATUS_PRELOADED}">
 
             <ImageView
                 android:id="@+id/log_fragment_icon_download"
@@ -158,7 +158,7 @@
                 android:text="@{statusText}"
                 android:textAppearance="?textAppearanceBody1"
                 android:textColor="?colorError"
-                android:visibility="@{statusText == null ? View.GONE : View.VISIBLE}"
+                android:visibility="@{statusText != null}"
                 tools:text="@string/log_status_likely_oom" />
         </RelativeLayout>
 
@@ -173,7 +173,7 @@
             android:textSize="16sp"
             android:gravity="center"
             android:text="@{error ?? @string/error_unknown}"
-            android:visibility="@{status == StatusWrapper.STATUS_ERROR ? View.VISIBLE : View.GONE}"
+            android:visibility="@{status == StatusWrapper.STATUS_ERROR}"
             tools:text="@string/error_unknown"
             tools:visibility="visible"/>
 
@@ -197,7 +197,7 @@
             android:paddingVertical="3dp"
             android:scrollbarStyle="outsideInset"
             android:transitionGroup="true"
-            android:visibility="@{status == StatusWrapper.STATUS_LOADED ? View.VISIBLE : View.GONE}"
+            android:visibility="@{status == StatusWrapper.STATUS_LOADED}"
             tools:visibility="visible"
             tools:ignore="RtlSymmetry" />
     </RelativeLayout>

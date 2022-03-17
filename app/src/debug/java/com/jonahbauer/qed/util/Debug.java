@@ -67,7 +67,7 @@ public class Debug {
     public static Event dummyEvent() {
         Event event = new Event(-1);
         event.setTitle("Musterveranstaltung");
-        event.setCost(200);
+        event.setCost(200d);
         event.setNotes("Raum für Notizen");
         event.setMaxParticipants(50);
 

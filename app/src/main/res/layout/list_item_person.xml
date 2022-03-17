@@ -5,7 +5,6 @@
 
     <data>
         <import type="com.jonahbauer.qed.util.Themes" />
-        <import type="android.view.View" />
 
         <variable name="person" type="com.jonahbauer.qed.model.Person" />
         <variable name="invertedInitials" type="boolean" />
@@ -34,7 +33,7 @@
         <com.jonahbauer.qed.layoutStuff.views.MaterialListItem
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="@{person != null ? View.VISIBLE : View.GONE}"
+            android:visibility="@{person != null}"
             app:icon="@drawable/person_initials_circle"
             app:iconTint="@{Themes.colorful(context, person.id)}"
             app:iconText="@{person.getInitials(invertedInitials)}"

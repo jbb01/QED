@@ -14,7 +14,6 @@ import com.jonahbauer.qed.util.TimeUtils;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 
-import java.text.MessageFormat;
 import java.util.*;
 import java.util.function.Function;
 
@@ -40,7 +39,7 @@ public class EventAdapter extends ArrayAdapter<Event> implements SectionIndexer 
             item.setIcon(R.drawable.ic_event_icon);
         }
 
-        String subtitle = MessageFormat.format(
+        String subtitle = String.format(
                 context.getString(R.string.event_title_time),
                 event.getStart() != null ? TimeUtils.format(event.getStart()) : event.getStartString(),
                 event.getEnd() != null ? TimeUtils.format(event.getEnd()) : event.getEndString()

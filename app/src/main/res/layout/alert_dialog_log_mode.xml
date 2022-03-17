@@ -3,8 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
-        <import type="android.view.View" />
         <import type="com.jonahbauer.qed.model.LogRequest.Mode" />
 
         <variable name="mode" type="Mode" />
@@ -39,7 +37,7 @@
                 android:minHeight="40dp"/>
         </TableRow>
 
-        <TableRow android:visibility="@{(mode == null || mode == Mode.POST_RECENT) ? View.VISIBLE : View.GONE}">
+        <TableRow android:visibility="@{mode == null || mode == Mode.POST_RECENT}">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -70,7 +68,7 @@
         </TableRow>
 
 
-        <TableRow android:visibility="@{mode == Mode.SINCE_OWN ? View.VISIBLE : View.GONE}">
+        <TableRow android:visibility="@{mode == Mode.SINCE_OWN}">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -100,7 +98,7 @@
 
         </TableRow>
 
-        <TableRow android:visibility="@{mode == Mode.DATE_RECENT ? View.VISIBLE : View.GONE}">
+        <TableRow android:visibility="@{mode == Mode.DATE_RECENT}">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -130,7 +128,7 @@
 
         </TableRow>
 
-        <TableRow android:visibility="@{mode == Mode.DATE_INTERVAL ? View.VISIBLE : View.GONE}">
+        <TableRow android:visibility="@{mode == Mode.DATE_INTERVAL}">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -170,7 +168,7 @@
             </LinearLayout>
         </TableRow>
 
-        <TableRow android:visibility="@{mode == Mode.DATE_INTERVAL ? View.VISIBLE : View.GONE}">
+        <TableRow android:visibility="@{mode == Mode.DATE_INTERVAL}">
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -181,11 +179,11 @@
                 android:textSize="12sp"
                 android:textAppearance="?textAppearanceBody1"
                 android:textColor="?colorError"
-                android:visibility="@{errorDateFrom == null ? View.GONE : View.VISIBLE}"
+                android:visibility="@{errorDateFrom != null}"
                 tools:text="@string/error"/>
         </TableRow>
 
-        <TableRow android:visibility="@{mode == Mode.DATE_INTERVAL ? View.VISIBLE : View.GONE}">
+        <TableRow android:visibility="@{mode == Mode.DATE_INTERVAL}">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -225,7 +223,7 @@
             </LinearLayout>
         </TableRow>
 
-        <TableRow android:visibility="@{mode == Mode.DATE_INTERVAL ? View.VISIBLE : View.GONE}">
+        <TableRow android:visibility="@{mode == Mode.DATE_INTERVAL}">
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -236,7 +234,7 @@
                 android:textSize="12sp"
                 android:textAppearance="?textAppearanceBody1"
                 android:textColor="?colorError"
-                android:visibility="@{errorDateTo == null ? View.GONE : View.VISIBLE}"
+                android:visibility="@{errorDateTo != null}"
                 tools:text="@string/error"/>
         </TableRow>
 
@@ -244,7 +242,7 @@
             android:id="@+id/log_fragment_file"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="@{mode == Mode.FILE ? View.VISIBLE : View.GONE}">
+            android:visibility="@{mode == Mode.FILE}">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -269,7 +267,7 @@
 
         </TableRow>
 
-        <TableRow android:visibility="@{mode == Mode.POST_INTERVAL ? View.VISIBLE : View.GONE}">
+        <TableRow android:visibility="@{mode == Mode.POST_INTERVAL}">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -291,7 +289,7 @@
                 android:selectAllOnFocus="true" />
         </TableRow>
 
-        <TableRow android:visibility="@{mode == Mode.POST_INTERVAL ? View.VISIBLE : View.GONE}">
+        <TableRow android:visibility="@{mode == Mode.POST_INTERVAL}">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -313,7 +311,7 @@
                 android:selectAllOnFocus="true" />
         </TableRow>
 
-        <TableRow android:visibility="@{mode != Mode.FILE ? View.VISIBLE : View.GONE}">
+        <TableRow android:visibility="@{mode != Mode.FILE}">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -344,7 +342,7 @@
             android:text="@{error}"
             android:textAppearance="?textAppearanceBody1"
             android:textColor="?colorError"
-            android:visibility="@{error == null ? View.GONE : View.VISIBLE}"
+            android:visibility="@{error != null}"
             tools:text="@string/error"
             tools:visibility="visible" />
 

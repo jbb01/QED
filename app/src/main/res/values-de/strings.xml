@@ -207,12 +207,13 @@
     <string name="event_section_information">Informationen</string>
     <string name="event_section_organization">Organisatoren</string>
     <string name="event_section_participants">Teilnehmer</string>
-    <string name="event_title_time">{0} - {1}</string>
+    <string name="event_title_time">%s - %s</string>
     <string name="event_subtitle_time">Zeitraum</string>
-    <string name="event_title_deadline">{0}</string>
+    <string name="event_title_deadline">%s</string>
     <string name="event_subtitle_deadline">Anmeldeschluss</string>
     <string name="event_subtitle_hotel">Unterkunft</string>
     <string name="event_subtitle_hotel_address">Adresse der Unterkunft</string>
+    <string name="event_title_cost">%.2f €</string>
     <string name="event_subtitle_cost">Kosten</string>
     <string name="event_subtitle_max_participants">Maximale Teilnehmerzahl</string>
     <string name="event_subtitle_notes">Anmerkungen</string>
@@ -227,7 +228,7 @@
     <string name="album_section_categories">Kategorien</string>
     <string name="album_subtitle_owner">Besitzer</string>
     <string name="album_subtitle_creation_date">Erstelldatum</string>
-    <string name="album_title_dates">{0} - {1}</string>
+    <string name="album_title_dates">%s - %s</string>
     <string name="album_subtitle_dates">Zeitraum</string>
     <string name="album_subtitle_upload_dates">Upload-Zeitraum</string>
     <string name="album_subtitle_image_count">Anzahl der Bilder</string>
@@ -238,11 +239,11 @@
     <string name="message_section_message">Nachricht</string>
     <string name="message_subtitle_id">ID</string>
     <string name="message_subtitle_name">Name</string>
-    <string name="message_title_username">{0} ({1})</string>
+    <string name="message_title_username">%s (%d)</string>
     <string name="message_subtitle_username">Benutzername</string>
     <string name="message_subtitle_channel">Channel</string>
     <string name="message_subtitle_timestamp">Zeitstempel</string>
-    <string name="message_title_timestamp">{0}</string>
+    <string name="message_title_timestamp">%s</string>
     <string name="message_subtitle_bottag">Bottag</string>
 
     <!-- Registration -->
@@ -274,11 +275,11 @@
     <string name="person_section_contacts">Kontaktinformationen</string>
     <string name="person_section_registrations">Anmeldungen</string>
     <string name="person_subtitle_mail">E-Mail Adresse</string>
-    <string name="person_title_birthday">{0}</string>
+    <string name="person_title_birthday">%s</string>
     <string name="person_subtitle_birthday">Geburtstag</string>
-    <string name="person_title_date_of_joining">{0}</string>
+    <string name="person_title_date_of_joining">%s</string>
     <string name="person_subtitle_date_of_joining">Eintrittsdatum</string>
-    <string name="person_title_leaving_date">{0}</string>
+    <string name="person_title_leaving_date">%s</string>
     <string name="person_subtitle_leaving_date">Austrittsdatum</string>
     <string name="person_title_member_true">Ja</string>
     <string name="person_title_member_false">Nein</string>

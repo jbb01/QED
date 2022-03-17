@@ -59,6 +59,8 @@ public class Person implements Parcelable {
     private String lastName;
     private String email;
 
+    private String gender;
+
     private String birthdayString;
     private LocalDate birthday;
 
@@ -125,6 +127,7 @@ public class Person implements Parcelable {
         if (firstName != null) entries.add( "\"firstName\":\"" + firstName + "\"");
         if (lastName != null) entries.add( "\"lastName\":\"" + lastName + "\"");
         if (birthdayString != null) entries.add( "\"birthday\":\"" + birthdayString + "\"");
+        if (gender != null) entries.add("\"gender\":\"" + gender + "\"");
         if (email != null) entries.add( "\"email\":\"" + email + "\"");
         if (homeStation != null) entries.add( "\"homeStation\":\"" + homeStation + "\"");
         if (railcard != null) entries.add( "\"railcard\":\"" + railcard + "\"");
@@ -149,6 +152,7 @@ public class Person implements Parcelable {
         dest.writeString(username);
         dest.writeString(firstName);
         dest.writeString(lastName);
+        dest.writeString(gender);
         dest.writeString(birthdayString);
         dest.writeSerializable(birthday);
         dest.writeString(email);
@@ -183,6 +187,7 @@ public class Person implements Parcelable {
             person.username = source.readString();
             person.firstName = source.readString();
             person.lastName = source.readString();
+            person.gender = source.readString();
             person.birthdayString = source.readString();
             person.birthday = (LocalDate) source.readSerializable();
             person.email = source.readString();

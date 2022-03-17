@@ -12,4 +12,9 @@ public class ViewAdapter {
     public static void bindVisibility(View view, int visibility) {
         view.setVisibility(visibility);
     }
+
+    @BindingAdapter("android:visibility")
+    public static void bindVisibility(View view, boolean visibility) {
+        view.setVisibility(visibility ? View.VISIBLE : View.GONE);
+    }
 }

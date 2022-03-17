@@ -3,7 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <import type="android.view.View" />
         <import type="com.jonahbauer.qed.util.StatusWrapper" />
 
         <variable name="status" type="int" />
@@ -29,7 +28,7 @@
             android:layout_gravity="center_horizontal"
             android:gravity="center_horizontal"
             android:paddingTop="15dp"
-            android:visibility="@{status == StatusWrapper.STATUS_PRELOADED ? View.VISIBLE : View.GONE}" />
+            android:visibility="@{status == StatusWrapper.STATUS_PRELOADED}" />
 
         <ListView
             android:id="@+id/list"
@@ -43,7 +42,7 @@
             android:fastScrollAlwaysVisible="true"
             android:fastScrollEnabled="true"
             android:scrollbarStyle="outsideInset"
-            android:visibility="@{status == StatusWrapper.STATUS_LOADED ? View.VISIBLE : View.GONE}" />
+            android:visibility="@{status == StatusWrapper.STATUS_LOADED}" />
 
         <TextView
             android:layout_width="match_parent"
@@ -56,6 +55,6 @@
             android:text="@{error ?? @string/error_unknown}"
             android:textAlignment="center"
             android:textSize="16sp"
-            android:visibility="@{status == StatusWrapper.STATUS_ERROR ? View.VISIBLE : View.GONE}" />
+            android:visibility="@{status == StatusWrapper.STATUS_ERROR}" />
     </RelativeLayout>
 </layout>

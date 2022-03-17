@@ -43,7 +43,7 @@
             android:layout_height="0dp"
             android:layout_gravity="center_horizontal"
             android:gravity="center_horizontal"
-            android:visibility="@{thumbnail == null ? View.VISIBLE : View.GONE}"
+            android:visibility="@{thumbnail == null}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintDimensionRatio="w,1:1"
             app:layout_constraintLeft_toLeftOf="parent"

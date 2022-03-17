@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
     <data>
-        <import type="android.view.View"/>
-
         <variable name="offline" type="boolean" />
         <variable name="forcedOfflineMode" type="boolean" />
         <variable name="onClick" type="android.view.View.OnClickListener"/>
@@ -15,7 +13,7 @@
         android:orientation="vertical"
         android:elevation="0dp"
         android:background="?colorSurface"
-        android:visibility="@{offline ? View.VISIBLE : View.GONE}"
+        android:visibility="@{offline}"
         android:gravity="center_vertical">
 
         <LinearLayout

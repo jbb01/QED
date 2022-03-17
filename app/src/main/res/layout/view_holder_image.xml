@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
     <data>
-        <import type="android.view.View"/>
-
         <variable name="drawable" type="android.graphics.drawable.Drawable" />
         <variable name="progressText" type="java.lang.String" />
         <variable name="progress" type="java.lang.Integer"/>
@@ -22,7 +20,7 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
             android:scaleType="matrix"
-            android:visibility="@{drawable != null ? View.VISIBLE : View.GONE}"
+            android:visibility="@{drawable != null}"
             android:src="@{drawable}"
             android:transitionName="@string/transition_name_image_fragment_image"
             tools:ignore="ContentDescription"
@@ -40,7 +38,7 @@
             android:layout_gravity="center_horizontal"
             android:gravity="center_horizontal"
             android:padding="100dp"
-            android:visibility="@{(drawable == null &amp;&amp; progress == null) ? View.VISIBLE : View.GONE}"/>
+            android:visibility="@{drawable == null &amp;&amp; progress == null}"/>
 
         <ProgressBar
             style="?android:attr/progressBarStyleHorizontal"
@@ -59,7 +57,7 @@
             android:progressTint="?colorSecondary"
             android:secondaryProgress="100"
             android:secondaryProgressTint="#333"
-            android:visibility="@{(drawable == null &amp;&amp; progress != null) ? View.VISIBLE : View.GONE}"/>
+            android:visibility="@{drawable == null &amp;&amp; progress != null}"/>
 
         <TextView
             android:id="@+id/progress_text"
@@ -74,7 +72,7 @@
             android:textColor="@android:color/white"
             android:textSize="18sp"
             android:text="@{progressText}"
-            android:visibility="@{(drawable == null &amp;&amp; progressText != null) ? View.VISIBLE : View.GONE}"
+            android:visibility="@{drawable == null &amp;&amp; progressText != null}"
             tools:text="50%"
             tools:visibility="visible" />
     </merge>

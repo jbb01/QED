@@ -21,6 +21,7 @@ public final class PersonParser extends HtmlParser<Person> {
     private static final String GENERAL_KEY_LAST_NAME = "Nachname:";
     private static final String GENERAL_KEY_EMAIL = "Emailadresse:";
     private static final String GENERAL_KEY_BIRTH_DAY = "Geburtstag:";
+    private static final String GENERAL_KEY_GENDER = "Geschlecht:";
     private static final String GENERAL_KEY_DATE_OF_JOINING = "Eingetreten:";
     private static final String GENERAL_KEY_LEAVING_DATE = "Ausgetreten:";
     private static final String GENERAL_KEY_MEMBER = "Aktuell Mitglied:";
@@ -75,27 +76,30 @@ public final class PersonParser extends HtmlParser<Person> {
                            case GENERAL_KEY_BIRTH_DAY: {
                                Element time = value.child(0);
                                person.setBirthdayString(time.text());
-                               person.setBirthday(parseLocalDate(time.attr("datetime")));
+                               person.setBirthday(parseLocalDate(time));
                                break;
+                           }
+                           case GENERAL_KEY_GENDER: {
+                               person.setGender(value.text());
                            }
                            case GENERAL_KEY_DATE_OF_JOINING: {
                                Element time = value.child(0);
                                person.setDateOfJoiningString(time.text());
-                               person.setDateOfJoining(parseLocalDate(time.attr("datetime")));
+                               person.setDateOfJoining(parseLocalDate(time));
                                break;
                            }
                            case GENERAL_KEY_LEAVING_DATE: {
                                Element time = value.child(0);
                                person.setLeavingDateString(time.text());
-                               person.setLeavingDate(parseLocalDate(time.attr("datetime")));
+                               person.setLeavingDate(parseLocalDate(time));
                                break;
                            }
                            case GENERAL_KEY_MEMBER: {
-                               person.setMember("Ja".equals(value.text()));
+                               person.setMember(parseBoolean(value));
                                break;
                            }
                            case GENERAL_KEY_ACTIVE: {
-                               person.setActive("Ja".equals(value.text()));
+                               person.setActive(parseBoolean(value));
                                break;
                            }
                        }
@@ -144,11 +148,7 @@ public final class PersonParser extends HtmlParser<Person> {
         if (element.selectFirst("i") != null) return;
 
         element.select(".address").forEach(address ->
-                person.getAddresses().add(
-                        address.html()
-                               .replaceAll("\\s*<br>\\s*", "\n")
-                               .trim()
-                )
+                person.getAddresses().add(parseAddress(address))
         );
     }
 
@@ -204,5 +204,9 @@ public final class PersonParser extends HtmlParser<Person> {
                 Log.e(LOG_TAG, "Error parsing person " + person.getId() + ".", e);
             }
         });
+    }
+
+    public static String parseAddress(Element element) {
+        return element.html().replaceAll("\\s*<br>\\s*", "\n").trim();
     }
 }
