@@ -47,7 +47,7 @@ public class EventFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        ViewUtils.setFitsSystemWindows(view);
+        ViewUtils.setFitsSystemWindows(this);
         postponeEnterTransition(200, TimeUnit.MILLISECONDS);
 
         mEventViewModel.getEvent().observe(getViewLifecycleOwner(), wrapper -> {

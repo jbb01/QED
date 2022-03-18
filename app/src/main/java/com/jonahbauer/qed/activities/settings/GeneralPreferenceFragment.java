@@ -6,14 +6,23 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.preference.Preference;
 import androidx.preference.SwitchPreference;
 import com.jonahbauer.qed.R;
+import com.jonahbauer.qed.activities.MainActivity;
 import com.jonahbauer.qed.networking.NetworkConstants;
 import com.jonahbauer.qed.util.Actions;
+import com.jonahbauer.qed.util.Colors;
 import com.jonahbauer.qed.util.Preferences;
 
 public class GeneralPreferenceFragment extends AbstractPreferenceFragment implements PreferenceFragment, Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
     private Preference bugReport;
     private Preference github;
     private SwitchPreference nightMode;
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        // need to overwrite saved action bar color after changing from/to dark mode
+        ((MainActivity) requireActivity()).setActionBarColor(Colors.getPrimaryColor(requireContext()));
+    }
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {

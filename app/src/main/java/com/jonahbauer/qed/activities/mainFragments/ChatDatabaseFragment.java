@@ -84,7 +84,7 @@ public class ChatDatabaseFragment extends Fragment implements CompoundButton.OnC
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        ViewUtils.setFitsSystemWindows(view);
+        ViewUtils.setFitsSystemWindows(this);
 
         mDateFrom = new MutableLiveData<>(LocalDate.now());
         mTimeFrom = new MutableLiveData<>(LocalTime.now());

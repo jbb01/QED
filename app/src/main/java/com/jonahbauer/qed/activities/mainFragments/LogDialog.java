@@ -48,7 +48,6 @@ import java.util.function.Function;
 
 public class LogDialog extends DialogFragment implements AdapterView.OnItemSelectedListener,
                                                          DialogInterface.OnClickListener,
-                                                         DialogInterface.OnDismissListener,
                                                          DialogInterface.OnCancelListener {
 
     // date interval
@@ -224,11 +223,6 @@ public class LogDialog extends DialogFragment implements AdapterView.OnItemSelec
         } else if (which == BUTTON_NEGATIVE) {
             dialog.cancel();
         }
-    }
-
-    @Override
-    public void onDismiss(@NonNull DialogInterface dialog) {
-        this.dismiss();
     }
 
     @Override

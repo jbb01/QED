@@ -114,7 +114,7 @@ public class ImageInfoFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        ViewUtils.setFitsSystemWindows(view);
+        ViewUtils.setFitsSystemWindows(this);
 
         mImageInfoViewModel.getImage().observe(getViewLifecycleOwner(), status -> {
             if (status.getCode() == StatusWrapper.STATUS_ERROR) {

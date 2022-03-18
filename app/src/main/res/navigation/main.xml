@@ -51,9 +51,6 @@
             app:argType="com.jonahbauer.qed.model.LogRequest"
             app:nullable="true" />
         <action
-            android:id="@+id/show_request_dialog"
-            app:destination="@id/nav_log_dialog" />
-        <action
             android:id="@+id/show_message"
             app:destination="@id/nav_bottom_sheet_message" />
         <deepLink
@@ -194,11 +191,6 @@
             app:argType="com.jonahbauer.qed.model.Album"
             app:nullable="false"/>
     </dialog>
-
-    <dialog
-        android:id="@+id/nav_log_dialog"
-        android:name="com.jonahbauer.qed.activities.mainFragments.LogDialog"
-        tools:layout="@layout/alert_dialog_log_mode"/>
 
     <action
         android:id="@+id/login"

@@ -25,6 +25,8 @@ import androidx.annotation.Nullable;
 import androidx.databinding.BindingAdapter;
 
 public class AlbumInfoFragment extends InfoFragment {
+    private static final String SAVED_TITLE_HIDDEN = "titleHidden";
+
     private AlbumViewModel mAlbumViewModel;
     private FragmentInfoAlbumBinding mBinding;
 
@@ -94,6 +96,16 @@ public class AlbumInfoFragment extends InfoFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        if (savedInstanceState != null) {
+            if (savedInstanceState.getBoolean(SAVED_TITLE_HIDDEN)) hideTitle();
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(SAVED_TITLE_HIDDEN, mHideTitle);
     }
 
     @BindingAdapter("album_categories")

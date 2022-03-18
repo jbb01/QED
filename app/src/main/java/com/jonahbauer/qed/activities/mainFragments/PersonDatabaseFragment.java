@@ -58,7 +58,7 @@ public class PersonDatabaseFragment extends Fragment implements CompoundButton.O
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        ViewUtils.setFitsSystemWindows(view);
+        ViewUtils.setFitsSystemWindows(this);
         TransitionUtils.postponeEnterAnimationToPreDraw(this, view);
 
         mPersonAdapter = new PersonAdapter(getContext(), new ArrayList<>(), PersonAdapter.SortMode.FIRST_NAME, mBinding.fixedHeader.getRoot());

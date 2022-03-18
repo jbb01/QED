@@ -45,6 +45,11 @@ import java.util.Objects;
 public class MainActivity extends AppCompatActivity implements NetworkListener, NavController.OnDestinationChangedListener {
     private static final String LOG_TAG = MainActivity.class.getName();
 
+    private static final String SAVED_ACTION_BAR_COLOR = "actionBarColor";
+    private static final String SAVED_ACTION_BAR_ALPHA = "actionBarAlpha";
+    private static final String SAVED_ACTION_BAR_VISIBILITY = "actionBarVisibility";
+    private static final String SAVED_BACKGROUND_COLOR = "backgroundColor";
+
     private ActivityMainBinding mBinding;
 
     private final IntSet mTopLevelDestinations = IntSet.of(
@@ -63,6 +68,7 @@ public class MainActivity extends AppCompatActivity implements NetworkListener, 
 
     private @ColorInt int mActionBarColor;
     private @FloatRange(from = 0, to = 1) float mActionBarAlpha = 1;
+    private @Px int mActionBarHeight;
     private @ColorInt int mBackgroundColor;
 
     @Override
@@ -99,11 +105,45 @@ public class MainActivity extends AppCompatActivity implements NetworkListener, 
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
 
         mActionBarColor = Colors.getPrimaryColor(this);
+
+        ViewCompat.setOnApplyWindowInsetsListener(mBinding.contentRoot, (v, insets) -> {
+            var systemInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+
+            mBinding.appBarLayout.setPadding(systemInsets.left, systemInsets.top, systemInsets.right, 0);
+            mBinding.actionModeAppBarLayout.setPadding(systemInsets.left, systemInsets.top, systemInsets.right, 0);
+
+            ViewCompat.dispatchApplyWindowInsets(mBinding.coordinator, insets);
+            return WindowInsetsCompat.CONSUMED;
+        });
+        mBinding.toolbar.addOnLayoutChangeListener((v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
+            mActionBarHeight = bottom - top;
+            ViewCompat.requestApplyInsets(mBinding.coordinator);
+        });
+
+        if (savedInstanceState != null) {
+            setActionBarColor(savedInstanceState.getInt(SAVED_ACTION_BAR_COLOR));
+            setActionBarAlpha(savedInstanceState.getFloat(SAVED_ACTION_BAR_ALPHA));
+            setBackgroundColor(savedInstanceState.getInt(SAVED_BACKGROUND_COLOR));
+            if (savedInstanceState.getBoolean(SAVED_ACTION_BAR_VISIBILITY, true)) {
+                getSupportActionBar().show();
+            } else {
+                getSupportActionBar().hide();
+            }
+        }
     }
 
     @Override
     public boolean onSupportNavigateUp() {
         return NavigationUI.navigateUp(mNavController, mAppBarConfiguration) || super.onSupportNavigateUp();
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(SAVED_ACTION_BAR_COLOR, mActionBarColor);
+        outState.putFloat(SAVED_ACTION_BAR_ALPHA, mActionBarAlpha);
+        outState.putBoolean(SAVED_ACTION_BAR_VISIBILITY, getSupportActionBar().isShowing());
+        outState.putInt(SAVED_BACKGROUND_COLOR, mBackgroundColor);
     }
 
     private Fragment getFragment() {
@@ -171,6 +211,10 @@ public class MainActivity extends AppCompatActivity implements NetworkListener, 
     public void setBackgroundColor(@ColorInt int color) {
         this.mBackgroundColor = color;
         this.mBinding.contentRoot.setBackgroundColor(color);
+    }
+
+    public @Px int getActionBarHeight() {
+        return mActionBarHeight;
     }
 
     @NonNull

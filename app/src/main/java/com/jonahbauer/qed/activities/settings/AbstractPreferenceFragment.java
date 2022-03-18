@@ -19,7 +19,7 @@ public abstract class AbstractPreferenceFragment extends PreferenceFragmentCompa
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        ViewUtils.setFitsSystemWindows(view);
+        ViewUtils.setFitsSystemWindows(this);
         view.setBackgroundColor(Colors.getBackgroundColor(requireContext()));
         super.onViewCreated(view, savedInstanceState);
     }

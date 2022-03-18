@@ -37,6 +37,7 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 public class PersonInfoFragment extends InfoFragment {
     private static final String SAVED_EXPANDED = "expanded";
+    private static final String SAVED_TITLE_HIDDEN = "titleHidden";
 
     private PersonViewModel mPersonViewModel;
     private FragmentInfoPersonBinding mBinding;
@@ -162,6 +163,7 @@ public class PersonInfoFragment extends InfoFragment {
 
         if (savedInstanceState != null) {
             mExpanded = savedInstanceState.getBoolean(SAVED_EXPANDED);
+            if (savedInstanceState.getBoolean(SAVED_TITLE_HIDDEN)) hideTitle();
         }
         setEventsExpanded(mExpanded);
     }
@@ -185,6 +187,7 @@ public class PersonInfoFragment extends InfoFragment {
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putBoolean(SAVED_EXPANDED, mExpanded);
+        outState.putBoolean(SAVED_TITLE_HIDDEN, mHideTitle);
     }
 
     @Override

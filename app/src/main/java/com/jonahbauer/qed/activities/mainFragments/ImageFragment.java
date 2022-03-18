@@ -55,6 +55,8 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
     private static final String LOG_TAG = ImageFragment.class.getSimpleName();
     private static final @StyleRes int THEME = R.style.Theme_App_Dark;
 
+    private static final String SAVED_EXTENDED = "extended";
+
     private FragmentImageBinding mBinding;
 
     private Image mImage; // currently shown image
@@ -101,6 +103,10 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
         }
 
         setupTransitions();
+
+        if (savedInstanceState != null) {
+            mExtended = savedInstanceState.getBoolean(SAVED_EXTENDED);
+        }
     }
 
     private void setupTransitions() {
@@ -143,10 +149,7 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
         var context = requireContext();
         inflater = inflater.cloneInContext(context);
 
-        var activity = (MainActivity) requireActivity();
-        var controller = activity.getWindowInsetsController();
         ViewUtils.setTransparentSystemBars(this);
-        controller.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_BARS_BY_SWIPE);
 
         mBinding = FragmentImageBinding.inflate(inflater, container, false);
 
@@ -159,22 +162,28 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
         mInfoButton = menu.findItem(R.id.image_info);
         mBinding.toolbar.setVisibility(View.GONE);
 
-        toggleExtended(mExtended);
+        setExtended(mExtended);
         return mBinding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        ViewCompat.setOnApplyWindowInsetsListener(mBinding.toolbar, (v, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(mBinding.fragment, (v, insets) -> {
             var systemInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            ViewUtils.setPaddingTop(v, systemInsets.top);
-            return insets;
-        });
 
-        ViewCompat.setOnApplyWindowInsetsListener(mBinding.overlayBottom, (v, insets) -> {
-            var systemInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            ViewUtils.setPaddingBottom(v, (int) (ViewUtils.dpToPx(v, 24) + systemInsets.bottom));
-            return insets;
+            mBinding.toolbar.setPadding(
+                    systemInsets.left,
+                    systemInsets.top,
+                    systemInsets.right,
+                    0
+            );
+            mBinding.overlayBottom.setPadding(
+                    systemInsets.left,
+                    (int) ViewUtils.dpToPx(v, 24),
+                    systemInsets.right,
+                    (int) (ViewUtils.dpToPx(v, 24) + systemInsets.bottom)
+            );
+            return WindowInsetsCompat.CONSUMED;
         });
         postponeEnterTransition(500, TimeUnit.MILLISECONDS);
         setEnterSharedElementCallback(new SharedElementCallback() {
@@ -226,8 +235,14 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
 
     @Override
     public void onResume() {
-        toggleExtended(mExtended);
+        setExtended(mExtended);
         super.onResume();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(SAVED_EXTENDED, mExtended);
     }
 
     @Override
@@ -340,18 +355,20 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
         }
     }
 
-    private void toggleExtended() { toggleExtended(!mExtended); }
+    private void toggleExtended() { setExtended(!mExtended); }
 
-    private void toggleExtended(boolean extended) {
+    private void setExtended(boolean extended) {
         this.mExtended = extended;
+        mBinding.setExtended(extended);
 
         var controller = ((MainActivity) requireActivity()).getWindowInsetsController();
-        if (extended) {
-            controller.show(WindowInsetsCompat.Type.systemBars());
-            mBinding.setExtended(true);
-        } else {
-            controller.hide(WindowInsetsCompat.Type.systemBars());
-            mBinding.setExtended(false);
+        if (controller != null) {
+            if (extended) {
+                controller.show(WindowInsetsCompat.Type.systemBars());
+            } else {
+                controller.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_BARS_BY_SWIPE);
+                controller.hide(WindowInsetsCompat.Type.systemBars());
+            }
         }
     }
 

@@ -52,7 +52,7 @@ public class LoginFragment extends Fragment implements NetworkListener, QEDPageR
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        ViewUtils.setFitsSystemWindows(view);
+        ViewUtils.setFitsSystemWindows(this);
 
         mBinding.rememberMeCheckbox.setChecked(Preferences.general().isRememberMe());
         mBinding.rememberMeCheckbox.setOnCheckedChangeListener(

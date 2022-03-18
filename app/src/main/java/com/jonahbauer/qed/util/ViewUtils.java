@@ -19,7 +19,6 @@ import androidx.annotation.StringRes;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
@@ -301,18 +300,19 @@ public class ViewUtils {
         window.setNavigationBarColor(navigationBarColor.data);
     }
 
-    public static void setFitsSystemWindows(View view) {
-        var lp = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
-        lp.topMargin = (int) dpToPx(view, 80);
-        view.setLayoutParams(lp);
-
+    public static void setFitsSystemWindows(Fragment fragment) {
+        var view = fragment.requireView();
         ViewCompat.setOnApplyWindowInsetsListener(view, (v, windowInsets) -> {
             var mask = systemBars() | ime();
             var insets = windowInsets.getInsets(mask);
-            setPaddingBottom(v, insets.bottom);
-            return new WindowInsetsCompat.Builder(windowInsets)
-                    .setInsets(mask, Insets.of(insets.left, insets.top, insets.right, 0))
-                    .build();
+
+            var activity = (MainActivity) fragment.requireActivity();
+            var lp = (ViewGroup.MarginLayoutParams) v.getLayoutParams();
+            lp.topMargin = activity.getActionBarHeight() + insets.top;
+            v.setLayoutParams(lp);
+
+            v.setPadding(insets.left, 0, insets.right, insets.bottom);
+            return WindowInsetsCompat.CONSUMED;
         });
     }
 

@@ -10,7 +10,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavBackStackEntry;
 import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import com.google.android.material.snackbar.Snackbar;
 import com.jonahbauer.qed.Application;
@@ -84,10 +83,10 @@ public class LogFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        ViewUtils.setFitsSystemWindows(view);
+        ViewUtils.setFitsSystemWindows(this);
 
         NavController navController = NavHostFragment.findNavController(this);
-        NavBackStackEntry entry = navController.getCurrentBackStackEntry();
+        NavBackStackEntry entry = navController.getBackStackEntry(R.id.nav_chat_log);
         Objects.requireNonNull(entry);
         entry.getSavedStateHandle()
              .getLiveData(LOG_REQUEST_KEY, DEFAULT_REQUEST)
@@ -110,8 +109,8 @@ public class LogFragment extends Fragment {
         });
 
         mBinding.subtitle.setOnClickListener(v -> {
-            var action = LogFragmentDirections.showRequestDialog();
-            Navigation.findNavController(view).navigate(action);
+            var dialog = LogDialog.newInstance();
+            dialog.show(getChildFragmentManager(), null);
         });
 
         mLogViewModel.getDownloadStatus().observe(getViewLifecycleOwner(), pair -> {

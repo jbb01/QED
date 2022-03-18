@@ -27,6 +27,7 @@ import androidx.databinding.BindingAdapter;
 
 public class EventInfoFragment extends InfoFragment {
     private static final String SAVED_EXPANDED = "expanded";
+    private static final String SAVED_TITLE_HIDDEN = "titleHidden";
 
     private EventViewModel mEventViewModel;
     private FragmentInfoEventBinding mBinding;
@@ -111,6 +112,7 @@ public class EventInfoFragment extends InfoFragment {
 
         if (savedInstanceState != null) {
             mExpanded = savedInstanceState.getBoolean(SAVED_EXPANDED);
+            if (savedInstanceState.getBoolean(SAVED_TITLE_HIDDEN)) hideTitle();
         }
         setParticipantsExpanded(mExpanded);
     }
@@ -133,6 +135,7 @@ public class EventInfoFragment extends InfoFragment {
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putBoolean(SAVED_EXPANDED, mExpanded);
+        outState.putBoolean(SAVED_TITLE_HIDDEN, mHideTitle);
     }
 
     @BindingAdapter("event_organizers")
