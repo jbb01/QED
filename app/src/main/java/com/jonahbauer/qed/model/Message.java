@@ -30,6 +30,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Locale;
+import java.util.Objects;
 
 import lombok.AccessLevel;
 import lombok.Data;
@@ -60,6 +61,10 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
 
     @NonNull
     @ColumnInfo(name = "name")
+    private final String rawName;
+
+    @NonNull
+    @Ignore
     private final String name;
 
     @NonNull
@@ -99,6 +104,7 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
     @Ignore
     public Message(@NonNull String message) {
         this.name = "Error";
+        this.rawName = "Error";
         this.message = message;
         this.date = Instant.now();
         this.userId = 503;
@@ -114,17 +120,17 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
 
     @Ignore
     public Message(long id,
-                   @NonNull String name,
+                   @NonNull String rawName,
                    @NonNull String message,
                    @NonNull Instant date,
                    @NonNull String color,
                    int bottag,
                    @NonNull String channel) {
-        this(id, name, message, date, -1, null, color, bottag, channel);
+        this(id, rawName, message, date, -1, null, color, bottag, channel);
     }
 
     public Message(long id,
-                   @NonNull String name,
+                   @NonNull String rawName,
                    @NonNull String message,
                    @NonNull Instant date,
                    long userId,
@@ -132,7 +138,8 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
                    @NonNull String color,
                    int bottag,
                    @NonNull String channel) {
-        this.name = name;
+        this.rawName = rawName;
+        this.name = rawName.trim();
         this.message = message;
         this.date = date;
         this.userId = userId;
@@ -184,6 +191,10 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
         return getBottag() != 0;
     }
 
+    public boolean isAnonymous() {
+        return name.isEmpty();
+    }
+
     public int compareTo(Message other) {
         return Long.compare(id,other.id);
     }
@@ -222,7 +233,7 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
                 case "ok":
                     return OK;
                 case "post":
-                    String name = json.getString("name").trim();
+                    String rawName = json.getString("name");
                     String message = json.getString("message");
                     String username = json.isNull("username") ? null : json.getString("username");
                     String color = json.getString("color");
@@ -240,7 +251,7 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
                         return null;
                     }
 
-                    return new Message(id, name, message, date, userid, username, color, bottag, channel);
+                    return new Message(id, rawName, message, date, userid, username, color, bottag, channel);
                 default:
                     Log.e(LOG_TAG, "Unknown message type: \"" + type + "\"");
                     return null;
@@ -278,7 +289,7 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(name);
+        dest.writeString(rawName);
         dest.writeString(message);
         dest.writeSerializable(date);
         dest.writeLong(userId);
@@ -293,19 +304,17 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
 
         @Override
         public Message createFromParcel(Parcel source) {
-            String name = source.readString();
-            String message = source.readString();
-            Instant date = (Instant) source.readSerializable();
+            String rawName = Objects.requireNonNull(source.readString());
+            String message = Objects.requireNonNull(source.readString());
+            Instant date = Objects.requireNonNull((Instant) source.readSerializable());
             long userId = source.readLong();
             String userName = source.readString();
-            String color = source.readString();
-            String channel = source.readString();
+            String color = Objects.requireNonNull(source.readString());
+            String channel = Objects.requireNonNull(source.readString());
             int bottag = source.readInt();
             long id = source.readLong();
 
-            assert date != null && name != null & message != null & color != null & channel != null;
-
-            return new Message(id, name, message, date, userId, userName, color, bottag, channel);
+            return new Message(id, rawName, message, date, userId, userName, color, bottag, channel);
         }
 
         @Override

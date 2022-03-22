@@ -64,8 +64,8 @@ public class PersonListViewModel extends ViewModel implements QEDPageReceiver<Li
         mFilter.setValue(person -> {
             return (firstName == null || person.getFirstName().toLowerCase().contains(finalFirstName))
                     && (lastName == null || person.getLastName().toLowerCase().contains(finalLastName))
-                    && (member == null || person.isMember() == member)
-                    && (active == null || person.isActive() == active);
+                    && (member == null || person.getMember() == member)
+                    && (active == null || person.getActive() == active);
         });
     }
 

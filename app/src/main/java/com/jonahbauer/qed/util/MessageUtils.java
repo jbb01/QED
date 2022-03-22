@@ -112,7 +112,7 @@ public class MessageUtils {
                 if (actionMode == null) {
                     Log.e(LOG_TAG, "Unexpected null value for action mode");
                 } else {
-                    if (msg.getName().trim().isEmpty()) {
+                    if (msg.isAnonymous()) {
                         actionMode.setTitle(R.string.message_name_anonymous);
                     } else {
                         actionMode.setTitle(msg.getName());

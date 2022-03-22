@@ -48,6 +48,8 @@ public abstract class InfoBottomSheet extends BottomSheetDialogFragment implemen
     @ColorInt
     private int mDarkColor;
 
+    private final Rect mTempRect = new Rect();
+
     public InfoBottomSheet() {}
 
     @NonNull
@@ -95,6 +97,19 @@ public abstract class InfoBottomSheet extends BottomSheetDialogFragment implemen
             layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, contentHeight);
         }
         view.setLayoutParams(layoutParams);
+    }
+
+    /**
+     * Adjust the height of the coordinator layout to prevent snackbars from appearing off screen.
+     */
+    private void adjustCoordinatorHeight(View bottomSheet) {
+        if (mBinding.coordinator != null) {
+            bottomSheet.getLocalVisibleRect(mTempRect);
+
+            var params = mBinding.coordinator.getLayoutParams();
+            params.height = mTempRect.height();
+            mBinding.coordinator.setLayoutParams(params);
+        }
     }
 
     @Override
@@ -186,6 +201,10 @@ public abstract class InfoBottomSheet extends BottomSheetDialogFragment implemen
                 // forward touch event on header to content scroll view
                 // noinspection ClickableViewAccessibility
                 mBinding.getRoot().setOnTouchListener(new TouchDelegator());
+
+                // set initial coordinator height
+                var bottomSheet = (View) view.getParent();
+                adjustCoordinatorHeight(bottomSheet);
             }
         });
 
@@ -213,14 +232,27 @@ public abstract class InfoBottomSheet extends BottomSheetDialogFragment implemen
 
             @Override
             public void onWindowAttached() {
-                View touchOutside = view.getRootView().findViewById(R.id.touch_outside);
+                var touchOutside = view.getRootView().findViewById(R.id.touch_outside);
+                var bottomSheet = (View) view.getParent();
 
                 if (mSheetCallback == null) {
                     mSheetCallback = new ColorfulBottomSheetCallback(mDialogWindow, touchOutside, getColor());
                 }
 
-                mBehavior = BottomSheetBehavior.from((View) view.getParent());
+                mBehavior = BottomSheetBehavior.from(bottomSheet);
                 mBehavior.addBottomSheetCallback(mSheetCallback);
+
+                // update coordinator height when sliding
+                mBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+
+                    @Override
+                    public void onStateChanged(@NonNull View bottomSheet, int newState) {}
+
+                    @Override
+                    public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+                        adjustCoordinatorHeight(bottomSheet);
+                    }
+                });
 
                 adjustHeight(mBinding.getRoot());
             }

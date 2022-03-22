@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.sheets.InfoFragment;
 import com.jonahbauer.qed.databinding.FragmentInfoMessageBinding;
 import com.jonahbauer.qed.model.Message;
@@ -61,8 +62,9 @@ public class MessageInfoFragment extends InfoFragment {
     }
 
     @Override
-    protected String getTitle() {
-        return getMessage().getName();
+    protected CharSequence getTitle() {
+        var message = getMessage();
+        return message.isAnonymous() ? getText(R.string.message_name_anonymous) : message.getName();
     }
 
     @Override

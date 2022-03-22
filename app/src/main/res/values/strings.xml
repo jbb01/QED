@@ -29,6 +29,7 @@
     <string name="error_out_of_memory">Out of memory.</string>
     <string name="error_empty">Empty</string>
     <string name="error_user">Error in Layer 8</string>
+    <string name="error_incomplete">An error occurred. Results might be incomplete.</string>
 
     <string name="info">Details</string>
     <string name="offline_mode">Offline-Mode</string>
@@ -139,6 +140,7 @@
     <string name="person_section_contacts">Contact Information</string>
     <string name="person_section_registrations">Registrations</string>
     <string name="person_subtitle_mail">Email Address</string>
+    <string name="person_clip_label_mail">Email Address (%s)</string>
     <string name="person_title_birthday">%s</string>
     <string name="person_subtitle_birthday">Birthday</string>
     <string name="person_title_date_of_joining">%s</string>
@@ -155,6 +157,8 @@
     <string name="person_subtitle_railcard">Railcard</string>
     <string name="person_subtitle_food">Food Preferences</string>
     <string name="person_subtitle_notes">Notes</string>
+    <string name="person_clip_label_address">Address (%s)</string>
+    <string name="person_clip_label_contact">%s (%s)</string>
 
     <!-- Events Database Fragment -->
     <string name="title_fragment_events_database">Events</string>
@@ -169,12 +173,15 @@
     <string name="event_subtitle_deadline">Registration Deadline</string>
     <string name="event_subtitle_hotel">Venue</string>
     <string name="event_subtitle_hotel_address">Venue Address</string>
+    <string name="event_clip_label_hotel_address">Venue Address (%s)</string>
     <string name="event_title_cost">%.2f €</string>
     <string name="event_subtitle_cost">Costs</string>
     <string name="event_subtitle_max_participants">Maximum Number of Participants</string>
     <string name="event_subtitle_notes">Notes</string>
     <string name="event_subtitle_mail_organizers">Email Organizers</string>
+    <string name="event_clip_label_mail_organizers">Email Organizers (%s)</string>
     <string name="event_subtitle_mail_participants">Email Participants</string>
+    <string name="event_clip_label_mail_participants">Email Participants (%s)</string>
     <string name="event_show_more">Show More</string>
     <string name="event_show_less">Show Less</string>
 
@@ -194,11 +201,16 @@
     <string name="message_section_metadata">Metadata</string>
     <string name="message_section_message">Message</string>
     <string name="message_subtitle_id">ID</string>
+    <string name="message_clip_label_id">ID</string>
     <string name="message_subtitle_name">Name</string>
+    <string name="message_clip_label_name">Name</string>
     <string name="message_title_username">%s (%d)</string>
     <string name="message_subtitle_username">Username</string>
+    <string name="message_clip_label_username">Username</string>
     <string name="message_subtitle_channel">Channel</string>
+    <string name="message_clip_label_channel">Channel</string>
     <string name="message_subtitle_timestamp">Timestamp</string>
+    <string name="message_clip_label_timestamp">Timestamp</string>
     <string name="message_title_timestamp">%s</string>
     <string name="message_subtitle_bottag">Bottag</string>
 

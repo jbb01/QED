@@ -57,6 +57,7 @@ public class Person implements Parcelable {
     private String username;
     private String firstName;
     private String lastName;
+    private String fullName;
     private String email;
 
     private String gender;
@@ -69,8 +70,8 @@ public class Person implements Parcelable {
     private String food;
     private String notes;
 
-    private boolean member;
-    private boolean active;
+    private Boolean member;
+    private Boolean active;
 
     private String dateOfJoiningString;
     private LocalDate dateOfJoining;
@@ -81,19 +82,27 @@ public class Person implements Parcelable {
     private Instant loaded;
 
     // Pair of type and number/name
-    private Set<Pair<String, String>> contacts = new LinkedHashSet<>();
-    private Set<String> addresses = new LinkedHashSet<>();
-    private Map<String, Registration> events = new LinkedHashMap<>();
+    private final Set<Pair<String, String>> contacts = new LinkedHashSet<>();
+    private final Set<String> addresses = new LinkedHashSet<>();
+    private final Map<String, Registration> events = new LinkedHashMap<>();
 
     public String getFullName() {
-        return getFullName(false);
+        if (fullName != null && (firstName == null || lastName == null)) {
+            return fullName;
+        } else {
+            return getFullName(false);
+        }
     }
 
     public String getFullName(boolean inverted) {
-        if (inverted) {
-            return getLastName() + ", " + getFirstName();
+        if (firstName == null) {
+            return lastName;
+        } else if (lastName == null) {
+            return firstName;
+        } else if (inverted) {
+            return lastName + ", " + firstName;
         } else {
-            return getFirstName() + " " + getLastName();
+            return firstName + " " + lastName;
         }
     }
 
@@ -152,13 +161,15 @@ public class Person implements Parcelable {
         dest.writeString(username);
         dest.writeString(firstName);
         dest.writeString(lastName);
+        dest.writeString(fullName);
         dest.writeString(gender);
         dest.writeString(birthdayString);
         dest.writeSerializable(birthday);
         dest.writeString(email);
         dest.writeString(homeStation);
         dest.writeString(railcard);
-        dest.writeInt((member ? 2 : 0) + (active ? 1 : 0));
+        dest.writeSerializable(member);
+        dest.writeSerializable(active);
         dest.writeString(dateOfJoiningString);
         dest.writeSerializable(dateOfJoining);
         dest.writeString(leavingDateString);
@@ -187,15 +198,15 @@ public class Person implements Parcelable {
             person.username = source.readString();
             person.firstName = source.readString();
             person.lastName = source.readString();
+            person.fullName = source.readString();
             person.gender = source.readString();
             person.birthdayString = source.readString();
             person.birthday = (LocalDate) source.readSerializable();
             person.email = source.readString();
             person.homeStation = source.readString();
             person.railcard = source.readString();
-            int memberActive = source.readInt();
-            person.member = memberActive / 2 == 1;
-            person.active = memberActive % 2 == 1;
+            person.member = (Boolean) source.readSerializable();
+            person.active = (Boolean) source.readSerializable();
             person.dateOfJoiningString = source.readString();
             person.dateOfJoining = (LocalDate) source.readSerializable();
             person.leavingDateString = source.readString();

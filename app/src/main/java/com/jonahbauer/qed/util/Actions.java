@@ -126,6 +126,11 @@ public class Actions {
         return open(context, uri);
     }
 
+    public static boolean openThreema(@NonNull Context context, String id) {
+        String uri = String.format("https://threema.id/%s", id);
+        return open(context, uri);
+    }
+
     public static boolean openTwitter(@NonNull Context context, String username) {
         username = (username.startsWith("@") ? username.substring(1) : username);
         String uri = String.format("https://twitter.com/%s", username);

@@ -70,6 +70,7 @@
     <string name="error_out_of_memory">Speicher reicht nicht aus.</string>
     <string name="error_empty">Diese Liste ist leer.</string>
     <string name="error_user">Fehler in Layer 8</string>
+    <string name="error_incomplete">Es ist ein Fehler aufgetreten. Ergebnisse sind möglicherweiße unvollständig.</string>
     <string name="offline_mode_not_available">Im Offline-Modus nicht verfügbar.</string>
     <string name="log_status_download_pending">Download ausstehend…</string>
     <string name="log_status_download_successful">Download erfolgreich. %.2f MiB</string>
@@ -213,12 +214,15 @@
     <string name="event_subtitle_deadline">Anmeldeschluss</string>
     <string name="event_subtitle_hotel">Unterkunft</string>
     <string name="event_subtitle_hotel_address">Adresse der Unterkunft</string>
+    <string name="event_clip_label_hotel_address">Adresse der Unterkunft (%s)</string>
     <string name="event_title_cost">%.2f €</string>
     <string name="event_subtitle_cost">Kosten</string>
     <string name="event_subtitle_max_participants">Maximale Teilnehmerzahl</string>
     <string name="event_subtitle_notes">Anmerkungen</string>
     <string name="event_subtitle_mail_organizers">Email Orgas</string>
+    <string name="event_clip_label_mail_organizers">Email Orgas (%s)</string>
     <string name="event_subtitle_mail_participants">Email Teilnehmer</string>
+    <string name="event_clip_label_mail_participants">Email Teilnehmer (%s)</string>
     <string name="event_show_more">Mehr anzeigen</string>
     <string name="event_show_less">Weniger anzeigen</string>
 
@@ -238,11 +242,16 @@
     <string name="message_section_metadata">Metadaten</string>
     <string name="message_section_message">Nachricht</string>
     <string name="message_subtitle_id">ID</string>
+    <string name="message_clip_label_id">ID</string>
     <string name="message_subtitle_name">Name</string>
+    <string name="message_clip_label_name">Name</string>
     <string name="message_title_username">%s (%d)</string>
     <string name="message_subtitle_username">Benutzername</string>
+    <string name="message_clip_label_username">Benutzername</string>
     <string name="message_subtitle_channel">Channel</string>
+    <string name="message_clip_label_channel">Channel</string>
     <string name="message_subtitle_timestamp">Zeitstempel</string>
+    <string name="message_clip_label_timestamp">Zeitstempel</string>
     <string name="message_title_timestamp">%s</string>
     <string name="message_subtitle_bottag">Bottag</string>
 
@@ -275,6 +284,7 @@
     <string name="person_section_contacts">Kontaktinformationen</string>
     <string name="person_section_registrations">Anmeldungen</string>
     <string name="person_subtitle_mail">E-Mail Adresse</string>
+    <string name="person_clip_label_mail">E-Mail Adresse (%s)</string>
     <string name="person_title_birthday">%s</string>
     <string name="person_subtitle_birthday">Geburtstag</string>
     <string name="person_title_date_of_joining">%s</string>
@@ -291,6 +301,8 @@
     <string name="person_subtitle_railcard">Bahnermäßigung</string>
     <string name="person_subtitle_food">Essenswünsche</string>
     <string name="person_subtitle_notes">Anmerkungen</string>
+    <string name="person_clip_label_address">Adresse (%s)</string>
+    <string name="person_clip_label_contact">%s (%s)</string>
 
     <!-- Log Dialog Activity -->
     <string name="title_activity_log_dialog">Logs</string>

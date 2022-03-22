@@ -48,8 +48,11 @@ public class AlbumInfoFragment extends InfoFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mBinding = FragmentInfoAlbumBinding.inflate(inflater, container, false);
         mAlbumViewModel.getAlbum().observe(getViewLifecycleOwner(), albumStatusWrapper -> {
-            mBinding.setAlbum(albumStatusWrapper.getValue());
-            mBinding.setLoading(albumStatusWrapper.getCode() == StatusWrapper.STATUS_PRELOADED);
+            var value = albumStatusWrapper.getValue();
+            var code = albumStatusWrapper.getCode();
+            mBinding.setAlbum(value);
+            mBinding.setLoading(code == StatusWrapper.STATUS_PRELOADED);
+            mBinding.setError(code == StatusWrapper.STATUS_ERROR ? getString(R.string.error_incomplete) : null);
         });
         mBinding.setColor(getColor());
         if (mHideTitle) hideTitle();

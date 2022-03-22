@@ -14,7 +14,7 @@ public abstract class InfoFragment extends Fragment {
     @DrawableRes
     protected abstract int getBackground();
 
-    protected abstract String getTitle();
+    protected abstract CharSequence getTitle();
 
     protected abstract float getTitleBottom();
 

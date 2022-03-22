@@ -51,8 +51,11 @@ public class EventInfoFragment extends InfoFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mBinding = FragmentInfoEventBinding.inflate(inflater, container, false);
         mEventViewModel.getEvent().observe(getViewLifecycleOwner(), eventStatusWrapper -> {
-            mBinding.setEvent(eventStatusWrapper.getValue());
-            mBinding.setLoading(eventStatusWrapper.getCode() == StatusWrapper.STATUS_PRELOADED);
+            var value = eventStatusWrapper.getValue();
+            var code = eventStatusWrapper.getCode();
+            mBinding.setEvent(value);
+            mBinding.setLoading(code == StatusWrapper.STATUS_PRELOADED);
+            mBinding.setError(code == StatusWrapper.STATUS_ERROR ? getString(R.string.error_incomplete) : null);
         });
         mBinding.setColor(getColor());
         if (mHideTitle) hideTitle();

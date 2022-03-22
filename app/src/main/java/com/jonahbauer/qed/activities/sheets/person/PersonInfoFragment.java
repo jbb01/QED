@@ -20,13 +20,11 @@ import com.jonahbauer.qed.util.StatusWrapper;
 import com.jonahbauer.qed.util.Themes;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.function.BiConsumer;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StyleRes;
-import androidx.core.util.Pair;
 import androidx.databinding.BindingAdapter;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMaps;
@@ -67,6 +65,7 @@ public class PersonInfoFragment extends InfoFragment {
         icons.put("skype", R.drawable.ic_person_contact_skype);
         icons.put("teamspeak", R.drawable.ic_person_contact_teamspeak);
         icons.put("telegram", R.drawable.ic_person_contact_telegram);
+        icons.put("threema", R.drawable.ic_person_contact_threema);
         icons.put("telefon", R.drawable.ic_person_contact_phone);
         icons.put("twitter", R.drawable.ic_person_contact_twitter);
         icons.put("whatsapp", R.drawable.ic_person_contact_whatsapp);
@@ -87,6 +86,7 @@ public class PersonInfoFragment extends InfoFragment {
         actions.put("skype", Actions::openSkype);
         actions.put("telegram", Actions::openTelegram);
         actions.put("telefon", Actions::dial);
+        actions.put("threema", Actions::openThreema);
         actions.put("twitter", Actions::openTwitter);
         actions.put("whatsapp", Actions::openWhatsapp);
         actions.put("xmpp", Actions::openXmpp);
@@ -110,8 +110,11 @@ public class PersonInfoFragment extends InfoFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mBinding = FragmentInfoPersonBinding.inflate(inflater, container, false);
         mPersonViewModel.getPerson().observe(getViewLifecycleOwner(), personStatusWrapper -> {
-            mBinding.setPerson(personStatusWrapper.getValue());
-            mBinding.setLoading(personStatusWrapper.getCode() == StatusWrapper.STATUS_PRELOADED);
+            var value = personStatusWrapper.getValue();
+            var code = personStatusWrapper.getCode();
+            mBinding.setPerson(value);
+            mBinding.setLoading(code == StatusWrapper.STATUS_PRELOADED);
+            mBinding.setError(code == StatusWrapper.STATUS_ERROR ? getString(R.string.error_incomplete) : null);
         });
         mBinding.setColor(getColor());
         if (mHideTitle) hideTitle();
@@ -199,16 +202,20 @@ public class PersonInfoFragment extends InfoFragment {
     }
 
     @BindingAdapter("person_addresses")
-    public static void bindAddresses(ViewGroup parent, Set<String> addresses) {
-        Context context = parent.getContext();
+    public static void bindAddresses(ViewGroup parent, Person person) {
         parent.removeAllViews();
+        if (person == null) return;
+
+        var context = parent.getContext();
+        var addresses = person.getAddresses();
         addresses.forEach((address) -> {
             ListItem item = new ListItem(context);
             item.setIcon(R.drawable.ic_person_location);
             item.setTitle(address);
             item.setOnClickListener(v -> Actions.showOnMap(context, address));
             item.setOnLongClickListener(v -> {
-                Actions.copy(context, parent.getRootView(), address, address);
+                var name = person.getFullName();
+                Actions.copy(context, parent, context.getString(R.string.person_clip_label_address, name), address);
                 return true;
             });
             parent.addView(item);
@@ -216,9 +223,12 @@ public class PersonInfoFragment extends InfoFragment {
     }
 
     @BindingAdapter("person_contacts")
-    public static void bindContacts(ViewGroup parent, Set<Pair<String, String>> contacts) {
-        Context context = parent.getContext();
+    public static void bindContacts(ViewGroup parent, Person person) {
         parent.removeAllViews();
+        if (person == null) return;
+
+        var context = parent.getContext();
+        var contacts = person.getContacts();
         contacts.forEach((contact) -> {
             ListItem item = new ListItem(context);
             item.setIcon(CONTACT_ICONS.getInt(contact.first.toLowerCase()));
@@ -231,7 +241,8 @@ public class PersonInfoFragment extends InfoFragment {
             }
 
             item.setOnLongClickListener(v -> {
-                Actions.copy(context, parent.getRootView(), contact.first, contact.second);
+                var name = person.getFullName();
+                Actions.copy(context, parent, context.getString(R.string.person_clip_label_contact, contact.first, name), contact.second);
                 return true;
             });
 

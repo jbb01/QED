@@ -45,6 +45,16 @@ public class Event implements Comparable<Event>, Parcelable {
 
     private Instant loaded;
 
+    public boolean hasParticipantInformation() {
+        return participants.size() != organizers.size()
+                || (emailAll != null && !emailAll.trim().equals(""));
+    }
+
+    public boolean hasOrganizerInformation() {
+        return !organizers.isEmpty()
+                || (emailOrga != null && !emailOrga.trim().equals(""));
+    }
+
     @Override
     @NonNull
     public String toString() {

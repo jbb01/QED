@@ -9,6 +9,7 @@
 
         <variable name="loading" type="boolean" />
         <variable name="color" type="int" />
+        <variable name="error" type="String" />
         <variable name="event" type="com.jonahbauer.qed.model.Event" />
     </data>
 
@@ -48,6 +49,18 @@
                 tools:text="Akademie 2018"/>
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/error"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="@dimen/activity_vertical_margin"
+            android:paddingHorizontal="@dimen/activity_horizontal_margin"
+            android:textColor="?colorError"
+            android:text="@{error}"
+            android:visibility="@{error != null, default = gone}"
+            tools:text="@string/error_incomplete"
+            tools:visibility="visible"/>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -86,7 +99,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{event.hotelAddress != null}"
-                android:onClick="@{(view) -> Actions.showOnMap(view.context, event.hotelAddress)}"
+                android:onClick="@{v -> Actions.showOnMap(context, event.hotelAddress)}"
+                android:onLongClick="@{v -> Actions.copy(context, v, @string/event_clip_label_hotel_address(event.title), event.hotelAddress)}"
                 app:icon="@drawable/ic_event_hotel_address"
                 app:title="@{event.hotelAddress}"
                 app:subtitle="@string/event_subtitle_hotel_address" />
@@ -116,13 +130,16 @@
                 app:subtitle="@string/event_subtitle_notes"/>
         </LinearLayout>
 
-        <View style="?dividerStyle"/>
+        <View
+            android:visibility="@{event.hasOrganizerInformation()}"
+            style="?dividerStyle" />
 
         <LinearLayout
             android:id="@+id/orga_section"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="@{event.hasOrganizerInformation()}">
 
             <TextView
                 android:layout_width="match_parent"
@@ -134,7 +151,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{event.emailOrga != null}"
-                android:onClick="@{(view) -> Actions.sendTo(view.context, event.emailOrga)}"
+                android:onClick="@{v -> Actions.sendTo(context, event.emailOrga)}"
+                android:onLongClick="@{v -> Actions.copy(context, v, @string/event_clip_label_mail_organizers(event.title), event.emailOrga)}"
                 app:icon="@drawable/ic_event_mail"
                 app:title="@{event.emailOrga}"
                 app:subtitle="@string/event_subtitle_mail_organizers"/>
@@ -147,13 +165,14 @@
         </LinearLayout>
 
         <View
-            android:visibility="@{event.participants.size() != event.organizers.size()}"
+            android:visibility="@{event.hasParticipantInformation()}"
             style="?dividerStyle"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="@{event.hasParticipantInformation()}">
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -164,7 +183,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{event.emailAll != null}"
-                android:onClick="@{(view) -> Actions.sendTo(view.context, event.emailAll)}"
+                android:onClick="@{v -> Actions.sendTo(context, event.emailAll)}"
+                android:onLongClick="@{v -> Actions.copy(context, v, @string/event_clip_label_mail_participants(event.title), event.emailAll)}"
                 app:icon="@drawable/ic_event_mail"
                 app:title="@{event.emailAll}"
                 app:subtitle="@string/event_subtitle_mail_participants"/>
