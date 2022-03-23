@@ -413,7 +413,7 @@ public class ChatFragment extends Fragment implements NetworkListener, AbsListVi
         mDisposable.clear();
         mInitDone = true;
 
-        addPost(new Message(message), true);
+        addPost(Message.newErrorMessage(message), true);
 
         mBinding.setReady(false);
         mBinding.setLoading(false);

@@ -144,8 +144,7 @@ public class AlbumViewModel extends AndroidViewModel {
             }
 
             if (!mFiltered) {
-                out.setLoaded(true);
-                out.setImageListDownloaded(Instant.now());
+                out.setLoaded(Instant.now());
 
                 //noinspection ResultOfMethodCallIgnored
                 mAlbumDao.insertOrUpdateAlbum(out)

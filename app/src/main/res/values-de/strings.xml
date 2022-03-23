@@ -70,7 +70,7 @@
     <string name="error_out_of_memory">Speicher reicht nicht aus.</string>
     <string name="error_empty">Diese Liste ist leer.</string>
     <string name="error_user">Fehler in Layer 8</string>
-    <string name="error_incomplete">Es ist ein Fehler aufgetreten. Ergebnisse sind möglicherweiße unvollständig.</string>
+    <string name="error_incomplete">Es ist ein Fehler aufgetreten. Ergebnisse sind möglicherweise unvollständig.</string>
     <string name="offline_mode_not_available">Im Offline-Modus nicht verfügbar.</string>
     <string name="log_status_download_pending">Download ausstehend…</string>
     <string name="log_status_download_successful">Download erfolgreich. %.2f MiB</string>

@@ -97,7 +97,7 @@ public class GalleryFragment extends Fragment implements AdapterView.OnItemClick
         Album album = mAlbumAdapter.getItem(position);
 
         if (album == null) return;
-        if (isOnline() || album.getImageListDownloaded() != null) {
+        if (isOnline() || album.getLoaded() != null) {
             var extras = new FragmentNavigator.Extras.Builder()
                     .addSharedElement(view, getString(R.string.transition_name_album_fragment))
                     .build();

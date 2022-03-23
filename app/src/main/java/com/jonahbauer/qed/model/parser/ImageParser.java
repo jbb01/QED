@@ -122,7 +122,7 @@ public final class ImageParser extends HtmlParser<Image> {
         return image;
     }
 
-    protected Instant parseInstant(String date) {
+    protected static Instant parseInstant(@NonNull String date) {
         try {
             return Instant.from(DATE_TIME_FORMATTER.parse(date));
         } catch (DateTimeParseException e) {

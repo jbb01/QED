@@ -1,5 +1,6 @@
 package com.jonahbauer.qed.model;
 
+import android.annotation.SuppressLint;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -8,7 +9,6 @@ import androidx.core.util.Pair;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.jonahbauer.qed.model.parcel.ParcelExtensions;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
@@ -48,10 +49,10 @@ public class Person implements Parcelable {
 
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
-    private String mComparableFirstName;
+    private transient String mComparableFirstName;
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
-    private String mComparableLastName;
+    private transient String mComparableLastName;
 
     private final long id;
     private String username;
@@ -162,81 +163,94 @@ public class Person implements Parcelable {
         dest.writeString(firstName);
         dest.writeString(lastName);
         dest.writeString(fullName);
-        dest.writeString(gender);
-        dest.writeString(birthdayString);
-        dest.writeSerializable(birthday);
         dest.writeString(email);
+
+        dest.writeString(gender);
+
+        dest.writeString(birthdayString);
+        ParcelExtensions.writeLocalDate(dest, birthday);
+
         dest.writeString(homeStation);
         dest.writeString(railcard);
-        dest.writeSerializable(member);
-        dest.writeSerializable(active);
+        dest.writeString(food);
+        dest.writeString(notes);
+
+        dest.writeValue(member);
+        dest.writeValue(active);
+
         dest.writeString(dateOfJoiningString);
-        dest.writeSerializable(dateOfJoining);
+        ParcelExtensions.writeLocalDate(dest, dateOfJoining);
+
         dest.writeString(leavingDateString);
-        dest.writeSerializable(leavingDate);
+        ParcelExtensions.writeLocalDate(dest, leavingDate);
+
+        ParcelExtensions.writeInstant(dest, loaded);
+
         dest.writeInt(contacts.size());
         for (Pair<String, String> number : contacts) {
             dest.writeString(number.first);
             dest.writeString(number.second);
         }
-        dest.writeStringList(new ArrayList<>(addresses));
+
+        ParcelExtensions.writeStringCollection(dest, addresses);
+
         dest.writeInt(events.size());
         for (Map.Entry<String, Registration> event : events.entrySet()) {
             dest.writeString(event.getKey());
-            dest.writeLong(event.getValue().getId());
+            dest.writeTypedObject(event.getValue(), flags);
         }
-        dest.writeString(food);
-        dest.writeString(notes);
-        dest.writeLong(loaded != null ? loaded.toEpochMilli() : Long.MIN_VALUE);
     }
 
     public static final Parcelable.Creator<Person> CREATOR = new Parcelable.Creator<>() {
         @NonNull
         @Override
+        @SuppressLint("ParcelClassLoader")
         public Person createFromParcel(@NonNull Parcel source) {
             Person person = new Person(source.readLong());
             person.username = source.readString();
             person.firstName = source.readString();
             person.lastName = source.readString();
             person.fullName = source.readString();
-            person.gender = source.readString();
-            person.birthdayString = source.readString();
-            person.birthday = (LocalDate) source.readSerializable();
             person.email = source.readString();
+
+            person.gender = source.readString();
+
+            person.birthdayString = source.readString();
+            person.birthday = ParcelExtensions.readLocalDate(source);
+
             person.homeStation = source.readString();
             person.railcard = source.readString();
-            person.member = (Boolean) source.readSerializable();
-            person.active = (Boolean) source.readSerializable();
-            person.dateOfJoiningString = source.readString();
-            person.dateOfJoining = (LocalDate) source.readSerializable();
-            person.leavingDateString = source.readString();
-            person.leavingDate = (LocalDate) source.readSerializable();
+            person.food = source.readString();
+            person.notes = source.readString();
 
-            int phoneNumberCount = source.readInt();
-            for (int i = 0; i < phoneNumberCount; i++) {
+            person.member = (Boolean) source.readValue(null);
+            person.active = (Boolean) source.readValue(null);
+
+            person.dateOfJoiningString = source.readString();
+            person.dateOfJoining = ParcelExtensions.readLocalDate(source);
+
+            person.leavingDateString = source.readString();
+            person.leavingDate = ParcelExtensions.readLocalDate(source);
+
+            person.loaded = ParcelExtensions.readInstant(source);
+
+            int contactCount = source.readInt();
+            for (int i = 0; i < contactCount; i++) {
                 person.contacts.add(new Pair<>(
                         source.readString(),
                         source.readString()
                 ));
             }
 
-            var addresses = new ArrayList<String>();
-            source.readStringList(addresses);
-            person.addresses.addAll(addresses);
+            ParcelExtensions.readStringCollection(source, person.addresses);
 
             int eventCount = source.readInt();
             for (int i = 0; i < eventCount; i++) {
                 person.events.put(
                         source.readString(),
-                        new Registration(source.readLong())
+                        source.readTypedObject(Registration.CREATOR)
                 );
             }
-
-            person.food = source.readString();
-            person.notes = source.readString();
-
-            var loaded = source.readLong();
-            person.loaded = loaded == Long.MIN_VALUE ? null : Instant.ofEpochMilli(loaded);
 
             return person;
         }

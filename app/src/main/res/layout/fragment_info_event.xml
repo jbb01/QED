@@ -116,7 +116,7 @@
             <com.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{event.maxParticipants != 0}"
+                android:visibility="@{event.maxParticipants != null}"
                 app:icon="@drawable/ic_event_max_member"
                 app:title="@{String.valueOf(event.maxParticipants)}"
                 app:subtitle="@string/event_subtitle_max_participants"/>

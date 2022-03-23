@@ -11,6 +11,7 @@ import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
 
+import com.jonahbauer.qed.model.parcel.ParcelExtensions;
 import com.jonahbauer.qed.model.room.Converters;
 
 import java.time.Instant;
@@ -183,15 +184,20 @@ public class Image implements Parcelable {
     @Override
     public void writeToParcel(@NonNull Parcel dest, int flags) {
         dest.writeLong(id);
+        dest.writeLong(albumId);
+        dest.writeLong(order);
         dest.writeString(albumName);
         dest.writeString(format);
         dest.writeString(path);
+        dest.writeString(name);
         dest.writeString(owner);
-        dest.writeSerializable(uploadTime);
-        dest.writeSerializable(creationTime);
-        dest.writeInt((original ? 1 : 0));
-        dest.writeInt((loaded ? 1 : 0));
+        ParcelExtensions.writeInstant(dest, uploadTime);
+        ParcelExtensions.writeInstant(dest, creationTime);
+        ParcelExtensions.writeBoolean(dest, original);
+        dest.writeTypedObject(thumbnail, flags);
         dest.writeMap(data);
+        ParcelExtensions.writeBoolean(dest, loaded);
+        ParcelExtensions.writeBoolean(dest, databaseLoaded);
     }
 
     public static final Parcelable.Creator<Image> CREATOR = new Parcelable.Creator<>() {
@@ -199,17 +205,20 @@ public class Image implements Parcelable {
         @Override
         public Image createFromParcel(@NonNull Parcel source) {
             Image image = new Image(source.readLong());
+            image.albumId = source.readLong();
+            image.order = source.readLong();
             image.albumName = source.readString();
             image.format = source.readString();
             image.path = source.readString();
+            image.name = source.readString();
             image.owner = source.readString();
-            image.uploadTime = (Instant) source.readSerializable();
-            image.creationTime = (Instant) source.readSerializable();
-            image.original = source.readInt() != 0;
-            image.loaded = source.readInt() != 0;
-
+            image.uploadTime = ParcelExtensions.readInstant(source);
+            image.creationTime = ParcelExtensions.readInstant(source);
+            image.original = ParcelExtensions.readBoolean(source);
+            image.thumbnail = source.readTypedObject(Bitmap.CREATOR);
             source.readMap(image.data, Image.class.getClassLoader());
-
+            image.loaded = ParcelExtensions.readBoolean(source);
+            image.databaseLoaded = ParcelExtensions.readBoolean(source);
             return image;
         }
 

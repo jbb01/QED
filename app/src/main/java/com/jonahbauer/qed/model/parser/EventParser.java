@@ -4,6 +4,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import androidx.annotation.Nullable;
 import com.jonahbauer.qed.model.Event;
 import com.jonahbauer.qed.model.Registration;
 import com.jonahbauer.qed.networking.parser.HtmlParser;
@@ -17,7 +18,7 @@ import java.util.regex.Pattern;
 
 public final class EventParser extends HtmlParser<Event> {
     private static final String LOG_TAG = EventParser.class.getName();
-    
+
     private static final Pattern COST_PATTERN = Pattern.compile("(\\d+(?:,\\d+)?)\\s*€");
     private static final Pattern NUMBER_PATTERN = Pattern.compile("\\d+");
 
@@ -81,19 +82,14 @@ public final class EventParser extends HtmlParser<Event> {
                                break;
                            }
                            case GENERAL_KEY_COST: {
-                               String cost = value.text();
-                               Matcher matcher = COST_PATTERN.matcher(cost);
-                               if (matcher.find()) {
-                                   //noinspection ConstantConditions
-                                   event.setCost(Double.parseDouble(matcher.group(1).replace(',', '.')));
-                               }
+                               event.setCost(parseCost(value));
                                break;
                            }
                            case GENERAL_KEY_MAX_PARTICIPANTS: {
                                String limit = value.text();
                                Matcher matcher = NUMBER_PATTERN.matcher(limit);
                                if (matcher.find()) {
-                                   event.setMaxParticipants(Integer.parseInt(matcher.group()));
+                                   event.setMaxParticipants(parseInteger(matcher.group()));
                                }
                                break;
                            }
@@ -172,5 +168,18 @@ public final class EventParser extends HtmlParser<Event> {
                        Log.e(LOG_TAG, "Error parsing event " + event.getId() + ".", e);
                    }
                });
+    }
+
+    @Nullable
+    static Double parseCost(@NonNull Element element) {
+        Matcher matcher = COST_PATTERN.matcher(element.text());
+        if (matcher.find() && matcher.groupCount() > 0) {
+            String match = matcher.group(1);
+            assert match != null;
+
+            match = match.replace(',', '.');
+            return parseDouble(match);
+        }
+        return null;
     }
 }

@@ -11,6 +11,7 @@ import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
 
+import com.jonahbauer.qed.model.parcel.ParcelExtensions;
 import com.jonahbauer.qed.model.room.Converters;
 
 import java.io.UnsupportedEncodingException;
@@ -67,13 +68,7 @@ public class Album implements Parcelable {
      * database. If this flag is not set the album cannot be viewed in offline mode.
      */
     @ColumnInfo(name = "image_list_downloaded")
-    private Instant imageListDownloaded;
-
-    /**
-     * This flag indicates whether the album has been completely loaded from the website.
-     */
-    @Ignore
-    private boolean loaded;
+    private Instant loaded;
 
     @NonNull
     @Override
@@ -84,7 +79,7 @@ public class Album implements Parcelable {
         if (owner != null) entries.add("\"owner\":\"" + owner + "\"");
         if (creationDate != null) entries.add("\"creationDate\":\"" + creationDate + "\"");
         entries.add("\"private\": " + private_);
-        entries.add("\"imageListDownloaded\": " + imageListDownloaded);
+        entries.add("\"loaded\": " + loaded);
         if (!persons.isEmpty()) entries.add("\"persons\":" + persons);
         if (!dates.isEmpty()) entries.add("\"dates\":" + dates);
         if (!uploadDates.isEmpty()) entries.add("\"upload_dates\":" + uploadDates);
@@ -103,19 +98,19 @@ public class Album implements Parcelable {
         dest.writeString(name);
         dest.writeString(owner);
         dest.writeString(creationDate);
-        dest.writeInt(private_ ? 1 : 0);
+        ParcelExtensions.writeBoolean(dest, private_);
         dest.writeTypedList(persons);
         dest.writeInt(dates.size());
         for (LocalDate date : dates) {
-            dest.writeSerializable(date);
+            ParcelExtensions.writeLocalDate(dest, date);
         }
         dest.writeInt(uploadDates.size());
         for (LocalDate date : uploadDates) {
-            dest.writeSerializable(date);
+            ParcelExtensions.writeLocalDate(dest, date);
         }
         dest.writeStringList(categories);
         dest.writeTypedList(images);
-        dest.writeLong(imageListDownloaded != null ? imageListDownloaded.getEpochSecond() : Long.MIN_VALUE);
+        ParcelExtensions.writeInstant(dest, loaded);
     }
 
     public static final Parcelable.Creator<Album> CREATOR = new Parcelable.Creator<>() {
@@ -126,24 +121,23 @@ public class Album implements Parcelable {
             album.name = source.readString();
             album.owner = source.readString();
             album.creationDate = source.readString();
-            album.private_ = source.readInt() != 0;
+            album.private_ = ParcelExtensions.readBoolean(source);
             source.readTypedList(album.persons, Person.CREATOR);
 
             int dateSize = source.readInt();
             for (int i = 0; i < dateSize; i++) {
-                album.dates.add((LocalDate) source.readSerializable());
+                album.dates.add(ParcelExtensions.readLocalDate(source));
             }
 
             int uploadDateSize = source.readInt();
             for (int i = 0; i < uploadDateSize; i++) {
-                album.uploadDates.add((LocalDate) source.readSerializable());
+                album.uploadDates.add(ParcelExtensions.readLocalDate(source));
             }
 
             source.readStringList(album.categories);
             source.readTypedList(album.images, Image.CREATOR);
 
-            var timestamp = source.readLong();
-            album.imageListDownloaded = timestamp == Long.MIN_VALUE ? null : Instant.ofEpochSecond(timestamp);
+            album.loaded = ParcelExtensions.readInstant(source);
             return album;
         }
 

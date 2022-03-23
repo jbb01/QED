@@ -12,14 +12,12 @@ import org.jsoup.select.Elements;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import static com.jonahbauer.qed.model.parser.EventParser.parseCost;
 
 public final class EventListParser extends HtmlParser<List<Event>> {
     private static final String LOG_TAG = EventListParser.class.getName();
     public static final EventListParser INSTANCE = new EventListParser();
-
-    private static final Pattern COST_PATTERN = Pattern.compile("(\\d+(?:,\\d+)?)\\s*€");
 
     private EventListParser() {}
 
@@ -57,6 +55,12 @@ public final class EventListParser extends HtmlParser<List<Event>> {
                             event.setEnd(parseLocalDate(element));
                         } catch (Exception ignored) {}
 
+                        hotel: try {
+                            var element = columns.get(4).selectFirst("a");
+                            if (element == null) break hotel;
+                            event.setHotel(element.text());
+                        } catch (Exception ignored) {}
+
                         deadline: try {
                             var element = columns.get(5).selectFirst("time");
                             if (element == null) break deadline;
@@ -65,23 +69,15 @@ public final class EventListParser extends HtmlParser<List<Event>> {
                         } catch (Exception ignored) {}
 
                         cost: try {
-                            var element = columns.get(6).selectFirst("cost");
+                            var element = columns.get(6);
                             if (element == null) break cost;
-                            String costText = element.text();
-                            Matcher costMatcher = COST_PATTERN.matcher(costText);
-                            if (costMatcher.find()) {
-                                String match = costMatcher.group(1);
-                                if (match != null) {
-                                    match = match.replace(',', '.');
-                                    event.setCost(Double.parseDouble(match));
-                                }
-                            }
+                            event.setCost(parseCost(element));
                         } catch (Exception ignored) {}
 
                         maxParticipants: try {
                             var element = columns.get(7);
                             if (element == null) break maxParticipants;
-                            event.setMaxParticipants(Integer.parseInt(element.text()));
+                            event.setMaxParticipants(parseInteger(element));
                         } catch (NumberFormatException ignored) {}
 
                         return event;

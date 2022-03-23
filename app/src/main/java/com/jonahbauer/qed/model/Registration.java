@@ -8,14 +8,13 @@ import androidx.annotation.StringRes;
 
 import com.jonahbauer.qed.R;
 
+import com.jonahbauer.qed.model.parcel.ParcelExtensions;
 import lombok.Data;
 
 @Data
 public class Registration implements Parcelable {
     private final long id;
 
-    private Event event;
-    private Person person;
     private Status status;
     private boolean organizer;
 
@@ -27,16 +26,16 @@ public class Registration implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(id);
-        dest.writeParcelable(event, flags);
-        dest.writeParcelable(person, flags);
+        ParcelExtensions.writeEnum(dest, status);
+        ParcelExtensions.writeBoolean(dest, organizer);
     }
 
     public static final Creator<Registration> CREATOR = new Creator<>() {
         @Override
         public Registration createFromParcel(Parcel in) {
             Registration registration = new Registration(in.readLong());
-            registration.event = in.readParcelable(Event.class.getClassLoader());
-            registration.person = in.readParcelable(Person.class.getClassLoader());
+            registration.status = ParcelExtensions.readEnum(in, Status.values());
+            registration.organizer = ParcelExtensions.readBoolean(in);
             return registration;
         }
 

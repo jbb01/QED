@@ -14,6 +14,7 @@ import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
 
+import com.jonahbauer.qed.model.parcel.ParcelExtensions;
 import com.jonahbauer.qed.model.room.Converters;
 import com.jonahbauer.qed.networking.NetworkConstants;
 import com.jonahbauer.qed.util.Preferences;
@@ -51,10 +52,10 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
             .withLocale(Locale.GERMANY)
             .withZone(NetworkConstants.SERVER_TIME_ZONE);
 
-    public static final Message PONG = new Message(0, "PONG", "PONG", Instant.EPOCH, 0, "PONG", "000000", 0, "PONG");
-    public static final Message PING = new Message(0, "PING", "PING", Instant.EPOCH, 0, "PING", "000000", 0, "PING");
-    public static final Message ACK = new Message(0, "ACK", "ACK", Instant.EPOCH, 0, "ACK", "000000", 0, "ACK");
-    public static final Message OK = new Message(0, "OK", "OK", Instant.EPOCH, 0, "OK", "000000", 0, "OK");
+    public static final Message PONG = new Message(0, "PONG", "PONG", Instant.EPOCH, 0, "PONG", "000000", "PONG", 0);
+    public static final Message PING = new Message(0, "PING", "PING", Instant.EPOCH, 0, "PING", "000000", "PING", 0);
+    public static final Message ACK = new Message(0, "ACK", "ACK", Instant.EPOCH, 0, "ACK", "000000", "ACK", 0);
+    public static final Message OK = new Message(0, "OK", "OK", Instant.EPOCH, 0, "OK", "000000", "OK", 0);
 
     @PrimaryKey
     private final long id;
@@ -65,7 +66,7 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
 
     @NonNull
     @Ignore
-    private final String name;
+    private final transient String name;
 
     @NonNull
     @ColumnInfo(name = "message")
@@ -101,32 +102,8 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
     @Getter(AccessLevel.PRIVATE)
     private final boolean error;
 
-    @Ignore
-    public Message(@NonNull String message) {
-        this.name = "Error";
-        this.rawName = "Error";
-        this.message = message;
-        this.date = Instant.now();
-        this.userId = 503;
-        this.userName = "Error";
-        this.color = "220000";
-        this.id = Long.MAX_VALUE;
-        this.bottag = 0;
-        this.channel = "";
-
-        this.transformedColor = Color.rgb(255, 0, 0);
-        this.error = true;
-    }
-
-    @Ignore
-    public Message(long id,
-                   @NonNull String rawName,
-                   @NonNull String message,
-                   @NonNull Instant date,
-                   @NonNull String color,
-                   int bottag,
-                   @NonNull String channel) {
-        this(id, rawName, message, date, -1, null, color, bottag, channel);
+    public static Message newErrorMessage(@NonNull String message) {
+        return new Message(Long.MAX_VALUE, "Error", message, Instant.now(), 503, "Error", "220000", "", 0, Color.RED, true);
     }
 
     public Message(long id,
@@ -136,8 +113,26 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
                    long userId,
                    @Nullable String userName,
                    @NonNull String color,
+                   @NonNull String channel,
+                   int bottag
+    ) {
+        this(id, rawName, message, date, userId, userName, color, channel, bottag, transformColor(color), false);
+    }
+
+    @Ignore
+    private Message(long id,
+                   @NonNull String rawName,
+                   @NonNull String message,
+                   @NonNull Instant date,
+                   long userId,
+                   @Nullable String userName,
+                   @NonNull String color,
+                   @NonNull String channel,
                    int bottag,
-                   @NonNull String channel) {
+                   @ColorInt int transformedColor,
+                   boolean error
+    ) {
+        this.id = id;
         this.rawName = rawName;
         this.name = rawName.trim();
         this.message = message;
@@ -145,12 +140,10 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
         this.userId = userId;
         this.userName = userName;
         this.color = color;
-        this.id = id;
-        this.bottag = bottag;
         this.channel = channel;
-
-        this.transformedColor = transformColor(color);
-        this.error = false;
+        this.bottag = bottag;
+        this.transformedColor = transformedColor;
+        this.error = error;
     }
 
     @NonNull
@@ -251,7 +244,7 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
                         return null;
                     }
 
-                    return new Message(id, rawName, message, date, userid, username, color, bottag, channel);
+                    return new Message(id, rawName, message, date, userid, username, color, channel, bottag);
                 default:
                     Log.e(LOG_TAG, "Unknown message type: \"" + type + "\"");
                     return null;
@@ -289,32 +282,36 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(id);
         dest.writeString(rawName);
         dest.writeString(message);
-        dest.writeSerializable(date);
+        ParcelExtensions.writeInstant(dest, date);
         dest.writeLong(userId);
         dest.writeString(userName);
         dest.writeString(color);
         dest.writeString(channel);
         dest.writeInt(bottag);
-        dest.writeLong(id);
+        dest.writeInt(transformedColor);
+        ParcelExtensions.writeBoolean(dest, error);
     }
 
     public static final Parcelable.Creator<Message> CREATOR = new Parcelable.Creator<>() {
 
         @Override
         public Message createFromParcel(Parcel source) {
-            String rawName = Objects.requireNonNull(source.readString());
-            String message = Objects.requireNonNull(source.readString());
-            Instant date = Objects.requireNonNull((Instant) source.readSerializable());
-            long userId = source.readLong();
-            String userName = source.readString();
-            String color = Objects.requireNonNull(source.readString());
-            String channel = Objects.requireNonNull(source.readString());
-            int bottag = source.readInt();
-            long id = source.readLong();
+            var id = source.readLong();
+            var rawName = Objects.requireNonNull(source.readString());
+            var message = Objects.requireNonNull(source.readString());
+            var date = Objects.requireNonNull(ParcelExtensions.readInstant(source));
+            var userId = source.readLong();
+            var userName = source.readString();
+            var color = Objects.requireNonNull(source.readString());
+            var channel = Objects.requireNonNull(source.readString());
+            var bottag = source.readInt();
+            var transformedColor = source.readInt();
+            var error = ParcelExtensions.readBoolean(source);
 
-            return new Message(id, rawName, message, date, userId, userName, color, bottag, channel);
+            return new Message(id, rawName, message, date, userId, userName, color, channel, bottag, transformedColor, error);
         }
 
         @Override

@@ -4,6 +4,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import androidx.annotation.Nullable;
 import org.jetbrains.annotations.Contract;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -27,7 +28,8 @@ public abstract class HtmlParser<T> implements Parser<T> {
     @Contract("_, _ -> param1")
     protected abstract T parse(@NonNull T obj, Document document) throws HtmlParseException;
 
-    protected LocalDate parseLocalDate(String date) {
+    @Nullable
+    protected static LocalDate parseLocalDate(@NonNull String date) {
         try {
             return LocalDate.parse(date);
         } catch (DateTimeParseException e) {
@@ -36,11 +38,13 @@ public abstract class HtmlParser<T> implements Parser<T> {
         }
     }
 
-    protected LocalDate parseLocalDate(Element time) {
+    @Nullable
+    protected static LocalDate parseLocalDate(@NonNull Element time) {
         return parseLocalDate(time.attr("datetime"));
     }
 
-    protected Instant parseInstant(String instant) {
+    @Nullable
+    protected static Instant parseInstant(@NonNull String instant) {
         try {
             return OffsetDateTime.parse(instant).toInstant();
         } catch (DateTimeParseException e) {
@@ -49,15 +53,55 @@ public abstract class HtmlParser<T> implements Parser<T> {
         }
     }
 
-    protected Instant parseInstant(Element time) {
+    @Nullable
+    protected static Instant parseInstant(@NonNull Element time) {
         return parseInstant(time.attr("datetime"));
     }
 
-    protected boolean parseBoolean(String bool) {
-        return "Ja".equals(bool);
+    @Nullable
+    protected static Boolean parseBoolean(@Nullable String bool) {
+        if ("Ja".equals(bool)) {
+            return true;
+        } else if ("Nein".equals(bool)) {
+            return false;
+        } else {
+            Log.w(LOG_TAG, "Could not parse boolean \"" + bool + "\".");
+            return null;
+        }
     }
 
-    protected boolean parseBoolean(Element element) {
+    @Nullable
+    protected static Boolean parseBoolean(@NonNull Element element) {
         return parseBoolean(element.text());
+    }
+
+    @Nullable
+    protected static Integer parseInteger(String number) {
+        try {
+            return Integer.parseInt(number);
+        } catch (NumberFormatException e) {
+            Log.w(LOG_TAG, "Could not parse integer \"" + number + "\".", e);
+            return null;
+        }
+    }
+
+    @Nullable
+    protected static Integer parseInteger(@NonNull Element element) {
+        return parseInteger(element.text());
+    }
+
+    @Nullable
+    protected static Double parseDouble(String number) {
+        try {
+            return Double.parseDouble(number);
+        } catch (NumberFormatException e) {
+            Log.w(LOG_TAG, "Could not parse double \"" + number + "\".", e);
+            return null;
+        }
+    }
+
+    @Nullable
+    protected static Double parseDouble(@NonNull Element element) {
+        return parseDouble(element.text());
     }
 }

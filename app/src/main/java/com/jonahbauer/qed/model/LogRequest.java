@@ -49,7 +49,6 @@ public abstract class LogRequest implements Serializable {
 
     @Nullable
     @Contract("null -> null")
-    @SuppressWarnings("ConstantConditions")
     public static LogRequest parse(@Nullable Uri uri) {
         if (uri == null) return null;
 

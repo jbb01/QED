@@ -169,8 +169,8 @@ public class MessageUtils {
                                 message.getUserId(),
                                 message.getUserName(),
                                 message.getColor(),
-                                message.getBottag(),
-                                message.getChannel()
+                                message.getChannel(),
+                                message.getBottag()
                         );
                     }
                 }

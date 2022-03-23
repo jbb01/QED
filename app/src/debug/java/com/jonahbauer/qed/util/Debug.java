@@ -116,7 +116,7 @@ public class Debug {
         album.setOwner("Max Mustermann");
         album.setCreationDate("01.01.2000");
         album.setPrivate_(true);
-        album.setImageListDownloaded(Instant.now());
+        album.setLoaded(Instant.now());
         album.getCategories().add("Kategorie 1");
         album.getCategories().add("Kategorie 2");
         album.getCategories().add("Kategorie 3");
@@ -140,8 +140,8 @@ public class Debug {
                 1337,
                 "Max Mustermann",
                 "FF0000",
-                0,
-                ""
+                "",
+                0
         );
     }
 
