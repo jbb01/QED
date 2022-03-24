@@ -7,12 +7,15 @@ import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.core.view.OneShotPreDrawListener;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.DefaultLifecycleObserver;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.transition.Transition;
 import androidx.transition.TransitionListenerAdapter;
 import com.google.android.material.transition.MaterialContainerTransform;
 import com.google.android.material.transition.MaterialElevationScale;
 import com.google.android.material.transition.MaterialFadeThrough;
 import com.jonahbauer.qed.R;
+import com.jonahbauer.qed.activities.MainActivity;
 import com.jonahbauer.qed.layoutStuff.transition.ActionBarAnimation;
 import lombok.experimental.UtilityClass;
 
@@ -36,6 +39,12 @@ public class TransitionUtils {
         setupDefaultReenterTransition(fragment, duration, actionBarColor);
         setupDefaultExitTransition(fragment, duration);
         setupDefaultReturnTransition(fragment, duration);
+        fragment.getLifecycle().addObserver(new DefaultLifecycleObserver() {
+            @Override
+            public void onResume(@NonNull LifecycleOwner owner) {
+                ((MainActivity) fragment.requireActivity()).setActionBarColor(actionBarColor);
+            }
+        });
     }
 
     public static void setupDefaultEnterTransition(Fragment fragment, int duration, @ColorInt int actionBarColor) {

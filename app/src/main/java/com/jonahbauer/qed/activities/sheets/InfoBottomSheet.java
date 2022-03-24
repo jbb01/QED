@@ -17,10 +17,7 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 
-import androidx.annotation.ColorInt;
-import androidx.annotation.DrawableRes;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import androidx.annotation.*;
 import androidx.core.view.ViewCompat;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -31,7 +28,6 @@ import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.databinding.FragmentInfoBinding;
 import com.jonahbauer.qed.layoutStuff.ColorfulBottomSheetCallback;
 import com.jonahbauer.qed.util.Colors;
-import com.jonahbauer.qed.util.ViewUtils;
 
 public abstract class InfoBottomSheet extends BottomSheetDialogFragment implements View.OnScrollChangeListener {
     private BottomSheetBehavior.BottomSheetCallback mSheetCallback;
@@ -335,10 +331,6 @@ public abstract class InfoBottomSheet extends BottomSheetDialogFragment implemen
     public abstract InfoFragment createFragment();
 
     protected ViewModelProvider getViewModelProvider() {
-        try {
-            return ViewUtils.getViewModelProvider(this);
-        } catch (Exception e) {
-            return new ViewModelProvider(this);
-        }
+        return new ViewModelProvider(this);
     }
 }

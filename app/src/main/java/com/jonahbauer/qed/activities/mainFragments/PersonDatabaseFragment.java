@@ -52,7 +52,7 @@ public class PersonDatabaseFragment extends Fragment implements CompoundButton.O
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mBinding = FragmentPersonsDatabaseBinding.inflate(inflater, container, false);
-        mPersonListViewModel = ViewUtils.getViewModelProvider(this).get(PersonListViewModel.class);
+        mPersonListViewModel = ViewUtils.getViewModelProvider(this, R.id.nav_database_persons).get(PersonListViewModel.class);
         return mBinding.getRoot();
     }
 
@@ -177,7 +177,8 @@ public class PersonDatabaseFragment extends Fragment implements CompoundButton.O
             var extras = new FragmentNavigator.Extras.Builder()
                     .addSharedElement(view, getString(R.string.transition_name_single_fragment))
                     .build();
-            var action = PersonDatabaseFragmentDirections.showPerson(person);
+            var action = PersonDatabaseFragmentDirections.showPerson(person.getId());
+            action.setPerson(person);
             Navigation.findNavController(view).navigate(action, extras);
 
             TransitionUtils.setupReenterElevationScale(this);

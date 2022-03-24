@@ -29,7 +29,7 @@ public class MessageInfoFragment extends InfoFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mMessageViewModel = getViewModelProvider().get(MessageViewModel.class);
+        mMessageViewModel = getViewModelProvider(0).get(MessageViewModel.class);
     }
 
     @Override

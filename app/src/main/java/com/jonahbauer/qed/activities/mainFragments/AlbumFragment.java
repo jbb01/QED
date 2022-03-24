@@ -13,7 +13,6 @@ import android.widget.CompoundButton;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.SharedElementCallback;
-import androidx.core.util.Pair;
 import androidx.core.view.OneShotPreDrawListener;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
@@ -66,25 +65,14 @@ public class AlbumFragment extends Fragment implements CompoundButton.OnCheckedC
         setHasOptionsMenu(true);
 
         Bundle arguments = getArguments();
-        if (arguments != null) {
-            // handle deep link
-            if (arguments.containsKey(NavController.KEY_DEEP_LINK_INTENT)) {
-                Intent intent = (Intent) arguments.get(NavController.KEY_DEEP_LINK_INTENT);
 
-                Pair<Album, Filter> data = parseIntent(intent);
-                if (data != null) {
-                    mAlbum = data.first;
-                    mFilter = data.second;
-                }
-            }
+        AlbumFragmentArgs args = AlbumFragmentArgs.fromBundle(arguments);
+        mAlbum = args.getAlbum();
+        if (mAlbum == null) mAlbum = new Album(args.getId());
 
-            if (mAlbum == null) {
-                mAlbum = AlbumFragmentArgs.fromBundle(arguments).getAlbum();
-            }
-        }
-
-        if (mAlbum == null) {
-            mAlbum = new Album(0);
+        if (arguments != null && arguments.containsKey(NavController.KEY_DEEP_LINK_INTENT)) {
+            Intent intent = (Intent) arguments.get(NavController.KEY_DEEP_LINK_INTENT);
+            mFilter = parseFilters(intent);
         }
 
         TransitionUtils.setupDefaultTransitions(this);
@@ -95,7 +83,7 @@ public class AlbumFragment extends Fragment implements CompoundButton.OnCheckedC
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mBinding = FragmentAlbumBinding.inflate(inflater, container, false);
-        mAlbumViewModel = ViewUtils.getViewModelProvider(this).get(AlbumViewModel.class);
+        mAlbumViewModel = ViewUtils.getViewModelProvider(this, R.id.nav_album).get(AlbumViewModel.class);
         return mBinding.getRoot();
     }
 
@@ -432,28 +420,18 @@ public class AlbumFragment extends Fragment implements CompoundButton.OnCheckedC
         setReenterTransition(reenterTransition);
     }
 
-    private Pair<Album, Filter> parseIntent(Intent intent) {
+    private Filter parseFilters(Intent intent) {
         if (intent == null) return null;
 
         Uri uri = intent.getData();
         if (uri == null) return null;
 
-        Album album = null;
-
         Filter.Builder builder = Filter.builder();
 
-        String idStr = uri.getQueryParameter("albumid");
         String dateStr = uri.getQueryParameter("byday");
         String uploadStr = uri.getQueryParameter("byupload");
         String ownerStr = uri.getQueryParameter("byowner");
         String categoryStr = uri.getQueryParameter("bycategory");
-
-        if (idStr != null) {
-            try {
-                long id = Long.parseLong(idStr);
-                album = new Album(id);
-            } catch (NumberFormatException ignored) {}
-        }
 
         if (dateStr != null) {
             try {
@@ -488,11 +466,7 @@ public class AlbumFragment extends Fragment implements CompoundButton.OnCheckedC
             }
         }
 
-        if (album == null) {
-            return null;
-        } else {
-            return Pair.create(album, builder.build());
-        }
+        return builder.build();
     }
 
     private Long getSelectedItemId() {

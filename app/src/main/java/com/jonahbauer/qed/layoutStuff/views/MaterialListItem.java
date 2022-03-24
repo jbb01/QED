@@ -445,7 +445,7 @@ public class MaterialListItem extends ViewGroup {
     }
 
     public void setIcon(@DrawableRes int icon) {
-        setIcon(AppCompatResources.getDrawable(getContext(), icon));
+        setIcon(icon == 0 ? null : AppCompatResources.getDrawable(getContext(), icon));
     }
 
     public void setTitleTextAppearance(@StyleRes int textAppearance) {

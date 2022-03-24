@@ -47,7 +47,7 @@ public class EventDatabaseFragment extends Fragment implements AdapterView.OnIte
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mBinding = FragmentEventsDatabaseBinding.inflate(inflater, container, false);
-        mEventListViewModel = ViewUtils.getViewModelProvider(this).get(EventListViewModel.class);
+        mEventListViewModel = ViewUtils.getViewModelProvider(this, R.id.nav_database_events).get(EventListViewModel.class);
         return mBinding.getRoot();
     }
 
@@ -85,7 +85,8 @@ public class EventDatabaseFragment extends Fragment implements AdapterView.OnIte
             var extras = new FragmentNavigator.Extras.Builder()
                     .addSharedElement(view, getString(R.string.transition_name_single_fragment))
                     .build();
-            var action = EventDatabaseFragmentDirections.showEvent(event);
+            var action = EventDatabaseFragmentDirections.showEvent(event.getId());
+            action.setEvent(event);
             Navigation.findNavController(view).navigate(action, extras);
 
             TransitionUtils.setupReenterElevationScale(this);

@@ -108,7 +108,7 @@ public class ImageInfoFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mBinding = FragmentImageInfoBinding.inflate(inflater, container, false);
-        mImageInfoViewModel = ViewUtils.getViewModelProvider(this).get(ImageInfoViewModel.class);
+        mImageInfoViewModel = ViewUtils.getViewModelProvider(this, R.id.nav_image_info).get(ImageInfoViewModel.class);
         return mBinding.getRoot();
     }
 

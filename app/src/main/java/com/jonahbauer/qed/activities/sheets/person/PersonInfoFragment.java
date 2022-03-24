@@ -102,7 +102,7 @@ public class PersonInfoFragment extends InfoFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mPersonViewModel = getViewModelProvider().get(PersonViewModel.class);
+        mPersonViewModel = getViewModelProvider(R.id.nav_person).get(PersonViewModel.class);
     }
 
     @Nullable

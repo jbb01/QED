@@ -77,7 +77,7 @@ public class LogFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mBinding = FragmentLogBinding.inflate(inflater, container, false);
-        mLogViewModel = ViewUtils.getViewModelProvider(this).get(LogViewModel.class);
+        mLogViewModel = ViewUtils.getViewModelProvider(this, R.id.nav_chat_log).get(LogViewModel.class);
         return mBinding.getRoot();
     }
 

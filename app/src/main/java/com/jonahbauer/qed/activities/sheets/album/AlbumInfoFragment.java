@@ -41,7 +41,7 @@ public class AlbumInfoFragment extends InfoFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mAlbumViewModel = getViewModelProvider().get(AlbumViewModel.class);
+        mAlbumViewModel = getViewModelProvider(0).get(AlbumViewModel.class);
     }
 
     @Override

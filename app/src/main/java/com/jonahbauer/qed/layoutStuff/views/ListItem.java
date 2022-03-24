@@ -84,7 +84,7 @@ public class ListItem extends LinearLayout {
     }
 
     public void setTitle(@StringRes int title) {
-        setTitle(getResources().getText(title));
+        setTitle(title == 0 ? null : getResources().getText(title));
     }
 
     public CharSequence getSubtitle() {
@@ -98,7 +98,7 @@ public class ListItem extends LinearLayout {
     }
 
     public void setSubtitle(@StringRes int subtitle) {
-        setSubtitle(getResources().getText(subtitle));
+        setSubtitle(subtitle == 0 ? null : getResources().getText(subtitle));
     }
 
     public Drawable getIcon() {
@@ -111,7 +111,7 @@ public class ListItem extends LinearLayout {
     }
 
     public void setIcon(@DrawableRes int icon) {
-        setIcon(AppCompatResources.getDrawable(getContext(), icon));
+        setIcon(icon == 0 ? null : AppCompatResources.getDrawable(getContext(), icon));
     }
 
     public void setIconTint(ColorStateList tint) {

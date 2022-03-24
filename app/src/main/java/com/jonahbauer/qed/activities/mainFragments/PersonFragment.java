@@ -29,8 +29,9 @@ public class PersonFragment extends Fragment {
 
         PersonFragmentArgs args = PersonFragmentArgs.fromBundle(getArguments());
         Person person = args.getPerson();
+        if (person == null) person = new Person(args.getId());
 
-        mPersonViewModel = ViewUtils.getViewModelProvider(this).get(PersonViewModel.class);
+        mPersonViewModel = ViewUtils.getViewModelProvider(this, R.id.nav_person).get(PersonViewModel.class);
         mPersonViewModel.load(person);
 
         var color = Themes.colorful(requireContext(), person.getId());

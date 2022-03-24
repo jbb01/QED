@@ -78,7 +78,7 @@ public class ChatDatabaseFragment extends Fragment implements CompoundButton.OnC
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mBinding = FragmentChatDatabaseBinding.inflate(inflater, container, false);
-        mMessageListViewModel = ViewUtils.getViewModelProvider(this).get(MessageListViewModel.class);
+        mMessageListViewModel = ViewUtils.getViewModelProvider(this, R.id.nav_chat_db).get(MessageListViewModel.class);
         return mBinding.getRoot();
     }
 

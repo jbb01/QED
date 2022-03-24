@@ -19,10 +19,7 @@ import androidx.core.view.*;
 import androidx.customview.widget.Openable;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.NavBackStackEntry;
-import androidx.navigation.NavController;
-import androidx.navigation.NavDestination;
-import androidx.navigation.Navigation;
+import androidx.navigation.*;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
@@ -90,7 +87,18 @@ public class MainActivity extends AppCompatActivity implements NetworkListener, 
                 .setOpenableLayout(drawerLayout)
                 .build();
         NavigationUI.setupActionBarWithNavController(this, mNavController, mAppBarConfiguration);
-        NavigationUI.setupWithNavController(navigationView, mNavController);
+        navigationView.setNavigationItemSelectedListener(item -> {
+            var destination = item.getItemId();
+
+            var first = mNavController.getBackQueue().firstOrNull();
+            var options = new NavOptions.Builder();
+            if (mTopLevelDestinations.contains(destination) && first != null) {
+                options.setPopUpTo(first.getDestination().getId(), true);
+            }
+            mNavController.navigate(item.getItemId(), null, options.build());
+            drawerLayout.close();
+            return true;
+        });
 
         mNavController.addOnDestinationChangedListener(this);
 

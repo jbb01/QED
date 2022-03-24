@@ -48,7 +48,7 @@ public class GalleryFragment extends Fragment implements AdapterView.OnItemClick
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mBinding = FragmentGalleryBinding.inflate(inflater, container, false);
-        mAlbumListViewModel = ViewUtils.getViewModelProvider(this).get(AlbumListViewModel.class);
+        mAlbumListViewModel = ViewUtils.getViewModelProvider(this, R.id.nav_gallery).get(AlbumListViewModel.class);
         return mBinding.getRoot();
     }
 
@@ -101,7 +101,8 @@ public class GalleryFragment extends Fragment implements AdapterView.OnItemClick
             var extras = new FragmentNavigator.Extras.Builder()
                     .addSharedElement(view, getString(R.string.transition_name_album_fragment))
                     .build();
-            var action = GalleryFragmentDirections.showAlbum(album);
+            var action = GalleryFragmentDirections.showAlbum(album.getId());
+            action.setAlbum(album);
             Navigation.findNavController(view).navigate(action, extras);
 
             TransitionUtils.setupReenterElevationScale(this);

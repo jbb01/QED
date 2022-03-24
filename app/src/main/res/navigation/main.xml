@@ -112,11 +112,15 @@
         tools:layout="@layout/fragment_album">
         <argument
             android:name="album"
+            android:defaultValue="@null"
             app:argType="com.jonahbauer.qed.model.Album"
             app:nullable="true"/>
+        <argument
+            android:name="id"
+            app:argType="long"/>
         <deepLink
-            android:id="@+id/deep_link_chat_log"
-            app:uri="qedgallery.qed-verein.de/album_view.php" />
+            android:id="@+id/deep_link_album"
+            app:uri="qedgallery.qed-verein.de/album_view.php?albumid={id}" />
         <action
             android:id="@+id/show_image"
             app:destination="@id/nav_image"/>
@@ -158,8 +162,12 @@
         tools:layout="@layout/fragment_info_person">
         <argument
             android:name="person"
+            android:defaultValue="@null"
             app:argType="com.jonahbauer.qed.model.Person"
-            app:nullable="false" />
+            app:nullable="true" />
+        <argument
+            android:name="id"
+            app:argType="long"/>
     </fragment>
 
     <fragment
@@ -168,8 +176,12 @@
         tools:layout="@layout/fragment_info_event">
         <argument
             android:name="event"
+            android:defaultValue="@null"
             app:argType="com.jonahbauer.qed.model.Event"
-            app:nullable="false" />
+            app:nullable="true" />
+        <argument
+            android:name="id"
+            app:argType="long"/>
     </fragment>
 
     <dialog
@@ -194,6 +206,7 @@
 
     <action
         android:id="@+id/login"
+        app:launchSingleTop="true"
         app:destination="@id/nav_login"/>
 
     <include app:graph="@navigation/settings" />

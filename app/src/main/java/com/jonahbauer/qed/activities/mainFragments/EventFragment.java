@@ -29,8 +29,9 @@ public class EventFragment extends Fragment {
 
         EventFragmentArgs args = EventFragmentArgs.fromBundle(getArguments());
         Event event = args.getEvent();
+        if (event == null) event = new Event(args.getId());
 
-        mEventViewModel = ViewUtils.getViewModelProvider(this).get(EventViewModel.class);
+        mEventViewModel = ViewUtils.getViewModelProvider(this, R.id.nav_event).get(EventViewModel.class);
         mEventViewModel.load(event);
 
         var color = Themes.colorful(requireContext(), event.getId());

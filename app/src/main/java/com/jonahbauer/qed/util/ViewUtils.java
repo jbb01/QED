@@ -14,6 +14,7 @@ import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.ActionBar;
@@ -317,10 +318,9 @@ public class ViewUtils {
     }
 
     @NonNull
-    @Contract("_ -> new")
-    public static ViewModelProvider getViewModelProvider(Fragment fragment) {
-        NavBackStackEntry entry = NavHostFragment.findNavController(fragment).getCurrentBackStackEntry();
-        assert entry != null;
+    @Contract("_,_ -> new")
+    public static ViewModelProvider getViewModelProvider(Fragment fragment, @IdRes int destinationId) {
+        NavBackStackEntry entry = NavHostFragment.findNavController(fragment).getBackStackEntry(destinationId);
         return new ViewModelProvider(entry.getViewModelStore(), entry.getDefaultViewModelProviderFactory());
     }
 }

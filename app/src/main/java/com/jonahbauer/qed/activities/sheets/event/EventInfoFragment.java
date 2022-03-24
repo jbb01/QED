@@ -44,7 +44,7 @@ public class EventInfoFragment extends InfoFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mEventViewModel = getViewModelProvider().get(EventViewModel.class);
+        mEventViewModel = getViewModelProvider(R.id.nav_event).get(EventViewModel.class);
     }
 
     @Override
