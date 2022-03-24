@@ -81,6 +81,7 @@ public final class PersonParser extends HtmlParser<Person> {
                            }
                            case GENERAL_KEY_GENDER: {
                                person.setGender(value.text());
+                               break;
                            }
                            case GENERAL_KEY_DATE_OF_JOINING: {
                                Element time = value.child(0);
@@ -198,8 +199,11 @@ public final class PersonParser extends HtmlParser<Person> {
                 Registration registration = new Registration(id);
                 registration.setStatus(status);
                 registration.setOrganizer(orga);
+                registration.setEventTitle(event);
+                registration.setPerson(person);
 
-                person.getEvents().put(event, registration);
+                person.getEvents().remove(registration);
+                person.getEvents().add(registration);
             } catch (Exception e) {
                 Log.e(LOG_TAG, "Error parsing person " + person.getId() + ".", e);
             }

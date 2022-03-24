@@ -12,6 +12,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.model.Event;
 import com.jonahbauer.qed.model.Person;
+import com.jonahbauer.qed.model.Registration;
 import com.jonahbauer.qed.util.Actions;
 
 public class DeepLinkingActivity extends AppCompatActivity {
@@ -44,6 +45,9 @@ public class DeepLinkingActivity extends AppCompatActivity {
             } else if (path.matches("^/events/\\d{1,5}")) {
                 int id = Integer.parseInt(path.substring(8));
                 mBottomSheet = Actions.showInfoSheet(this, new Event(id), FRAGMENT_TAG);
+            } else if (path.matches("^/registrations/\\d{1,5}")) {
+                int id = Integer.parseInt(path.substring(15));
+                mBottomSheet = Actions.showInfoSheet(this, new Registration(id), FRAGMENT_TAG);
             }
         }
     }

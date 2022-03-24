@@ -157,8 +157,11 @@ public final class EventParser extends HtmlParser<Event> {
                                    Registration registration = new Registration(id);
                                    registration.setStatus(status);
                                    registration.setOrganizer(orga);
+                                   registration.setEvent(event);
+                                   registration.setPersonName(participant);
 
-                                   event.getParticipants().put(participant, registration);
+                                   event.getParticipants().remove(registration);
+                                   event.getParticipants().add(registration);
                                } catch (Exception e) {
                                    Log.e(LOG_TAG, "Error parsing event " + event.getId() + ".", e);
                                }

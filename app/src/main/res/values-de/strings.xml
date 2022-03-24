@@ -226,6 +226,51 @@
     <string name="event_show_more">Mehr anzeigen</string>
     <string name="event_show_less">Weniger anzeigen</string>
 
+    <!-- Registration Bottom Sheet -->
+    <string name="registration_title">Anmeldung von %s</string>
+    <string name="registration_section_information">Allgemein</string>
+    <string name="registration_section_personal">Persönliche Informationen</string>
+    <string name="registration_section_transport">An- und Abreise</string>
+    <string name="registration_section_payment">Zahlungen</string>
+    <string name="registration_section_additional">Sonstiges</string>
+    <string name="registration_subtitle_event">Veranstaltung</string>
+    <string name="registration_subtitle_person">Teilnehmer</string>
+    <string name="registration_subtitle_organizer">Organisator</string>
+    <string name="registration_subtitle_status">Anmeldestatus</string>
+    <string name="registration_subtitle_birthday">Geburtstag</string>
+    <string name="registration_title_birthday">%s</string>
+    <string name="registration_subtitle_gender">Geschlecht</string>
+    <string name="registration_subtitle_mail">E-Mail Adresse</string>
+    <string name="registration_clip_label_mail">E-Mail Adresse (%s)</string>
+    <string name="registration_subtitle_address">Adresse</string>
+    <string name="registration_clip_label_address">Adresse (%s)</string>
+    <string name="registration_subtitle_phone">Telefonnummer</string>
+    <string name="registration_clip_label_phone">Telefonnummer (%s)</string>
+    <string name="registration_subtitle_time_of_arrival">Ankunftszeit</string>
+    <string name="registration_title_time_of_arrival">%s</string>
+    <string name="registration_subtitle_time_of_departure">Abfahrtszeit</string>
+    <string name="registration_title_time_of_departure">%s</string>
+    <string name="registration_subtitle_overnight_stays">Übernachtungen</string>
+    <string name="registration_subtitle_source_station">Ankunftsbahnhof</string>
+    <string name="registration_subtitle_target_station">Abfahrtsbahnhof</string>
+    <string name="registration_subtitle_railcard">Bahnermäßigung</string>
+    <string name="registration_subtitle_food">Essenswünsche</string>
+    <string name="registration_subtitle_notes">Notizen</string>
+    <string name="registration_subtitle_talks">Vorträge</string>
+    <string name="registration_title_payment">%.2f €</string>
+    <string name="registration_subtitle_payment">Gezahlter Betrag</string>
+    <string name="registration_subtitle_payment_done">Vollständig Bezahlt</string>
+    <string name="registration_title_payment_done_true">@string/yes</string>
+    <string name="registration_title_payment_done_false">@string/no</string>
+    <string name="registration_subtitle_payment_membership_abatement">Mitgliedsermäßigung</string>
+    <string name="registration_title_payment_membership_abatement_true">@string/yes</string>
+    <string name="registration_title_payment_membership_abatement_false">@string/no</string>
+    <string name="registration_subtitle_payment_other_abatement">Sonstige Ermäßigung</string>
+    <string name="registration_subtitle_payment_time">Geldeingang</string>
+    <string name="registration_title_payment_time">%s</string>
+    <string name="registration_snackbar_person_not_available">Person ist nicht verfügbar</string>
+    <string name="registration_snackbar_event_not_available">Event ist nicht verfügbar</string>
+
     <!-- Album Bottom Sheet -->
     <string name="album_section_general">Allgemein</string>
     <string name="album_section_persons">Personen</string>

@@ -185,6 +185,51 @@
     <string name="event_show_more">Show More</string>
     <string name="event_show_less">Show Less</string>
 
+    <!-- Registration Bottom Sheet -->
+    <string name="registration_title">%s\'s Registration</string>
+    <string name="registration_section_information">General</string>
+    <string name="registration_section_personal">Personal Information</string>
+    <string name="registration_section_transport">Transport</string>
+    <string name="registration_section_payment">Payment</string>
+    <string name="registration_section_additional">Additional Information</string>
+    <string name="registration_subtitle_event">Event</string>
+    <string name="registration_subtitle_person">Person</string>
+    <string name="registration_subtitle_organizer">Organizer</string>
+    <string name="registration_subtitle_status">Registration Status</string>
+    <string name="registration_subtitle_birthday">Birthday</string>
+    <string name="registration_title_birthday">%s</string>
+    <string name="registration_subtitle_gender">Gender</string>
+    <string name="registration_subtitle_mail">Email Address</string>
+    <string name="registration_clip_label_mail">Email Address (%s)</string>
+    <string name="registration_subtitle_address">Address</string>
+    <string name="registration_clip_label_address">Address (%s)</string>
+    <string name="registration_subtitle_phone">Phone Number</string>
+    <string name="registration_clip_label_phone">Phone (%s)</string>
+    <string name="registration_subtitle_time_of_arrival">Time of Arrival</string>
+    <string name="registration_title_time_of_arrival">%s</string>
+    <string name="registration_subtitle_time_of_departure">Time of Departure</string>
+    <string name="registration_title_time_of_departure">%s</string>
+    <string name="registration_subtitle_overnight_stays">Overnight Stays</string>
+    <string name="registration_subtitle_source_station">Arrival Station</string>
+    <string name="registration_subtitle_target_station">Departure Station</string>
+    <string name="registration_subtitle_railcard">Railcard</string>
+    <string name="registration_subtitle_food">Food Preferences</string>
+    <string name="registration_subtitle_notes">Notes</string>
+    <string name="registration_subtitle_talks">Talks</string>
+    <string name="registration_title_payment">%.2f €</string>
+    <string name="registration_subtitle_payment">Paid Amount</string>
+    <string name="registration_subtitle_payment_done">Fully Paid</string>
+    <string name="registration_title_payment_done_true">@string/yes</string>
+    <string name="registration_title_payment_done_false">@string/no</string>
+    <string name="registration_subtitle_payment_membership_abatement">Membership Abatement</string>
+    <string name="registration_title_payment_membership_abatement_true">@string/yes</string>
+    <string name="registration_title_payment_membership_abatement_false">@string/no</string>
+    <string name="registration_subtitle_payment_other_abatement">Other Abatement</string>
+    <string name="registration_subtitle_payment_time">Payment Time</string>
+    <string name="registration_title_payment_time">%s</string>
+    <string name="registration_snackbar_person_not_available">Person is not available</string>
+    <string name="registration_snackbar_event_not_available">Event is not available</string>
+
     <!-- Album Bottom Sheet -->
     <string name="album_section_general">General</string>
     <string name="album_section_persons">Persons</string>

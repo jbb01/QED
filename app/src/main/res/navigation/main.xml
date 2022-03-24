@@ -168,6 +168,9 @@
         <argument
             android:name="id"
             app:argType="long"/>
+        <action
+            android:id="@+id/show_registration"
+            app:destination="@id/nav_registration"/>
     </fragment>
 
     <fragment
@@ -182,6 +185,29 @@
         <argument
             android:name="id"
             app:argType="long"/>
+        <action
+            android:id="@+id/show_registration"
+            app:destination="@id/nav_registration"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_registration"
+        android:name="com.jonahbauer.qed.activities.mainFragments.RegistrationFragment"
+        tools:layout="@layout/fragment_info_registration">
+        <argument
+            android:name="registration"
+            android:defaultValue="@null"
+            app:argType="com.jonahbauer.qed.model.Registration"
+            app:nullable="true" />
+        <argument
+            android:name="id"
+            app:argType="long"/>
+        <action
+            android:id="@+id/show_person"
+            app:destination="@id/nav_person"/>
+        <action
+            android:id="@+id/show_event"
+            app:destination="@id/nav_event"/>
     </fragment>
 
     <dialog

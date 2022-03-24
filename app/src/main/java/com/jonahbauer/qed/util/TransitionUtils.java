@@ -5,6 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
+import androidx.core.app.SharedElementCallback;
 import androidx.core.view.OneShotPreDrawListener;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.DefaultLifecycleObserver;
@@ -17,6 +18,10 @@ import com.google.android.material.transition.MaterialFadeThrough;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.MainActivity;
 import com.jonahbauer.qed.layoutStuff.transition.ActionBarAnimation;
+
+import java.util.List;
+import java.util.Map;
+
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
@@ -116,6 +121,30 @@ public class TransitionUtils {
         // ... and remove it from the non-shared element transition
         var enterTransition = new MaterialFadeThrough();
         fragment.setEnterTransition(enterTransition);
+
+        fragment.setEnterSharedElementCallback(new SharedElementCallback() {
+            @Override
+            public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
+                super.onMapSharedElements(names, sharedElements);
+                if (sharedElements.size() == 0) {
+                    // shared element transition will not run, so we have to add the action bar
+                    // animation to the enter transition again, but only once
+                    enterTransition.addListener(new ActionBarAnimation(fragment, actionBarColor) {
+                        @Override
+                        public void onTransitionCancel(@NonNull Transition transition) {
+                            super.onTransitionCancel(transition);
+                            enterTransition.removeListener(this);
+                        }
+
+                        @Override
+                        public void onTransitionEnd(@NonNull Transition transition) {
+                            super.onTransitionEnd(transition);
+                            enterTransition.removeListener(this);
+                        }
+                    });
+                }
+            }
+        });
 
         var sharedReturnTransition = new MaterialContainerTransform(fragment.requireContext(), true);
         sharedReturnTransition.setFadeMode(MaterialContainerTransform.FADE_MODE_CROSS);

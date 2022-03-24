@@ -4,10 +4,12 @@ import androidx.annotation.NonNull;
 
 import com.jonahbauer.qed.model.Event;
 import com.jonahbauer.qed.model.Person;
+import com.jonahbauer.qed.model.Registration;
 import com.jonahbauer.qed.model.parser.EventListParser;
 import com.jonahbauer.qed.model.parser.EventParser;
 import com.jonahbauer.qed.model.parser.PersonListParser;
 import com.jonahbauer.qed.model.parser.PersonParser;
+import com.jonahbauer.qed.model.parser.RegistrationParser;
 import com.jonahbauer.qed.networking.Feature;
 import com.jonahbauer.qed.networking.NetworkConstants;
 import com.jonahbauer.qed.networking.async.AsyncLoadQEDPage;
@@ -89,4 +91,20 @@ public class QEDDBPages extends QEDPages {
         );
     }
     //</editor-fold>
+
+    @NonNull
+    @CheckReturnValue
+    public static Disposable getRegistration(@NonNull Registration registration, QEDPageReceiver<Registration> registrationReceiver) {
+        AsyncLoadQEDPage network = new AsyncLoadQEDPage(
+                Feature.DATABASE,
+                NetworkConstants.DATABASE_SERVER_REGISTRATION + registration.getId()
+        );
+
+        return run(
+                network,
+                RegistrationParser.INSTANCE,
+                registrationReceiver,
+                registration
+        );
+    }
 }

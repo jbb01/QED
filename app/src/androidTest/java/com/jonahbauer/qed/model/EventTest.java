@@ -44,7 +44,8 @@ public class EventTest {
         var registration = new Registration(1);
         registration.setStatus(Registration.Status.CONFIRMED);
         registration.setOrganizer(true);
-        event.getParticipants().put("Max Mustermann", registration);
+        registration.setPersonName("Max Mustermann");
+        event.getParticipants().add(registration);
 
         return event;
     }

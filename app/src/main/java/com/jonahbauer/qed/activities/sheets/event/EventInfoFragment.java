@@ -1,5 +1,6 @@
 package com.jonahbauer.qed.activities.sheets.event;
 
+import android.app.PendingIntent;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.TypedValue;
@@ -8,7 +9,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import androidx.navigation.NavDeepLinkBuilder;
 import com.jonahbauer.qed.R;
+import com.jonahbauer.qed.activities.MainActivity;
+import com.jonahbauer.qed.activities.mainFragments.EventFragmentArgs;
+import com.jonahbauer.qed.activities.mainFragments.EventFragmentDirections;
+import com.jonahbauer.qed.activities.mainFragments.RegistrationFragmentArgs;
 import com.jonahbauer.qed.activities.sheets.InfoFragment;
 import com.jonahbauer.qed.databinding.FragmentInfoEventBinding;
 import com.jonahbauer.qed.layoutStuff.views.ListItem;
@@ -18,12 +24,13 @@ import com.jonahbauer.qed.model.viewmodel.EventViewModel;
 import com.jonahbauer.qed.util.StatusWrapper;
 import com.jonahbauer.qed.util.Themes;
 
-import java.util.Map;
+import java.util.Collection;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StyleRes;
 import androidx.databinding.BindingAdapter;
+import androidx.navigation.Navigation;
 
 public class EventInfoFragment extends InfoFragment {
     private static final String SAVED_EXPANDED = "expanded";
@@ -142,29 +149,52 @@ public class EventInfoFragment extends InfoFragment {
     }
 
     @BindingAdapter("event_organizers")
-    public static void bindOrganizers(ViewGroup parent, Map<String, Registration> organizers) {
+    public static void bindOrganizers(ViewGroup parent, Collection<Registration> organizers) {
         Context context = parent.getContext();
         parent.removeAllViews();
-        organizers.forEach((name, registration) -> {
+        organizers.forEach(registration -> {
             ListItem item = new ListItem(context);
             item.setIcon(R.drawable.ic_event_orga);
-            item.setTitle(name);
+            item.setTitle(registration.getPersonName());
             item.setSubtitle(R.string.registration_orga);
+            item.setOnClickListener(v -> showRegistration(parent, registration));
             parent.addView(item);
         });
     }
 
     @BindingAdapter("event_participants")
-    public static void bindParticipants(ViewGroup parent, Map<String, Registration> participants) {
+    public static void bindParticipants(ViewGroup parent, Collection<Registration> participants) {
         Context context = parent.getContext();
         parent.removeAllViews();
-        participants.forEach((name, registration) -> {
+        participants.forEach(registration -> {
             if (registration.isOrganizer()) return;
             ListItem item = new ListItem(context);
             item.setIcon(registration.getStatus().toDrawableRes());
-            item.setTitle(name);
+            item.setTitle(registration.getPersonName());
             item.setSubtitle(registration.getStatus().toStringRes());
+            item.setOnClickListener(v -> showRegistration(parent, registration));
             parent.addView(item);
         });
+    }
+
+    private static void showRegistration(View view, Registration registration) {
+        try {
+            var navController = Navigation.findNavController(view);
+
+            var action = EventFragmentDirections.showRegistration(registration.getId());
+            action.setRegistration(registration);
+            navController.navigate(action);
+        } catch (IllegalStateException e) {
+            try {
+                var intent = new NavDeepLinkBuilder(view.getContext())
+                        .setComponentName(MainActivity.class)
+                        .setGraph(R.navigation.main)
+                        .addDestination(R.id.nav_database_events)
+                        .addDestination(R.id.nav_event, new EventFragmentArgs.Builder(registration.getEventId()).setEvent(registration.getEvent()).build().toBundle())
+                        .addDestination(R.id.nav_registration, new RegistrationFragmentArgs.Builder(registration.getId()).setRegistration(registration).build().toBundle())
+                        .createPendingIntent();
+                intent.send();
+            } catch (PendingIntent.CanceledException ignored) {}
+        }
     }
 }

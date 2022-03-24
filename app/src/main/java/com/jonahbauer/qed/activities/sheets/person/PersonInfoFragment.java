@@ -1,5 +1,6 @@
 package com.jonahbauer.qed.activities.sheets.person;
 
+import android.app.PendingIntent;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.TypedValue;
@@ -8,7 +9,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import androidx.navigation.NavDeepLinkBuilder;
 import com.jonahbauer.qed.R;
+import com.jonahbauer.qed.activities.MainActivity;
+import com.jonahbauer.qed.activities.mainFragments.PersonFragmentArgs;
+import com.jonahbauer.qed.activities.mainFragments.PersonFragmentDirections;
+import com.jonahbauer.qed.activities.mainFragments.RegistrationFragmentArgs;
 import com.jonahbauer.qed.activities.sheets.InfoFragment;
 import com.jonahbauer.qed.databinding.FragmentInfoPersonBinding;
 import com.jonahbauer.qed.layoutStuff.views.ListItem;
@@ -19,13 +25,15 @@ import com.jonahbauer.qed.util.Actions;
 import com.jonahbauer.qed.util.StatusWrapper;
 import com.jonahbauer.qed.util.Themes;
 
-import java.util.Map;
+import java.util.Collection;
 import java.util.function.BiConsumer;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StyleRes;
 import androidx.databinding.BindingAdapter;
+import androidx.navigation.Navigation;
+
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMaps;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
@@ -251,16 +259,38 @@ public class PersonInfoFragment extends InfoFragment {
     }
 
     @BindingAdapter("person_registrations")
-    public static void bindRegistrations(ViewGroup parent, Map<String, Registration> registrations) {
+    public static void bindRegistrations(ViewGroup parent, Collection<Registration> registrations) {
         Context context = parent.getContext();
         parent.removeAllViews();
-        registrations.forEach((title, registration) -> {
+        registrations.forEach(registration -> {
             ListItem item = new ListItem(context);
             item.setIcon(R.drawable.ic_person_event);
-            item.setTitle(title);
+            item.setTitle(registration.getEventTitle());
             item.setSubtitle(registration.getStatus().toStringRes());
+            item.setOnClickListener(v -> showRegistration(v, registration));
             parent.addView(item);
             // TODO subtitle orga
         });
+    }
+
+    private static void showRegistration(View view, Registration registration) {
+        try {
+            var navController = Navigation.findNavController(view);
+
+            var action = PersonFragmentDirections.showRegistration(registration.getId());
+            action.setRegistration(registration);
+            navController.navigate(action);
+        } catch (IllegalStateException e) {
+            try {
+                var intent = new NavDeepLinkBuilder(view.getContext())
+                        .setComponentName(MainActivity.class)
+                        .setGraph(R.navigation.main)
+                        .addDestination(R.id.nav_database_persons)
+                        .addDestination(R.id.nav_person, new PersonFragmentArgs.Builder(registration.getPersonId()).setPerson(registration.getPerson()).build().toBundle())
+                        .addDestination(R.id.nav_registration, new RegistrationFragmentArgs.Builder(registration.getId()).setRegistration(registration).build().toBundle())
+                        .createPendingIntent();
+                intent.send();
+            } catch (PendingIntent.CanceledException ignored) {}
+        }
     }
 }

@@ -12,6 +12,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import com.jonahbauer.qed.model.parcel.ParcelExtensions;
+import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenCustomHashSet;
 import lombok.Data;
 
 @Data
@@ -36,9 +37,9 @@ public class Event implements Comparable<Event>, Parcelable {
 
     private String emailOrga;
     private String emailAll;
-    private final Map<String, Registration> participants = new LinkedHashMap<>();
+    private final Set<Registration> participants = new ObjectLinkedOpenCustomHashSet<>(Registration.STRATEGY_ID);
 
-    private transient Map<String, Registration> organizers;
+    private transient List<Registration> organizers;
     // hash code of participants map for calculated organizers
     private transient int organizersValid = 0;
 
@@ -73,11 +74,11 @@ public class Event implements Comparable<Event>, Parcelable {
         return entries.stream().collect(Collectors.joining(", ", "{", "}"));
     }
 
-    public Map<String, Registration> getOrganizers() {
+    public List<Registration> getOrganizers() {
         if (organizers == null || organizersValid != participants.hashCode()) {
-            organizers = participants.entrySet().stream()
-                                     .filter(entry -> entry.getValue().isOrganizer())
-                                     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+            organizers = participants.stream()
+                                     .filter(Registration::isOrganizer)
+                                     .collect(Collectors.toList());
             organizersValid = participants.hashCode();
         }
 
@@ -121,12 +122,7 @@ public class Event implements Comparable<Event>, Parcelable {
         dest.writeString(emailOrga);
         dest.writeString(emailAll);
 
-        dest.writeInt(participants.size());
-        for (Map.Entry<String, Registration> entry : participants.entrySet()) {
-            dest.writeString(entry.getKey());
-            dest.writeTypedObject(entry.getValue(), flags);
-        }
-
+        ParcelExtensions.writeTypedCollection(dest, participants);
         ParcelExtensions.writeInstant(dest, loaded);
     }
 
@@ -155,13 +151,7 @@ public class Event implements Comparable<Event>, Parcelable {
             event.emailOrga = source.readString();
             event.emailAll = source.readString();
 
-            int participantCount = source.readInt();
-            for (int i = 0; i < participantCount; i++) {
-                event.participants.put(
-                        source.readString(),
-                        source.readTypedObject(Registration.CREATOR)
-                );
-            }
+            ParcelExtensions.readTypedCollection(source, event.participants, Registration.CREATOR);
 
             event.loaded = ParcelExtensions.readInstant(source);
 

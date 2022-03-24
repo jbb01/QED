@@ -52,6 +52,7 @@
                 <data android:host="qeddb.qed-verein.de"/>
                 <data android:pathPattern="/people/..*"/>
                 <data android:pathPattern="/events/..*"/>
+                <data android:pathPattern="/registrations/..*"/>
             </intent-filter>
         </activity>
 

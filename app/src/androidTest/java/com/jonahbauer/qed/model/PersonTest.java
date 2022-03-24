@@ -52,7 +52,8 @@ public class PersonTest {
         var registration = new Registration(1);
         registration.setStatus(Registration.Status.CONFIRMED);
         registration.setOrganizer(true);
-        person.getEvents().put("Musterveranstaltung", registration);
+        registration.setEventTitle("Musterveranstaltung");
+        person.getEvents().add(registration);
 
         return person;
     }

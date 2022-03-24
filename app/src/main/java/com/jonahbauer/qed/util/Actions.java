@@ -20,9 +20,11 @@ import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.sheets.event.EventInfoBottomSheet;
 import com.jonahbauer.qed.activities.sheets.message.MessageInfoBottomSheet;
 import com.jonahbauer.qed.activities.sheets.person.PersonInfoBottomSheet;
+import com.jonahbauer.qed.activities.sheets.registration.RegistrationInfoBottomSheet;
 import com.jonahbauer.qed.model.Event;
 import com.jonahbauer.qed.model.Message;
 import com.jonahbauer.qed.model.Person;
+import com.jonahbauer.qed.model.Registration;
 import com.jonahbauer.qed.networking.NetworkConstants;
 
 import java.time.LocalTime;
@@ -149,31 +151,43 @@ public class Actions {
     }
 
     public static EventInfoBottomSheet showInfoSheet(@NonNull Fragment fragment, @NonNull Event event) {
-        EventInfoBottomSheet sheet = EventInfoBottomSheet.newInstance(event);
+        var sheet = EventInfoBottomSheet.newInstance(event);
         sheet.show(fragment.getParentFragmentManager(), sheet.getTag());
         return sheet;
     }
 
     public static EventInfoBottomSheet showInfoSheet(@NonNull FragmentActivity activity, @NonNull Event event, @Nullable String tag) {
-        EventInfoBottomSheet sheet = EventInfoBottomSheet.newInstance(event);
+        var sheet = EventInfoBottomSheet.newInstance(event);
         sheet.show(activity.getSupportFragmentManager(), tag);
         return sheet;
     }
 
     public static PersonInfoBottomSheet showInfoSheet(@NonNull Fragment fragment, @NonNull Person person) {
-        PersonInfoBottomSheet sheet = PersonInfoBottomSheet.newInstance(person);
+        var sheet = PersonInfoBottomSheet.newInstance(person);
         sheet.show(fragment.getParentFragmentManager(), sheet.getTag());
         return sheet;
     }
 
     public static PersonInfoBottomSheet showInfoSheet(@NonNull FragmentActivity activity, @NonNull Person person, @Nullable String tag) {
-        PersonInfoBottomSheet sheet = PersonInfoBottomSheet.newInstance(person);
+        var sheet = PersonInfoBottomSheet.newInstance(person);
+        sheet.show(activity.getSupportFragmentManager(), tag);
+        return sheet;
+    }
+
+    public static RegistrationInfoBottomSheet showInfoSheet(@NonNull Fragment fragment, @NonNull Registration registration) {
+        var sheet = RegistrationInfoBottomSheet.newInstance(registration);
+        sheet.show(fragment.getParentFragmentManager(), sheet.getTag());
+        return sheet;
+    }
+
+    public static RegistrationInfoBottomSheet showInfoSheet(@NonNull FragmentActivity activity, @NonNull Registration registration, @Nullable String tag) {
+        var sheet = RegistrationInfoBottomSheet.newInstance(registration);
         sheet.show(activity.getSupportFragmentManager(), tag);
         return sheet;
     }
 
     public static MessageInfoBottomSheet showInfoSheet(@NonNull Fragment fragment, @NonNull Message message) {
-        MessageInfoBottomSheet sheet = MessageInfoBottomSheet.newInstance(message);
+        var sheet = MessageInfoBottomSheet.newInstance(message);
         sheet.show(fragment.getParentFragmentManager(), sheet.getTag());
         return sheet;
     }

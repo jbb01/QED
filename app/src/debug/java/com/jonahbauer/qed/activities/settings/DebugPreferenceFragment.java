@@ -11,6 +11,7 @@ import com.jonahbauer.qed.util.Debug;
 public class DebugPreferenceFragment extends AbstractPreferenceFragment implements PreferenceFragment, Preference.OnPreferenceClickListener {
     private Preference mPersonInfoSheet;
     private Preference mEventInfoSheet;
+    private Preference mRegistrationInfoSheet;
     private Preference mAlbumInfoSheet;
     private Preference mMessageInfoSheet;
 
@@ -25,6 +26,10 @@ public class DebugPreferenceFragment extends AbstractPreferenceFragment implemen
         mEventInfoSheet = findPreference("eventInfoSheet");
         assert mEventInfoSheet != null;
         mEventInfoSheet.setOnPreferenceClickListener(this);
+
+        mRegistrationInfoSheet = findPreference("registrationInfoSheet");
+        assert mRegistrationInfoSheet != null;
+        mRegistrationInfoSheet.setOnPreferenceClickListener(this);
 
         mAlbumInfoSheet = findPreference("albumInfoSheet");
         assert mAlbumInfoSheet != null;
@@ -42,6 +47,9 @@ public class DebugPreferenceFragment extends AbstractPreferenceFragment implemen
             return true;
         } else if (preference == mEventInfoSheet) {
             Actions.showInfoSheet(this, Debug.dummyEvent());
+            return true;
+        } else if (preference == mRegistrationInfoSheet) {
+            Actions.showInfoSheet(this, Debug.dummyRegistration());
             return true;
         } else if (preference == mAlbumInfoSheet) {
             AlbumInfoBottomSheet sheet = AlbumInfoBottomSheet.newInstance(Debug.dummyAlbum());

@@ -10,15 +10,14 @@ import androidx.core.util.Pair;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.jonahbauer.qed.model.parcel.ParcelExtensions;
+import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenCustomHashSet;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
@@ -85,7 +84,7 @@ public class Person implements Parcelable {
     // Pair of type and number/name
     private final Set<Pair<String, String>> contacts = new LinkedHashSet<>();
     private final Set<String> addresses = new LinkedHashSet<>();
-    private final Map<String, Registration> events = new LinkedHashMap<>();
+    private final Set<Registration> events = new ObjectLinkedOpenCustomHashSet<>(Registration.STRATEGY_ID);
 
     public String getFullName() {
         if (fullName != null && (firstName == null || lastName == null)) {
@@ -147,7 +146,7 @@ public class Person implements Parcelable {
         if (dateOfJoining != null) entries.add( "\"memberSince\":\"" + dateOfJoining + "\"");
         if (!contacts.isEmpty()) entries.add( "\"contacts\":" + contacts.stream().map(number -> "{\"note\":\"" + number.first + "\", \"number\":\"" + number.second + "\"}").collect(Collectors.joining(", ", "[", "]")));
         if (!addresses.isEmpty()) entries.add( "\"addresses\":" + addresses);
-        if (!events.isEmpty()) entries.add( "\"events\":" + events.entrySet().stream().map(event -> "{\"event\":\"" + event.getKey() + "\", \"registration\":\"" + event.getValue() + "\"}").collect(Collectors.joining(", ", "[", "]")));
+        if (!events.isEmpty()) entries.add( "\"events\":" + events.stream().map(String::valueOf).collect(Collectors.joining(", ", "[", "]")));
         return entries.stream().collect(Collectors.joining(", ", "{", "}"));
     }
 
@@ -193,12 +192,7 @@ public class Person implements Parcelable {
         }
 
         ParcelExtensions.writeStringCollection(dest, addresses);
-
-        dest.writeInt(events.size());
-        for (Map.Entry<String, Registration> event : events.entrySet()) {
-            dest.writeString(event.getKey());
-            dest.writeTypedObject(event.getValue(), flags);
-        }
+        ParcelExtensions.writeTypedCollection(dest, events);
     }
 
     public static final Parcelable.Creator<Person> CREATOR = new Parcelable.Creator<>() {
@@ -243,14 +237,7 @@ public class Person implements Parcelable {
             }
 
             ParcelExtensions.readStringCollection(source, person.addresses);
-
-            int eventCount = source.readInt();
-            for (int i = 0; i < eventCount; i++) {
-                person.events.put(
-                        source.readString(),
-                        source.readTypedObject(Registration.CREATOR)
-                );
-            }
+            ParcelExtensions.readTypedCollection(source, person.events, Registration.CREATOR);
 
             return person;
         }

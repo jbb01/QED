@@ -9,10 +9,7 @@ import com.jonahbauer.qed.model.Message;
 import com.jonahbauer.qed.model.Person;
 import com.jonahbauer.qed.model.Registration;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 
 import lombok.experimental.UtilityClass;
 
@@ -46,20 +43,24 @@ public class Debug {
 
         registration = new Registration(-1);
         registration.setStatus(Registration.Status.OPEN);
-        person.getEvents().put("Akademie 2021", registration);
+        registration.setEventTitle("Akademie 2021");
+        person.getEvents().add(registration);
 
         registration = new Registration(-1);
         registration.setStatus(Registration.Status.CONFIRMED);
-        person.getEvents().put("Musterstadt 2020", registration);
+        registration.setEventTitle("Musterstadt 2020");
+        person.getEvents().add(registration);
 
         registration = new Registration(-1);
         registration.setStatus(Registration.Status.CANCELLED);
-        person.getEvents().put("Musterstadt 2019", registration);
+        registration.setEventTitle("Musterstadt 2019");
+        person.getEvents().add(registration);
 
         registration = new Registration(-1);
         registration.setStatus(Registration.Status.CONFIRMED);
         registration.setOrganizer(true);
-        person.getEvents().put("Testseminar", registration);
+        registration.setEventTitle("Testseminar");
+        person.getEvents().add(registration);
 
         return person;
     }
@@ -90,12 +91,14 @@ public class Debug {
         registration = new Registration(-1);
         registration.setStatus(Registration.Status.CONFIRMED);
         registration.setOrganizer(true);
-        event.getParticipants().put("Max Mustermann", registration);
+        registration.setPersonName("Max Mustermann");
+        event.getParticipants().add(registration);
 
         registration = new Registration(-1);
         registration.setStatus(Registration.Status.OPEN);
         registration.setOrganizer(true);
-        event.getParticipants().put("Erika Musterfrau", registration);
+        registration.setPersonName("Erika Musterfrau");
+        event.getParticipants().add(registration);
 
         for (int i = 0; i < 10; i++) {
             registration = new Registration(-1);
@@ -104,7 +107,8 @@ public class Debug {
                             : Math.random() > 0 ? Registration.Status.CONFIRMED
                             : Registration.Status.CANCELLED
             );
-            event.getParticipants().put("Testteilnehmer " + i, registration);
+            registration.setPersonName("Testteilnehmer " + i);
+            event.getParticipants().add(registration);
         }
 
         return event;
@@ -143,6 +147,44 @@ public class Debug {
                 "",
                 0
         );
+    }
+
+    public static Registration dummyRegistration() {
+        var registration = new Registration(-1);
+        registration.setStatus(Registration.Status.OPEN);
+        registration.setOrganizer(true);
+
+        registration.setEventId(0);
+        registration.setEventTitle("Musterveranstaltung");
+
+        registration.setPersonId(0);
+        registration.setPersonName("Max Mustermann");
+        registration.setPersonBirthday(LocalDate.now());
+        registration.setPersonBirthdayString("01.01.2000");
+        registration.setPersonGender("männlich");
+        registration.setPersonMail("max.mustermann@example.com");
+        registration.setPersonAddress("Musterstraße 10\n12345 Musterstadt");
+        registration.setPersonPhone("0123456789");
+
+        registration.setTimeOfArrival(LocalDate.of(2020, 1, 1).atStartOfDay(ZoneId.of("Europe/Berlin")).toInstant());
+        registration.setTimeOfArrivalString("01.01.2020 00:00");
+        registration.setTimeOfDeparture(LocalDate.of(2020, 1, 4).atStartOfDay(ZoneId.of("Europe/Berlin")).toInstant());
+        registration.setTimeOfDepartureString("04.01.2020 00:00");
+        registration.setSourceStation("Musterstadt HBF");
+        registration.setTargetStation("Musterstadt HBF");
+        registration.setRailcard("50");
+        registration.setOvernightStays(3);
+
+        registration.setPaymentAmount(100d);
+        registration.setPaymentDone(true);
+        registration.setPaymentTime(LocalDate.of(2020, 1, 30));
+        registration.setPaymentTimeString("30.01.2020");
+        registration.setMemberAbatement(true);
+        registration.setOtherAbatement(null);
+
+        registration.setLoaded(Instant.now());
+
+        return registration;
     }
 
     public static String loremIpsum() {
