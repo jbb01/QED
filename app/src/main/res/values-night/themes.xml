@@ -15,7 +15,7 @@
         <item name="colorOnSecondary">@android:color/black</item>
 
         <item name="android:colorBackground">@color/colorBackgroundNight</item>
-        <item name="android:colorBackgroundFloating">@color/colorBackgroundNight</item>
+        <item name="colorBackgroundFloating">@color/colorBackgroundNight</item>
         <item name="colorOnBackground">@android:color/white</item>
         <item name="colorOnBackgroundVariant">@android:color/darker_gray</item>
 

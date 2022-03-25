@@ -78,7 +78,7 @@ public class AlbumViewModel extends AndroidViewModel {
     }
 
     private void loadInternet(@NonNull Album album, @Nullable Filter filter) {
-        Callback callback = new Callback(filter != null && filter.isEmpty());
+        Callback callback = new Callback(filter != null && !filter.isEmpty());
         mDisposable.add(
                 QEDGalleryPages.getAlbum(album, filter, callback)
         );
