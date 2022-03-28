@@ -176,7 +176,7 @@ public class ImageAdapter extends ArrayAdapter<Image> {
     @Override
     public long getItemId(int position) {
         var item = getItem(position);
-        return item != null ? item.getId() : -1;
+        return item != null ? item.getId() : Image.NO_ID;
     }
 
     @Override

@@ -113,7 +113,7 @@ public class PersonAdapter extends FixedHeaderAdapter<Person, Character> {
     @Override
     public long getItemId(int position) {
         var item = getItem(position);
-        return item != null ? item.getId() : -1;
+        return item != null ? item.getId() : Person.NO_ID;
     }
 
     @Override

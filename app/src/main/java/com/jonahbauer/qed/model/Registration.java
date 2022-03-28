@@ -20,6 +20,7 @@ import lombok.ToString;
 
 @Data
 public class Registration implements Parcelable {
+    public static final long NO_ID = Long.MIN_VALUE;
     private final long id;
 
     private Status status;
@@ -32,11 +33,11 @@ public class Registration implements Parcelable {
     private transient Event event;
 
     // Event
-    private long eventId;
+    private long eventId = Event.NO_ID;
     private String eventTitle;
 
     // Person
-    private long personId;
+    private long personId = Person.NO_ID;
     private String personName;
     private LocalDate personBirthday;
     private String personBirthdayString;
@@ -95,7 +96,7 @@ public class Registration implements Parcelable {
     }
 
     public Person getPerson() {
-        if (person == null && personId != 0) {
+        if (person == null && personId != Person.NO_ID) {
             person = new Person(personId);
             person.setFullName(personName);
             person.setBirthday(personBirthday);
@@ -116,7 +117,7 @@ public class Registration implements Parcelable {
     }
 
     public Event getEvent() {
-        if (event == null && eventId != 0) {
+        if (event == null && eventId != Event.NO_ID) {
             event = new Event(eventId);
             event.setTitle(eventTitle);
         }

@@ -15,14 +15,13 @@ import com.jonahbauer.qed.model.parcel.ParcelExtensions;
 import com.jonahbauer.qed.model.room.Converters;
 
 import java.time.Instant;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import it.unimi.dsi.fastutil.objects.ObjectSet;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -31,6 +30,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(of = "id")
 @TypeConverters(Converters.class)
 public class Image implements Parcelable {
+    public static final long NO_ID = Long.MIN_VALUE;
     public static final Set<String> VIDEO_FILE_EXTENSIONS;
     public static final Set<String> AUDIO_FILE_EXTENSIONS;
 
@@ -52,25 +52,8 @@ public class Image implements Parcelable {
     public static final String DATA_KEY_RESOLUTION = "resolution";
 
     static {
-        HashSet<String> videoFileExtensions = new HashSet<>();
-        videoFileExtensions.add("mp4");
-        videoFileExtensions.add("mkv");
-        videoFileExtensions.add("flv");
-        videoFileExtensions.add("mov");
-        videoFileExtensions.add("avi");
-        videoFileExtensions.add("wmv");
-        videoFileExtensions.add("mpeg");
-        videoFileExtensions.add("webm");
-        VIDEO_FILE_EXTENSIONS = Collections.unmodifiableSet(videoFileExtensions);
-
-        HashSet<String> audioFileExtensions = new HashSet<>();
-        audioFileExtensions.add("wav");
-        audioFileExtensions.add("mp3");
-        audioFileExtensions.add("ogg");
-        audioFileExtensions.add("m4a");
-        audioFileExtensions.add("flac");
-        audioFileExtensions.add("opus");
-        AUDIO_FILE_EXTENSIONS = Collections.unmodifiableSet(audioFileExtensions);
+        VIDEO_FILE_EXTENSIONS = ObjectSet.of("mp4", "mkv", "flv", "mov", "avi", "wmv", "mpeg", "webm");
+        AUDIO_FILE_EXTENSIONS = ObjectSet.of("wav", "mp3", "ogg", "m4a", "flac", "opus");
     }
 
     @PrimaryKey
@@ -137,7 +120,7 @@ public class Image implements Parcelable {
     @NonNull
     public String toString() {
         LinkedList<String> entries = new LinkedList<>();
-        if (id != -1) entries.add("\"id\":" + id);
+        if (id != NO_ID) entries.add("\"id\":" + id);
         if (format != null) entries.add("\"format\":\"" + format + "\"");
         if (path != null) entries.add("\"path\":\"" + path + "\"");
         if (name != null) entries.add("\"name\":\"" + name + "\"");
@@ -148,7 +131,7 @@ public class Image implements Parcelable {
         entries.add("\"loaded\":" + loaded);
         if (!data.isEmpty()) entries.add(data.entrySet().stream().map(e -> "\"" + e.getKey() + "\":\"" + e.getValue() + "\"").collect(Collectors.joining(",")));
         if (albumName != null) entries.add("\"albumName\":\"" + albumName + "\"");
-        if (albumId != -1) entries.add("\"albumId\":" + albumId);
+        if (albumId != Album.NO_ID) entries.add("\"albumId\":" + albumId);
         return entries.stream().collect(Collectors.joining(", ", "{", "}"));
     }
 

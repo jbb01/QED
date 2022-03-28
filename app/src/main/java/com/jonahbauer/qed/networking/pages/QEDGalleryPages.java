@@ -12,6 +12,7 @@ import com.jonahbauer.qed.model.parser.AlbumParser;
 import com.jonahbauer.qed.model.parser.ImageParser;
 import com.jonahbauer.qed.networking.Feature;
 import com.jonahbauer.qed.networking.NetworkConstants;
+import com.jonahbauer.qed.networking.Reason;
 import com.jonahbauer.qed.networking.async.AsyncLoadQEDPage;
 import com.jonahbauer.qed.networking.async.AsyncLoadQEDPageToImage;
 import com.jonahbauer.qed.networking.async.AsyncLoadQEDPageToStream;
@@ -52,6 +53,11 @@ public class QEDGalleryPages extends QEDPages {
     @NonNull
     @CheckReturnValue
     public static Disposable getAlbum(@NonNull Album album, @Nullable Album.Filter filter, QEDPageReceiver<Album> albumReceiver) {
+        if (album.getId() == Album.NO_ID) {
+            albumReceiver.onError(album, Reason.NOT_FOUND, null);
+            return Disposable.disposed();
+        }
+
         String filterString = "";
         if (filter != null && !filter.isEmpty()) {
             album = new Album(album.getId());
@@ -74,6 +80,11 @@ public class QEDGalleryPages extends QEDPages {
     @NonNull
     @CheckReturnValue
     public static Disposable getImageInfo(@NonNull Image image, QEDPageReceiver<Image> imageInfoReceiver) {
+        if (image.getId() == Image.NO_ID) {
+            imageInfoReceiver.onError(image, Reason.NOT_FOUND, null);
+            return Disposable.disposed();
+        }
+
         AsyncLoadQEDPage network = new AsyncLoadQEDPage(
                 Feature.GALLERY,
                 NetworkConstants.GALLERY_SERVER_IMAGE_INFO + image.getId()
@@ -90,6 +101,11 @@ public class QEDGalleryPages extends QEDPages {
     @NonNull
     @CheckReturnValue
     public static <T> Disposable getImage(@NonNull T tag, @NonNull Image image, @NonNull Mode mode, @NonNull OutputStream outputStream, QEDPageStreamReceiver<T> imageReceiver) {
+        if (image.getId() == Image.NO_ID) {
+            imageReceiver.onError(tag, Reason.NOT_FOUND, null);
+            return Disposable.disposed();
+        }
+
         AsyncLoadQEDPageToStream network = new AsyncLoadQEDPageToStream(
                 Feature.GALLERY,
                 String.format(NetworkConstants.GALLERY_SERVER_IMAGE, mode.mQuery, image.getId()),
@@ -106,6 +122,10 @@ public class QEDGalleryPages extends QEDPages {
     @NonNull
     @CheckReturnValue
     public static Single<Optional<Bitmap>> getThumbnail(@NonNull Image image) {
+        if (image.getId() == Image.NO_ID) {
+            return Single.error(new NullPointerException());
+        }
+
         AsyncLoadQEDPageToImage network = new AsyncLoadQEDPageToImage(
                 Feature.GALLERY,
                 String.format(NetworkConstants.GALLERY_SERVER_IMAGE, Mode.THUMBNAIL.mQuery, image.getId())

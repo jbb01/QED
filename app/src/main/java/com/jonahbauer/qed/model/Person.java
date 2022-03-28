@@ -25,6 +25,7 @@ import lombok.Setter;
 
 @Data
 public class Person implements Parcelable {
+    public static final long NO_ID = Long.MIN_VALUE;
     public static final Comparator<Person> COMPARATOR_FIRST_NAME = Comparator.nullsLast(Comparator.comparing(
             person -> {
                 if (person.mComparableFirstName == null) {
@@ -140,9 +141,9 @@ public class Person implements Parcelable {
         if (email != null) entries.add( "\"email\":\"" + email + "\"");
         if (homeStation != null) entries.add( "\"homeStation\":\"" + homeStation + "\"");
         if (railcard != null) entries.add( "\"railcard\":\"" + railcard + "\"");
-        if (id != -1) entries.add( "\"id\":" + id);
-        entries.add( "\"member\":" + member);
-        entries.add( "\"active\":" + active);
+        if (id != NO_ID) entries.add( "\"id\":" + id);
+        if (member != null) entries.add( "\"member\":" + member);
+        if (active != null) entries.add( "\"active\":" + active);
         if (dateOfJoining != null) entries.add( "\"memberSince\":\"" + dateOfJoining + "\"");
         if (!contacts.isEmpty()) entries.add( "\"contacts\":" + contacts.stream().map(number -> "{\"note\":\"" + number.first + "\", \"number\":\"" + number.second + "\"}").collect(Collectors.joining(", ", "[", "]")));
         if (!addresses.isEmpty()) entries.add( "\"addresses\":" + addresses);

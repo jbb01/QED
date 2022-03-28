@@ -12,6 +12,7 @@ import com.jonahbauer.qed.model.parser.PersonParser;
 import com.jonahbauer.qed.model.parser.RegistrationParser;
 import com.jonahbauer.qed.networking.Feature;
 import com.jonahbauer.qed.networking.NetworkConstants;
+import com.jonahbauer.qed.networking.Reason;
 import com.jonahbauer.qed.networking.async.AsyncLoadQEDPage;
 import com.jonahbauer.qed.networking.async.QEDPageReceiver;
 
@@ -28,6 +29,11 @@ public class QEDDBPages extends QEDPages {
     @NonNull
     @CheckReturnValue
     public static Disposable getEvent(@NonNull Event event, QEDPageReceiver<Event> eventReceiver) {
+        if (event.getId() == Event.NO_ID) {
+            eventReceiver.onError(event, Reason.NOT_FOUND, null);
+            return Disposable.disposed();
+        }
+
         AsyncLoadQEDPage network = new AsyncLoadQEDPage(
                 Feature.DATABASE,
                 NetworkConstants.DATABASE_SERVER_EVENT + event.getId()
@@ -62,6 +68,11 @@ public class QEDDBPages extends QEDPages {
     @NonNull
     @CheckReturnValue
     public static Disposable getPerson(@NonNull Person person, QEDPageReceiver<Person> personReceiver) {
+        if (person.getId() == Person.NO_ID) {
+            personReceiver.onError(person, Reason.NOT_FOUND, null);
+            return Disposable.disposed();
+        }
+
         AsyncLoadQEDPage network = new AsyncLoadQEDPage(
                 Feature.DATABASE,
                 NetworkConstants.DATABASE_SERVER_PERSON + person.getId()
@@ -95,6 +106,11 @@ public class QEDDBPages extends QEDPages {
     @NonNull
     @CheckReturnValue
     public static Disposable getRegistration(@NonNull Registration registration, QEDPageReceiver<Registration> registrationReceiver) {
+        if (registration.getId() == Registration.NO_ID) {
+            registrationReceiver.onError(registration, Reason.NOT_FOUND, null);
+            return Disposable.disposed();
+        }
+
         AsyncLoadQEDPage network = new AsyncLoadQEDPage(
                 Feature.DATABASE,
                 NetworkConstants.DATABASE_SERVER_REGISTRATION + registration.getId()

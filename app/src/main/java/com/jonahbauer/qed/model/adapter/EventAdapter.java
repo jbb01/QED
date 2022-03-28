@@ -128,7 +128,7 @@ public class EventAdapter extends ArrayAdapter<Event> implements SectionIndexer 
     @Override
     public long getItemId(int position) {
         var item = getItem(position);
-        return item != null ? item.getId() : -1;
+        return item != null ? item.getId() : Event.NO_ID;
     }
 
     @Override

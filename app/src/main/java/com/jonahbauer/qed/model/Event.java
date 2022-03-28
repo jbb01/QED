@@ -17,6 +17,8 @@ import lombok.Data;
 
 @Data
 public class Event implements Comparable<Event>, Parcelable {
+    public static final long NO_ID = Long.MIN_VALUE;
+
     private final long id;
     private String title;
     private Double cost;
@@ -65,7 +67,7 @@ public class Event implements Comparable<Event>, Parcelable {
         if (deadlineString != null) entries.add( "\"deadline\":\"" + deadlineString + "\"");
         if (cost != null) entries.add( "\"cost\":" + cost);
         if (maxParticipants != null) entries.add( "\"maxMember\":" + maxParticipants);
-        if (id != -1) entries.add( "\"id\":" + id);
+        if (id != NO_ID) entries.add( "\"id\":" + id);
         if (hotel != null) entries.add( "\"hotel\":\"" + hotel + "\"");
         if (hotelAddress != null) entries.add( "\"hotelAddress\":\"" + hotelAddress + "\"");
         if (emailOrga != null) entries.add( "\"emailOrga\":\"" + emailOrga + "\"");

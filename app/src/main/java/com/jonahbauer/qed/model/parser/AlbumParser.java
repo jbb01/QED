@@ -92,7 +92,7 @@ public final class AlbumParser extends HtmlParser<Album> {
             if (matcher.find()) {
                 image = new Image(Long.parseLong(matcher.group(1)));
             } else {
-                image = new Image(-1);
+                image = new Image(Image.NO_ID);
             }
 
             image.setName(img.attr("alt"));
@@ -129,7 +129,7 @@ public final class AlbumParser extends HtmlParser<Album> {
                                     //noinspection ConstantConditions
                                     person = new Person(Long.parseLong(matcher.group(1)));
                                 } else {
-                                    person = new Person(-1);
+                                    person = new Person(Person.NO_ID);
                                 }
 
                                 // extract name

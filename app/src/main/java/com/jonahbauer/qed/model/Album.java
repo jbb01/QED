@@ -31,6 +31,7 @@ import lombok.Data;
 @Entity
 @TypeConverters(Converters.class)
 public class Album implements Parcelable {
+    public static final long NO_ID = Long.MIN_VALUE;
     public static final String CATEGORY_ETC = "Sonstige";
 
     @PrimaryKey
@@ -74,7 +75,7 @@ public class Album implements Parcelable {
     @Override
     public String toString() {
         LinkedList<String> entries = new LinkedList<>();
-        if (id != -1) entries.add("\"id\":" + id);
+        if (id != NO_ID) entries.add("\"id\":" + id);
         if (name != null) entries.add("\"name\":\"" + name + "\"");
         if (owner != null) entries.add("\"owner\":\"" + owner + "\"");
         if (creationDate != null) entries.add("\"creationDate\":\"" + creationDate + "\"");

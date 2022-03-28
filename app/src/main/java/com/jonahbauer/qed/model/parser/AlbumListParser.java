@@ -39,7 +39,7 @@ public final class AlbumListParser extends HtmlParser<List<Album>> {
                             //noinspection ConstantConditions
                             album = new Album(Long.parseLong(matcher.group(1)));
                         } else {
-                            album = new Album(-1);
+                            album = new Album(Album.NO_ID);
                         }
 
                         album.setName(a.text());

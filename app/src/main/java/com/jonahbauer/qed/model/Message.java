@@ -52,6 +52,7 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
             .withLocale(Locale.GERMANY)
             .withZone(NetworkConstants.SERVER_TIME_ZONE);
 
+    public static final long NO_ID = -1;
     public static final Message PONG = new Message(0, "PONG", "PONG", Instant.EPOCH, 0, "PONG", "000000", "PONG", 0);
     public static final Message PING = new Message(0, "PING", "PING", Instant.EPOCH, 0, "PING", "000000", "PING", 0);
     public static final Message ACK = new Message(0, "ACK", "ACK", Instant.EPOCH, 0, "ACK", "000000", "ACK", 0);
@@ -232,8 +233,8 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
                     String color = json.getString("color");
                     String dateStr = json.getString("date");
                     String channel = json.getString("channel");
-                    int userid = json.optInt("user_id", -1);
-                    int id = json.getInt("id");
+                    long userid = json.optLong("user_id", Person.NO_ID);
+                    long id = json.optLong("id", NO_ID);
                     int bottag = json.getInt("bottag");
 
                     Instant date;

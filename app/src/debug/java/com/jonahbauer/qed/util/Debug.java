@@ -16,7 +16,7 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class Debug {
     public static Person dummyPerson() {
-        Person person = new Person(-1);
+        Person person = new Person(Person.NO_ID);
         person.setFirstName("Max");
         person.setLastName("Mustermann");
         person.setUsername("MaxMustermann");
@@ -41,32 +41,36 @@ public class Debug {
 
         Registration registration;
 
-        registration = new Registration(-1);
+        registration = new Registration(Registration.NO_ID);
         registration.setStatus(Registration.Status.OPEN);
         registration.setEventTitle("Akademie 2021");
+        registration.setPerson(person);
         person.getEvents().add(registration);
 
-        registration = new Registration(-1);
+        registration = new Registration(Registration.NO_ID);
         registration.setStatus(Registration.Status.CONFIRMED);
         registration.setEventTitle("Musterstadt 2020");
+        registration.setPerson(person);
         person.getEvents().add(registration);
 
-        registration = new Registration(-1);
+        registration = new Registration(Registration.NO_ID);
         registration.setStatus(Registration.Status.CANCELLED);
         registration.setEventTitle("Musterstadt 2019");
+        registration.setPerson(person);
         person.getEvents().add(registration);
 
-        registration = new Registration(-1);
+        registration = new Registration(Registration.NO_ID);
         registration.setStatus(Registration.Status.CONFIRMED);
         registration.setOrganizer(true);
         registration.setEventTitle("Testseminar");
+        registration.setPerson(person);
         person.getEvents().add(registration);
 
         return person;
     }
 
     public static Event dummyEvent() {
-        Event event = new Event(-1);
+        Event event = new Event(Event.NO_ID);
         event.setTitle("Musterveranstaltung");
         event.setCost(200d);
         event.setNotes("Raum für Notizen");
@@ -88,26 +92,29 @@ public class Debug {
         event.setEmailOrga("musterveranstaltung@example.org");
 
         Registration registration;
-        registration = new Registration(-1);
+        registration = new Registration(Registration.NO_ID);
         registration.setStatus(Registration.Status.CONFIRMED);
         registration.setOrganizer(true);
         registration.setPersonName("Max Mustermann");
+        registration.setEvent(event);
         event.getParticipants().add(registration);
 
-        registration = new Registration(-1);
+        registration = new Registration(Registration.NO_ID);
         registration.setStatus(Registration.Status.OPEN);
         registration.setOrganizer(true);
         registration.setPersonName("Erika Musterfrau");
+        registration.setEvent(event);
         event.getParticipants().add(registration);
 
         for (int i = 0; i < 10; i++) {
-            registration = new Registration(-1);
+            registration = new Registration(Registration.NO_ID);
             registration.setStatus(
                     Math.random() > 0.5 ? Registration.Status.OPEN
                             : Math.random() > 0 ? Registration.Status.CONFIRMED
                             : Registration.Status.CANCELLED
             );
             registration.setPersonName("Testteilnehmer " + i);
+            registration.setEvent(event);
             event.getParticipants().add(registration);
         }
 
@@ -115,7 +122,7 @@ public class Debug {
     }
 
     public static Album dummyAlbum() {
-        Album album = new Album(-1);
+        Album album = new Album(Album.NO_ID);
         album.setName("Album");
         album.setOwner("Max Mustermann");
         album.setCreationDate("01.01.2000");
@@ -130,7 +137,7 @@ public class Debug {
             album.getDates().add(LocalDate.of(2000, 1, i));
         }
         for (int i = 0; i < 10; i++) {
-            album.getImages().add(new Image(-1));
+            album.getImages().add(new Image(Image.NO_ID));
         }
         return album;
     }
@@ -150,14 +157,14 @@ public class Debug {
     }
 
     public static Registration dummyRegistration() {
-        var registration = new Registration(-1);
+        var registration = new Registration(Registration.NO_ID);
         registration.setStatus(Registration.Status.OPEN);
         registration.setOrganizer(true);
 
-        registration.setEventId(0);
+        registration.setEventId(Event.NO_ID);
         registration.setEventTitle("Musterveranstaltung");
 
-        registration.setPersonId(0);
+        registration.setPersonId(Person.NO_ID);
         registration.setPersonName("Max Mustermann");
         registration.setPersonBirthday(LocalDate.now());
         registration.setPersonBirthdayString("01.01.2000");
