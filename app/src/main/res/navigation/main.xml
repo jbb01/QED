@@ -135,15 +135,26 @@
         tools:layout="@layout/fragment_image">
         <argument
             android:name="image"
+            android:defaultValue="@null"
             app:argType="com.jonahbauer.qed.model.Image"
-            app:nullable="false"/>
+            app:nullable="true"/>
+        <argument
+            android:name="id"
+            app:argType="long"/>
         <argument
             android:name="album"
+            android:defaultValue="@null"
             app:argType="com.jonahbauer.qed.model.Album"
-            app:nullable="false"/>
+            app:nullable="true"/>
         <action
             android:id="@+id/show_image_info"
             app:destination="@id/nav_image_info"/>
+        <deepLink
+            android:id="@+id/deep_link_image_view"
+            app:uri="qedgallery.qed-verein.de/image_view.php?imageid={id}" />
+        <deepLink
+            android:id="@+id/deep_link_image"
+            app:uri="qedgallery.qed-verein.de/image.php?imageid={id}" />
     </fragment>
 
     <fragment

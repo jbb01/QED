@@ -406,7 +406,9 @@ public class AlbumFragment extends Fragment implements CompoundButton.OnCheckedC
         var extras = new FragmentNavigator.Extras.Builder()
                 .addSharedElement(view.findViewById(R.id.thumbnail), getString(R.string.transition_name_image_fragment_image))
                 .build();
-        var action = AlbumFragmentDirections.showImage(image, mAlbum);
+        var action = AlbumFragmentDirections.showImage(image.getId());
+        action.setImage(image);
+        action.setAlbum(mAlbum);
         Navigation.findNavController(view).navigate(action, extras);
 
         // TODO oneshot transitions

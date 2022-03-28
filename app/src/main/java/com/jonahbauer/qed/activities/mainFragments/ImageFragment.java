@@ -22,9 +22,10 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.DefaultLifecycleObserver;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
-import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
@@ -79,26 +80,14 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
 
         mImageAdapter = new ImageAdapter();
 
-        Bundle args = getArguments();
-        if (args != null) {
-            if (args.containsKey(NavController.KEY_DEEP_LINK_INTENT)) {
-                Intent intent = (Intent) args.get(NavController.KEY_DEEP_LINK_INTENT);
-                Image image = parseIntent(intent);
-                if (image != null) {
-                    mImage = image;
-                    mImageAdapter.submitList(Collections.singletonList(image));
-                }
-            }
+        ImageFragmentArgs args = ImageFragmentArgs.fromBundle(getArguments());
+        mImage = args.getImage();
+        if (mImage == null) mImage = new Image(args.getId());
 
-            if (mImage == null) {
-                ImageFragmentArgs imageArgs = ImageFragmentArgs.fromBundle(args);
-                mImage = imageArgs.getImage();
-                mImageAdapter.submitList(imageArgs.getAlbum().getImages());
-            }
-        }
-
-        if (mImage == null) {
-            mImage = new Image(0);
+        var album = args.getAlbum();
+        if (album != null) {
+            mImageAdapter.submitList(album.getImages());
+        } else {
             mImageAdapter.submitList(Collections.singletonList(mImage));
         }
 
@@ -141,6 +130,15 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
         reenterTransition.setDuration(duration);
         reenterTransition.addListener(new ActionBarAnimation(this, Color.BLACK, false));
         setReenterTransition(reenterTransition);
+
+        getLifecycle().addObserver(new DefaultLifecycleObserver() {
+            @Override
+            public void onResume(@NonNull LifecycleOwner owner) {
+                var activity = (MainActivity) requireActivity();
+                activity.setActionBarColor(Color.BLACK);
+                activity.getSupportActionBar().hide();
+            }
+        });
     }
 
     @Nullable
@@ -351,7 +349,7 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
                            .getSavedStateHandle()
                            .set(AlbumFragment.IMAGE_ID_KEY, mImage.getId());
         } catch (Exception e) {
-            Log.e(LOG_TAG, "Could not save image id on backstack.", e);
+            Log.w(LOG_TAG, "Could not save image id on backstack.", e);
         }
     }
 
@@ -375,23 +373,6 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
     private void downloadOriginal(int position) {
         ImageViewHolder viewHolder = mImageAdapter.getViewHolderByPosition(position);
         viewHolder.downloadOriginal();
-    }
-
-    private Image parseIntent(Intent intent) {
-        if (intent == null) return null;
-
-        Uri uri = intent.getData();
-        if (uri == null) return null;
-
-        String idStr = uri.getQueryParameter("imageid");
-        if (idStr != null) {
-            try {
-                long id = Long.parseLong(idStr);
-                return new Image(id);
-            } catch (NumberFormatException ignored) {}
-        }
-
-        return null;
     }
 
     @Nullable
