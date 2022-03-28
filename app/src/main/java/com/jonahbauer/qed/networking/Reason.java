@@ -8,6 +8,7 @@ import androidx.room.rxjava3.EmptyResultSetException;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.networking.exceptions.InvalidCredentialsException;
 import com.jonahbauer.qed.networking.exceptions.LowMemoryException;
+import com.jonahbauer.qed.networking.parser.HtmlParseException;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -30,7 +31,9 @@ public enum Reason {
 
     @NonNull
     public static Reason guess(Throwable throwable) {
-        if (throwable instanceof InvalidCredentialsException) {
+        if (throwable instanceof HtmlParseException) {
+            return ((HtmlParseException) throwable).getReason();
+        } else if (throwable instanceof InvalidCredentialsException) {
             return UNABLE_TO_LOG_IN;
         } else if (throwable instanceof FileNotFoundException) {
             return NOT_FOUND;

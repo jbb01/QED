@@ -74,6 +74,7 @@
             <com.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:visibility="@{(event.start != null || event.startString != null) &amp;&amp; (event.end != null || event.endString != null)}"
                 android:onClick="@{(view) -> Actions.recordToCalendar(view.context, event)}"
                 app:icon="@drawable/ic_event_time"
                 app:title="@{@string/event_title_time(TimeUtils.format(event.start) ?? event.startString, TimeUtils.format(event.end) ?? event.endString)}"

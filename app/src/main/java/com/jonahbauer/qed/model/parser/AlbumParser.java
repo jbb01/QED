@@ -75,7 +75,7 @@ public final class AlbumParser extends HtmlParser<Album> {
         Element error = document.selectFirst(".error");
         if (error != null) {
             if (error.text().contains("AlbumNotFoundException")) {
-                throw new HtmlParseException(Reason.NOT_FOUND.toString());
+                throw new HtmlParseException(Reason.NOT_FOUND);
             } else {
                 throw new HtmlParseException();
             }

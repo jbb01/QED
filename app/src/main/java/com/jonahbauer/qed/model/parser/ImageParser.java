@@ -6,9 +6,12 @@ import androidx.annotation.NonNull;
 
 import com.jonahbauer.qed.model.Image;
 import com.jonahbauer.qed.networking.NetworkConstants;
+import com.jonahbauer.qed.networking.Reason;
+import com.jonahbauer.qed.networking.parser.HtmlParseException;
 import com.jonahbauer.qed.networking.parser.HtmlParser;
 
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
@@ -48,6 +51,7 @@ public final class ImageParser extends HtmlParser<Image> {
     @NonNull
     @Override
     protected Image parse(@NonNull Image image, Document document) {
+        checkError(document);
         image.setName(document.select("main div div b").text());
 
         String href = document.select("main > div:nth-child(3) > a")
@@ -120,6 +124,17 @@ public final class ImageParser extends HtmlParser<Image> {
         });
 
         return image;
+    }
+
+    private void checkError(Document document) {
+        Element error = document.selectFirst(".error");
+        if (error != null) {
+            if (error.text().contains("Zugriff verweigert")) {
+                throw new HtmlParseException(Reason.NOT_FOUND);
+            } else {
+                throw new HtmlParseException();
+            }
+        }
     }
 
     protected static Instant parseInstant(@NonNull String date) {
