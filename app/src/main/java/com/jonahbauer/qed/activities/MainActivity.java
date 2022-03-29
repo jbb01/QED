@@ -1,5 +1,6 @@
 package com.jonahbauer.qed.activities;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -90,6 +91,7 @@ public class MainActivity extends AppCompatActivity implements NetworkListener, 
         navigationView.setNavigationItemSelectedListener(item -> {
             var destination = item.getItemId();
 
+            @SuppressLint("RestrictedApi")
             var first = mNavController.getBackQueue().firstOrNull();
             var options = new NavOptions.Builder();
             if (mTopLevelDestinations.contains(destination) && first != null) {

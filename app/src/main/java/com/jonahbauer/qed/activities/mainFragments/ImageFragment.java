@@ -44,6 +44,7 @@ import com.jonahbauer.qed.util.TransitionUtils;
 import com.jonahbauer.qed.util.ViewUtils;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectList;
 
 import java.io.File;
 import java.lang.ref.SoftReference;
@@ -84,9 +85,9 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
         mImage = args.getImage();
         if (mImage == null) mImage = new Image(args.getId());
 
-        var album = args.getAlbum();
-        if (album != null) {
-            mImageAdapter.submitList(album.getImages());
+        var imageList = args.getImageList();
+        if (imageList != null && imageList.length > 0) {
+            mImageAdapter.submitList(ObjectList.of(imageList));
         } else {
             mImageAdapter.submitList(Collections.singletonList(mImage));
         }

@@ -408,7 +408,7 @@ public class AlbumFragment extends Fragment implements CompoundButton.OnCheckedC
                 .build();
         var action = AlbumFragmentDirections.showImage(image.getId());
         action.setImage(image);
-        action.setAlbum(mAlbum);
+        action.setImageList(mImageAdapter.getImages().toArray(new Image[0]));
         Navigation.findNavController(view).navigate(action, extras);
 
         // TODO oneshot transitions

@@ -142,9 +142,9 @@
             android:name="id"
             app:argType="long"/>
         <argument
-            android:name="album"
+            android:name="imageList"
             android:defaultValue="@null"
-            app:argType="com.jonahbauer.qed.model.Album"
+            app:argType="com.jonahbauer.qed.model.Image[]"
             app:nullable="true"/>
         <action
             android:id="@+id/show_image_info"
