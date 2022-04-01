@@ -33,6 +33,11 @@
             app:useSimpleSummaryProvider="true"
             android:icon="@drawable/ic_settings_channel" />
 
+        <Preference
+            android:icon="@drawable/ic_settings_colorful_messages"
+            android:key="@string/preferences_chat_color_key"
+            android:title="@string/preferences_chat_color_title" />
+
     </PreferenceCategory>
 
     <PreferenceCategory

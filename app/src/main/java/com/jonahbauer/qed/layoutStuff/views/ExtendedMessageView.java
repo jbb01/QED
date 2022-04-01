@@ -186,7 +186,7 @@ public class ExtendedMessageView extends LinearLayout implements MessageView {
         setChannel(MessageView.formatChannel(context, message.getChannel()));
         setTimestamp(message.getDate());
 
-        var color = ColorStateList.valueOf(message.getTransformedColor());
+        var color = ColorStateList.valueOf(message.getColor(getContext()));
         setNameColor(color);
         if (mColorful) setMessageColor(color);
     }

@@ -390,6 +390,7 @@
     <string name="preferences_chat_group_appearance">Darstellung</string>
     <string name="preferences_chat_name_title">Name</string>
     <string name="preferences_chat_channel_title">Channel</string>
+    <string name="preferences_chat_color_title">Farbe</string>
     <string name="preferences_chat_sense_title">Sinn anzeigen</string>
     <string name="preferences_chat_public_id_title">Öffentliche ID</string>
     <string name="preferences_chat_linkify_title">Links anzeigen</string>
@@ -410,4 +411,22 @@
     <string name="preferences_gallery_confirm_delete_thumbnails">Möchtest du wirklich alle gespeicherten Thumbnails löschen?</string>
     <string name="preferences_gallery_confirm_delete_images">Möchtest du wirklich alle gespeicherten Bilder löschen?</string>
     <string name="preferences_gallery_confirm_delete_gallery_database">Möchtest du wirklich die Galerie-Datenbank löschen?</string>
+
+    <!-- Color Dialog -->
+    <string name="red">Rot</string>
+    <string name="green">Grün</string>
+    <string name="blue">Blau</string>
+    <string name="color_picker_delta_e">ΔE = %.2f</string>
+    <string name="color_picker_calculate">Berechnen</string>
+    <string name="color_picker_help">
+        Mit diesem Dialog kannst du die Farbe deiner Nachrichten im Chat anpassen, ohne den Namen sichtbar zu verändern.
+        Da die Farbe vom MD5-Hash des Namens abhängt, kann sie durch Anhängen von Whitespaces an den Namen verändert
+        werden. Jeder Druck auf \"Berechnen\" sorgt für eine bessere Approximation der ausgewählten Farbe, benötigt dafür aber
+        immer mehr Zeit. Mit \"OK\" wird die aktuelle Approximation angewendet.
+        \n\nDie eher ungewöhnliche Form der Farbauswahl kommt daher, dass die RGB-Werte der Farbe wegen des dunklen
+        Hintergrunds (auf der Website) alle mindestens 100 betragen müssen. Das ist bei einer Farbauswahl von
+        RGB-Werten zwar trivial zu implementieren, im HSV-Farbraum braucht es allerdings etwas schwarze Magie.
+    </string>
+    <string name="color_picker_help_hint">Hilfe</string>
+    <string name="color_picker_mode_hint">Modus wechseln</string>
 </resources>

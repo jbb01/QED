@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <import type="com.jonahbauer.qed.util.Colors" />
+        <import type="android.view.View" />
+        <import type="com.jonahbauer.qed.activities.ColorPickerDialogFragment" />
+
+        <variable name="color" type="int" />
+        <variable name="calculatedColor" type="int" />
+        <variable name="name" type="CharSequence" />
+        <variable name="mode" type="int" />
+        <variable name="deltaE" type="double" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.jonahbauer.qed.layoutStuff.views.ChatColorPicker
+                android:id="@+id/color_picker"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="@{mode == ColorPickerDialogFragment.MODE_HSV ? View.VISIBLE : View.GONE, default = visible}"
+                android:padding="12dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:ringWidth="36dp"/>
+
+            <TableLayout
+                android:id="@+id/rgb_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="12dp"
+                app:layout_constraintTop_toBottomOf="@id/info"
+                app:layout_constraintBottom_toTopOf="@id/toggle_mode"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:visibility="@{mode == ColorPickerDialogFragment.MODE_RGB ? View.VISIBLE : View.GONE}"
+                android:orientation="vertical">
+                <TableRow
+                    android:gravity="center_vertical">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/red"
+                        android:textAppearance="?textAppearanceBody1"/>
+
+                    <SeekBar
+                        android:id="@+id/seek_bar_red"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:paddingVertical="8dp"
+                        android:thumbTint="#f00"
+                        android:progressBackgroundTint="#f00"
+                        android:progressTint="#f00"
+                        android:max="155"
+                        android:progress="55"/>
+                </TableRow>
+
+                <TableRow
+                    android:gravity="center_vertical">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/green"
+                        android:textAppearance="?textAppearanceBody1"/>
+
+                    <SeekBar
+                        android:id="@+id/seek_bar_green"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:paddingVertical="8dp"
+                        android:thumbTint="#0f0"
+                        android:progressBackgroundTint="#0f0"
+                        android:progressTint="#0f0"
+                        android:max="155"
+                        android:progress="120"/>
+                </TableRow>
+
+                <TableRow
+                    android:gravity="center_vertical">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/blue"
+                        android:textAppearance="?textAppearanceBody1"/>
+
+                    <SeekBar
+                        android:id="@+id/seek_bar_blue"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:paddingVertical="8dp"
+                        android:thumbTint="#00f"
+                        android:progressBackgroundTint="#00f"
+                        android:progressTint="#00f"
+                        android:max="155"
+                        android:progress="35"/>
+                </TableRow>
+            </TableLayout>
+
+            <ImageButton
+                android:id="@+id/info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:padding="12dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_color_picker_help"
+                android:contentDescription="@string/color_picker_help_hint"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:tint="?attr/colorControlNormal" />
+
+            <ImageButton
+                android:id="@+id/toggle_mode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:padding="12dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@{mode == ColorPickerDialogFragment.MODE_RGB ? @drawable/ic_color_picker_input_mode_hsv : @drawable/ic_color_picker_input_mode_rgb, default = @drawable/ic_color_picker_input_mode_rgb}"
+                android:contentDescription="@string/color_picker_mode_hint"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:tint="?attr/colorControlNormal" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@color/colorSurfaceNight"
+            android:orientation="vertical">
+            <TableRow
+                android:padding="1dp">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:padding="8dp"
+                    android:textSize="20sp"
+                    android:text="@{name}"
+                    android:textColor="@{color}"
+                    android:textAppearance="@style/TextAppearance.App.Message.Name"
+                    android:background="@color/colorSurfaceNight"
+                    android:singleLine="true"
+                    tools:text="@tools:sample/full_names"/>
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="1dp"
+                    android:padding="8dp"
+                    android:textSize="20sp"
+                    android:text="@{name}"
+                    android:textColor="@{calculatedColor}"
+                    android:textAppearance="@style/TextAppearance.App.Message.Name"
+                    android:background="@color/colorSurfaceNight"
+                    android:singleLine="true"
+                    tools:text="@tools:sample/full_names"/>
+            </TableRow>
+
+            <TableRow
+                android:padding="1dp">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:padding="8dp"
+                    android:textSize="20sp"
+                    android:text="@{name}"
+                    android:textColor="@{Colors.transformColor(color)}"
+                    android:textAppearance="@style/TextAppearance.App.Message.Name"
+                    android:background="@color/colorSurface"
+                    android:singleLine="true"
+                    tools:text="@tools:sample/full_names"/>
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="1dp"
+                    android:padding="8dp"
+                    android:textSize="20sp"
+                    android:text="@{name}"
+                    android:textColor="@{Colors.transformColor(calculatedColor)}"
+                    android:textAppearance="@style/TextAppearance.App.Message.Name"
+                    android:background="@color/colorSurface"
+                    android:singleLine="true"
+                    tools:text="@tools:sample/full_names"/>
+            </TableRow>
+        </TableLayout>
+
+        <TextView
+            android:id="@+id/delta_e"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:textAlignment="textEnd"
+            android:text="@{Double.isNaN(deltaE) ? `` : @string/color_picker_delta_e(deltaE)}"/>
+    </LinearLayout>
+</layout>

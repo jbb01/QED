@@ -30,7 +30,6 @@ import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 
 public class MessageAdapter extends ArrayAdapter<Message> {
     private final Context mContext;
@@ -133,7 +132,8 @@ public class MessageAdapter extends ArrayAdapter<Message> {
         lp.width = mKatex ? LayoutParams.MATCH_PARENT : LayoutParams.WRAP_CONTENT;
         binding.message.setLayoutParams(lp);
 
-        if (position == 0 || message.getLocalDate().isAfter(getItem(position - 1).getLocalDate())) {
+        var previousMessage = position == 0 ? null : getItem(position - 1);
+        if (previousMessage == null || message.getLocalDate().isAfter(previousMessage.getLocalDate())) {
             binding.messageDateBanner.setVisibility(View.VISIBLE);
             binding.messageDateBanner.setText(formatBanner(message.getLocalDate()));
         } else {
@@ -199,16 +199,15 @@ public class MessageAdapter extends ArrayAdapter<Message> {
     }
 
     @Override
-    @NonNull
-    @SuppressWarnings("ConstantConditions")
+    @Nullable
     public Message getItem(int position) {
         return super.getItem(position);
     }
 
     @Override
     public long getItemId(int position) {
-        Objects.checkIndex(position, getCount());
-        return getItem(position).getId();
+        var item = getItem(position);
+        return item != null ? item.getId() : Message.NO_ID;
     }
 
     @Override
@@ -244,8 +243,8 @@ public class MessageAdapter extends ArrayAdapter<Message> {
         MathView.extractAndPreload(
                 mContext,
                 message.getMessage(),
-                (int) mDefaultTextSize,
-                mColorful ? message.getTransformedColor() : mDefaultTextColor,
+                mDefaultTextSize,
+                mColorful ? message.getColor(getContext()) : mDefaultTextColor,
                 mathPreload
         );
     }

@@ -3,16 +3,20 @@ package com.jonahbauer.qed.activities.settings;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.preference.Preference;
-import androidx.preference.PreferenceManager;
-import androidx.preference.SwitchPreference;
+
 import com.google.android.material.snackbar.Snackbar;
 import com.jonahbauer.qed.R;
+import com.jonahbauer.qed.activities.ColorPickerDialogFragment;
 import com.jonahbauer.qed.layoutStuff.SeekBarPreference;
 import com.jonahbauer.qed.model.room.Database;
 import com.jonahbauer.qed.util.Preferences;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.preference.EditTextPreference;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceManager;
+import androidx.preference.SwitchPreference;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
@@ -21,13 +25,18 @@ public class ChatPreferenceFragment extends AbstractPreferenceFragment implement
     private static final String[] MAX_SHOWN_ROWS_STRING_VALUES = {"10.000", "20.000", "50.000", "100.000", "200.000", "500.000", "\u221E"};
 
     private Preference deleteDatabase;
+    private EditTextPreference name;
     private SwitchPreference katex;
     private SwitchPreference links;
+    private Preference color;
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.preferences_chat, rootKey);
         setHasOptionsMenu(true);
+
+        name = findPreference(Preferences.chat().keys().name());
+        assert name != null;
 
         katex = findPreference(Preferences.chat().keys().katex());
         assert katex != null;
@@ -40,6 +49,10 @@ public class ChatPreferenceFragment extends AbstractPreferenceFragment implement
         deleteDatabase = findPreference(Preferences.chat().keys().dbClear());
         assert deleteDatabase != null;
         deleteDatabase.setOnPreferenceClickListener(this);
+
+        color = findPreference(Preferences.chat().keys().color());
+        assert color != null;
+        color.setOnPreferenceClickListener(this);
 
         SeekBarPreference maxShownRows = findPreference(Preferences.chat().keys().dbMaxResults());
         assert maxShownRows != null;
@@ -67,6 +80,10 @@ public class ChatPreferenceFragment extends AbstractPreferenceFragment implement
             });
             alertDialog.show();
             return true;
+        } else if (preference == color) {
+            var dialog = new ColorPickerDialogFragment();
+            dialog.show(getChildFragmentManager(), null);
+            dialog.setOnDismissListener(() -> name.setText(Preferences.chat().getName()));
         }
         return false;
     }

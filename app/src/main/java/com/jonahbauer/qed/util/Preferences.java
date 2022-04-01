@@ -110,6 +110,7 @@ public class Preferences {
     public static class Chat {
         private final String KEY_NAME;
         private final String KEY_CHANNEL;
+        private final String KEY_COLOR;
         private final String KEY_SENSE;
         private final String KEY_PUBLIC_ID;
         private final String KEY_LINKIFY;
@@ -123,6 +124,7 @@ public class Preferences {
         private Chat(Resources resources) {
             KEY_NAME = resources.getString(R.string.preferences_chat_name_key);
             KEY_CHANNEL = resources.getString(R.string.preferences_chat_channel_key);
+            KEY_COLOR = resources.getString(R.string.preferences_chat_color_key);
             KEY_SENSE = resources.getString(R.string.preferences_chat_sense_key);
             KEY_PUBLIC_ID = resources.getString(R.string.preferences_chat_public_id_key);
             KEY_LINKIFY = resources.getString(R.string.preferences_chat_linkify_key);
@@ -184,6 +186,10 @@ public class Preferences {
 
             public String channel() {
                 return KEY_CHANNEL;
+            }
+
+            public String color() {
+                return KEY_COLOR;
             }
 
             public String sense() {

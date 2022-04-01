@@ -269,6 +269,7 @@
     <!-- Preference Keys -->
     <string name="preferences_chat_name_key" translatable="false">chat.name</string>
     <string name="preferences_chat_channel_key" translatable="false">chat.channel</string>
+    <string name="preferences_chat_color_key" translatable="false">chat.color</string>
     <string name="preferences_chat_sense_key" translatable="false">chat.show_sense</string>
     <string name="preferences_chat_public_id_key" translatable="false">chat.public_id</string>
     <string name="preferences_chat_linkify_key" translatable="false">chat.linkify</string>
@@ -311,6 +312,7 @@
     <string name="preferences_chat_group_appearance">Appearance</string>
     <string name="preferences_chat_name_title">Name</string>
     <string name="preferences_chat_channel_title">Channel</string>
+    <string name="preferences_chat_color_title">Color</string>
     <string name="preferences_chat_sense_title">Show Sense</string>
     <string name="preferences_chat_public_id_title">Public ID</string>
     <string name="preferences_chat_linkify_title">Show Links</string>
@@ -459,6 +461,24 @@
     <string name="image_info_owner">Owner</string>
     <string name="image_info_upload_date">Uploaded Date</string>
     <string name="image_info_number_of_calls">Number of Calls</string>
+
+    <!-- Color Dialog -->
+    <string name="red">Red</string>
+    <string name="green">Green</string>
+    <string name="blue">Blue</string>
+    <string name="color_picker_delta_e">ΔE = %.2f</string>
+    <string name="color_picker_calculate">Calculate</string>
+    <string name="color_picker_help">
+        This dialog allows you to pick the color of your chat messages without visibly changing the name.
+        Since the color depends on the MD5 hash of the name this can be achieved by prepending the name with
+        whitespaces. Every press on the \"Calculate\" button results in a better approximation of the desired color
+        but takes longer to compute. You can apply the current approximation using \"OK\".
+        \n\nThe somewhat unusual shape of the color picker comes from the constraint that the RGB values of the color
+        have to be at least 100 because of the dark background (on the website). Being trivial to implement for RGB
+        color pickers, this poses a challenge in the HSV color space, thus requiring a bit of black magic.
+    </string>
+    <string name="color_picker_help_hint">Help</string>
+    <string name="color_picker_mode_hint">Toggle Mode</string>
 
     <!-- Sonstiges -->
 

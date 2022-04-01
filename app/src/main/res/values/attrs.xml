@@ -118,6 +118,21 @@
         <attr name="iconTint" />
     </declare-styleable>
 
+    <attr name="chatColorPickerStyle" format="reference"/>
+    <declare-styleable name="ChatColorPicker">
+        <attr name="hue" format="float"/>
+        <attr name="saturation" format="float"/>
+        <attr name="value" format="float"/>
+
+        <attr name="hueCursor" format="reference"/>
+        <attr name="hueCursorTint" format="reference|color"/>
+
+        <attr name="satValCursor" format="reference"/>
+        <attr name="satValCursorTint" format="reference|color"/>
+
+        <attr name="ringWidth" format="dimension"/>
+    </declare-styleable>
+
     <attr name="dividerStyle" format="reference"/>
     <attr name="triCheckboxStyle" format="reference"/>
 

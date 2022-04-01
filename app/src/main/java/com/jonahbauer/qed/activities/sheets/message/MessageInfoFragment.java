@@ -37,7 +37,7 @@ public class MessageInfoFragment extends InfoFragment {
         mBinding = FragmentInfoMessageBinding.inflate(inflater, container, false);
         mMessageViewModel.getMessage().observe(getViewLifecycleOwner(), messageStatusWrapper -> {
             mBinding.setMessage(messageStatusWrapper.getValue());
-            mBinding.setColor(messageStatusWrapper.getValue().getTransformedColor());
+            mBinding.setColor(messageStatusWrapper.getValue().getColor(requireContext()));
         });
         return mBinding.getRoot();
     }
@@ -53,7 +53,7 @@ public class MessageInfoFragment extends InfoFragment {
 
     @Override
     public int getColor() {
-        return getMessage().getTransformedColor();
+        return getMessage().getColor(requireContext());
     }
 
     @Override

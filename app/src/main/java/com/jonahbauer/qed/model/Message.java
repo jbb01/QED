@@ -1,5 +1,7 @@
 package com.jonahbauer.qed.model;
 
+import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -17,7 +19,7 @@ import androidx.room.TypeConverters;
 import com.jonahbauer.qed.model.parcel.ParcelExtensions;
 import com.jonahbauer.qed.model.room.Converters;
 import com.jonahbauer.qed.networking.NetworkConstants;
-import com.jonahbauer.qed.util.Preferences;
+import com.jonahbauer.qed.util.Colors;
 
 import org.jetbrains.annotations.Contract;
 import org.json.JSONException;
@@ -96,15 +98,17 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
     private final int bottag;
 
     @Ignore
-    @ColorInt
-    private final int transformedColor;
-
-    @Ignore
     @Getter(AccessLevel.PRIVATE)
     private final boolean error;
 
+    @Ignore
+    private final transient @ColorInt int colorInt;
+
+    @Ignore
+    private final transient @ColorInt int transformedColorInt;
+
     public static Message newErrorMessage(@NonNull String message) {
-        return new Message(Long.MAX_VALUE, "Error", message, Instant.now(), 503, "Error", "220000", "", 0, Color.RED, true);
+        return new Message(Long.MAX_VALUE, "Error", message, Instant.now(), 503, "Error", "FF0000", "", 0, true);
     }
 
     public Message(long id,
@@ -117,7 +121,7 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
                    @NonNull String channel,
                    int bottag
     ) {
-        this(id, rawName, message, date, userId, userName, color, channel, bottag, transformColor(color), false);
+        this(id, rawName, message, date, userId, userName, color, channel, bottag, false);
     }
 
     @Ignore
@@ -130,7 +134,6 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
                    @NonNull String color,
                    @NonNull String channel,
                    int bottag,
-                   @ColorInt int transformedColor,
                    boolean error
     ) {
         this.id = id;
@@ -143,8 +146,18 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
         this.color = color;
         this.channel = channel;
         this.bottag = bottag;
-        this.transformedColor = transformedColor;
         this.error = error;
+        
+        int colorInt, transformedColorInt;
+        try {
+            colorInt = Color.parseColor("#" + color);
+            transformedColorInt = Colors.transformColor(colorInt);
+        } catch (IllegalArgumentException e) {
+            colorInt = Color.WHITE;
+            transformedColorInt = Color.BLACK;
+        }
+        this.colorInt = colorInt;
+        this.transformedColorInt = transformedColorInt;
     }
 
     @NonNull
@@ -187,6 +200,15 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
 
     public boolean isAnonymous() {
         return name.isEmpty();
+    }
+
+    public @ColorInt int getColor(@NonNull Context context) {
+        var config = context.getResources().getConfiguration();
+        if ((config.uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES) {
+            return colorInt;
+        } else {
+            return transformedColorInt;
+        }
     }
 
     public int compareTo(Message other) {
@@ -256,26 +278,6 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
         }
     }
 
-    @ColorInt
-    private static int transformColor(String color) {
-        return transformColor(Color.parseColor("#" + color));
-    }
-
-    @ColorInt
-    private static int transformColor(int color) {
-        if (Preferences.general().isNightMode()) {
-            return color;
-        } else {
-            float[] hsv = new float[3];
-            Color.colorToHSV(color, hsv);
-
-            hsv[1] = 1;
-            hsv[2] = 0.85f;
-
-            return Color.HSVToColor(hsv);
-        }
-    }
-
     @Override
     public int describeContents() {
         return 0;
@@ -292,7 +294,6 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
         dest.writeString(color);
         dest.writeString(channel);
         dest.writeInt(bottag);
-        dest.writeInt(transformedColor);
         ParcelExtensions.writeBoolean(dest, error);
     }
 
@@ -309,10 +310,9 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
             var color = Objects.requireNonNull(source.readString());
             var channel = Objects.requireNonNull(source.readString());
             var bottag = source.readInt();
-            var transformedColor = source.readInt();
             var error = ParcelExtensions.readBoolean(source);
 
-            return new Message(id, rawName, message, date, userId, userName, color, channel, bottag, transformedColor, error);
+            return new Message(id, rawName, message, date, userId, userName, color, channel, bottag, error);
         }
 
         @Override

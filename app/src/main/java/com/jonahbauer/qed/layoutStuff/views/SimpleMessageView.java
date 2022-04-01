@@ -277,9 +277,9 @@ public class SimpleMessageView extends ConstraintLayout implements MessageView {
 
     @Override
     public void setMessage(Message message) {
-        var color = message.getTransformedColor();
-        setNameColor(ColorStateList.valueOf(color));
-        if (mColorful) setMessageColor(ColorStateList.valueOf(color));
+        var color = ColorStateList.valueOf(message.getColor(getContext()));
+        setNameColor(color);
+        if (mColorful) setMessageColor(color);
 
         setName(MessageView.formatName(getContext(), message.getName(), message.getUserName()));
         setMessage(message.getMessage());

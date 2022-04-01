@@ -75,6 +75,16 @@
         <item name="android:textColor">?colorOnSurface</item>
     </style>
 
+    <style name="Widget.App.ChatColorPicker" parent="">
+        <item name="hueCursor">@drawable/ic_color_picker_hue_cursor</item>
+        <item name="hueCursorTint">?colorControlNormal</item>
+
+        <item name="satValCursor">@drawable/ic_color_picker_sat_val_cursor</item>
+        <item name="satValCursorTint">?colorControlNormal</item>
+
+        <item name="ringWidth">30dp</item>
+    </style>
+
     <!-- TextAppearance -->
     <style name="TextAppearance.App.Button" parent="android:TextAppearance.Material.Button">
         <item name="android:textColor">?colorSecondary</item>

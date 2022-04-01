@@ -50,7 +50,7 @@ public class MessageInfoBottomSheet extends InfoBottomSheet {
 
     @Override
     public int getColor() {
-        return getMessage().getTransformedColor();
+        return getMessage().getColor(requireContext());
     }
 
     @Override
