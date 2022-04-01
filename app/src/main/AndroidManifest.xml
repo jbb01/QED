@@ -60,8 +60,7 @@
         <activity
             android:name=".activities.MainActivity"
             android:hardwareAccelerated="true"
-            android:label="@string/app_name"
-            android:launchMode="standard"
+            android:launchMode="singleTask"
             android:theme="@style/Theme.App.SplashScreen"
             android:windowSoftInputMode="adjustResize|stateHidden"
             android:exported="true">

@@ -38,7 +38,7 @@ public class ColorPickerViewModel extends ViewModel {
         if (!Objects.equals(mName, name.trim())) {
             mName = name.trim();
             var color = Colors.getColorForName(name);
-            mResult.setValue(Pair.create(mName, color));
+            mResult.setValue(Pair.create(name, color));
             setColor(color);
         }
     }
