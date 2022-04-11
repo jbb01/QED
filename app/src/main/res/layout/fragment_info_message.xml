@@ -6,6 +6,7 @@
         <import type="com.jonahbauer.qed.util.Actions"/>
         <import type="com.jonahbauer.qed.util.TimeUtils"/>
         <import type="com.jonahbauer.qed.model.Message"/>
+        <import type="com.jonahbauer.qed.model.Person"/>
 
         <variable name="color" type="int" />
         <variable name="message" type="com.jonahbauer.qed.model.Message" />
@@ -47,7 +48,7 @@
             <com.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{message.userId != Message.NO_ID}"
+                android:visibility="@{message.userId != Person.NO_ID}"
                 android:onLongClick="@{v -> Actions.copy(context, v, @string/message_clip_label_username, message.userName)}"
                 app:icon="@drawable/ic_message_username"
                 app:title="@{@string/message_title_username(message.userName, message.userId)}"
