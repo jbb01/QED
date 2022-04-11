@@ -2,7 +2,6 @@ package com.jonahbauer.qed.activities.mainFragments;
 
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.graphics.drawable.Animatable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -10,22 +9,23 @@ import android.view.*;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.app.SharedElementCallback;
 import androidx.core.view.OneShotPreDrawListener;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
-import androidx.navigation.fragment.FragmentNavigator;
-import androidx.navigation.fragment.NavHostFragment;
-import androidx.transition.Fade;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.android.material.transition.Hold;
 import com.jonahbauer.qed.R;
+import com.jonahbauer.qed.activities.imageActivity.ImageActivity;
+import com.jonahbauer.qed.activities.imageActivity.ImageFragmentArgs;
 import com.jonahbauer.qed.databinding.FragmentAlbumBinding;
 import com.jonahbauer.qed.layoutStuff.CustomArrayAdapter;
-import com.jonahbauer.qed.layoutStuff.transition.ActionBarAnimation;
 import com.jonahbauer.qed.model.Album;
 import com.jonahbauer.qed.model.Album.Filter;
 import com.jonahbauer.qed.model.Image;
@@ -43,8 +43,8 @@ import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-public class AlbumFragment extends Fragment implements CompoundButton.OnCheckedChangeListener, AdapterView.OnItemClickListener {
-    public static final String IMAGE_ID_KEY = "imageId";
+public class AlbumFragment extends Fragment implements CompoundButton.OnCheckedChangeListener, AdapterView.OnItemClickListener, OnActivityReenterListener {
+    private static final String SAVED_SELECTED_ITEM_ID = "selectedItemId";
 
     private Album mAlbum;
     private Filter mFilter;
@@ -58,6 +58,9 @@ public class AlbumFragment extends Fragment implements CompoundButton.OnCheckedC
     private CustomArrayAdapter<LocalDate> mAdapterDate;
     private CustomArrayAdapter<LocalDate> mAdapterUpload;
     private CustomArrayAdapter<Person> mAdapterPhotographer;
+
+    private Long mSelectedItemId;
+    private ActivityResultLauncher<Intent> mImageActivityLauncher;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -77,6 +80,14 @@ public class AlbumFragment extends Fragment implements CompoundButton.OnCheckedC
 
         TransitionUtils.setupDefaultTransitions(this);
         TransitionUtils.setupEnterContainerTransform(this, Colors.getPrimaryColor(requireContext()));
+
+        mImageActivityLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), r -> {});
+
+        if (savedInstanceState != null) {
+            mSelectedItemId = savedInstanceState.containsKey(SAVED_SELECTED_ITEM_ID)
+                    ? savedInstanceState.getLong(SAVED_SELECTED_ITEM_ID)
+                    : null;
+        }
     }
 
     @Nullable
@@ -89,21 +100,7 @@ public class AlbumFragment extends Fragment implements CompoundButton.OnCheckedC
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        ViewUtils.setFitsSystemWindows(this);
         postponeEnterTransition(200, TimeUnit.MILLISECONDS);
-        setExitSharedElementCallback(new SharedElementCallback() {
-            @Override
-            public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
-                var selectedImageId = getSelectedItemId();
-                if (selectedImageId != null) {
-                    var itemView = mBinding.imageContainer.findViewWithTag(selectedImageId);
-                    if (itemView != null) {
-                        var thumbnail = itemView.findViewById(R.id.thumbnail);
-                        sharedElements.put(names.get(0), thumbnail);
-                    }
-                }
-            }
-        });
 
         mImageAdapter = new ImageAdapter(requireContext(), new ArrayList<>());
         mBinding.imageContainer.setAdapter(mImageAdapter);
@@ -115,17 +112,7 @@ public class AlbumFragment extends Fragment implements CompoundButton.OnCheckedC
 
                 // scroll selected image into view
                 var selectedImageId = getSelectedItemId();
-                if (selectedImageId != null) {
-                    var selectedView = mBinding.imageContainer.findViewWithTag(selectedImageId);
-                    if (selectedView == null) {
-                        var position = mImageAdapter.getImages().indexOf(new Image(selectedImageId));
-                        mBinding.imageContainer.setSelection(position);
-                    } else if (selectedView.getTop() < 0) {
-                        mBinding.imageContainer.scrollListBy(selectedView.getTop());
-                    } else if (selectedView.getBottom() > mBinding.imageContainer.getHeight()) {
-                        mBinding.imageContainer.scrollListBy(- mBinding.imageContainer.getHeight() + selectedView.getBottom());
-                    }
-                }
+                if (selectedImageId != null) scrollToId(selectedImageId);
             }
         });
 
@@ -178,10 +165,50 @@ public class AlbumFragment extends Fragment implements CompoundButton.OnCheckedC
     }
 
     @Override
+    public void onActivityReenter(int resultCode, Intent data) {
+        if (resultCode == ImageActivity.RESULT_OK && data != null) {
+            var id = data.getLongExtra(ImageActivity.RESULT_EXTRA_IMAGE_ID, -1L);
+            if (id != -1) {
+                mSelectedItemId = id;
+
+                var activity = requireActivity();
+                activity.setExitSharedElementCallback(new SharedElementCallback() {
+                    @Override
+                    public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
+                        var selectedImageId = getSelectedItemId();
+                        if (selectedImageId != null) {
+                            var itemView = mBinding.imageContainer.findViewWithTag(selectedImageId);
+                            if (itemView != null) {
+                                var thumbnail = itemView.findViewById(R.id.thumbnail);
+                                sharedElements.put(names.get(0), thumbnail);
+                            }
+                        }
+
+                        activity.setExitSharedElementCallback((SharedElementCallback) null);
+                    }
+                });
+
+                if (scrollToId(id)) {
+                    TransitionUtils.postponeEnterTransition(activity, 200);
+                    OneShotPreDrawListener.add(mBinding.imageContainer, activity::startPostponedEnterTransition);
+                }
+            }
+        }
+    }
+
+    @Override
     public void onStart() {
         super.onStart();
         if (mAlbumViewModel.getAlbum().getValue() == null) {
             load();
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (mSelectedItemId != null) {
+            outState.putLong(SAVED_SELECTED_ITEM_ID, mSelectedItemId);
         }
     }
 
@@ -228,6 +255,8 @@ public class AlbumFragment extends Fragment implements CompoundButton.OnCheckedC
 
         if (album != null && album.getName() != null) {
             ViewUtils.setActionBarText(this, album.getName());
+        } else {
+            ViewUtils.setActionBarText(this, getString(R.string.title_fragment_album));
         }
 
         boolean successOrEmpty = albumStatusWrapper.getCode() == StatusWrapper.STATUS_LOADED;
@@ -346,6 +375,23 @@ public class AlbumFragment extends Fragment implements CompoundButton.OnCheckedC
         mBinding.imageContainer.setNumColumns(columnCount);
     }
 
+    private boolean scrollToId(long id) {
+        // scroll selected image into view
+        var selectedView = mBinding.imageContainer.findViewWithTag(id);
+        if (selectedView == null) {
+            var position = mImageAdapter.getImages().indexOf(new Image(id));
+            mBinding.imageContainer.setSelection(position);
+            return true;
+        } else if (selectedView.getTop() < 0) {
+            mBinding.imageContainer.scrollListBy(selectedView.getTop());
+            return true;
+        } else if (selectedView.getBottom() > mBinding.imageContainer.getHeight()) {
+            mBinding.imageContainer.scrollListBy(- mBinding.imageContainer.getHeight() + selectedView.getBottom());
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.album_info) {
@@ -395,31 +441,17 @@ public class AlbumFragment extends Fragment implements CompoundButton.OnCheckedC
             return;
         }
 
-        // save image id to backstack
-        try {
-            NavHostFragment.findNavController(this)
-                           .getBackStackEntry(R.id.nav_album)
-                           .getSavedStateHandle()
-                           .set(AlbumFragment.IMAGE_ID_KEY, id);
-        } catch (IllegalArgumentException ignored) {}
+        mSelectedItemId = id;
 
-        var extras = new FragmentNavigator.Extras.Builder()
-                .addSharedElement(view.findViewById(R.id.thumbnail), getString(R.string.transition_name_image_fragment_image))
-                .build();
-        var action = AlbumFragmentDirections.showImage(image.getId());
-        action.setImage(image);
-        action.setImageList(mImageAdapter.getImages().toArray(new Image[0]));
-        Navigation.findNavController(view).navigate(action, extras);
-
-        // TODO oneshot transitions
-        var exitTransition = new Fade(Fade.MODE_OUT);
-        exitTransition.setDuration(TransitionUtils.getTransitionDuration(this));
-        setExitTransition(exitTransition);
-
-        var reenterTransition = new Hold();
-        reenterTransition.addListener(new ActionBarAnimation(this, Colors.getPrimaryColor(requireContext()), true, Color.BLACK));
-        reenterTransition.setDuration(TransitionUtils.getTransitionDuration(this));
-        setReenterTransition(reenterTransition);
+        var activity = requireActivity();
+        var args = new ImageFragmentArgs.Builder(image.getId())
+                .setImage(image)
+                .setImageList(mImageAdapter.getImages().toArray(new Image[0]))
+                .build().toBundle();
+        var intent = new Intent(activity, ImageActivity.class);
+        intent.putExtras(args);
+        var options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view.findViewById(R.id.thumbnail), getString(R.string.transition_name_image_fragment_image));
+        mImageActivityLauncher.launch(intent, options);
     }
 
     private Filter parseFilters(Intent intent) {
@@ -472,12 +504,6 @@ public class AlbumFragment extends Fragment implements CompoundButton.OnCheckedC
     }
 
     private Long getSelectedItemId() {
-        var navController = NavHostFragment.findNavController(this);
-        var entry = navController.getCurrentBackStackEntry();
-        if (entry != null) {
-            return entry.getSavedStateHandle().get(IMAGE_ID_KEY);
-        } else {
-            return null;
-        }
+        return mSelectedItemId;
     }
 }

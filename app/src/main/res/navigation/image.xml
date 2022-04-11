@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/image"
+    app:startDestination="@+id/nav_image">
+
+    <fragment
+        android:id="@+id/nav_image"
+        android:name="com.jonahbauer.qed.activities.imageActivity.ImageFragment"
+        tools:layout="@layout/fragment_image">
+        <argument
+            android:name="image"
+            android:defaultValue="@null"
+            app:argType="com.jonahbauer.qed.model.Image"
+            app:nullable="true"/>
+        <argument
+            android:name="id"
+            app:argType="long"/>
+        <argument
+            android:name="imageList"
+            android:defaultValue="@null"
+            app:argType="com.jonahbauer.qed.model.Image[]"
+            app:nullable="true"/>
+        <action
+            android:id="@+id/show_image_info"
+            app:destination="@id/nav_image_info"/>
+        <deepLink
+            android:id="@+id/deep_link_image_view"
+            app:uri="qedgallery.qed-verein.de/image_view.php?imageid={id}" />
+        <deepLink
+            android:id="@+id/deep_link_image"
+            app:uri="qedgallery.qed-verein.de/image.php?imageid={id}" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_image_info"
+        android:name="com.jonahbauer.qed.activities.imageActivity.ImageInfoFragment"
+        tools:layout="@layout/fragment_image_info">
+        <argument
+            android:name="image"
+            app:argType="com.jonahbauer.qed.model.Image"
+            app:nullable="false"/>
+    </fragment>
+</navigation>

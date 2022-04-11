@@ -7,7 +7,6 @@ import androidx.annotation.Nullable;
 import androidx.preference.PreferenceFragmentCompat;
 import com.jonahbauer.qed.util.Colors;
 import com.jonahbauer.qed.util.TransitionUtils;
-import com.jonahbauer.qed.util.ViewUtils;
 
 public abstract class AbstractPreferenceFragment extends PreferenceFragmentCompat {
 
@@ -19,7 +18,6 @@ public abstract class AbstractPreferenceFragment extends PreferenceFragmentCompa
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        ViewUtils.setFitsSystemWindows(this);
         view.setBackgroundColor(Colors.getBackgroundColor(requireContext()));
         super.onViewCreated(view, savedInstanceState);
     }

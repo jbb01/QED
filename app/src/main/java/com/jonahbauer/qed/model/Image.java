@@ -177,10 +177,8 @@ public class Image implements Parcelable {
         ParcelExtensions.writeInstant(dest, uploadTime);
         ParcelExtensions.writeInstant(dest, creationTime);
         ParcelExtensions.writeBoolean(dest, original);
-        dest.writeTypedObject(thumbnail, flags);
         dest.writeMap(data);
         ParcelExtensions.writeBoolean(dest, loaded);
-        ParcelExtensions.writeBoolean(dest, databaseLoaded);
     }
 
     public static final Parcelable.Creator<Image> CREATOR = new Parcelable.Creator<>() {
@@ -198,10 +196,8 @@ public class Image implements Parcelable {
             image.uploadTime = ParcelExtensions.readInstant(source);
             image.creationTime = ParcelExtensions.readInstant(source);
             image.original = ParcelExtensions.readBoolean(source);
-            image.thumbnail = source.readTypedObject(Bitmap.CREATOR);
             source.readMap(image.data, Image.class.getClassLoader());
             image.loaded = ParcelExtensions.readBoolean(source);
-            image.databaseLoaded = ParcelExtensions.readBoolean(source);
             return image;
         }
 

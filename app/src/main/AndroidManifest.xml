@@ -41,7 +41,7 @@
             android:noHistory="true"
             android:theme="@style/Theme.App.Translucent">
 
-            <intent-filter>
+            <intent-filter android:label="@string/app_name">
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <category android:name="android.intent.category.DEFAULT" />
@@ -72,6 +72,16 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".activities.imageActivity.ImageActivity"
+            android:hardwareAccelerated="true"
+            android:launchMode="standard"
+            android:theme="@style/Theme.App.Dark.NoActionBar"
+            android:exported="true">
+
+            <nav-graph android:value="@navigation/image"/>
         </activity>
 
         <provider

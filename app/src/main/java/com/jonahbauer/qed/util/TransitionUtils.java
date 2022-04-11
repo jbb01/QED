@@ -1,5 +1,8 @@
 package com.jonahbauer.qed.util;
 
+import android.app.Activity;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +29,7 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class TransitionUtils {
+    private static final Handler HANDLER = new Handler(Looper.getMainLooper());
 
     /*
      * Default Transitions
@@ -161,5 +165,10 @@ public class TransitionUtils {
         TypedValue value = new TypedValue();
         fragment.requireContext().getTheme().resolveAttribute(R.attr.motionDurationLong1, value, true);
         return value.data;
+    }
+
+    public static void postponeEnterTransition(@NonNull Activity activity, long duration) {
+        activity.postponeEnterTransition();
+        HANDLER.postDelayed(activity::startPostponedEnterTransition, duration);
     }
 }

@@ -14,6 +14,7 @@ import android.view.ViewParent;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Interpolator;
 
+import androidx.annotation.AttrRes;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -50,15 +51,15 @@ public class AdvancedImageView extends androidx.appcompat.widget.AppCompatImageV
     private final GestureListener mGestureListener;
     private final ScaleGestureDetector mScaleGestureDetector;
 
-    public AdvancedImageView(Context context) {
+    public AdvancedImageView(@NonNull Context context) {
         this(context, null);
     }
 
-    public AdvancedImageView(Context context, AttributeSet attrs) {
+    public AdvancedImageView(@NonNull Context context, @Nullable AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public AdvancedImageView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public AdvancedImageView(@NonNull Context context, @Nullable AttributeSet attrs, @AttrRes int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
         mGestureListener = new GestureListener();

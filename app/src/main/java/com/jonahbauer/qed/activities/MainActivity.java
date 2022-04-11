@@ -16,7 +16,9 @@ import androidx.annotation.*;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
-import androidx.core.view.*;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.ViewPropertyAnimatorCompat;
+import androidx.core.view.ViewPropertyAnimatorListenerAdapter;
 import androidx.customview.widget.Openable;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
@@ -29,6 +31,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.jonahbauer.qed.BuildConfig;
 import com.jonahbauer.qed.MainDirections;
 import com.jonahbauer.qed.R;
+import com.jonahbauer.qed.activities.mainFragments.OnActivityReenterListener;
 import com.jonahbauer.qed.databinding.ActivityMainBinding;
 import com.jonahbauer.qed.layoutStuff.CustomActionMode;
 import com.jonahbauer.qed.networking.NetworkListener;
@@ -44,9 +47,6 @@ public class MainActivity extends AppCompatActivity implements NetworkListener, 
     private static final String LOG_TAG = MainActivity.class.getName();
 
     private static final String SAVED_ACTION_BAR_COLOR = "actionBarColor";
-    private static final String SAVED_ACTION_BAR_ALPHA = "actionBarAlpha";
-    private static final String SAVED_ACTION_BAR_VISIBILITY = "actionBarVisibility";
-    private static final String SAVED_BACKGROUND_COLOR = "backgroundColor";
 
     private ActivityMainBinding mBinding;
 
@@ -59,15 +59,10 @@ public class MainActivity extends AppCompatActivity implements NetworkListener, 
     private AppBarConfiguration mAppBarConfiguration;
     private NavController mNavController;
 
-    private WindowInsetsControllerCompat mWindowInsetsController;
-
     private ActionMode mActionMode;
     private ViewPropertyAnimatorCompat mActionModeFade;
 
     private @ColorInt int mActionBarColor;
-    private @FloatRange(from = 0, to = 1) float mActionBarAlpha = 1;
-    private @Px int mActionBarHeight;
-    private @ColorInt int mBackgroundColor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,34 +106,10 @@ public class MainActivity extends AppCompatActivity implements NetworkListener, 
         // double tap to exit
         getOnBackPressedDispatcher().addCallback(this, new BackPressedCallback());
 
-        mWindowInsetsController = new WindowInsetsControllerCompat(getWindow(), mBinding.getRoot());
-        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
-
         mActionBarColor = Colors.getPrimaryColor(this);
-
-        ViewCompat.setOnApplyWindowInsetsListener(mBinding.contentRoot, (v, insets) -> {
-            var systemInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-
-            mBinding.appBarLayout.setPadding(systemInsets.left, systemInsets.top, systemInsets.right, 0);
-            mBinding.actionModeAppBarLayout.setPadding(systemInsets.left, systemInsets.top, systemInsets.right, 0);
-
-            ViewCompat.dispatchApplyWindowInsets(mBinding.coordinator, insets);
-            return WindowInsetsCompat.CONSUMED;
-        });
-        mBinding.toolbar.addOnLayoutChangeListener((v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
-            mActionBarHeight = bottom - top;
-            ViewCompat.requestApplyInsets(mBinding.coordinator);
-        });
 
         if (savedInstanceState != null) {
             setActionBarColor(savedInstanceState.getInt(SAVED_ACTION_BAR_COLOR));
-            setActionBarAlpha(savedInstanceState.getFloat(SAVED_ACTION_BAR_ALPHA));
-            setBackgroundColor(savedInstanceState.getInt(SAVED_BACKGROUND_COLOR));
-            if (savedInstanceState.getBoolean(SAVED_ACTION_BAR_VISIBILITY, true)) {
-                getSupportActionBar().show();
-            } else {
-                getSupportActionBar().hide();
-            }
         }
     }
 
@@ -151,9 +122,14 @@ public class MainActivity extends AppCompatActivity implements NetworkListener, 
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(SAVED_ACTION_BAR_COLOR, mActionBarColor);
-        outState.putFloat(SAVED_ACTION_BAR_ALPHA, mActionBarAlpha);
-        outState.putBoolean(SAVED_ACTION_BAR_VISIBILITY, getSupportActionBar().isShowing());
-        outState.putInt(SAVED_BACKGROUND_COLOR, mBackgroundColor);
+    }
+
+    @Override
+    public void onActivityReenter(int resultCode, Intent data) {
+        var fragment = getFragment();
+        if (fragment instanceof OnActivityReenterListener) {
+            ((OnActivityReenterListener) fragment).onActivityReenter(resultCode, data);
+        }
     }
 
     private Fragment getFragment() {
@@ -186,10 +162,6 @@ public class MainActivity extends AppCompatActivity implements NetworkListener, 
         return true;
     }
 
-    public WindowInsetsControllerCompat getWindowInsetsController() {
-        return mWindowInsetsController;
-    }
-
     @Keep
     public @ColorInt int getActionBarColor() {
         return mActionBarColor;
@@ -199,32 +171,6 @@ public class MainActivity extends AppCompatActivity implements NetworkListener, 
     public void setActionBarColor(@ColorInt int actionBarColor) {
         mActionBarColor = actionBarColor;
         mBinding.appBarLayout.setBackgroundColor(actionBarColor);
-    }
-
-    @Keep
-    public float getActionBarAlpha() {
-        return mActionBarAlpha;
-    }
-
-    @Keep
-    public void setActionBarAlpha(@FloatRange(from = 0, to = 1) float alpha) {
-        mActionBarAlpha = alpha;
-        mBinding.appBarLayout.setAlpha(alpha);
-    }
-
-    @Keep
-    public @ColorInt int getBackgroundColor() {
-        return mBackgroundColor;
-    }
-
-    @Keep
-    public void setBackgroundColor(@ColorInt int color) {
-        this.mBackgroundColor = color;
-        this.mBinding.contentRoot.setBackgroundColor(color);
-    }
-
-    public @Px int getActionBarHeight() {
-        return mActionBarHeight;
     }
 
     @NonNull
@@ -257,7 +203,6 @@ public class MainActivity extends AppCompatActivity implements NetworkListener, 
 
         if (callback.onCreateActionMode(actionMode, actionMode.getMenu())) {
             if (mActionModeFade != null) mActionModeFade.cancel();
-            appBarLayout.setAlpha(0f);
             mActionModeFade = ViewCompat.animate(appBarLayout).alpha(1f);
             mActionModeFade.setListener(new ViewPropertyAnimatorListenerAdapter() {
                 @Override
@@ -369,6 +314,7 @@ public class MainActivity extends AppCompatActivity implements NetworkListener, 
         private ActionModeCallbackWrapper(ActionMode.Callback mWrapped) {
             this.mWrapped = mWrapped;
         }
+
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             return mWrapped.onCreateActionMode(mode, menu);

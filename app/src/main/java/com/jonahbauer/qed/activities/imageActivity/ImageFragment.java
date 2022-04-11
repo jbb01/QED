@@ -1,42 +1,31 @@
-package com.jonahbauer.qed.activities.mainFragments;
+package com.jonahbauer.qed.activities.imageActivity;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.*;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.StyleRes;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.SharedElementCallback;
 import androidx.core.content.FileProvider;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.DefaultLifecycleObserver;
-import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
-import androidx.transition.*;
+import androidx.transition.Fade;
 import androidx.viewpager2.widget.ViewPager2;
-import com.google.android.material.transition.Hold;
 import com.jonahbauer.qed.R;
-import com.jonahbauer.qed.activities.MainActivity;
-import com.jonahbauer.qed.activities.imageActivity.ImageViewHolder;
 import com.jonahbauer.qed.databinding.FragmentImageBinding;
-import com.jonahbauer.qed.layoutStuff.transition.ActionBarAnimation;
 import com.jonahbauer.qed.model.Image;
 import com.jonahbauer.qed.util.Preferences;
 import com.jonahbauer.qed.util.StatusWrapper;
@@ -50,13 +39,8 @@ import java.io.File;
 import java.lang.ref.SoftReference;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickListener {
-    private static final String LOG_TAG = ImageFragment.class.getSimpleName();
-    private static final @StyleRes int THEME = R.style.Theme_App_Dark;
-
     private static final String SAVED_EXTENDED = "extended";
 
     private FragmentImageBinding mBinding;
@@ -92,74 +76,27 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
             mImageAdapter.submitList(Collections.singletonList(mImage));
         }
 
-        setupTransitions();
-
         if (savedInstanceState != null) {
             mExtended = savedInstanceState.getBoolean(SAVED_EXTENDED);
         }
-    }
 
-    private void setupTransitions() {
-        var duration = TransitionUtils.getTransitionDuration(this);
-
-        var sharedEnterTransition = (TransitionSet) TransitionInflater.from(requireContext()).inflateTransition(R.transition.image_fragment_enter);
-        sharedEnterTransition.addListener(new ActionBarAnimation(this, Color.BLACK, false));
-        sharedEnterTransition.setDuration(duration);
-        setSharedElementEnterTransition(sharedEnterTransition);
-
-        var enterTransition = new Hold();
-        enterTransition.addListener(new ActionBarAnimation(this, Color.BLACK, false));
-        enterTransition.setDuration(duration);
-        setEnterTransition(enterTransition);
-
-        var returnTransition = (TransitionSet) TransitionInflater.from(requireContext()).inflateTransition(R.transition.image_fragment_return);
-        returnTransition.setDuration(duration);
-        returnTransition.addListener(new TransitionListenerAdapter() {
-            @Override
-            public void onTransitionStart(@NonNull Transition transition) {
-                ViewUtils.resetTransparentSystemBars(ImageFragment.this);
-            }
-        });
-        setSharedElementReturnTransition(returnTransition);
-        setReturnTransition(new Fade());
-
-        var exitTransition = new Fade(Fade.MODE_OUT);
-        exitTransition.setDuration(duration);
-        setExitTransition(exitTransition);
-
-        var reenterTransition = new Hold();
-        reenterTransition.setDuration(duration);
-        reenterTransition.addListener(new ActionBarAnimation(this, Color.BLACK, false));
-        setReenterTransition(reenterTransition);
-
-        getLifecycle().addObserver(new DefaultLifecycleObserver() {
-            @Override
-            public void onResume(@NonNull LifecycleOwner owner) {
-                var activity = (MainActivity) requireActivity();
-                activity.setActionBarColor(Color.BLACK);
-                activity.getSupportActionBar().hide();
-            }
-        });
+        var transition = new Fade();
+        transition.setDuration(TransitionUtils.getTransitionDuration(this));
+        setExitTransition(transition);
+        setReenterTransition(transition);
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        var context = requireContext();
-        inflater = inflater.cloneInContext(context);
-
         ViewUtils.setTransparentSystemBars(this);
 
         mBinding = FragmentImageBinding.inflate(inflater, container, false);
 
-        mBinding.toolbar.setNavigationIcon(R.drawable.ic_arrow_back);
-        MenuInflater menuInflater = new MenuInflater(context);
-        Menu menu = mBinding.toolbar.getMenu();
-        menuInflater.inflate(R.menu.menu_image, menu);
+        var menu = mBinding.toolbar.getMenu();
         mOpenWithButton = menu.findItem(R.id.image_open_with);
         mDownloadButton = menu.findItem(R.id.image_download_original);
         mInfoButton = menu.findItem(R.id.image_info);
-        mBinding.toolbar.setVisibility(View.GONE);
 
         setExtended(mExtended);
         return mBinding.getRoot();
@@ -184,24 +121,6 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
             );
             return WindowInsetsCompat.CONSUMED;
         });
-        postponeEnterTransition(500, TimeUnit.MILLISECONDS);
-        setEnterSharedElementCallback(new SharedElementCallback() {
-            @Override
-            public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
-                super.onMapSharedElements(names, sharedElements);
-
-                var imageTransitionName = getString(R.string.transition_name_image_fragment_image);
-                if (!names.contains(imageTransitionName)) return;
-
-                var viewHolder = mImageAdapter.getViewHolderByPosition(mBinding.viewPager.getCurrentItem());
-                if (viewHolder == null) return;
-
-                var itemView = viewHolder.itemView;
-                var target = itemView.findViewById(R.id.gallery_image);
-                target.setTransitionName(imageTransitionName);
-                sharedElements.put(imageTransitionName, target);
-            }
-        });
 
         // prepare view pager
         mBinding.viewPager.setOnClickListener(v -> toggleExtended());
@@ -217,9 +136,7 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
         mBinding.viewPager.registerOnPageChangeCallback(pageChangeCallback);
 
         // prepare toolbar
-        mBinding.toolbar.setNavigationOnClickListener(v -> {
-            NavHostFragment.findNavController(this).navigateUp();
-        });
+        mBinding.toolbar.setNavigationOnClickListener(v -> requireActivity().finishAfterTransition());
         mBinding.toolbar.setOnMenuItemClickListener(this);
 
         // select image
@@ -246,7 +163,7 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
 
     @Override
     public void onDestroyView() {
-        var activity = (MainActivity) requireActivity();
+        var activity = (ImageActivity) requireActivity();
         var controller = activity.getWindowInsetsController();
         controller.show(WindowInsetsCompat.Type.systemBars());
         ViewUtils.resetTransparentSystemBars(this);
@@ -307,7 +224,7 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
         }
 
         if (statusWrapper.getCode() != StatusWrapper.STATUS_PRELOADED) {
-            startPostponedEnterTransition();
+            requireActivity().startPostponedEnterTransition();
         }
 
         if (code == StatusWrapper.STATUS_ERROR) {
@@ -343,14 +260,10 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
 
         mImage = mImageAdapter.getCurrentList().get(position);
 
-        // save image id on back stack
-        try {
-            NavHostFragment.findNavController(this)
-                           .getBackStackEntry(R.id.nav_album)
-                           .getSavedStateHandle()
-                           .set(AlbumFragment.IMAGE_ID_KEY, mImage.getId());
-        } catch (Exception e) {
-            Log.w(LOG_TAG, "Could not save image id on backstack.", e);
+        // save image id
+        var activity = getActivity();
+        if (activity instanceof ImageActivity) {
+            ((ImageActivity) activity).setResultImageId(mImage.getId());
         }
     }
 
@@ -360,7 +273,7 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
         this.mExtended = extended;
         mBinding.setExtended(extended);
 
-        var controller = ((MainActivity) requireActivity()).getWindowInsetsController();
+        var controller = ((ImageActivity) requireActivity()).getWindowInsetsController();
         if (controller != null) {
             if (extended) {
                 controller.show(WindowInsetsCompat.Type.systemBars());
@@ -374,15 +287,6 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
     private void downloadOriginal(int position) {
         ImageViewHolder viewHolder = mImageAdapter.getViewHolderByPosition(position);
         viewHolder.downloadOriginal();
-    }
-
-    @Nullable
-    @Override
-    public Context getContext() {
-        var context = super.getContext();
-        if (context == null) return null;
-
-        return new ContextThemeWrapper(context, THEME);
     }
 
     private class ImageAdapter extends ListAdapter<Image, ImageViewHolder> {

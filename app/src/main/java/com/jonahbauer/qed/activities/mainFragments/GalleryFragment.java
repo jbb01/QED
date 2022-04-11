@@ -54,7 +54,6 @@ public class GalleryFragment extends Fragment implements AdapterView.OnItemClick
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        ViewUtils.setFitsSystemWindows(this);
         TransitionUtils.postponeEnterAnimationToPreDraw(this, view);
 
         mAlbumAdapter = new AlbumAdapter(getContext(), new ArrayList<>());

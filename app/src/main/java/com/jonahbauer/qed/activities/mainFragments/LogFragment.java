@@ -83,16 +83,12 @@ public class LogFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        ViewUtils.setFitsSystemWindows(this);
-
         NavController navController = NavHostFragment.findNavController(this);
         NavBackStackEntry entry = navController.getBackStackEntry(R.id.nav_chat_log);
         Objects.requireNonNull(entry);
         entry.getSavedStateHandle()
              .getLiveData(LOG_REQUEST_KEY, DEFAULT_REQUEST)
-             .observe(getViewLifecycleOwner(), logRequest -> {
-                 mLogViewModel.load(logRequest);
-             });
+             .observe(getViewLifecycleOwner(), mLogViewModel::load);
 
         mMessageAdapter = new MessageAdapter(requireContext(), new ArrayList<>(), null, false, null, false);
         mBinding.list.setAdapter(mMessageAdapter);

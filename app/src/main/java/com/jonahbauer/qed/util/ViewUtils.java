@@ -20,15 +20,12 @@ import androidx.annotation.StringRes;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavBackStackEntry;
 import androidx.navigation.fragment.NavHostFragment;
 import com.jonahbauer.qed.R;
-import com.jonahbauer.qed.activities.MainActivity;
 import com.jonahbauer.qed.databinding.AlertDialogEditTextBinding;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.Contract;
@@ -41,9 +38,6 @@ import java.time.format.FormatStyle;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-
-import static androidx.core.view.WindowInsetsCompat.Type.ime;
-import static androidx.core.view.WindowInsetsCompat.Type.systemBars;
 
 @UtilityClass
 @SuppressWarnings("unused")
@@ -299,22 +293,6 @@ public class ViewUtils {
         var window = activity.getWindow();
         window.setStatusBarColor(statusBarColor.data);
         window.setNavigationBarColor(navigationBarColor.data);
-    }
-
-    public static void setFitsSystemWindows(Fragment fragment) {
-        var view = fragment.requireView();
-        ViewCompat.setOnApplyWindowInsetsListener(view, (v, windowInsets) -> {
-            var mask = systemBars() | ime();
-            var insets = windowInsets.getInsets(mask);
-
-            var activity = (MainActivity) fragment.requireActivity();
-            var lp = (ViewGroup.MarginLayoutParams) v.getLayoutParams();
-            lp.topMargin = activity.getActionBarHeight() + insets.top;
-            v.setLayoutParams(lp);
-
-            v.setPadding(insets.left, 0, insets.right, insets.bottom);
-            return WindowInsetsCompat.CONSUMED;
-        });
     }
 
     @NonNull

@@ -12,7 +12,8 @@
         android:id="@+id/fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="?android:colorBackground">
+        android:background="?android:colorBackground"
+        tools:theme="@style/Theme.App.Dark.NoActionBar">
 
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/view_pager"
@@ -27,8 +28,11 @@
             android:layout_alignParentTop="true"
             android:background="#88000000"
             android:elevation="0dp"
-            android:visibility="@{extended}"
-            app:popupTheme="?popupTheme"/>
+            android:visibility="@{extended, default = gone}"
+            app:navigationIcon="@drawable/ic_arrow_back"
+            app:menu="@menu/menu_image"
+            app:popupTheme="?popupTheme"
+            tools:visibility="visible"/>
 
         <LinearLayout
             android:id="@+id/overlay_bottom"
@@ -43,7 +47,8 @@
             android:orientation="vertical"
             android:paddingHorizontal="16dp"
             android:paddingVertical="24dp"
-            android:visibility="@{extended}">
+            android:visibility="@{extended, default = gone}"
+            tools:visibility="visible">
 
             <TextView
                 android:layout_width="wrap_content"

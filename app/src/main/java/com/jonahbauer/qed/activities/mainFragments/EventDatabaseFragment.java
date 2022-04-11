@@ -53,7 +53,6 @@ public class EventDatabaseFragment extends Fragment implements AdapterView.OnIte
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        ViewUtils.setFitsSystemWindows(this);
         TransitionUtils.postponeEnterAnimationToPreDraw(this, view);
 
         mEventAdapter = new EventAdapter(getContext(), new ArrayList<>());

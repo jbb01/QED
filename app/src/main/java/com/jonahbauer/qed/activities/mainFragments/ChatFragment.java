@@ -82,8 +82,6 @@ public class ChatFragment extends Fragment implements NetworkListener, AbsListVi
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        ViewUtils.setFitsSystemWindows(this);
-
         mBinding.messageInput.setOnClickListener(v -> {
             if (mBinding.list.getLastVisiblePosition() >= mMessageAdapter.getCount() - 1) {
                 mHandler.postDelayed(() -> mBinding.list.setSelection(mMessageAdapter.getCount() - 1), 100);

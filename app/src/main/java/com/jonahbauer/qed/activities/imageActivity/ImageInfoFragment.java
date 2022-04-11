@@ -1,4 +1,4 @@
-package com.jonahbauer.qed.activities.mainFragments;
+package com.jonahbauer.qed.activities.imageActivity;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -16,16 +16,16 @@ import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
-import androidx.transition.Fade;
-import com.google.android.material.transition.Hold;
+
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.databinding.FragmentImageInfoBinding;
-import com.jonahbauer.qed.layoutStuff.transition.ActionBarAnimation;
 import com.jonahbauer.qed.model.Image;
 import com.jonahbauer.qed.model.viewmodel.ImageInfoViewModel;
 import com.jonahbauer.qed.util.StatusWrapper;
 import com.jonahbauer.qed.util.TransitionUtils;
 import com.jonahbauer.qed.util.ViewUtils;
+
+import androidx.transition.Fade;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
@@ -94,14 +94,10 @@ public class ImageInfoFragment extends Fragment {
         ImageInfoFragmentArgs args = ImageInfoFragmentArgs.fromBundle(getArguments());
         mImage = args.getImage();
 
-        var enterTransition = new Hold();
-        enterTransition.addListener(new ActionBarAnimation(this, Color.BLACK, true, Color.BLACK));
-        enterTransition.setDuration(TransitionUtils.getTransitionDuration(this));
-        setEnterTransition(enterTransition);
-
-        var returnTransition = new Fade();
-        returnTransition.setDuration(TransitionUtils.getTransitionDuration(this));
-        setReturnTransition(returnTransition);
+        var transition = new Fade();
+        transition.setDuration(TransitionUtils.getTransitionDuration(this));
+        setEnterTransition(transition);
+        setReturnTransition(transition);
     }
 
     @Nullable
@@ -114,22 +110,18 @@ public class ImageInfoFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        ViewUtils.setFitsSystemWindows(this);
-
         mImageInfoViewModel.getImage().observe(getViewLifecycleOwner(), status -> {
             if (status.getCode() == StatusWrapper.STATUS_ERROR) {
                 Toast.makeText(requireContext(), status.getReason().getStringRes(), Toast.LENGTH_SHORT).show();
-
-                NavHostFragment.findNavController(this)
-                               .navigateUp();
+                NavHostFragment.findNavController(this).navigateUp();
                 return;
             }
 
-            updateView(status.getValue());
-
             var image = status.getValue();
-            ViewUtils.setActionBarText(this, image != null ? image.getName() : "");
+            updateView(image);
+            mBinding.toolbar.setTitle(image != null ? image.getName() : "");
         });
+        mBinding.toolbar.setNavigationOnClickListener(v -> NavHostFragment.findNavController(this).navigateUp());
     }
 
     @Override
@@ -144,10 +136,12 @@ public class ImageInfoFragment extends Fragment {
         super.onStop();
     }
 
-    private void updateView(Image image) {
+    private void updateView(@Nullable Image image) {
         mBinding.imageInfo.removeAllViews();
         mBinding.otherInfos.removeAllViews();
         mBinding.qedInfos.removeAllViews();
+
+        if (image == null) return;
 
         // histogram
         if (image.getPath() != null) {
@@ -244,9 +238,7 @@ public class ImageInfoFragment extends Fragment {
                                         mBinding.histogram.setBitmap(bitmap);
                                         mBinding.histogramLayout.setVisibility(View.VISIBLE);
                                     },
-                                    throwable -> {
-                                        mBinding.histogramLayout.setVisibility(View.GONE);
-                                    }
+                                    throwable -> mBinding.histogramLayout.setVisibility(View.GONE)
                             )
         );
     }
