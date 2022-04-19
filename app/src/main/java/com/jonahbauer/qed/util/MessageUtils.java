@@ -1,14 +1,14 @@
 package com.jonahbauer.qed.util;
 
+import android.content.Context;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SoundEffectConstants;
-import android.widget.ListView;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.fragment.app.Fragment;
 
@@ -28,6 +28,7 @@ import java.util.Locale;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
@@ -40,87 +41,43 @@ public class MessageUtils {
      * Sets the checked item in the list and shows an appropriate toolbar.
      *
      * @param fragment a fragment for context
-     * @param listView the list view
+     * @param view the list view (only used for sound effects and snackbar alignment)
      * @param adapter the list adapter
      * @param infoCallback a callback for when the action mode's info button is pressed
      * @param replyCallback a callback for when the action mode's reply button is pressed
      * @param position the position of the checked item in the {@link MessageAdapter}
-     * @param value if the item is checked or not
      */
-    public static void setChecked(@NonNull Fragment fragment,
-                                  @NonNull ListView listView,
-                                  @NonNull MessageAdapter adapter,
-                                  @Nullable BiConsumer<ActionMode, Message> infoCallback,
-                                  @Nullable BiConsumer<ActionMode, Message> replyCallback,
-                                  int position, boolean value) {
-        listView.setItemChecked(position, value);
-
+    public static void setCheckedItem(@NonNull Fragment fragment,
+                                      @NonNull View view,
+                                      @NonNull MessageAdapter adapter,
+                                      @Nullable BiConsumer<ActionMode, Message> infoCallback,
+                                      @Nullable BiConsumer<ActionMode, Message> replyCallback,
+                                      int position) {
         var activity = fragment.getActivity();
-        if (activity instanceof AppCompatActivity) {
-            var appCompatActivity = (AppCompatActivity) activity;
+        if (activity instanceof MainActivity) {
+            var mainActivity = (MainActivity) activity;
 
-            if (value) {
-                listView.playSoundEffect(SoundEffectConstants.CLICK);
-                Message msg = adapter.getItem(position);
-                if (msg == null) return;
+            mainActivity.finishActionMode();
+            adapter.setCheckedItemPosition(position); // set position after finishing action mode
+            if (position == -1) return;
 
-                var actionModeCallBack = new ActionMode.Callback() {
-                    @Override
-                    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-                        mode.getMenuInflater().inflate(R.menu.menu_message, menu);
+            view.playSoundEffect(SoundEffectConstants.CLICK);
+            Message msg = adapter.getItem(position);
+            if (msg == null) return;
 
-                        var reply = menu.findItem(R.id.message_reply);
-                        if (reply != null) reply.setVisible(replyCallback != null);
-
-                        var info = menu.findItem(R.id.message_info);
-                        if (info != null) info.setVisible(infoCallback != null);
-
-                        return true;
-                    }
-
-                    @Override
-                    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-                        return false;
-                    }
-
-                    @Override
-                    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-                        if (item.getItemId() == R.id.message_info) {
-                            if (infoCallback != null) {
-                                infoCallback.accept(mode, msg);
-                                return true;
-                            }
-                        } else if (item.getItemId() == R.id.message_copy) {
-                            Actions.copy(fragment.requireContext(), listView, msg.getName(), msg.getMessage());
-                            return true;
-                        } else if (item.getItemId() == R.id.message_reply) {
-                            if (replyCallback != null) {
-                                replyCallback.accept(mode, msg);
-                                return true;
-                            }
-                        }
-                        return false;
-                    }
-
-                    @Override
-                    public void onDestroyActionMode(ActionMode mode) {
-                        listView.setItemChecked(position, false);
-                    }
-                };
-
-                var actionMode = appCompatActivity.startSupportActionMode(actionModeCallBack);
-                if (actionMode == null) {
-                    Log.e(LOG_TAG, "Unexpected null value for action mode");
+            var actionModeCallback = new MessageActionMode(fragment.requireContext(), view, msg, adapter, infoCallback, replyCallback);
+            var actionMode = mainActivity.startSupportActionMode(actionModeCallback);
+            if (actionMode == null) {
+                Log.e(LOG_TAG, "Unexpected null value for action mode");
+            } else {
+                if (msg.isAnonymous()) {
+                    actionMode.setTitle(R.string.message_name_anonymous);
                 } else {
-                    if (msg.isAnonymous()) {
-                        actionMode.setTitle(R.string.message_name_anonymous);
-                    } else {
-                        actionMode.setTitle(msg.getName());
-                    }
+                    actionMode.setTitle(msg.getName());
                 }
-            } else if (appCompatActivity instanceof MainActivity) {
-                ((MainActivity) appCompatActivity).finishActionMode();
             }
+        } else {
+            adapter.setCheckedItemPosition(position);
         }
     }
 
@@ -193,5 +150,57 @@ public class MessageUtils {
                 ZonedDateTime.ofInstant(message.getDate(), NetworkConstants.SERVER_TIME_ZONE).format(COPY_TIME_FORMAT),
                 message.getUserName() != null ? "✓" : ""
         );
+    }
+
+    @RequiredArgsConstructor
+    private static class MessageActionMode implements ActionMode.Callback {
+        private final @NonNull Context mContext;
+        private final @Nullable View mView;
+        private final @NonNull Message mMessage;
+        private final @NonNull MessageAdapter mAdapter;
+        private final @Nullable BiConsumer<ActionMode, Message> mInfoCallback;
+        private final @Nullable BiConsumer<ActionMode, Message> mReplyCallback;
+
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            mode.getMenuInflater().inflate(R.menu.menu_message, menu);
+
+            var reply = menu.findItem(R.id.message_reply);
+            if (reply != null) reply.setVisible(mReplyCallback != null);
+
+            var info = menu.findItem(R.id.message_info);
+            if (info != null) info.setVisible(mInfoCallback != null);
+
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return false;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            if (item.getItemId() == R.id.message_info) {
+                if (mInfoCallback != null) {
+                    mInfoCallback.accept(mode, mMessage);
+                    return true;
+                }
+            } else if (item.getItemId() == R.id.message_copy) {
+                Actions.copy(mContext, mView, mMessage.getName(), mMessage.getMessage());
+                return true;
+            } else if (item.getItemId() == R.id.message_reply) {
+                if (mReplyCallback != null) {
+                    mReplyCallback.accept(mode, mMessage);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            mAdapter.setCheckedItemPosition(-1);
+        }
     }
 }

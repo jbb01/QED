@@ -243,7 +243,6 @@
             android:layout_below="@id/database_search_filters"
             android:layout_alignParentBottom="true"
             android:background="@android:color/transparent"
-            android:choiceMode="singleChoice"
             android:clipChildren="false"
             android:clipToPadding="false"
             android:divider="@android:color/transparent"

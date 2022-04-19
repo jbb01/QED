@@ -92,16 +92,12 @@ public class LogFragment extends Fragment {
 
         mMessageAdapter = new MessageAdapter(requireContext(), new ArrayList<>(), null, false, null, false);
         mBinding.list.setAdapter(mMessageAdapter);
-        mBinding.list.setOnItemClickListener((parent, view1, position, id) -> setChecked(position, false));
+        mBinding.list.setOnItemClickListener((parent, view1, position, id) -> {
+            setCheckedItem(-1);
+        });
         mBinding.list.setOnItemLongClickListener((parent, view1, position, id) -> {
-            if (!mBinding.list.isItemChecked(position)) {
-                int checked = mBinding.list.getCheckedItemPosition();
-                if (checked != -1) setChecked(checked, false);
-
-                setChecked(position, true);
-                return true;
-            }
-            return false;
+            setCheckedItem(position);
+            return true;
         });
 
         mBinding.subtitle.setOnClickListener(v -> {
@@ -170,18 +166,16 @@ public class LogFragment extends Fragment {
      * Sets the checked item in the list and shows an appropriate toolbar.
      *
      * @param position the position of the checked item in the {@link #mMessageAdapter}
-     * @param value if the item is checked or not
      */
-    private void setChecked(int position, boolean value) {
-        MessageUtils.setChecked(
+    private void setCheckedItem(int position) {
+        MessageUtils.setCheckedItem(
                 this,
                 mBinding.list,
                 mMessageAdapter,
                 (mode, msg) -> NavHostFragment.findNavController(this)
                                               .navigate(LogFragmentDirections.showMessage(msg)),
                 null,
-                position,
-                value
+                position
         );
     }
 

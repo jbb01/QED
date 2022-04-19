@@ -113,23 +113,15 @@ public class ChatFragment extends Fragment implements NetworkListener, AbsListVi
         mBinding.quickSettings.setOnClickListener(this::toggleQuickSettingsShown);
         setQuickSettingsShown(mQuickSettingsShown);
 
-        var messageBox = mBinding.list;
         mMessageAdapter = new MessageAdapter(view.getContext(), new ArrayList<>(), mBinding.mathPreload);
-        messageBox.setAdapter(mMessageAdapter);
-        messageBox.setOnScrollListener(this);
-        messageBox.setOnItemClickListener((parent, v, position, id) -> {
-            setChecked(position, false);
+        mBinding.list.setAdapter(mMessageAdapter);
+        mBinding.list.setOnScrollListener(this);
+        mBinding.list.setOnItemClickListener((parent, v, position, id) -> {
+            setCheckedItem(-1);
         });
-        messageBox.setOnItemLongClickListener((parent, v, position, id) -> {
-            if (!messageBox.isItemChecked(position)) {
-                int checked = messageBox.getCheckedItemPosition();
-                if (checked != -1) setChecked(checked, false);
-
-                setChecked(position, true);
-                return true;
-            } else {
-                return false;
-            }
+        mBinding.list.setOnItemLongClickListener((parent, v, position, id) -> {
+            setCheckedItem(position);
+            return true;
         });
         mInitMessages = new ArrayList<>(100);
 
@@ -188,6 +180,7 @@ public class ChatFragment extends Fragment implements NetworkListener, AbsListVi
 
         mInitMessages.clear();
         mMessageAdapter.clear();
+        setCheckedItem(-1);
         mInitDone = false;
         mBinding.setLoading(true);
 
@@ -290,6 +283,7 @@ public class ChatFragment extends Fragment implements NetworkListener, AbsListVi
                 mMessageAdapter.clear();
                 mMessageAdapter.addAll(mInitMessages);
                 mMessageAdapter.notifyDataSetChanged();
+                setCheckedItem(-1);
 
                 mBinding.list.setSelection(mInitMessages.size() - 1);
 
@@ -383,18 +377,16 @@ public class ChatFragment extends Fragment implements NetworkListener, AbsListVi
      * Sets the checked item in the message list and shows an appropriate toolbar.
      *
      * @param position the position of the checked item in the {@link #mMessageAdapter}
-     * @param value if the item is checked or not
      */
-    private void setChecked(int position, boolean value) {
-        MessageUtils.setChecked(
+    private void setCheckedItem(int position) {
+        MessageUtils.setCheckedItem(
                 this,
                 mBinding.list,
                 mMessageAdapter,
                 (mode, msg) -> NavHostFragment.findNavController(this)
                                               .navigate(ChatFragmentDirections.showMessage(msg)),
                 this::reply,
-                position,
-                value
+                position
         );
     }
 

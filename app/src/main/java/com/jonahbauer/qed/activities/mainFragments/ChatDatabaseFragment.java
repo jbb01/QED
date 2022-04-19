@@ -91,15 +91,12 @@ public class ChatDatabaseFragment extends Fragment implements CompoundButton.OnC
 
         // setup list view
         mMessageAdapter = new MessageAdapter(requireContext(), new ArrayList<>(), null, false, null, true);
-        mBinding.messageListView.setOnItemClickListener((parent, v, position, id) -> setChecked(position, false));
+        mBinding.messageListView.setOnItemClickListener((parent, v, position, id) -> {
+            setCheckedItem(-1);
+        });
         mBinding.messageListView.setOnItemLongClickListener((parent, v, position, id) -> {
-            if (!mBinding.messageListView.isItemChecked(position)) {
-                int checked = mBinding.messageListView.getCheckedItemPosition();
-                if (checked != -1) setChecked(checked, false);
-
-                setChecked(position, true);
-                return true;
-            } else return false;
+            setCheckedItem(position);
+            return true;
         });
         mBinding.messageListView.setAdapter(mMessageAdapter);
 
@@ -129,6 +126,7 @@ public class ChatDatabaseFragment extends Fragment implements CompoundButton.OnC
             mBinding.setStatus(messages.getCode());
 
             mMessageAdapter.clear();
+            setCheckedItem(-1);
             if (messages.getCode() == StatusWrapper.STATUS_LOADED) {
                 mMessageAdapter.addAll(messages.getValue());
 
@@ -142,18 +140,16 @@ public class ChatDatabaseFragment extends Fragment implements CompoundButton.OnC
      * Sets the checked item in the list view and shows an appropriate toolbar.
      *
      * @param position the position of the checked item in the {@link #mMessageAdapter}
-     * @param value if the item is checked or not
      */
-    private void setChecked(int position, boolean value) {
-        MessageUtils.setChecked(
+    private void setCheckedItem(int position) {
+        MessageUtils.setCheckedItem(
                 this,
                 mBinding.messageListView,
                 mMessageAdapter,
                 (mode, msg) -> NavHostFragment.findNavController(this)
                                               .navigate(ChatDatabaseFragmentDirections.showMessage(msg)),
                 null,
-                position,
-                value
+                position
         );
     }
 

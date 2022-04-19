@@ -186,7 +186,6 @@
             android:layout_alignParentStart="true"
             android:layout_alignParentBottom="true"
             android:background="@android:color/transparent"
-            android:choiceMode="singleChoice"
             android:clipChildren="false"
             android:clipToPadding="false"
             android:divider="@android:color/transparent"

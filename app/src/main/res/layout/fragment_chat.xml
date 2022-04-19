@@ -55,7 +55,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@android:color/transparent"
-                    android:choiceMode="singleChoice"
                     android:clipChildren="false"
                     android:clipToPadding="false"
                     android:divider="@android:color/transparent"

@@ -23,6 +23,7 @@ import com.jonahbauer.qed.model.Message;
 import com.jonahbauer.qed.util.Preferences;
 import com.jonahbauer.qed.util.ViewUtils;
 
+import java.lang.ref.WeakReference;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -30,6 +31,10 @@ import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
+
+import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 
 public class MessageAdapter extends ArrayAdapter<Message> {
     private final Context mContext;
@@ -54,6 +59,9 @@ public class MessageAdapter extends ArrayAdapter<Message> {
     @ColorInt
     private int mDefaultTextColor;
     private final LinearLayout mathPreload;
+
+    private int mCheckedItemPosition = -1;
+    private final Int2ObjectMap<WeakReference<View>> mViews = new Int2ObjectArrayMap<>();
 
     public MessageAdapter(Context context, @NonNull List<Message> messageList, @Nullable LinearLayout mathPreload) {
         this(context, messageList, mathPreload, null, null, false);
@@ -165,8 +173,10 @@ public class MessageAdapter extends ArrayAdapter<Message> {
         view.setFocusable(false);
         view.setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
 
-        if (!mExtended) return (View) view.getParent();
-        return view;
+        var root = mExtended ? view : (View) view.getParent();
+        savePosition(position, view);
+        root.setActivated(position == mCheckedItemPosition);
+        return root;
     }
 
     public List<Message> getData() {
@@ -199,12 +209,6 @@ public class MessageAdapter extends ArrayAdapter<Message> {
     }
 
     @Override
-    @Nullable
-    public Message getItem(int position) {
-        return super.getItem(position);
-    }
-
-    @Override
     public long getItemId(int position) {
         var item = getItem(position);
         return item != null ? item.getId() : Message.NO_ID;
@@ -213,6 +217,7 @@ public class MessageAdapter extends ArrayAdapter<Message> {
     @Override
     public void clear() {
         super.clear();
+        mCheckedItemPosition = -1;
         reload();
     }
 
@@ -252,4 +257,49 @@ public class MessageAdapter extends ArrayAdapter<Message> {
     private String formatBanner(LocalDate date) {
         return mDateBannerFormat.format(date);
     }
+
+    private void savePosition(int position, View view) {
+        var oldPosition = (int) Objects.requireNonNullElse(view.getTag(R.id.tag_position), -1);
+        var oldPositionViewRef = mViews.get(oldPosition);
+        if (oldPositionViewRef != null && oldPositionViewRef.get() == view) {
+            mViews.remove(oldPosition);
+        }
+
+        mViews.put(position, new WeakReference<>(view));
+        view.setTag(R.id.tag_position, position);
+    }
+
+    public void setCheckedItemPosition(int position) {
+        if (mCheckedItemPosition != position) {
+            var oldCheckedView = getViewForPosition(mCheckedItemPosition);
+            if (oldCheckedView != null) {
+                oldCheckedView.setActivated(false);
+            }
+
+            mCheckedItemPosition = position;
+
+            var newCheckedView = getViewForPosition(mCheckedItemPosition);
+            if (newCheckedView != null) {
+                newCheckedView.setActivated(true);
+            }
+        }
+    }
+
+    public int getCheckedItemPosition() {
+        return mCheckedItemPosition;
+    }
+
+    private @Nullable View getViewForPosition(int position) {
+        var viewRef = mViews.get(position);
+        if (viewRef != null) {
+            var view = viewRef.get();
+            if (view != null) {
+                return view;
+            } else {
+                mViews.remove(position);
+            }
+        }
+        return null;
+    }
+
 }
