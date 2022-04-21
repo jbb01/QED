@@ -7,128 +7,70 @@ import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.widget.CompoundButton;
 
+import androidx.annotation.AttrRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.content.res.AppCompatResources;
 
 import com.google.android.material.checkbox.MaterialCheckBox;
 import com.jonahbauer.qed.R;
+import com.jonahbauer.qed.model.parcel.ParcelExtensions;
+
+import java.util.Objects;
+
+import lombok.RequiredArgsConstructor;
 
 /**
- * Base on https://stackoverflow.com/a/40939367/3950497 answer.
+ * Based on https://stackoverflow.com/a/40939367/3950497.
  */
 public class CheckBoxTriStates extends MaterialCheckBox {
+    private State mState = State.UNKNOWN;
 
-    static public final int UNKNOWN = -1;
+    private final OnCheckedChangeListener mSuperListener = this::onCheckedChanged;
+    private OnCheckedChangeListener mListener;
 
-    static public final int UNCHECKED = 0;
+    private boolean mChangingState;
 
-    static public final int CHECKED = 1;
-
-    private int mState;
-
-    /**
-     * This is the listener set to the super class which is going to be evoke each
-     * time the check state has changed.
-     */
-    private final OnCheckedChangeListener mPrivateListener = (CompoundButton buttonView, boolean isChecked) -> {
-        // checkbox status is changed from uncheck to checked.
-        switch (mState) {
-            case UNKNOWN:
-                setState(UNCHECKED);
-                break;
-            case UNCHECKED:
-                setState(CHECKED);
-                break;
-            case CHECKED:
-                setState(UNKNOWN);
-                break;
-        }
-    };
-
-    /**
-     * Holds a reference to the listener set by a client, if any.
-     */
-    private OnCheckedChangeListener mClientListener;
-
-    /**
-     * This flag is needed to avoid accidentally changing the current {@link #mState} when
-     * {@link #onRestoreInstanceState(Parcelable)} calls {@link #setChecked(boolean)}
-     * evoking our {@link #mPrivateListener} and therefore changing the real state.
-     */
-    private boolean mRestoring;
-
-    public CheckBoxTriStates(Context context) {
+    public CheckBoxTriStates(@NonNull Context context) {
         this(context, null);
     }
 
-    public CheckBoxTriStates(Context context, AttributeSet attrs) {
+    public CheckBoxTriStates(@NonNull Context context, @Nullable AttributeSet attrs) {
         this(context, attrs, R.attr.triCheckboxStyle);
     }
 
-    public CheckBoxTriStates(Context context, AttributeSet attrs, int defStyleAttr) {
+    public CheckBoxTriStates(@NonNull Context context, @Nullable AttributeSet attrs, @AttrRes int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init();
     }
 
-    public int getState() {
-        return mState;
+    private void init() {
+        mState = State.UNKNOWN;
+        updateDrawable(true);
+        super.setOnCheckedChangeListener(mSuperListener);
     }
 
-    private void setState(int state) {
-        if(!this.mRestoring && this.mState != state) {
-            setChecked(state != UNKNOWN);
-            this.mState = state;
-
-            if(this.mClientListener != null) {
-                this.mClientListener.onCheckedChanged(this, this.isChecked());
-            }
-
-            updateBtn(false);
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        if (mChangingState) return;
+        switch (mState) {
+            case UNKNOWN:
+                setState(State.UNCHECKED);
+                break;
+            case UNCHECKED:
+                setState(State.CHECKED);
+                break;
+            case CHECKED:
+                setState(State.UNKNOWN);
+                break;
         }
     }
 
     @Override
     public void setOnCheckedChangeListener(@Nullable OnCheckedChangeListener listener) {
-
-        // we never truly set the listener to the client implementation, instead we only hold
-        // a reference to it and evoke it when needed.
-        if(this.mPrivateListener != listener) {
-            this.mClientListener = listener;
-        }
-
-        // always use our implementation
-        super.setOnCheckedChangeListener(mPrivateListener);
+        mListener = listener;
     }
 
-    @Override
-    public Parcelable onSaveInstanceState() {
-        Parcelable superState = super.onSaveInstanceState();
-
-        SavedState ss = new SavedState(superState);
-
-        ss.mState = mState;
-
-        return ss;
-    }
-
-    @Override
-    public void onRestoreInstanceState(Parcelable state) {
-        this.mRestoring = true; // indicates that the ui is restoring its state
-        SavedState ss = (SavedState) state;
-        super.onRestoreInstanceState(ss.getSuperState());
-        setState(ss.mState);
-        requestLayout();
-        this.mRestoring = false;
-    }
-
-    private void init() {
-        mState = UNKNOWN;
-        updateBtn(true);
-        setOnCheckedChangeListener(this.mPrivateListener);
-    }
-
-    private void updateBtn(boolean isInit) {
+    private void updateDrawable(boolean isInit) {
         int btnDrawable = R.drawable.ic_checkbox_checked_to_unknown;
         switch (mState) {
             case UNKNOWN:
@@ -148,8 +90,45 @@ public class CheckBoxTriStates extends MaterialCheckBox {
         if (getButtonDrawable() instanceof Animatable) ((Animatable)getButtonDrawable()).start();
     }
 
+    public @NonNull State getState() {
+        return mState;
+    }
+
+    private void setState(@NonNull State state) {
+        Objects.requireNonNull(state);
+        if (this.mState != state) {
+            this.mState = state;
+
+            mChangingState = true;
+            setChecked(state != State.UNKNOWN);
+            updateDrawable(false);
+            mChangingState = false;
+
+            if (this.mListener != null) {
+                this.mListener.onCheckedChanged(this, isChecked());
+            }
+        }
+    }
+
+    @Override
+    public Parcelable onSaveInstanceState() {
+        var superState = super.onSaveInstanceState();
+        var ss = new SavedState(superState);
+        ss.mState = mState;
+        return ss;
+    }
+
+    @Override
+    public void onRestoreInstanceState(Parcelable state) {
+        var ss = (SavedState) state;
+        super.onRestoreInstanceState(ss.getSuperState());
+
+        mState = ss.mState;
+        updateDrawable(true);
+    }
+
     static class SavedState extends BaseSavedState {
-        int mState;
+        State mState;
 
         SavedState(Parcelable superState) {
             super(superState);
@@ -157,35 +136,38 @@ public class CheckBoxTriStates extends MaterialCheckBox {
 
         private SavedState(Parcel in) {
             super(in);
-            mState = in.readInt();
+            mState = ParcelExtensions.readEnum(in, State.values());
         }
 
         @Override
         public void writeToParcel(Parcel out, int flags) {
             super.writeToParcel(out, flags);
-            out.writeValue(mState);
+            ParcelExtensions.writeEnum(out, mState);
         }
 
-        @NonNull
-        @Override
-        public String toString() {
-            return "CheckboxTriState.SavedState{"
-                    + Integer.toHexString(System.identityHashCode(this))
-                    + " state=" + mState + "}";
+        public static final Parcelable.Creator<SavedState> CREATOR = new Parcelable.Creator<>() {
+            @Override
+            public SavedState createFromParcel(Parcel in) {
+                return new SavedState(in);
+            }
+
+            @Override
+            public SavedState[] newArray(int size) {
+                return new SavedState[size];
+            }
+        };
+    }
+
+    @RequiredArgsConstructor
+    public enum State {
+        UNKNOWN(null),
+        UNCHECKED(false),
+        CHECKED(true);
+
+        private final Boolean value;
+
+        public @Nullable Boolean asBoolean() {
+            return value;
         }
-
-        @SuppressWarnings("hiding")
-        public static final Parcelable.Creator<SavedState> CREATOR =
-                new Parcelable.Creator<SavedState>() {
-                    @Override
-                    public SavedState createFromParcel(Parcel in) {
-                        return new SavedState(in);
-                    }
-
-                    @Override
-                    public SavedState[] newArray(int size) {
-                        return new SavedState[size];
-                    }
-                };
     }
 }

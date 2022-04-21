@@ -19,7 +19,6 @@ import androidx.navigation.Navigation;
 import androidx.navigation.fragment.FragmentNavigator;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.databinding.FragmentPersonsDatabaseBinding;
-import com.jonahbauer.qed.layoutStuff.views.CheckBoxTriStates;
 import com.jonahbauer.qed.model.Person;
 import com.jonahbauer.qed.model.adapter.PersonAdapter;
 import com.jonahbauer.qed.model.viewmodel.PersonListViewModel;
@@ -97,8 +96,6 @@ public class PersonDatabaseFragment extends Fragment implements CompoundButton.O
 
         mBinding.databaseFirstNameCheckbox.setOnCheckedChangeListener(this);
         mBinding.databaseLastNameCheckbox.setOnCheckedChangeListener(this);
-        mBinding.databaseActiveCheckbox.setOnCheckedChangeListener(this);
-        mBinding.databaseMemberCheckbox.setOnCheckedChangeListener(this);
 
         onCheckedChanged(mBinding.databaseFirstNameCheckbox, mBinding.databaseFirstNameCheckbox.isChecked());
         onCheckedChanged(mBinding.databaseLastNameCheckbox, mBinding.databaseLastNameCheckbox.isChecked());
@@ -140,8 +137,8 @@ public class PersonDatabaseFragment extends Fragment implements CompoundButton.O
     private void search() {
         String firstName = null;
         String lastName = null;
-        Boolean member = null;
-        Boolean active = null;
+        Boolean member;
+        Boolean active;
 
         if (mBinding.databaseFirstNameCheckbox.isChecked()) {
             firstName = mBinding.databaseFirstNameEditText.getText().toString().trim();
@@ -151,19 +148,8 @@ public class PersonDatabaseFragment extends Fragment implements CompoundButton.O
             lastName = mBinding.databaseLastNameEditText.getText().toString().trim();
         }
 
-        int memberCheckbox = mBinding.databaseMemberCheckbox.getState();
-        if (memberCheckbox == CheckBoxTriStates.CHECKED) {
-            member = true;
-        } else if (memberCheckbox == CheckBoxTriStates.UNCHECKED) {
-            member = false;
-        }
-
-        int activeCheckbox = mBinding.databaseActiveCheckbox.getState();
-        if (activeCheckbox == CheckBoxTriStates.CHECKED) {
-            active = true;
-        } else if (activeCheckbox == CheckBoxTriStates.UNCHECKED) {
-            active = false;
-        }
+        member = mBinding.databaseMemberCheckbox.getState().asBoolean();
+        active = mBinding.databaseActiveCheckbox.getState().asBoolean();
 
         mPersonAdapter.setSortMode(mSortLastName ? PersonAdapter.SortMode.LAST_NAME : PersonAdapter.SortMode.FIRST_NAME);
         mPersonListViewModel.filter(firstName, lastName, member, active);
