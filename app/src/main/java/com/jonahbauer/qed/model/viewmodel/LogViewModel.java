@@ -12,6 +12,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.jonahbauer.qed.model.LogRequest;
 import com.jonahbauer.qed.model.LogRequest.FileLogRequest;
 import com.jonahbauer.qed.model.Message;
+import com.jonahbauer.qed.model.adapter.MessageAdapter;
 import com.jonahbauer.qed.networking.Reason;
 import com.jonahbauer.qed.networking.async.QEDPageStreamReceiver;
 import com.jonahbauer.qed.networking.pages.QEDChatPages;
@@ -34,6 +35,8 @@ public class LogViewModel extends AndroidViewModel {
     private final MutableLiveData<LogRequest> mLogRequest = new MutableLiveData<>();
 
     private final CompositeDisposable mDisposable = new CompositeDisposable();
+
+    private int mCheckedItemPosition = MessageAdapter.INVALID_POSITION;
 
     public LogViewModel(@NonNull Application application) {
         super(application);
@@ -72,6 +75,7 @@ public class LogViewModel extends AndroidViewModel {
 
     public void load(@NonNull LogRequest logRequest) {
         if (!Objects.equals(mLogRequest.getValue(), logRequest)) {
+            mCheckedItemPosition = MessageAdapter.INVALID_POSITION;
             mLogRequest.setValue(logRequest);
         }
     }
@@ -90,6 +94,14 @@ public class LogViewModel extends AndroidViewModel {
 
     public LiveData<LogRequest> getLogRequest() {
         return mLogRequest;
+    }
+
+    public void setCheckedItemPosition(int checkedItemPosition) {
+        this.mCheckedItemPosition = checkedItemPosition;
+    }
+
+    public int getCheckedItemPosition() {
+        return mCheckedItemPosition;
     }
 
     private void parse(Uri file) {

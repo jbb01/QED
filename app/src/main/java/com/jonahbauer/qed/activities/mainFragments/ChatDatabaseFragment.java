@@ -126,13 +126,18 @@ public class ChatDatabaseFragment extends Fragment implements CompoundButton.OnC
             mBinding.setStatus(messages.getCode());
 
             mMessageAdapter.clear();
-            setCheckedItem(MessageAdapter.INVALID_POSITION);
             if (messages.getCode() == StatusWrapper.STATUS_LOADED) {
                 mMessageAdapter.addAll(messages.getValue());
 
                 mBinding.setHits(getString(R.string.hits, messages.getValue().size()));
             }
             mMessageAdapter.notifyDataSetChanged();
+
+            if (messages.getCode() == StatusWrapper.STATUS_LOADED) {
+                setCheckedItem(mMessageListViewModel.getCheckedItemPosition());
+            } else {
+                setCheckedItem(MessageAdapter.INVALID_POSITION);
+            }
         });
     }
 
@@ -142,6 +147,7 @@ public class ChatDatabaseFragment extends Fragment implements CompoundButton.OnC
      * @param position the position of the checked item in the {@link #mMessageAdapter}
      */
     private void setCheckedItem(int position) {
+        mMessageListViewModel.setCheckedItemPosition(position);
         MessageUtils.setCheckedItem(
                 this,
                 mBinding.messageListView,

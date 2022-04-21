@@ -154,6 +154,12 @@ public class LogFragment extends Fragment {
                 mBinding.setError(getString(reason.getStringRes()));
             }
             mMessageAdapter.notifyDataSetChanged();
+
+            if (messages.getCode() == StatusWrapper.STATUS_LOADED) {
+                setCheckedItem(mLogViewModel.getCheckedItemPosition());
+            } else {
+                setCheckedItem(MessageAdapter.INVALID_POSITION);
+            }
         });
 
         mLogViewModel.getLogRequest().observe(getViewLifecycleOwner(), logRequest -> {
@@ -168,6 +174,7 @@ public class LogFragment extends Fragment {
      * @param position the position of the checked item in the {@link #mMessageAdapter}
      */
     private void setCheckedItem(int position) {
+        mLogViewModel.setCheckedItemPosition(position);
         MessageUtils.setCheckedItem(
                 this,
                 mBinding.list,

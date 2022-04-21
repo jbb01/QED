@@ -9,6 +9,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.jonahbauer.qed.model.Message;
+import com.jonahbauer.qed.model.adapter.MessageAdapter;
 import com.jonahbauer.qed.model.room.Database;
 import com.jonahbauer.qed.model.room.MessageDao;
 import com.jonahbauer.qed.util.StatusWrapper;
@@ -26,6 +27,8 @@ public class MessageListViewModel extends AndroidViewModel {
     private final MutableLiveData<StatusWrapper<List<Message>>> mMessages = new MutableLiveData<>();
     private final CompositeDisposable mDisposable = new CompositeDisposable();
 
+    private int mCheckedItemPosition = MessageAdapter.INVALID_POSITION;
+
     public MessageListViewModel(@NonNull Application application) {
         super(application);
 
@@ -41,6 +44,7 @@ public class MessageListViewModel extends AndroidViewModel {
                      @Nullable Long fromId,
                      @Nullable Long toId,
                      long limit) {
+        mCheckedItemPosition = MessageAdapter.INVALID_POSITION;
         mMessages.setValue(StatusWrapper.preloaded(Collections.emptyList()));
         mDisposable.add(
                 mMessageDao.findAll(channel, message, name, fromDate, toDate, fromId, toId, limit)
@@ -51,6 +55,14 @@ public class MessageListViewModel extends AndroidViewModel {
                                    (e) -> mMessages.setValue(StatusWrapper.error(Collections.emptyList(), e))
                            )
         );
+    }
+
+    public int getCheckedItemPosition() {
+        return mCheckedItemPosition;
+    }
+
+    public void setCheckedItemPosition(int checkedItemPosition) {
+        this.mCheckedItemPosition = checkedItemPosition;
     }
 
     public LiveData<StatusWrapper<List<Message>>> getMessages() {
