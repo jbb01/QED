@@ -11,6 +11,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.view.ActionMode;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleEventObserver;
+import androidx.lifecycle.LifecycleOwner;
 
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.MainActivity;
@@ -75,6 +78,17 @@ public class MessageUtils {
                 } else {
                     actionMode.setTitle(msg.getName());
                 }
+
+                var lifecycle = fragment.getViewLifecycleOwner().getLifecycle();
+                lifecycle.addObserver(new LifecycleEventObserver() {
+                    @Override
+                    public void onStateChanged(@NonNull LifecycleOwner source, @NonNull Lifecycle.Event event) {
+                        if (event.getTargetState() == Lifecycle.State.DESTROYED) {
+                            actionMode.finish();
+                            lifecycle.removeObserver(this);
+                        }
+                    }
+                });
             }
         } else {
             adapter.setCheckedItemPosition(position);
@@ -200,7 +214,7 @@ public class MessageUtils {
 
         @Override
         public void onDestroyActionMode(ActionMode mode) {
-            mAdapter.setCheckedItemPosition(-1);
+            mAdapter.setCheckedItemPosition(MessageAdapter.INVALID_POSITION);
         }
     }
 }

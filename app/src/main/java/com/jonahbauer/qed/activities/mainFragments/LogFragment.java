@@ -93,7 +93,7 @@ public class LogFragment extends Fragment {
         mMessageAdapter = new MessageAdapter(requireContext(), new ArrayList<>(), null, false, null, false);
         mBinding.list.setAdapter(mMessageAdapter);
         mBinding.list.setOnItemClickListener((parent, view1, position, id) -> {
-            setCheckedItem(-1);
+            setCheckedItem(MessageAdapter.INVALID_POSITION);
         });
         mBinding.list.setOnItemLongClickListener((parent, view1, position, id) -> {
             setCheckedItem(position);

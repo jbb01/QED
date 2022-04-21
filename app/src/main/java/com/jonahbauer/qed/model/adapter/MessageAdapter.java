@@ -37,6 +37,8 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 
 public class MessageAdapter extends ArrayAdapter<Message> {
+    public static final int INVALID_POSITION = -1;
+
     private final Context mContext;
     private final List<Message> mMessageList;
 
@@ -60,7 +62,7 @@ public class MessageAdapter extends ArrayAdapter<Message> {
     private int mDefaultTextColor;
     private final LinearLayout mathPreload;
 
-    private int mCheckedItemPosition = -1;
+    private int mCheckedItemPosition = INVALID_POSITION;
     private final Int2ObjectMap<WeakReference<View>> mViews = new Int2ObjectArrayMap<>();
 
     public MessageAdapter(Context context, @NonNull List<Message> messageList, @Nullable LinearLayout mathPreload) {
@@ -217,7 +219,7 @@ public class MessageAdapter extends ArrayAdapter<Message> {
     @Override
     public void clear() {
         super.clear();
-        mCheckedItemPosition = -1;
+        mCheckedItemPosition = INVALID_POSITION;
         reload();
     }
 

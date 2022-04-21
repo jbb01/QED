@@ -117,7 +117,7 @@ public class ChatFragment extends Fragment implements NetworkListener, AbsListVi
         mBinding.list.setAdapter(mMessageAdapter);
         mBinding.list.setOnScrollListener(this);
         mBinding.list.setOnItemClickListener((parent, v, position, id) -> {
-            setCheckedItem(-1);
+            setCheckedItem(MessageAdapter.INVALID_POSITION);
         });
         mBinding.list.setOnItemLongClickListener((parent, v, position, id) -> {
             setCheckedItem(position);
@@ -180,7 +180,7 @@ public class ChatFragment extends Fragment implements NetworkListener, AbsListVi
 
         mInitMessages.clear();
         mMessageAdapter.clear();
-        setCheckedItem(-1);
+        setCheckedItem(MessageAdapter.INVALID_POSITION);
         mInitDone = false;
         mBinding.setLoading(true);
 
@@ -283,7 +283,7 @@ public class ChatFragment extends Fragment implements NetworkListener, AbsListVi
                 mMessageAdapter.clear();
                 mMessageAdapter.addAll(mInitMessages);
                 mMessageAdapter.notifyDataSetChanged();
-                setCheckedItem(-1);
+                setCheckedItem(MessageAdapter.INVALID_POSITION);
 
                 mBinding.list.setSelection(mInitMessages.size() - 1);
 

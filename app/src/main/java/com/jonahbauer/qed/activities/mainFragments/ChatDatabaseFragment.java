@@ -92,7 +92,7 @@ public class ChatDatabaseFragment extends Fragment implements CompoundButton.OnC
         // setup list view
         mMessageAdapter = new MessageAdapter(requireContext(), new ArrayList<>(), null, false, null, true);
         mBinding.messageListView.setOnItemClickListener((parent, v, position, id) -> {
-            setCheckedItem(-1);
+            setCheckedItem(MessageAdapter.INVALID_POSITION);
         });
         mBinding.messageListView.setOnItemLongClickListener((parent, v, position, id) -> {
             setCheckedItem(position);
@@ -126,7 +126,7 @@ public class ChatDatabaseFragment extends Fragment implements CompoundButton.OnC
             mBinding.setStatus(messages.getCode());
 
             mMessageAdapter.clear();
-            setCheckedItem(-1);
+            setCheckedItem(MessageAdapter.INVALID_POSITION);
             if (messages.getCode() == StatusWrapper.STATUS_LOADED) {
                 mMessageAdapter.addAll(messages.getValue());
 
