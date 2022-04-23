@@ -128,6 +128,8 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <style name="Theme.App.Dark.NoActionBar.Fullscreen"/>
+
     <style name="Theme.App.SplashScreen">
         <item name="android:windowBackground">@drawable/splash_screen</item>
     </style>

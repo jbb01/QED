@@ -104,20 +104,21 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        ViewCompat.setOnApplyWindowInsetsListener(mBinding.fragment, (v, insets) -> {
-            var systemInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+        ViewCompat.setOnApplyWindowInsetsListener(mBinding.fragment, (v, windowInsets) -> {
+            var mask = WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout();
+            var insets = windowInsets.getInsets(mask);
 
-            mBinding.toolbar.setPadding(
-                    systemInsets.left,
-                    systemInsets.top,
-                    systemInsets.right,
-                    0
-            );
+            mBinding.toolbar.setPadding(insets.left, insets.top, insets.right, 0);
+
+            var params = mBinding.toolbar.getLayoutParams();
+            params.height = (int) (ViewUtils.getActionBarSize(mBinding.toolbar.getContext()) + insets.top);
+            mBinding.toolbar.setLayoutParams(params);
+
             mBinding.overlayBottom.setPadding(
-                    systemInsets.left,
+                    insets.left,
                     (int) ViewUtils.dpToPx(v, 24),
-                    systemInsets.right,
-                    (int) (ViewUtils.dpToPx(v, 24) + systemInsets.bottom)
+                    insets.right,
+                    (int) (ViewUtils.dpToPx(v, 24) + insets.bottom)
             );
             return WindowInsetsCompat.CONSUMED;
         });

@@ -16,6 +16,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
+import androidx.annotation.Px;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
@@ -293,6 +294,15 @@ public class ViewUtils {
         var window = activity.getWindow();
         window.setStatusBarColor(statusBarColor.data);
         window.setNavigationBarColor(navigationBarColor.data);
+    }
+
+    public static @Px float getActionBarSize(@NonNull Context context) {
+        var out = new TypedValue();
+        if (context.getTheme().resolveAttribute(R.attr.actionBarSize, out, true)) {
+            return out.getDimension(context.getResources().getDisplayMetrics());
+        } else {
+            return dpToPx(context, 56);
+        }
     }
 
     @NonNull
