@@ -1,5 +1,6 @@
 package com.jonahbauer.qed.util;
 
+import android.animation.ObjectAnimator;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
@@ -11,8 +12,6 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.Transformation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -55,7 +54,7 @@ public class ViewUtils {
         int wrapContentMeasureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
         view.measure(matchParentMeasureSpec, wrapContentMeasureSpec);
 
-        final int duration = view.getContext().getResources().getInteger(android.R.integer.config_mediumAnimTime);
+        final int duration = view.getContext().getResources().getInteger(R.integer.material_motion_duration_medium_2);
         final int targetHeight = view.getMeasuredHeight();
         final int initialPadding = view.getPaddingTop();
 
@@ -64,60 +63,48 @@ public class ViewUtils {
         view.setVisibility(View.VISIBLE);
         view.setAlpha(0);
 
-        Animation anim = new Animation() {
-            @Override
-            protected void applyTransformation(float interpolatedTime, Transformation t) {
-                if (interpolatedTime == 1) {
-                    view.getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT;
-                    view.setAlpha(1);
-                    setPaddingTop(view, initialPadding);
-                } else {
-                    view.getLayoutParams().height = (int) (targetHeight * interpolatedTime);
-                    view.setAlpha(interpolatedTime);
-                    setPaddingTop(view, initialPadding - (int) (targetHeight * (1 - interpolatedTime)));
-                }
-                view.requestLayout();
+        var animator = ObjectAnimator.ofFloat(0, 1);
+        animator.addUpdateListener(animation -> {
+            var fraction = animation.getAnimatedFraction();
+            if (fraction == 1) {
+                view.getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                view.setAlpha(1);
+                setPaddingTop(view, initialPadding);
+            } else {
+                view.getLayoutParams().height = (int) (targetHeight * fraction);
+                view.setAlpha(fraction);
+                setPaddingTop(view, initialPadding - (int) (targetHeight * (1 - fraction)));
             }
-
-            @Override
-            public boolean willChangeBounds() {
-                return true;
-            }
-        };
-        anim.setDuration(duration);
-        view.startAnimation(anim);
+            view.requestLayout();
+        });
+        animator.setDuration(duration);
+        animator.start();
     }
 
     /**
      * Collapses the given view.
      */
     public static void collapse(@NonNull final View view) {
-        final int duration = view.getContext().getResources().getInteger(android.R.integer.config_mediumAnimTime);
+        final int duration = view.getContext().getResources().getInteger(R.integer.material_motion_duration_medium_2);
         final int initialHeight = view.getMeasuredHeight();
         final int initialPadding = view.getPaddingTop();
 
-        Animation anim = new Animation() {
-            @Override
-            protected void applyTransformation(float interpolatedTime, Transformation t) {
-                if (interpolatedTime == 1) {
-                    view.setVisibility(View.GONE);
-                    view.setAlpha(1);
-                    setPaddingTop(view, initialPadding);
-                } else {
-                    view.getLayoutParams().height = initialHeight - (int) (initialHeight * interpolatedTime);
-                    view.setAlpha(1 - interpolatedTime);
-                    setPaddingTop(view, initialPadding - (int) (initialHeight * interpolatedTime));
-                }
-                view.requestLayout();
+        var animator = ObjectAnimator.ofFloat(0, 1);
+        animator.addUpdateListener(animation -> {
+            var fraction = animation.getAnimatedFraction();
+            if (fraction == 1) {
+                view.setVisibility(View.GONE);
+                view.setAlpha(1);
+                setPaddingTop(view, initialPadding);
+            } else {
+                view.getLayoutParams().height = initialHeight - (int) (initialHeight * fraction);
+                view.setAlpha(1 - fraction);
+                setPaddingTop(view, initialPadding - (int) (initialHeight * fraction));
             }
-
-            @Override
-            public boolean willChangeBounds() {
-                return true;
-            }
-        };
-        anim.setDuration(duration);
-        view.startAnimation(anim);
+            view.requestLayout();
+        });
+        animator.setDuration(duration);
+        animator.start();
     }
 
     //<editor-fold desc="Padding" defaultstate="collapsed">
