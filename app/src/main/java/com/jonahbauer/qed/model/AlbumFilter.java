@@ -11,9 +11,6 @@ import lombok.Data;
 import lombok.experimental.ExtensionMethod;
 import org.jetbrains.annotations.Contract;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -31,8 +28,8 @@ public class AlbumFilter implements Parcelable {
     @Nullable
     private final String category;
 
-    public static AlbumFilter parse(@Nullable Uri uri) {
-        if (uri == null) return null;
+    public static @NonNull AlbumFilter parse(@Nullable Uri uri) {
+        if (uri == null) return AlbumFilter.EMPTY;
 
         LocalDate day = null;
         LocalDate upload = null;
@@ -52,13 +49,6 @@ public class AlbumFilter implements Parcelable {
         } catch (Exception ignored) {}
 
         category = uri.getQueryParameter("bycategory");
-        if ("".equals(category)) {
-            category = Album.CATEGORY_ETC;
-        } else {
-            try {
-                category = URLDecoder.decode(category, "UTF-8");
-            } catch (UnsupportedEncodingException ignored) {}
-        }
 
         return new AlbumFilter(day, upload, owner, category);
     }
@@ -76,13 +66,7 @@ public class AlbumFilter implements Parcelable {
             out += "&byowner=" + owner;
         }
         if (category != null) {
-            out += "&bycategory=";
-            if (!Album.CATEGORY_ETC.equals(category)) {
-                try {
-                    out += URLEncoder.encode(category, "UTF-8");
-                } catch (UnsupportedEncodingException ignored) {
-                }
-            }
+            out += "&bycategory=" + category;
         }
         return out;
     }

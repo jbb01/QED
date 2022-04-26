@@ -16,8 +16,6 @@ import com.jonahbauer.qed.model.viewmodel.AlbumViewModel;
 import com.jonahbauer.qed.util.StatusWrapper;
 import com.jonahbauer.qed.util.Themes;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.Collection;
 
 import androidx.annotation.NonNull;
@@ -118,11 +116,7 @@ public class AlbumInfoFragment extends InfoFragment {
         categories.forEach((category) -> {
             ListItem item = new ListItem(context);
             item.setIcon(R.drawable.ic_album_category);
-            String title = category;
-            try {
-                title = URLDecoder.decode(category, "UTF-8");
-            } catch (UnsupportedEncodingException ignored) {}
-            item.setTitle(title);
+            item.setTitle(Album.decodeCategory(category));
             parent.addView(item);
         });
     }

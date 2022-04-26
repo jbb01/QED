@@ -22,6 +22,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
+import java.io.IOException;
 import java.util.List;
 
 import static com.jonahbauer.qed.model.Image.AUDIO_FILE_EXTENSIONS;
@@ -127,7 +128,9 @@ public class ImageAdapter extends ArrayAdapter<Image> {
                                            applyThumbnail(binding, getThumbnail(image, false));
                                        },
                                        err -> {
-                                           Log.e(LOG_TAG, "Error loading thumbnail for image " + image.getId() + ".", err);
+                                           if (!(err instanceof IOException)) {
+                                               Log.e(LOG_TAG, "Error loading thumbnail for image " + image.getId() + ".", err);
+                                           }
                                            applyThumbnail(binding, getThumbnail(image, true));
                                        }
                                )

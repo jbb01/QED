@@ -116,6 +116,7 @@ public class Person implements Parcelable {
         List<String> entries = new LinkedList<>();
         if (firstName != null) entries.add( "\"first_name\":\"" + firstName + "\"");
         if (lastName != null) entries.add( "\"last_name\":\"" + lastName + "\"");
+        if (username != null) entries.add("\"username\":\"" + username + "\"");
         if (birthday != null) entries.add( "\"birthday\":\"" + birthday + "\"");
         if (gender != null) entries.add("\"gender\":\"" + gender + "\"");
         if (email != null) entries.add( "\"email\":\"" + email + "\"");

@@ -15,7 +15,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.net.URLDecoder;
 import java.time.LocalDate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -192,12 +191,7 @@ public final class AlbumParser extends HtmlParser<Album> {
                                 Matcher matcher = BY_CATEGORY.matcher(href);
                                 if (matcher.find()) {
                                     String category = matcher.group(1);
-                                    //noinspection ConstantConditions
-                                    if (category.isEmpty()) {
-                                        album.getCategories().add(Album.CATEGORY_ETC);
-                                    } else {
-                                        album.getCategories().add(URLDecoder.decode(category, "UTF-8"));
-                                    }
+                                    album.getCategories().add(category);
                                 }
                             } catch (Exception e) {
                                 Log.e(LOG_TAG, "Error parsing album " + album.getId() + ".", e);

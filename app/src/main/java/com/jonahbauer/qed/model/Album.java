@@ -13,6 +13,7 @@ import androidx.room.TypeConverters;
 import com.jonahbauer.qed.model.parcel.ParcelExtensions;
 import com.jonahbauer.qed.model.room.Converters;
 
+import java.net.URLDecoder;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 
 @Data
@@ -97,6 +99,13 @@ public class Album implements Parcelable {
         if (!uploadDates.isEmpty()) entries.add("\"upload_dates\":" + uploadDates);
         if (!categories.isEmpty()) entries.add("\"categories\":" + categories);
         return entries.stream().collect(Collectors.joining(", ", "{", "}"));
+    }
+
+    @SneakyThrows
+    public static String decodeCategory(String category) {
+        if (category == null) return null;
+        if ("".equals(category)) return Album.CATEGORY_ETC;
+        return URLDecoder.decode(category, "UTF-8");
     }
 
     @Override

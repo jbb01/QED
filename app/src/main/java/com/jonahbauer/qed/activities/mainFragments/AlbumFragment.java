@@ -5,9 +5,7 @@ import android.content.res.Configuration;
 import android.graphics.drawable.Animatable;
 import android.os.Bundle;
 import android.view.*;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.CompoundButton;
+import android.widget.*;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -37,19 +35,17 @@ import com.jonahbauer.qed.util.*;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 public class AlbumFragment extends Fragment implements CompoundButton.OnCheckedChangeListener, AdapterView.OnItemClickListener, OnActivityReenterListener {
     private static final String SAVED_SELECTED_ITEM_ID = "selectedItemId";
-
-    private Album mAlbum;
-    private AlbumFilter mFilter;
 
     private AlbumViewModel mAlbumViewModel;
     private FragmentAlbumBinding mBinding;
 
     private ImageAdapter mImageAdapter;
     private boolean mDummiesLoaded = false;
-    private ArrayAdapter<String> mAdapterCategory;
+    private CustomArrayAdapter<String> mAdapterCategory;
     private CustomArrayAdapter<LocalDate> mAdapterDate;
     private CustomArrayAdapter<LocalDate> mAdapterUpload;
     private CustomArrayAdapter<Person> mAdapterPhotographer;
@@ -65,13 +61,17 @@ public class AlbumFragment extends Fragment implements CompoundButton.OnCheckedC
         Bundle arguments = getArguments();
 
         AlbumFragmentArgs args = AlbumFragmentArgs.fromBundle(arguments);
-        mAlbum = args.getAlbum();
-        if (mAlbum == null) mAlbum = new Album(args.getId());
+        Album album = args.getAlbum();
+        if (album == null) album = new Album(args.getId());
 
+        AlbumFilter filter = AlbumFilter.EMPTY;
         if (arguments != null && arguments.containsKey(NavController.KEY_DEEP_LINK_INTENT)) {
             Intent intent = (Intent) arguments.get(NavController.KEY_DEEP_LINK_INTENT);
-            mFilter = parseFilters(intent);
+            filter = parseFilters(intent);
         }
+
+        mAlbumViewModel = ViewUtils.getViewModelProvider(this, R.id.nav_album).get(AlbumViewModel.class);
+        mAlbumViewModel.load(album, filter);
 
         TransitionUtils.setupDefaultTransitions(this);
         TransitionUtils.setupEnterContainerTransform(this, Colors.getPrimaryColor(requireContext()));
@@ -89,7 +89,6 @@ public class AlbumFragment extends Fragment implements CompoundButton.OnCheckedC
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mBinding = FragmentAlbumBinding.inflate(inflater, container, false);
-        mAlbumViewModel = ViewUtils.getViewModelProvider(this, R.id.nav_album).get(AlbumViewModel.class);
         return mBinding.getRoot();
     }
 
@@ -117,28 +116,10 @@ public class AlbumFragment extends Fragment implements CompoundButton.OnCheckedC
         mBinding.albumUploadCheckBox.setOnCheckedChangeListener(this);
         mBinding.albumCategoryCheckBox.setOnCheckedChangeListener(this);
 
-        mAdapterCategory = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, new ArrayList<>());
-        mAdapterCategory.setDropDownViewResource(android.R.layout.simple_list_item_single_choice);
-        mBinding.albumCategorySpinner.setAdapter(mAdapterCategory);
-        mBinding.albumCategorySpinner.setEnabled(false);
-
-        mAdapterPhotographer = new CustomArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, new ArrayList<>());
-        mAdapterPhotographer.setToString(Person::getUsername);
-        mAdapterPhotographer.setDropDownViewResource(android.R.layout.simple_list_item_single_choice);
-        mBinding.albumPhotographerSpinner.setAdapter(mAdapterPhotographer);
-        mBinding.albumPhotographerSpinner.setEnabled(false);
-
-        mAdapterDate = new CustomArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, new ArrayList<>());
-        mAdapterDate.setToString(TimeUtils::format);
-        mAdapterDate.setDropDownViewResource(android.R.layout.simple_list_item_single_choice);
-        mBinding.albumDateSpinner.setAdapter(mAdapterDate);
-        mBinding.albumDateSpinner.setEnabled(false);
-
-        mAdapterUpload = new CustomArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, new ArrayList<>());
-        mAdapterUpload.setToString(TimeUtils::format);
-        mAdapterUpload.setDropDownViewResource(android.R.layout.simple_list_item_single_choice);
-        mBinding.albumUploadSpinner.setAdapter(mAdapterUpload);
-        mBinding.albumUploadSpinner.setEnabled(false);
+        mAdapterCategory = setupSpinner(mBinding.albumCategorySpinner, Album::decodeCategory);
+        mAdapterPhotographer = setupSpinner(mBinding.albumPhotographerSpinner, Person::getUsername);
+        mAdapterDate = setupSpinner(mBinding.albumDateSpinner, TimeUtils::format);
+        mAdapterUpload = setupSpinner(mBinding.albumUploadSpinner, TimeUtils::format);
 
         mBinding.searchButton.setOnClickListener(v -> search());
 
@@ -153,6 +134,9 @@ public class AlbumFragment extends Fragment implements CompoundButton.OnCheckedC
         adjustColumnCount(getResources().getConfiguration());
 
         mAlbumViewModel.getAlbum().observe(getViewLifecycleOwner(), this::updateView);
+        mAlbumViewModel.getFilter().observe(getViewLifecycleOwner(), filter -> {
+            updateFilterValues(mAlbumViewModel.getAlbumValue(), filter);
+        });
         mAlbumViewModel.getOffline().observe(getViewLifecycleOwner(), offline -> {
             mBinding.setOffline(offline);
             mBinding.setForcedOfflineMode(Preferences.gallery().isOfflineMode());
@@ -192,14 +176,6 @@ public class AlbumFragment extends Fragment implements CompoundButton.OnCheckedC
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        if (mAlbumViewModel.getAlbum().getValue() == null) {
-            load();
-        }
-    }
-
-    @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         if (mSelectedItemId != null) {
@@ -207,7 +183,7 @@ public class AlbumFragment extends Fragment implements CompoundButton.OnCheckedC
         }
     }
 
-    private void loadFilters() {
+    private @NonNull AlbumFilter loadFilters() {
         LocalDate day = null;
         LocalDate upload = null;
         Long owner = null;
@@ -227,17 +203,12 @@ public class AlbumFragment extends Fragment implements CompoundButton.OnCheckedC
             category = (String) mBinding.albumCategorySpinner.getSelectedItem();
         }
 
-        mFilter = new AlbumFilter(day, upload, owner, category);
+        return new AlbumFilter(day, upload, owner, category);
     }
 
     private void search() {
-        loadFilters();
-        load();
-    }
-
-    private void load() {
-        boolean offline = Preferences.gallery().isOfflineMode();
-        mAlbumViewModel.load(mAlbum, offline ? null : mFilter, offline);
+        var filter = loadFilters();
+        mAlbumViewModel.filter(filter);
     }
 
     private void updateView(StatusWrapper<Album> albumStatusWrapper) {
@@ -246,7 +217,6 @@ public class AlbumFragment extends Fragment implements CompoundButton.OnCheckedC
 
         mBinding.setAlbum(album);
         mBinding.setStatus(albumStatusWrapper.getCode());
-        mBinding.setError(getString(albumStatusWrapper.getErrorMessage()));
 
         if (album != null && album.getName() != null) {
             ViewUtils.setActionBarText(this, album.getName());
@@ -254,83 +224,9 @@ public class AlbumFragment extends Fragment implements CompoundButton.OnCheckedC
             ViewUtils.setActionBarText(this, getString(R.string.title_fragment_album));
         }
 
-        boolean successOrEmpty = albumStatusWrapper.getCode() == StatusWrapper.STATUS_LOADED;
-        successOrEmpty |= albumStatusWrapper.getReason() == Reason.EMPTY && album != null;
-        if (successOrEmpty) {
-            assert album != null;
-
-            mAdapterCategory.clear();
-            mAdapterCategory.addAll(album.getCategories());
-            mAdapterCategory.notifyDataSetChanged();
-
-            mAdapterPhotographer.clear();
-            mAdapterPhotographer.addAll(album.getPersons());
-            mAdapterPhotographer.notifyDataSetChanged();
-
-            mAdapterDate.clear();
-            mAdapterDate.addAll(album.getDates());
-            mAdapterDate.notifyDataSetChanged();
-
-            mAdapterUpload.clear();
-            mAdapterUpload.addAll(album.getUploadDates());
-            mAdapterUpload.notifyDataSetChanged();
-
-            // apply filters to ui
-            if (mFilter != null && !mFilter.isEmpty()) {
-                // category
-                String category = mFilter.getCategory();
-                mBinding.albumCategoryCheckBox.setChecked(category != null);
-                if (category != null) {
-                    int index = album.getCategories().indexOf(category);
-                    if (index != -1) {
-                        mBinding.albumCategorySpinner.setSelection(index);
-                    } else {
-                        mAdapterCategory.add(category);
-                        mBinding.albumCategorySpinner.setSelection(album.getCategories().size());
-                    }
-                }
-
-                // owner
-                var owner = mFilter.getOwner();
-                mBinding.albumPhotographerCheckBox.setChecked(owner != null);
-                if (owner != null) {
-                    int index = album.getPersons().indexOf(new Person(owner));
-                    if (index != -1) {
-                        mBinding.albumPhotographerSpinner.setSelection(index);
-                    } else {
-                        var person = new Person(owner);
-                        person.setUsername(getString(R.string.album_photographer_unknown));
-                        mAdapterPhotographer.add(person);
-                        mBinding.albumPhotographerSpinner.setSelection(album.getPersons().size());
-                    }
-                }
-
-                // day
-                LocalDate day = mFilter.getDay();
-                mBinding.albumDateCheckBox.setChecked(day != null);
-                if (day != null) {
-                    int index = album.getDates().indexOf(day);
-                    if (index != -1) {
-                        mBinding.albumDateSpinner.setSelection(index);
-                    } else {
-                        mAdapterDate.add(day);
-                        mBinding.albumDateSpinner.setSelection(album.getDates().size());
-                    }
-                }
-
-                // upload
-                LocalDate upload = mFilter.getUpload();
-                mBinding.albumUploadCheckBox.setChecked(upload != null);
-                if (upload != null) {
-                    int index = album.getUploadDates().indexOf(upload);
-                    if (index != -1) {
-                        mBinding.albumUploadSpinner.setSelection(index);
-                    } else {
-                        mAdapterUpload.add(upload);
-                        mBinding.albumUploadSpinner.setSelection(album.getUploadDates().size());
-                    }
-                }
-            }
+        if (album != null) {
+            updateFilters(album);
+            updateFilterValues(album, mAlbumViewModel.getFilterValue());
         }
 
         if (albumStatusWrapper.getCode() == StatusWrapper.STATUS_LOADED) {
@@ -365,35 +261,62 @@ public class AlbumFragment extends Fragment implements CompoundButton.OnCheckedC
         }
     }
 
-    private void adjustColumnCount(@NonNull Configuration configuration) {
-        double width = configuration.screenWidthDp;
-        int columnCount = Double.valueOf(Math.round(width / 150d)).intValue();
+    private void updateFilters(@NonNull Album album) {
+        mAdapterCategory.clear();
+        mAdapterCategory.addAll(album.getCategories());
+        mAdapterCategory.notifyDataSetChanged();
 
-        mBinding.imageContainer.setNumColumns(columnCount);
+        mAdapterPhotographer.clear();
+        mAdapterPhotographer.addAll(album.getPersons());
+        mAdapterPhotographer.notifyDataSetChanged();
+
+        mAdapterDate.clear();
+        mAdapterDate.addAll(album.getDates());
+        mAdapterDate.notifyDataSetChanged();
+
+        mAdapterUpload.clear();
+        mAdapterUpload.addAll(album.getUploadDates());
+        mAdapterUpload.notifyDataSetChanged();
     }
 
-    private boolean scrollToId(long id) {
-        // scroll selected image into view
-        var selectedView = mBinding.imageContainer.findViewWithTag(id);
-        if (selectedView == null) {
-            var position = mImageAdapter.getImages().indexOf(new Image(id));
-            mBinding.imageContainer.setSelection(position);
-            return true;
-        } else if (selectedView.getTop() < 0) {
-            mBinding.imageContainer.scrollListBy(selectedView.getTop());
-            return true;
-        } else if (selectedView.getBottom() > mBinding.imageContainer.getHeight()) {
-            mBinding.imageContainer.scrollListBy(- mBinding.imageContainer.getHeight() + selectedView.getBottom());
-            return true;
+    private void updateFilterValues(@NonNull Album album, @NonNull AlbumFilter filter) {
+        updateFilterValue(
+                mBinding.albumCategoryCheckBox, mBinding.albumCategorySpinner, mAdapterCategory,
+                album.getCategories(), filter.getCategory()
+        );
+
+        var ownerId = filter.getOwner();
+        Person owner;
+        if (ownerId != null) {
+            owner = new Person(ownerId);
+            owner.setUsername(getString(R.string.album_photographer_unknown));
+        } else {
+            owner = null;
         }
-        return false;
+        updateFilterValue(
+                mBinding.albumPhotographerCheckBox, mBinding.albumPhotographerSpinner, mAdapterPhotographer,
+                album.getPersons(), owner
+        );
+
+        updateFilterValue(
+                mBinding.albumDateCheckBox, mBinding.albumDateSpinner, mAdapterDate,
+                album.getDates(), filter.getDay()
+        );
+
+        updateFilterValue(
+                mBinding.albumUploadCheckBox, mBinding.albumUploadSpinner, mAdapterUpload,
+                album.getUploadDates(), filter.getUpload()
+        );
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.album_info) {
-            var action = AlbumFragmentDirections.showAlbumInfo(mAlbum);
-            Navigation.findNavController(mBinding.getRoot()).navigate(action);
+            var album = mAlbumViewModel.getAlbumValue();
+            if (album.getId() != Album.NO_ID) {
+                var action = AlbumFragmentDirections.showAlbumInfo(album);
+                Navigation.findNavController(mBinding.getRoot()).navigate(action);
+            }
             return true;
         }
         return false;
@@ -451,12 +374,60 @@ public class AlbumFragment extends Fragment implements CompoundButton.OnCheckedC
         mImageActivityLauncher.launch(intent, options);
     }
 
-    private static AlbumFilter parseFilters(Intent intent) {
-        if (intent == null) return null;
-        return AlbumFilter.parse(intent.getData());
-    }
-
     private Long getSelectedItemId() {
         return mSelectedItemId;
     }
+
+    //<editor-fold desc="Utility Functions" defaultstate="collapsed">
+    private static @NonNull AlbumFilter parseFilters(Intent intent) {
+        if (intent == null) return AlbumFilter.EMPTY;
+        return AlbumFilter.parse(intent.getData());
+    }
+
+    private void adjustColumnCount(@NonNull Configuration configuration) {
+        double width = configuration.screenWidthDp;
+        int columnCount = Double.valueOf(Math.round(width / 150d)).intValue();
+
+        mBinding.imageContainer.setNumColumns(columnCount);
+    }
+
+    private boolean scrollToId(long id) {
+        // scroll selected image into view
+        var selectedView = mBinding.imageContainer.findViewWithTag(id);
+        if (selectedView == null) {
+            var position = mImageAdapter.getImages().indexOf(new Image(id));
+            mBinding.imageContainer.setSelection(position);
+            return true;
+        } else if (selectedView.getTop() < 0) {
+            mBinding.imageContainer.scrollListBy(selectedView.getTop());
+            return true;
+        } else if (selectedView.getBottom() > mBinding.imageContainer.getHeight()) {
+            mBinding.imageContainer.scrollListBy(- mBinding.imageContainer.getHeight() + selectedView.getBottom());
+            return true;
+        }
+        return false;
+    }
+
+    private <T> CustomArrayAdapter<T> setupSpinner(@NonNull Spinner spinner, @NonNull Function<T, CharSequence> toString) {
+        var adapter = new CustomArrayAdapter<T>(requireContext(), android.R.layout.simple_spinner_item, new ArrayList<>());
+        adapter.setToString(toString);
+        adapter.setDropDownViewResource(android.R.layout.simple_list_item_single_choice);
+        spinner.setAdapter(adapter);
+        spinner.setEnabled(false);
+        return adapter;
+    }
+
+    private <T> void updateFilterValue(CheckBox checkBox, Spinner spinner, ArrayAdapter<T> adapter, List<T> data, T value) {
+        checkBox.setChecked(value != null);
+        if (value != null) {
+            int index = data.indexOf(value);
+            if (index != -1) {
+                spinner.setSelection(index);
+            } else {
+                adapter.add(value);
+                spinner.setSelection(data.size());
+            }
+        }
+    }
+    //</editor-fold>
 }

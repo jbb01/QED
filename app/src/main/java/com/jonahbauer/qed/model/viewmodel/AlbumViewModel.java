@@ -12,7 +12,6 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.jonahbauer.qed.BuildConfig;
 import com.jonahbauer.qed.model.Album;
-import com.jonahbauer.qed.model.Image;
 import com.jonahbauer.qed.model.room.AlbumDao;
 import com.jonahbauer.qed.model.room.Database;
 import com.jonahbauer.qed.networking.Reason;
@@ -23,7 +22,7 @@ import com.jonahbauer.qed.util.Preferences;
 import com.jonahbauer.qed.util.StatusWrapper;
 
 import java.time.Instant;
-import java.util.List;
+import java.util.Objects;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
@@ -35,8 +34,9 @@ public class AlbumViewModel extends AndroidViewModel {
 
     private final AlbumDao mAlbumDao;
 
-    private final MutableLiveData<StatusWrapper<Album>> mAlbum = new MutableLiveData<>();
+    private final MutableLiveData<AlbumFilter> mFilter = new MutableLiveData<>();
     private final MutableLiveData<Boolean> mOffline = new MutableLiveData<>(false);
+    private final MutableLiveData<StatusWrapper<Album>> mAlbum = new MutableLiveData<>();
 
     private final CompositeDisposable mDisposable = new CompositeDisposable();
 
@@ -46,26 +46,35 @@ public class AlbumViewModel extends AndroidViewModel {
     }
 
     public void load(@NonNull Album album) {
-        load(album, null, Preferences.gallery().isOfflineMode());
+        load(album, AlbumFilter.EMPTY);
     }
 
-    public void load(@NonNull Album album, @Nullable AlbumFilter filter) {
+    public void filter(@NonNull AlbumFilter filter) {
+        load(getAlbumValue(), filter);
+    }
+
+    public void load(@NonNull Album album, @NonNull AlbumFilter filter) {
         load(album, filter, Preferences.gallery().isOfflineMode());
     }
 
-    public void load(@NonNull Album album, @Nullable AlbumFilter filter, boolean offline) {
+    public void load(@NonNull Album album, @NonNull AlbumFilter filter, boolean offline) {
         if (BuildConfig.DEBUG) {
             Log.d(LOG_TAG, "Loading album " + album + " with filters " + filter + ".");
         }
 
         mDisposable.clear();
-        mAlbum.setValue(StatusWrapper.preloaded(album));
+        mFilter.setValue(filter);
         mOffline.setValue(offline);
+        mAlbum.setValue(StatusWrapper.preloaded(album));
 
-        if (offline) {
-            loadDatabase(album);
+        reload();
+    }
+
+    private void reload() {
+        if (isOffline()) {
+            loadDatabase();
         } else {
-            loadInternet(album, filter);
+            loadInternet();
         }
     }
 
@@ -73,18 +82,27 @@ public class AlbumViewModel extends AndroidViewModel {
         return mAlbum;
     }
 
+    public LiveData<AlbumFilter> getFilter() {
+        return mFilter;
+    }
+
     public LiveData<Boolean> getOffline() {
         return mOffline;
     }
 
-    private void loadInternet(@NonNull Album album, @Nullable AlbumFilter filter) {
-        Callback callback = new Callback(filter != null && !filter.isEmpty());
+    private void loadInternet() {
+        var album = getAlbumValue();
+        var filter = getFilterValue();
+
+        Callback callback = new Callback(!filter.isEmpty());
         mDisposable.add(
                 QEDGalleryPages.getAlbum(album, filter, callback)
         );
     }
 
-    private void loadDatabase(@NonNull Album album) {
+    private void loadDatabase() {
+        var album = getAlbumValue();
+
         var observable = Observable.combineLatest(
                 mAlbumDao.findById(album.getId()).toObservable(),
                 mAlbumDao.findImagesByAlbum(album.getId()).toObservable(),
@@ -96,14 +114,14 @@ public class AlbumViewModel extends AndroidViewModel {
                           .observeOn(AndroidSchedulers.mainThread())
                           .subscribe(
                                   pair -> {
-                                      album.set(pair.first);
-                                      album.getImages().clear();
-                                      album.getImages().addAll(pair.second);
+                                      var out = pair.first;
+                                      out.getImages().clear();
+                                      out.getImages().addAll(pair.second);
 
-                                      if (album.getImages().size() > 0) {
-                                          mAlbum.setValue(StatusWrapper.loaded(album));
+                                      if (out.getImages().size() > 0) {
+                                          mAlbum.setValue(StatusWrapper.loaded(out));
                                       } else {
-                                          mAlbum.setValue(StatusWrapper.error(album, Reason.EMPTY));
+                                          mAlbum.setValue(StatusWrapper.error(out, Reason.EMPTY));
                                       }
                                   },
                                   e -> mAlbum.setValue(StatusWrapper.error(album, e))
@@ -117,6 +135,22 @@ public class AlbumViewModel extends AndroidViewModel {
         mDisposable.clear();
     }
 
+    public @NonNull Album getAlbumValue() {
+        var wrapper = mAlbum.getValue();
+        if (wrapper == null) return new Album(Album.NO_ID);
+        var album = wrapper.getValue();
+        if (album == null) return new Album(Album.NO_ID);
+        return album;
+    }
+
+    public @NonNull AlbumFilter getFilterValue() {
+        return Objects.requireNonNullElse(mFilter.getValue(), AlbumFilter.EMPTY);
+    }
+
+    private boolean isOffline() {
+        return Objects.requireNonNullElse(mOffline.getValue(), false);
+    }
+
     private class Callback implements QEDPageReceiver<Album> {
         private final boolean mFiltered;
 
@@ -126,7 +160,7 @@ public class AlbumViewModel extends AndroidViewModel {
 
         @Override
         public void onResult(@NonNull Album out) {
-            List<Image> images = out.getImages();
+            var images = out.getImages();
             if (images.size() > 0)  {
                 mAlbum.setValue(StatusWrapper.loaded(out));
             } else {
@@ -156,7 +190,7 @@ public class AlbumViewModel extends AndroidViewModel {
             QEDPageReceiver.super.onError(out, reason, cause);
 
             if (reason == Reason.NETWORK && out != null) {
-                load(out, null, true);
+                load(out, AlbumFilter.EMPTY, true);
             } else {
                 mAlbum.setValue(StatusWrapper.error(out, reason));
             }
