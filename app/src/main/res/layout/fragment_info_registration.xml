@@ -92,8 +92,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{registration.status != null}"
-                app:icon="@{registration.status.toDrawableResVariant()}"
-                app:title="@{registration.status.toStringRes()}"
+                app:icon="@{registration.status.drawableResVariant}"
+                app:title="@{registration.status.stringRes}"
                 app:subtitle="@string/registration_subtitle_status"
                 tools:icon="@drawable/ic_registration_status_open"
                 tools:title="@string/registration_status_open"/>
@@ -125,9 +125,9 @@
             <com.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{registration.personBirthday != null || registration.personBirthdayString != null}"
+                android:visibility="@{registration.personBirthday != null}"
                 app:icon="@drawable/ic_registration_birthday"
-                app:title="@{@string/registration_title_birthday(TimeUtils.format(registration.personBirthday) ?? registration.personBirthdayString)}"
+                app:title="@{@string/registration_title_birthday(TimeUtils.format(registration.personBirthday))}"
                 app:subtitle="@string/registration_subtitle_birthday"
                 tools:title="01.01.2000"/>
 
@@ -183,18 +183,18 @@
             <com.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{registration.timeOfArrival != null || registration.timeOfArrivalString != null}"
+                android:visibility="@{registration.timeOfArrival != null}"
                 app:icon="@drawable/ic_registration_time_of_arrival"
-                app:title="@{@string/registration_title_time_of_arrival(TimeUtils.format(registration.timeOfArrival) ?? registration.timeOfArrivalString)}"
+                app:title="@{@string/registration_title_time_of_arrival(TimeUtils.format(registration.timeOfArrival))}"
                 app:subtitle="@string/registration_subtitle_time_of_arrival"
                 tools:title="01.04.2022 00:00"/>
 
             <com.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{registration.timeOfDeparture != null || registration.timeOfDepartureString != null}"
+                android:visibility="@{registration.timeOfDeparture != null}"
                 app:icon="@drawable/ic_registration_time_of_departure"
-                app:title="@{@string/registration_title_time_of_departure(TimeUtils.format(registration.timeOfDeparture) ?? registration.timeOfDepartureString)}"
+                app:title="@{@string/registration_title_time_of_departure(TimeUtils.format(registration.timeOfDeparture))}"
                 app:subtitle="@string/registration_subtitle_time_of_departure"
                 tools:title="04.04.2022 00:00"/>
 
@@ -272,9 +272,9 @@
             <com.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{registration.paymentTimeString != null}"
+                android:visibility="@{registration.paymentTime != null}"
                 app:icon="@drawable/ic_registration_payment_time"
-                app:title="@{@string/registration_title_payment_time(TimeUtils.format(registration.paymentTime) ?? registration.paymentTimeString)}"
+                app:title="@{@string/registration_title_payment_time(TimeUtils.format(registration.paymentTime))}"
                 app:subtitle="@string/registration_subtitle_payment_time"
                 tools:title="01.01.2000"/>
 

@@ -44,14 +44,12 @@ public final class EventListParser extends HtmlParser<List<Event>> {
                         start: try {
                             var element = columns.get(2).selectFirst("time");
                             if (element == null) break start;
-                            event.setStartString(element.text());
                             event.setStart(parseLocalDate(element));
                         } catch (Exception ignored) {}
 
                         end: try {
                             var element = columns.get(3).selectFirst("time");
                             if (element == null) break end;
-                            event.setEndString(element.text());
                             event.setEnd(parseLocalDate(element));
                         } catch (Exception ignored) {}
 
@@ -64,7 +62,6 @@ public final class EventListParser extends HtmlParser<List<Event>> {
                         deadline: try {
                             var element = columns.get(5).selectFirst("time");
                             if (element == null) break deadline;
-                            event.setDeadlineString(element.text());
                             event.setDeadline(parseLocalDate(element));
                         } catch (Exception ignored) {}
 

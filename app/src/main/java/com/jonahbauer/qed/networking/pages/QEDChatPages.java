@@ -52,7 +52,7 @@ public class QEDChatPages extends QEDPages {
 
         AsyncLoadQEDPageToStream network = new AsyncLoadQEDPageToStream(
                 Feature.CHAT,
-                NetworkConstants.CHAT_SERVER_HISTORY + logRequest.getQueryString(),
+                NetworkConstants.CHAT_SERVER_HISTORY + logRequest.getQuery(),
                 out
         );
 

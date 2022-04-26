@@ -10,6 +10,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.function.IntFunction;
 
 @UtilityClass
 public class ParcelExtensions {
@@ -99,12 +100,12 @@ public class ParcelExtensions {
     /**
      * Reads an {@code enum} from a parcel.
      */
-    public static <T extends Enum<T>> T readEnum(@NonNull Parcel source, T[] values) {
+    public static <T extends Enum<T>> T readEnum(@NonNull Parcel source, IntFunction<T> getter) {
         var flag = source.readInt();
         if (flag == VAL_NULL) {
             return null;
         } else if (flag == VAL_NON_NULL) {
-            return values[source.readInt()];
+            return getter.apply(source.readInt());
         } else {
             throw new RuntimeException("Could not read enum from parcel.");
         }

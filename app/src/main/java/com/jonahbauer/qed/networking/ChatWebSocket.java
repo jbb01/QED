@@ -98,7 +98,7 @@ public class ChatWebSocket extends WebSocketListener implements ObservableOnSubs
     public void onMessage(@NonNull WebSocket webSocket, @NonNull String text) {
         if (BuildConfig.DEBUG) Log.d(LOG_TAG, text);
 
-        Message message = Message.interpretJSONMessage(text);
+        Message message = Message.parseJsonMessage(text);
         if (message == null) return;
 
         switch (message.getType()) {

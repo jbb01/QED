@@ -136,7 +136,7 @@ public class CheckBoxTriStates extends MaterialCheckBox {
 
         private SavedState(Parcel in) {
             super(in);
-            mState = ParcelExtensions.readEnum(in, State.values());
+            mState = ParcelExtensions.readEnum(in, State::get);
         }
 
         @Override
@@ -163,6 +163,8 @@ public class CheckBoxTriStates extends MaterialCheckBox {
         UNKNOWN(null),
         UNCHECKED(false),
         CHECKED(true);
+        private static final State[] VALUES = State.values();
+        public static State get(int ordinal) { return VALUES[ordinal]; }
 
         private final Boolean value;
 

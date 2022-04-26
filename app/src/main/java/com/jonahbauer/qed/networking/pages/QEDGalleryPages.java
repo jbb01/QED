@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.jonahbauer.qed.model.Album;
+import com.jonahbauer.qed.model.AlbumFilter;
 import com.jonahbauer.qed.model.Image;
 import com.jonahbauer.qed.model.parser.AlbumListParser;
 import com.jonahbauer.qed.model.parser.AlbumParser;
@@ -52,7 +53,7 @@ public class QEDGalleryPages extends QEDPages {
 
     @NonNull
     @CheckReturnValue
-    public static Disposable getAlbum(@NonNull Album album, @Nullable Album.Filter filter, QEDPageReceiver<Album> albumReceiver) {
+    public static Disposable getAlbum(@NonNull Album album, @Nullable AlbumFilter filter, QEDPageReceiver<Album> albumReceiver) {
         if (album.getId() == Album.NO_ID) {
             albumReceiver.onError(album, Reason.NOT_FOUND, null);
             return Disposable.disposed();

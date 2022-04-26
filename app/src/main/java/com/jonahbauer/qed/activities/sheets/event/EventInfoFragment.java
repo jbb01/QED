@@ -25,6 +25,7 @@ import com.jonahbauer.qed.util.StatusWrapper;
 import com.jonahbauer.qed.util.Themes;
 
 import java.util.Collection;
+import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -168,10 +169,11 @@ public class EventInfoFragment extends InfoFragment {
         parent.removeAllViews();
         participants.forEach(registration -> {
             if (registration.isOrganizer()) return;
+            var status = Objects.requireNonNull(registration.getStatus());
             ListItem item = new ListItem(context);
-            item.setIcon(registration.getStatus().toDrawableRes());
+            item.setIcon(status.getDrawableRes());
             item.setTitle(registration.getPersonName());
-            item.setSubtitle(registration.getStatus().toStringRes());
+            item.setSubtitle(status.getStringRes());
             item.setOnClickListener(v -> showRegistration(parent, registration));
             parent.addView(item);
         });

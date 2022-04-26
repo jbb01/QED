@@ -41,8 +41,8 @@ public class EventAdapter extends ArrayAdapter<Event> implements SectionIndexer 
 
         String subtitle = String.format(
                 context.getString(R.string.event_title_time),
-                event.getStart() != null ? TimeUtils.format(event.getStart()) : event.getStartString(),
-                event.getEnd() != null ? TimeUtils.format(event.getEnd()) : event.getEndString()
+                TimeUtils.format(event.getStart()),
+                TimeUtils.format(event.getEnd())
         );
 
         item.setTitle(event.getTitle());
@@ -70,10 +70,11 @@ public class EventAdapter extends ArrayAdapter<Event> implements SectionIndexer 
     private int[] mPositionForSection;
 
     private final Function<Event, String> mHeaderMap = event -> {
-        if (event.getStart() != null)
-            return String.valueOf(event.getStart().getYear());
-        else
-            return "0000";
+        var start = event.getStart();
+        if (start == null) return "0000";
+        var startDate = start.getLocalDate();
+        if (startDate == null) return "0000";
+        return String.valueOf(startDate.getYear());
     };
 
     private void prepareHeaders() {

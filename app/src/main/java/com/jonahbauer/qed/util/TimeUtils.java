@@ -3,6 +3,8 @@ package com.jonahbauer.qed.util;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 
+import com.jonahbauer.qed.model.util.ParsedInstant;
+import com.jonahbauer.qed.model.util.ParsedLocalDate;
 import com.jonahbauer.qed.networking.NetworkConstants;
 
 import java.time.Instant;
@@ -22,6 +24,14 @@ public class TimeUtils {
     public static final DateTimeFormatter TIME_MEDIUM = DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM);
     public static final DateTimeFormatter DATE_TIME_MEDIUM = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM);
 
+    public static String format(ParsedLocalDate parsedDate) {
+        if (parsedDate == null) return null;
+
+        var date = parsedDate.getLocalDate();
+        if (date != null) return format(date);
+        else return parsedDate.getString();
+    }
+
     public static String format(LocalDate date) {
         if (date == null) return null;
         return DATE_MEDIUM.format(date);
@@ -35,6 +45,14 @@ public class TimeUtils {
     public static String format(LocalDateTime dateTime) {
         if (dateTime == null) return null;
         return DATE_TIME_MEDIUM.format(dateTime);
+    }
+
+    public static String format(ParsedInstant parsedInstant) {
+        if (parsedInstant == null) return null;
+
+        var instant = parsedInstant.getInstant();
+        if (instant != null) return format(instant);
+        else return parsedInstant.getString();
     }
 
     public static String format(Instant instant) {

@@ -49,16 +49,22 @@ public class Actions {
     }
 
     public static boolean recordToCalendar(@NonNull Context context, @NonNull Event event) {
+        var parsedStart = event.getStart();
+        var parsedEnd = event.getEnd();
+        var start = parsedStart != null ? parsedStart.getLocalDate() : null;
+        var end = parsedEnd != null ? parsedEnd.getLocalDate() : null;
+        if (start == null || end == null) return false;
+
         Intent intent = new Intent(Intent.ACTION_INSERT)
                 .setData(CalendarContract.Events.CONTENT_URI)
                 .putExtra(CalendarContract.Events.TITLE, event.getTitle())
                 .putExtra(
                         CalendarContract.EXTRA_EVENT_BEGIN_TIME,
-                        ZonedDateTime.of(event.getStart(), LocalTime.MIN, NetworkConstants.SERVER_TIME_ZONE).toInstant().toEpochMilli()
+                        ZonedDateTime.of(start, LocalTime.MIN, NetworkConstants.SERVER_TIME_ZONE).toInstant().toEpochMilli()
                 )
                 .putExtra(
                         CalendarContract.EXTRA_EVENT_END_TIME,
-                        ZonedDateTime.of(event.getEnd(), LocalTime.MAX, NetworkConstants.SERVER_TIME_ZONE).toInstant().toEpochMilli()
+                        ZonedDateTime.of(end, LocalTime.MAX, NetworkConstants.SERVER_TIME_ZONE).toInstant().toEpochMilli()
                 )
                 .putExtra(CalendarContract.EXTRA_EVENT_ALL_DAY, true)
                 .putExtra(CalendarContract.Events.EVENT_LOCATION, event.getHotelAddress())

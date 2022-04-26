@@ -2,6 +2,7 @@ package com.jonahbauer.qed.model;
 
 import android.os.Parcel;
 import androidx.core.util.Pair;
+import com.jonahbauer.qed.model.util.ParsedLocalDate;
 import org.junit.Test;
 
 import java.time.Instant;
@@ -32,18 +33,15 @@ public class PersonTest {
         person.setFullName("Max Mustermann");
         person.setEmail("max.mustermann@example.org");
         person.setGender("männlich");
-        person.setBirthdayString("01.01.2000");
-        person.setBirthday(LocalDate.of(2000, 1, 1));
+        person.setBirthday(new ParsedLocalDate("01.01.2000", LocalDate.of(2000, 1, 1)));
         person.setHomeStation("Musterstadt");
         person.setRailcard("50");
         person.setFood("Steine");
         person.setNotes("Raum für Notizen");
         person.setMember(true);
         person.setActive(true);
-        person.setDateOfJoiningString("01.01.2018");
-        person.setDateOfJoining(LocalDate.of(2018, 1, 1));
-        person.setLeavingDateString("01.01.2019");
-        person.setLeavingDate(LocalDate.of(2019, 1, 1));
+        person.setDateOfJoining(new ParsedLocalDate("01.01.2018", LocalDate.of(2018, 1, 1)));
+        person.setDateOfLeaving(new ParsedLocalDate("01.01.2019", LocalDate.of(2019, 1, 1)));
         person.setLoaded(Instant.now());
         person.getContacts().add(Pair.create("mobil", "0123456789"));
         person.getContacts().add(Pair.create("daheim", "987654321"));

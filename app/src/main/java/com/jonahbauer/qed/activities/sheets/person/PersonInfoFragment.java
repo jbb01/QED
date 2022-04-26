@@ -26,6 +26,7 @@ import com.jonahbauer.qed.util.StatusWrapper;
 import com.jonahbauer.qed.util.Themes;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.function.BiConsumer;
 
 import androidx.annotation.NonNull;
@@ -263,10 +264,11 @@ public class PersonInfoFragment extends InfoFragment {
         Context context = parent.getContext();
         parent.removeAllViews();
         registrations.forEach(registration -> {
+            var status = Objects.requireNonNull(registration.getStatus());
             ListItem item = new ListItem(context);
             item.setIcon(R.drawable.ic_person_event);
             item.setTitle(registration.getEventTitle());
-            item.setSubtitle(registration.getStatus().toStringRes());
+            item.setSubtitle(status.getStringRes());
             item.setOnClickListener(v -> showRegistration(v, registration));
             parent.addView(item);
             // TODO subtitle orga

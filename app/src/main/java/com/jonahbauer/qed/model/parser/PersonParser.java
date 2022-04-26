@@ -75,7 +75,6 @@ public final class PersonParser extends HtmlParser<Person> {
                            }
                            case GENERAL_KEY_BIRTH_DAY: {
                                Element time = value.child(0);
-                               person.setBirthdayString(time.text());
                                person.setBirthday(parseLocalDate(time));
                                break;
                            }
@@ -85,14 +84,12 @@ public final class PersonParser extends HtmlParser<Person> {
                            }
                            case GENERAL_KEY_DATE_OF_JOINING: {
                                Element time = value.child(0);
-                               person.setDateOfJoiningString(time.text());
                                person.setDateOfJoining(parseLocalDate(time));
                                break;
                            }
                            case GENERAL_KEY_LEAVING_DATE: {
                                Element time = value.child(0);
-                               person.setLeavingDateString(time.text());
-                               person.setLeavingDate(parseLocalDate(time));
+                               person.setDateOfLeaving(parseLocalDate(time));
                                break;
                            }
                            case GENERAL_KEY_MEMBER: {

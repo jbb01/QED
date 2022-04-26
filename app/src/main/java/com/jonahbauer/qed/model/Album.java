@@ -4,7 +4,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
@@ -14,21 +13,20 @@ import androidx.room.TypeConverters;
 import com.jonahbauer.qed.model.parcel.ParcelExtensions;
 import com.jonahbauer.qed.model.room.Converters;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.experimental.Accessors;
 
 @Data
 @Entity
+@EqualsAndHashCode(of = "id")
 @TypeConverters(Converters.class)
 public class Album implements Parcelable {
     public static final long NO_ID = Long.MIN_VALUE;
@@ -47,7 +45,8 @@ public class Album implements Parcelable {
     private String creationDate;
 
     @ColumnInfo(name = "private")
-    private boolean private_;
+    @Accessors(prefix = "_")
+    private boolean _private;
 
     @ColumnInfo(name = "persons")
     private List<Person> persons = new ArrayList<>();
@@ -71,6 +70,18 @@ public class Album implements Parcelable {
     @ColumnInfo(name = "image_list_downloaded")
     private Instant loaded;
 
+    public void set(Album other) {
+        this.name = other.name;
+        this.owner = other.owner;
+        this.creationDate = other.creationDate;
+        this._private = other._private;
+        this.persons = other.persons;
+        this.dates = other.dates;
+        this.uploadDates = other.uploadDates;
+        this.categories = other.categories;
+        this.loaded = other.loaded;
+    }
+
     @NonNull
     @Override
     public String toString() {
@@ -79,7 +90,7 @@ public class Album implements Parcelable {
         if (name != null) entries.add("\"name\":\"" + name + "\"");
         if (owner != null) entries.add("\"owner\":\"" + owner + "\"");
         if (creationDate != null) entries.add("\"creationDate\":\"" + creationDate + "\"");
-        entries.add("\"private\": " + private_);
+        entries.add("\"private\": " + _private);
         entries.add("\"loaded\": " + loaded);
         if (!persons.isEmpty()) entries.add("\"persons\":" + persons);
         if (!dates.isEmpty()) entries.add("\"dates\":" + dates);
@@ -99,7 +110,7 @@ public class Album implements Parcelable {
         dest.writeString(name);
         dest.writeString(owner);
         dest.writeString(creationDate);
-        ParcelExtensions.writeBoolean(dest, private_);
+        ParcelExtensions.writeBoolean(dest, _private);
         dest.writeTypedList(persons);
         dest.writeInt(dates.size());
         for (LocalDate date : dates) {
@@ -122,7 +133,7 @@ public class Album implements Parcelable {
             album.name = source.readString();
             album.owner = source.readString();
             album.creationDate = source.readString();
-            album.private_ = ParcelExtensions.readBoolean(source);
+            album._private = ParcelExtensions.readBoolean(source);
             source.readTypedList(album.persons, Person.CREATOR);
 
             int dateSize = source.readInt();
@@ -148,43 +159,4 @@ public class Album implements Parcelable {
         }
     };
 
-    @Data
-    @Builder(builderClassName = "Builder", setterPrefix = "set")
-    public static class Filter {
-        @Nullable
-        private final LocalDate day;
-        @Nullable
-        private final LocalDate upload;
-        @Nullable
-        private final Person owner;
-        @Nullable
-        private final String category;
-
-        @NonNull
-        public String toString() {
-            String out = "";
-            if (day != null) {
-                out += "&byday=" + DateTimeFormatter.ISO_LOCAL_DATE.format(day);
-            }
-            if (upload != null) {
-                out += "&byupload=" + DateTimeFormatter.ISO_LOCAL_DATE.format(upload);
-            }
-            if (owner != null) {
-                out += "&byowner=" + owner.getId();
-            }
-            if (category != null) {
-                out += "&bycategory=";
-                if (!CATEGORY_ETC.equals(category)) {
-                    try {
-                        out += URLEncoder.encode(category, "UTF-8");
-                    } catch (UnsupportedEncodingException ignored) {}
-                }
-            }
-            return out;
-        }
-
-        public boolean isEmpty() {
-            return day == null && upload == null && owner == null && category == null;
-        }
-    }
 }

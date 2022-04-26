@@ -20,6 +20,7 @@ import androidx.navigation.fragment.FragmentNavigator;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.databinding.FragmentPersonsDatabaseBinding;
 import com.jonahbauer.qed.model.Person;
+import com.jonahbauer.qed.model.PersonFilter;
 import com.jonahbauer.qed.model.adapter.PersonAdapter;
 import com.jonahbauer.qed.model.viewmodel.PersonListViewModel;
 import com.jonahbauer.qed.networking.Reason;
@@ -152,7 +153,7 @@ public class PersonDatabaseFragment extends Fragment implements CompoundButton.O
         active = mBinding.databaseActiveCheckbox.getState().asBoolean();
 
         mPersonAdapter.setSortMode(mSortLastName ? PersonAdapter.SortMode.LAST_NAME : PersonAdapter.SortMode.FIRST_NAME);
-        mPersonListViewModel.filter(firstName, lastName, member, active);
+        mPersonListViewModel.filter(new PersonFilter(firstName, lastName, member, active));
     }
 
     @Override

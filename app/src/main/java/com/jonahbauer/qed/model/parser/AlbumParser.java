@@ -230,7 +230,7 @@ public final class AlbumParser extends HtmlParser<Album> {
                     case INFO_KEY_PERMISSIONS: {
                         //noinspection ConstantConditions
                         if (PERMISSIONS_PRIVATE.equals(th.nextElementSibling().text())) {
-                            album.setPrivate_(true);
+                            album.setPrivate(true);
                         }
                     }
                 }

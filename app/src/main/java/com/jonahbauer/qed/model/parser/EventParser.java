@@ -65,19 +65,16 @@ public final class EventParser extends HtmlParser<Event> {
                        switch (key) {
                            case GENERAL_KEY_START: {
                                Element time = value.child(0);
-                               event.setStartString(time.text());
                                event.setStart(parseLocalDate(time));
                                break;
                            }
                            case GENERAL_KEY_END: {
                                Element time = value.child(0);
-                               event.setEndString(time.text());
                                event.setEnd(parseLocalDate(time));
                                break;
                            }
                            case GENERAL_KEY_DEADLINE: {
                                Element time = value.child(0);
-                               event.setDeadlineString(time.text());
                                event.setDeadline(parseLocalDate(time));
                                break;
                            }

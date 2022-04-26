@@ -18,7 +18,7 @@ import com.jonahbauer.qed.model.room.Database;
 import com.jonahbauer.qed.networking.Reason;
 import com.jonahbauer.qed.networking.async.QEDPageReceiver;
 import com.jonahbauer.qed.networking.pages.QEDGalleryPages;
-import com.jonahbauer.qed.model.Album.Filter;
+import com.jonahbauer.qed.model.AlbumFilter;
 import com.jonahbauer.qed.util.Preferences;
 import com.jonahbauer.qed.util.StatusWrapper;
 
@@ -49,11 +49,11 @@ public class AlbumViewModel extends AndroidViewModel {
         load(album, null, Preferences.gallery().isOfflineMode());
     }
 
-    public void load(@NonNull Album album, @Nullable Filter filter) {
+    public void load(@NonNull Album album, @Nullable AlbumFilter filter) {
         load(album, filter, Preferences.gallery().isOfflineMode());
     }
 
-    public void load(@NonNull Album album, @Nullable Filter filter, boolean offline) {
+    public void load(@NonNull Album album, @Nullable AlbumFilter filter, boolean offline) {
         if (BuildConfig.DEBUG) {
             Log.d(LOG_TAG, "Loading album " + album + " with filters " + filter + ".");
         }
@@ -77,7 +77,7 @@ public class AlbumViewModel extends AndroidViewModel {
         return mOffline;
     }
 
-    private void loadInternet(@NonNull Album album, @Nullable Filter filter) {
+    private void loadInternet(@NonNull Album album, @Nullable AlbumFilter filter) {
         Callback callback = new Callback(filter != null && !filter.isEmpty());
         mDisposable.add(
                 QEDGalleryPages.getAlbum(album, filter, callback)
@@ -96,21 +96,11 @@ public class AlbumViewModel extends AndroidViewModel {
                           .observeOn(AndroidSchedulers.mainThread())
                           .subscribe(
                                   pair -> {
-                                      Album album0 = pair.first;
-                                      List<Image> images = pair.second;
-
-                                      album.setName(album0.getName());
-                                      album.setOwner(album0.getOwner());
-                                      album.setCreationDate(album0.getCreationDate());
-                                      album.setPersons(album0.getPersons());
-                                      album.setCategories(album0.getCategories());
-                                      album.setDates(album0.getDates());
-                                      album.setUploadDates(album0.getUploadDates());
-                                      album.setPrivate_(album0.isPrivate_());
+                                      album.set(pair.first);
                                       album.getImages().clear();
-                                      album.getImages().addAll(images);
+                                      album.getImages().addAll(pair.second);
 
-                                      if (images.size() > 0) {
+                                      if (album.getImages().size() > 0) {
                                           mAlbum.setValue(StatusWrapper.loaded(album));
                                       } else {
                                           mAlbum.setValue(StatusWrapper.error(album, Reason.EMPTY));

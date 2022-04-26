@@ -3,7 +3,6 @@ package com.jonahbauer.qed.activities.mainFragments;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.drawable.Animatable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.*;
 import android.widget.AdapterView;
@@ -27,7 +26,7 @@ import com.jonahbauer.qed.activities.imageActivity.ImageFragmentArgs;
 import com.jonahbauer.qed.databinding.FragmentAlbumBinding;
 import com.jonahbauer.qed.layoutStuff.CustomArrayAdapter;
 import com.jonahbauer.qed.model.Album;
-import com.jonahbauer.qed.model.Album.Filter;
+import com.jonahbauer.qed.model.AlbumFilter;
 import com.jonahbauer.qed.model.Image;
 import com.jonahbauer.qed.model.Person;
 import com.jonahbauer.qed.model.adapter.ImageAdapter;
@@ -35,11 +34,7 @@ import com.jonahbauer.qed.model.viewmodel.AlbumViewModel;
 import com.jonahbauer.qed.networking.Reason;
 import com.jonahbauer.qed.util.*;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -47,7 +42,7 @@ public class AlbumFragment extends Fragment implements CompoundButton.OnCheckedC
     private static final String SAVED_SELECTED_ITEM_ID = "selectedItemId";
 
     private Album mAlbum;
-    private Filter mFilter;
+    private AlbumFilter mFilter;
 
     private AlbumViewModel mAlbumViewModel;
     private FragmentAlbumBinding mBinding;
@@ -213,26 +208,26 @@ public class AlbumFragment extends Fragment implements CompoundButton.OnCheckedC
     }
 
     private void loadFilters() {
-        Filter.Builder builder = Album.Filter.builder();
+        LocalDate day = null;
+        LocalDate upload = null;
+        Long owner = null;
+        String category = null;
 
-        if (mBinding.albumCategoryCheckBox.isChecked()) {
-            String category = (String) mBinding.albumCategorySpinner.getSelectedItem();
-            builder.setCategory(category);
-        }
         if (mBinding.albumDateCheckBox.isChecked()) {
-            LocalDate date = (LocalDate) mBinding.albumDateSpinner.getSelectedItem();
-            builder.setDay(date);
+            day = (LocalDate) mBinding.albumDateSpinner.getSelectedItem();
         }
         if (mBinding.albumUploadCheckBox.isChecked()) {
-            LocalDate date = (LocalDate) mBinding.albumUploadSpinner.getSelectedItem();
-            builder.setUpload(date);
+            upload = (LocalDate) mBinding.albumUploadSpinner.getSelectedItem();
         }
         if (mBinding.albumPhotographerCheckBox.isChecked()) {
-            Person person = (Person) mBinding.albumPhotographerSpinner.getSelectedItem();
-            builder.setOwner(person);
+            var person = (Person) mBinding.albumPhotographerSpinner.getSelectedItem();
+            owner = person == null ? null : person.getId();
+        }
+        if (mBinding.albumCategoryCheckBox.isChecked()) {
+            category = (String) mBinding.albumCategorySpinner.getSelectedItem();
         }
 
-        mFilter = builder.build();
+        mFilter = new AlbumFilter(day, upload, owner, category);
     }
 
     private void search() {
@@ -296,14 +291,16 @@ public class AlbumFragment extends Fragment implements CompoundButton.OnCheckedC
                 }
 
                 // owner
-                Person owner = mFilter.getOwner();
+                var owner = mFilter.getOwner();
                 mBinding.albumPhotographerCheckBox.setChecked(owner != null);
                 if (owner != null) {
-                    int index = album.getPersons().indexOf(owner);
+                    int index = album.getPersons().indexOf(new Person(owner));
                     if (index != -1) {
                         mBinding.albumPhotographerSpinner.setSelection(index);
                     } else {
-                        mAdapterPhotographer.add(owner);
+                        var person = new Person(owner);
+                        person.setUsername(getString(R.string.album_photographer_unknown));
+                        mAdapterPhotographer.add(person);
                         mBinding.albumPhotographerSpinner.setSelection(album.getPersons().size());
                     }
                 }
@@ -454,53 +451,9 @@ public class AlbumFragment extends Fragment implements CompoundButton.OnCheckedC
         mImageActivityLauncher.launch(intent, options);
     }
 
-    private Filter parseFilters(Intent intent) {
+    private static AlbumFilter parseFilters(Intent intent) {
         if (intent == null) return null;
-
-        Uri uri = intent.getData();
-        if (uri == null) return null;
-
-        Filter.Builder builder = Filter.builder();
-
-        String dateStr = uri.getQueryParameter("byday");
-        String uploadStr = uri.getQueryParameter("byupload");
-        String ownerStr = uri.getQueryParameter("byowner");
-        String categoryStr = uri.getQueryParameter("bycategory");
-
-        if (dateStr != null) {
-            try {
-                LocalDate date = LocalDate.from(DateTimeFormatter.ISO_LOCAL_DATE.parse(dateStr));
-                builder.setDay(date);
-            } catch (DateTimeParseException ignored) {}
-        }
-
-        if (uploadStr != null) {
-            try {
-                LocalDate date = LocalDate.from(DateTimeFormatter.ISO_LOCAL_DATE.parse(uploadStr));
-                builder.setUpload(date);
-            } catch (DateTimeParseException ignored) {}
-        }
-
-        if (ownerStr != null) {
-            try {
-                long owner = Long.parseLong(ownerStr);
-                Person person = new Person(owner);
-                person.setUsername(getString(R.string.album_photographer_unknown));
-                builder.setOwner(person);
-            } catch (NumberFormatException ignored) {}
-        }
-
-        if (categoryStr != null) {
-            if ("".equals(categoryStr)) {
-                builder.setCategory(Album.CATEGORY_ETC);
-            } else {
-                try {
-                    builder.setCategory(URLDecoder.decode(categoryStr, "UTF-8"));
-                } catch (UnsupportedEncodingException ignored) {}
-            }
-        }
-
-        return builder.build();
+        return AlbumFilter.parse(intent.getData());
     }
 
     private Long getSelectedItemId() {

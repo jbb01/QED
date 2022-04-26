@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.jonahbauer.qed.model.Registration;
+import com.jonahbauer.qed.model.util.ParsedLocalDate;
 import com.jonahbauer.qed.networking.parser.HtmlParseException;
 import com.jonahbauer.qed.networking.parser.HtmlParser;
 
@@ -105,8 +106,7 @@ public final class RegistrationParser extends HtmlParser<Registration> {
                             }
                             case GENERAL_KEY_BIRTHDAY: {
                                 var birthdayString = value.text();
-                                registration.setPersonBirthdayString(birthdayString);
-                                registration.setPersonBirthday(parseLocalDate(birthdayString));
+                                registration.setPersonBirthday(new ParsedLocalDate(birthdayString, parseLocalDate(birthdayString)));
                                 break;
                             }
                             case GENERAL_KEY_GENDER: {
@@ -166,7 +166,6 @@ public final class RegistrationParser extends HtmlParser<Registration> {
                             }
                             case PAYMENT_KEY_TIMESTAMP: {
                                 var time = value.child(0);
-                                registration.setPaymentTimeString(time.text());
                                 registration.setPaymentTime(parseLocalDate(time));
                                 break;
                             }
@@ -199,13 +198,11 @@ public final class RegistrationParser extends HtmlParser<Registration> {
                         switch (key) {
                             case TRANSPORT_KEY_TIME_OF_ARRIVAL: {
                                 var time = value.child(0);
-                                registration.setTimeOfArrivalString(time.text());
                                 registration.setTimeOfArrival(parseInstant(time));
                                 break;
                             }
                             case TRANSPORT_KEY_TIME_OF_DEPARTURE: {
                                 var time = value.child(0);
-                                registration.setTimeOfDepartureString(time.text());
                                 registration.setTimeOfDeparture(parseInstant(time));
                                 break;
                             }

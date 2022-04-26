@@ -1,6 +1,7 @@
 package com.jonahbauer.qed.model;
 
 import android.os.Parcel;
+import com.jonahbauer.qed.model.util.ParsedLocalDate;
 import org.junit.Test;
 
 import java.time.Instant;
@@ -29,12 +30,9 @@ public class EventTest {
         event.setCost(100.5d);
         event.setNotes("Raum für Notizen");
         event.setMaxParticipants(10);
-        event.setStartString("01.01.2000");
-        event.setStart(LocalDate.of(2000, 1, 1));
-        event.setEndString("31.12.2000");
-        event.setEnd(LocalDate.of(2000, 12, 31));
-        event.setDeadlineString("01.01.1999");
-        event.setDeadline(LocalDate.of(1999, 1, 1));
+        event.setStart(new ParsedLocalDate("01.01.2000", LocalDate.of(2000, 1, 1)));
+        event.setEnd(new ParsedLocalDate("31.12.2000", LocalDate.of(2000, 12, 31)));
+        event.setDeadline(new ParsedLocalDate("01.01.1999", LocalDate.of(1999, 1, 1)));
         event.setHotel("JH Musterstadt");
         event.setHotelAddress("Musterstraße 10\n12345 Musterstadt");
         event.setEmailOrga("musterstadt-orga@example.com");

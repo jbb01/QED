@@ -85,25 +85,25 @@
             <com.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{person.birthday != null || person.birthdayString != null}"
+                android:visibility="@{person.birthday != null}"
                 app:icon="@drawable/ic_person_birthday"
-                app:title="@{@string/person_title_birthday(TimeUtils.format(person.birthday) ?? person.birthdayString)}"
+                app:title="@{@string/person_title_birthday(TimeUtils.format(person.birthday))}"
                 app:subtitle="@string/person_subtitle_birthday"/>
 
             <com.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{person.dateOfJoining != null || person.dateOfJoiningString != null}"
+                android:visibility="@{person.dateOfJoining != null}"
                 app:icon="@drawable/ic_person_date_of_joining"
-                app:title="@{@string/person_title_date_of_joining(TimeUtils.format(person.dateOfJoining) ?? person.dateOfJoiningString)}"
+                app:title="@{@string/person_title_date_of_joining(TimeUtils.format(person.dateOfJoining))}"
                 app:subtitle="@string/person_subtitle_date_of_joining"/>
 
             <com.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{person.leavingDate != null || person.leavingDateString != null}"
+                android:visibility="@{person.dateOfLeaving != null}"
                 app:icon="@drawable/ic_person_leaving_date"
-                app:title="@{@string/person_title_leaving_date(TimeUtils.format(person.leavingDate) ?? person.leavingDateString)}"
+                app:title="@{@string/person_title_leaving_date(TimeUtils.format(person.dateOfLeaving))}"
                 app:subtitle="@string/person_subtitle_leaving_date"/>
 
             <com.jonahbauer.qed.layoutStuff.views.ListItem

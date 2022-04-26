@@ -5,6 +5,10 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import androidx.annotation.Nullable;
+
+import com.jonahbauer.qed.model.util.ParsedInstant;
+import com.jonahbauer.qed.model.util.ParsedLocalDate;
+
 import org.jetbrains.annotations.Contract;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -38,9 +42,9 @@ public abstract class HtmlParser<T> implements Parser<T> {
         }
     }
 
-    @Nullable
-    protected static LocalDate parseLocalDate(@NonNull Element time) {
-        return parseLocalDate(time.attr("datetime"));
+    @NonNull
+    protected static ParsedLocalDate parseLocalDate(@NonNull Element time) {
+        return new ParsedLocalDate(time.text(), parseLocalDate(time.attr("datetime")));
     }
 
     @Nullable
@@ -53,9 +57,9 @@ public abstract class HtmlParser<T> implements Parser<T> {
         }
     }
 
-    @Nullable
-    protected static Instant parseInstant(@NonNull Element time) {
-        return parseInstant(time.attr("datetime"));
+    @NonNull
+    protected static ParsedInstant parseInstant(@NonNull Element time) {
+        return new ParsedInstant(time.text(), parseInstant(time.attr("datetime")));
     }
 
     @Nullable

@@ -74,18 +74,18 @@
             <com.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{(event.start != null || event.startString != null) &amp;&amp; (event.end != null || event.endString != null)}"
+                android:visibility="@{event.start != null &amp;&amp; event.end != null}"
                 android:onClick="@{(view) -> Actions.recordToCalendar(view.context, event)}"
                 app:icon="@drawable/ic_event_time"
-                app:title="@{@string/event_title_time(TimeUtils.format(event.start) ?? event.startString, TimeUtils.format(event.end) ?? event.endString)}"
+                app:title="@{@string/event_title_time(TimeUtils.format(event.start), TimeUtils.format(event.end))}"
                 app:subtitle="@string/event_subtitle_time"/>
 
             <com.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{event.deadline != null || event.deadlineString != null}"
+                android:visibility="@{event.deadline != null}"
                 app:icon="@drawable/ic_event_deadline"
-                app:title="@{@string/event_title_deadline(TimeUtils.format(event.deadline) ?? event.deadlineString)}"
+                app:title="@{@string/event_title_deadline(TimeUtils.format(event.deadline))}"
                 app:subtitle="@string/event_subtitle_deadline"/>
 
             <com.jonahbauer.qed.layoutStuff.views.ListItem

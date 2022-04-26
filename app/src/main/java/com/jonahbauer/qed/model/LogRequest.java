@@ -10,17 +10,19 @@ import static com.jonahbauer.qed.model.LogRequest.Mode.SINCE_OWN;
 import android.content.res.Resources;
 import android.net.Uri;
 
-import androidx.annotation.Keep;
-import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
+import android.os.Parcel;
+import android.os.Parcelable;
+import androidx.annotation.*;
 
 import com.jonahbauer.qed.R;
+import com.jonahbauer.qed.model.parcel.ParcelExtensions;
 import com.jonahbauer.qed.networking.NetworkConstants;
 import com.jonahbauer.qed.util.TimeUtils;
 
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.ExtensionMethod;
 import org.jetbrains.annotations.Contract;
 
-import java.io.Serializable;
 import java.text.MessageFormat;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -34,18 +36,62 @@ import lombok.Getter;
 
 @Getter
 @EqualsAndHashCode
-@Keep
-public abstract class LogRequest implements Serializable {
-    private final Mode mode;
-    private final long timestamp = System.currentTimeMillis();
+@ExtensionMethod(ParcelExtensions.class)
+public abstract class LogRequest implements Parcelable {
+    private final @NonNull Mode mode;
+    private final long timestamp;
+    private final String query;
 
-    protected LogRequest(Mode mode) {
+    private static final Creator<LogRequest> CREATOR = new Creator<>() {
+        @Override
+        public LogRequest createFromParcel(Parcel source) {
+            var start = source.dataPosition();
+            var mode = source.readEnum(Mode::get);
+            source.setDataPosition(start);
+
+            switch (mode) {
+                case FILE: return new FileLogRequest(source);
+                case SINCE_OWN: return new SinceOwnLogRequest(source);
+                case DATE_RECENT: return new DateRecentLogRequest(source);
+                case POST_RECENT: return new PostRecentLogRequest(source);
+                case DATE_INTERVAL: return new DateIntervalLogRequest(source);
+                case POST_INTERVAL: return new PostIntervalLogRequest(source);
+                default: throw new AssertionError("Unknown LogRequest mode: " + mode);
+            }
+        }
+
+        @Override
+        public LogRequest[] newArray(int size) {
+            return new LogRequest[size];
+        }
+    };
+
+    protected LogRequest(@NonNull Mode mode, String query) {
         this.mode = mode;
+        this.timestamp = System.currentTimeMillis();
+        this.query = "?mode=" + mode.getQuery() + query;
     }
 
-    public abstract String getQueryString();
+    protected LogRequest(@NonNull Parcel parcel) {
+        mode = parcel.readEnum(Mode::get);
+        timestamp = parcel.readLong();
+        query = parcel.readString();
+    }
 
-    public abstract String getSubtitle(Resources resources);
+    public abstract String getSubtitle(@NonNull Resources resources);
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    @CallSuper
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeEnum(mode);
+        dest.writeLong(timestamp);
+        dest.writeString(query);
+    }
 
     @Nullable
     @Contract("null -> null")
@@ -92,41 +138,42 @@ public abstract class LogRequest implements Serializable {
         return null;
     }
 
+    @Getter
+    @RequiredArgsConstructor
     public enum Mode {
-        POST_RECENT,
-        DATE_RECENT,
-        DATE_INTERVAL,
-        POST_INTERVAL,
-        SINCE_OWN,
-        FILE;
+        POST_RECENT(R.string.log_request_mode_postrecent, "postrecent"),
+        DATE_RECENT(R.string.log_request_mode_daterecent, "daterecent"),
+        DATE_INTERVAL(R.string.log_request_mode_dateinterval, "dateinterval"),
+        POST_INTERVAL(R.string.log_request_mode_postinterval, "postinterval"),
+        SINCE_OWN(R.string.log_request_mode_sinceown, "fromownpost"),
+        FILE(R.string.log_request_mode_file, "file");
+        private static final Mode[] VALUES = Mode.values();
+        public static Mode get(int ordinal) { return VALUES[ordinal]; }
 
-        @StringRes
-        public int toStringRes() {
-            switch (this) {
-                case POST_RECENT: return R.string.log_request_mode_postrecent;
-                case DATE_RECENT: return R.string.log_request_mode_daterecent;
-                case DATE_INTERVAL: return R.string.log_request_mode_dateinterval;
-                case POST_INTERVAL: return R.string.log_request_mode_postinterval;
-                case SINCE_OWN: return R.string.log_request_mode_sinceown;
-                case FILE: return R.string.log_request_mode_file;
-            }
-            throw new AssertionError();
-        }
+        private final @StringRes int stringRes;
+        private final String query;
     }
 
     @Getter
     @EqualsAndHashCode(callSuper = true)
     public static abstract class OnlineLogRequest extends LogRequest {
-        private final String channel;
+        private final @NonNull String channel;
 
-        protected OnlineLogRequest(Mode mode, String channel) {
-            super(mode);
+        protected OnlineLogRequest(@NonNull Mode mode, @NonNull String channel, @NonNull String query) {
+            super(mode, "&channel=" + channel + query);
             this.channel = channel;
         }
 
+        protected OnlineLogRequest(@NonNull Parcel parcel) {
+            super(parcel);
+            this.channel = parcel.readString();
+        }
+
         @Override
-        public String getQueryString() {
-            return "?channel=" + channel;
+        @CallSuper
+        public void writeToParcel(Parcel dest, int flags) {
+            super.writeToParcel(dest, flags);
+            dest.writeString(channel);
         }
     }
 
@@ -138,19 +185,25 @@ public abstract class LogRequest implements Serializable {
     public static class PostRecentLogRequest extends OnlineLogRequest {
         private final long last;
 
-        public PostRecentLogRequest(String channel, long last) {
-            super(POST_RECENT, channel);
+        public PostRecentLogRequest(@NonNull String channel, long last) {
+            super(POST_RECENT, channel, "&last=" + last);
             this.last = last;
         }
 
-        @Override
-        public String getQueryString() {
-            return super.getQueryString() + "&mode=postrecent&last=" + last;
+        public PostRecentLogRequest(@NonNull Parcel parcel) {
+            super(parcel);
+            this.last = parcel.readLong();
         }
 
         @Override
-        public String getSubtitle(Resources resources) {
+        public String getSubtitle(@NonNull Resources resources) {
             return MessageFormat.format(resources.getString(R.string.log_subtitle_post_recent), last);
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            super.writeToParcel(dest, flags);
+            dest.writeLong(last);
         }
     }
 
@@ -162,19 +215,29 @@ public abstract class LogRequest implements Serializable {
     public static class DateRecentLogRequest extends OnlineLogRequest {
         private final long seconds;
 
-        public DateRecentLogRequest(String channel, long duration, TimeUnit timeUnit) {
-            super(DATE_RECENT, channel);
-            this.seconds = timeUnit.toSeconds(duration);
+        public DateRecentLogRequest(@NonNull String channel, long duration, @NonNull TimeUnit timeUnit) {
+            this(channel, timeUnit.toSeconds(duration));
+        }
+
+        public DateRecentLogRequest(@NonNull String channel, long seconds) {
+            super(DATE_RECENT, channel, "&last=" + seconds);
+            this.seconds = seconds;
+        }
+
+        public DateRecentLogRequest(@NonNull Parcel parcel) {
+            super(parcel);
+            this.seconds = parcel.readLong();
         }
 
         @Override
-        public String getQueryString() {
-            return super.getQueryString() + "&mode=daterecent&last=" + seconds;
-        }
-
-        @Override
-        public String getSubtitle(Resources resources) {
+        public String getSubtitle(@NonNull Resources resources) {
             return MessageFormat.format(resources.getString(R.string.log_subtitle_date_recent), seconds / 3600);
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            super.writeToParcel(dest, flags);
+            dest.writeLong(seconds);
         }
     }
 
@@ -188,20 +251,28 @@ public abstract class LogRequest implements Serializable {
         private final long from;
         private final long to;
 
-        public PostIntervalLogRequest(String channel, long from, long to) {
-            super(POST_INTERVAL, channel);
+        public PostIntervalLogRequest(@NonNull String channel, long from, long to) {
+            super(POST_INTERVAL, channel, "&from=" + from + "&to=" + to);
             this.from = from;
             this.to = to;
         }
 
-        @Override
-        public String getQueryString() {
-            return super.getQueryString() + "&mode=postinterval&from=" + from + "&to=" + to;
+        public PostIntervalLogRequest(@NonNull Parcel parcel) {
+            super(parcel);
+            this.from = parcel.readLong();
+            this.to = parcel.readLong();
         }
 
         @Override
-        public String getSubtitle(Resources resources) {
+        public String getSubtitle(@NonNull Resources resources) {
             return MessageFormat.format(resources.getString(R.string.log_subtitle_post_interval), from, to);
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            super.writeToParcel(dest, flags);
+            dest.writeLong(from);
+            dest.writeLong(to);
         }
     }
 
@@ -217,23 +288,31 @@ public abstract class LogRequest implements Serializable {
         private static final DateTimeFormatter DATE_PARSER = DateTimeFormatter
                 .ofPattern("yyyy-MM-dd");
 
-        private final Instant from;
-        private final Instant to;
+        private final @NonNull Instant from;
+        private final @NonNull Instant to;
 
-        public DateIntervalLogRequest(String channel, Instant from, Instant to) {
-            super(DATE_INTERVAL, channel);
+        public DateIntervalLogRequest(@NonNull String channel, @NonNull Instant from, @NonNull Instant to) {
+            super(DATE_INTERVAL, channel, "&from=" + DATE_TIME_FORMATTER.format(from) + "&to=" + DATE_TIME_FORMATTER.format(to));
             this.from = from;
             this.to = to;
         }
 
-        @Override
-        public String getQueryString() {
-            return super.getQueryString() + "&mode=dateinterval&from=" + DATE_TIME_FORMATTER.format(from) + "&to=" + DATE_TIME_FORMATTER.format(to);
+        public DateIntervalLogRequest(@NonNull Parcel parcel) {
+            super(parcel);
+            this.from = parcel.readInstant();
+            this.to = parcel.readInstant();
         }
 
         @Override
-        public String getSubtitle(Resources resources) {
+        public String getSubtitle(@NonNull Resources resources) {
             return MessageFormat.format(resources.getString(R.string.log_subtitle_date_interval), TimeUtils.format(from), TimeUtils.format(to));
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            super.writeToParcel(dest, flags);
+            dest.writeInstant(from);
+            dest.writeInstant(to);
         }
     }
 
@@ -246,40 +325,57 @@ public abstract class LogRequest implements Serializable {
     public static class SinceOwnLogRequest extends OnlineLogRequest {
         private final long skip;
 
-        public SinceOwnLogRequest(String channel, long skip) {
-            super(SINCE_OWN, channel);
+        public SinceOwnLogRequest(@NonNull String channel, long skip) {
+            super(SINCE_OWN, channel, "&skip=" + skip);
             this.skip = skip;
         }
 
-        @Override
-        public String getQueryString() {
-            return super.getQueryString() + "&mode=fromownpost&skip=" + skip;
+        public SinceOwnLogRequest(@NonNull Parcel parcel) {
+            super(parcel);
+            this.skip = parcel.readLong();
         }
 
         @Override
-        public String getSubtitle(Resources resources) {
+        public String getSubtitle(@NonNull Resources resources) {
             return resources.getString(R.string.log_subtitle_since_own);
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            super.writeToParcel(dest, flags);
+            dest.writeLong(skip);
         }
     }
 
     @Getter
     @EqualsAndHashCode(callSuper = true)
     public static class FileLogRequest extends LogRequest {
-        private final Uri file;
+        private final @NonNull Uri file;
 
-        public FileLogRequest(Uri file) {
-            super(FILE);
+        public FileLogRequest(@NonNull Uri file) {
+            super(FILE, null);
             this.file = file;
         }
 
-        @Override
-        public String getQueryString() {
-            return "file://" + file.toString();
+        public FileLogRequest(@NonNull Parcel parcel) {
+            super(parcel);
+            this.file = parcel.readTypedObject(Uri.CREATOR);
         }
 
         @Override
-        public String getSubtitle(Resources resources) {
+        public String getQuery() {
+            return "file://" + file;
+        }
+
+        @Override
+        public String getSubtitle(@NonNull Resources resources) {
             return resources.getString(R.string.log_subtitle_file);
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            super.writeToParcel(dest, flags);
+            dest.writeTypedObject(file, flags);
         }
     }
 }

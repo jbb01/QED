@@ -11,14 +11,15 @@ import androidx.core.util.Pair;
 import com.jonahbauer.qed.R;
 
 import java.time.Instant;
-import java.time.LocalDate;
 
 import com.jonahbauer.qed.model.parcel.ParcelExtensions;
+import com.jonahbauer.qed.model.util.ParsedLocalDate;
+import com.jonahbauer.qed.model.util.ParsedInstant;
 import it.unimi.dsi.fastutil.Hash;
-import lombok.Data;
-import lombok.ToString;
+import lombok.*;
 
 @Data
+@EqualsAndHashCode(of = "id")
 public class Registration implements Parcelable {
     public static final long NO_ID = Long.MIN_VALUE;
     private final long id;
@@ -39,18 +40,15 @@ public class Registration implements Parcelable {
     // Person
     private long personId = Person.NO_ID;
     private String personName;
-    private LocalDate personBirthday;
-    private String personBirthdayString;
+    private ParsedLocalDate personBirthday;
     private String personGender;
     private String personMail;
     private String personAddress;
     private String personPhone;
 
     // Transport
-    private Instant timeOfArrival;
-    private String timeOfArrivalString;
-    private Instant timeOfDeparture;
-    private String timeOfDepartureString;
+    private ParsedInstant timeOfArrival;
+    private ParsedInstant timeOfDeparture;
     private String sourceStation;
     private String targetStation;
     private String railcard;
@@ -64,8 +62,7 @@ public class Registration implements Parcelable {
     // Payment
     private Double paymentAmount;
     private Boolean paymentDone;
-    private LocalDate paymentTime;
-    private String paymentTimeString;
+    private ParsedLocalDate paymentTime;
     private Boolean memberAbatement;
     private String otherAbatement;
 
@@ -76,7 +73,6 @@ public class Registration implements Parcelable {
         personId = person.getId();
         personName = person.getFullName();
         personBirthday = person.getBirthday();
-        personBirthdayString = person.getBirthdayString();
         personGender = person.getGender();
         personMail = person.getEmail();
 
@@ -100,7 +96,6 @@ public class Registration implements Parcelable {
             person = new Person(personId);
             person.setFullName(personName);
             person.setBirthday(personBirthday);
-            person.setBirthdayString(personBirthdayString);
             person.setGender(personGender);
             person.setEmail(personMail);
             if (personAddress != null) {
@@ -135,16 +130,12 @@ public class Registration implements Parcelable {
     }
 
     public boolean hasTransportInformation() {
-        return (timeOfArrivalString != null && !timeOfArrivalString.trim().equals(""))
-                || (timeOfDepartureString != null && !timeOfDepartureString.trim().equals(""))
-                || (overnightStays != null);
+        return timeOfArrival != null || timeOfDeparture != null || overnightStays != null;
     }
 
     public boolean hasPaymentInformation() {
-        return (paymentAmount != null)
-                || (paymentDone != null)
-                || (paymentTimeString != null && !paymentTimeString.trim().equals(""))
-                || (memberAbatement != null)
+        return paymentAmount != null || paymentDone != null || paymentTime != null
+                || memberAbatement != null
                 || (otherAbatement != null && !otherAbatement.trim().equals(""));
     }
 
@@ -164,17 +155,14 @@ public class Registration implements Parcelable {
 
         dest.writeLong(personId);
         dest.writeString(personName);
-        ParcelExtensions.writeLocalDate(dest, personBirthday);
-        dest.writeString(personBirthdayString);
+        dest.writeTypedObject(personBirthday, flags);
         dest.writeString(personGender);
         dest.writeString(personMail);
         dest.writeString(personAddress);
         dest.writeString(personPhone);
 
-        ParcelExtensions.writeInstant(dest, timeOfArrival);
-        dest.writeString(timeOfArrivalString);
-        ParcelExtensions.writeInstant(dest, timeOfDeparture);
-        dest.writeString(timeOfDepartureString);
+        dest.writeTypedObject(timeOfArrival, flags);
+        dest.writeTypedObject(timeOfDeparture, flags);
         dest.writeString(sourceStation);
         dest.writeString(targetStation);
         dest.writeString(railcard);
@@ -186,8 +174,7 @@ public class Registration implements Parcelable {
 
         dest.writeValue(paymentAmount);
         dest.writeValue(paymentDone);
-        ParcelExtensions.writeLocalDate(dest, paymentTime);
-        dest.writeString(paymentTimeString);
+        dest.writeTypedObject(paymentTime, flags);
         dest.writeValue(memberAbatement);
         dest.writeString(otherAbatement);
 
@@ -200,7 +187,7 @@ public class Registration implements Parcelable {
         public Registration createFromParcel(Parcel in) {
             Registration registration = new Registration(in.readLong());
 
-            registration.status = ParcelExtensions.readEnum(in, Status.values());
+            registration.status = ParcelExtensions.readEnum(in, Status::get);
             registration.organizer = (Boolean) in.readValue(null);
 
             registration.eventId = in.readLong();
@@ -208,17 +195,14 @@ public class Registration implements Parcelable {
 
             registration.personId = in.readLong();
             registration.personName = in.readString();
-            registration.personBirthday = ParcelExtensions.readLocalDate(in);
-            registration.personBirthdayString = in.readString();
+            registration.personBirthday = in.readTypedObject(ParsedLocalDate.CREATOR);
             registration.personGender = in.readString();
             registration.personMail = in.readString();
             registration.personAddress = in.readString();
             registration.personPhone = in.readString();
 
-            registration.timeOfArrival = ParcelExtensions.readInstant(in);
-            registration.timeOfArrivalString = in.readString();
-            registration.timeOfDeparture = ParcelExtensions.readInstant(in);
-            registration.timeOfDepartureString = in.readString();
+            registration.timeOfArrival = in.readTypedObject(ParsedInstant.CREATOR);
+            registration.timeOfDeparture = in.readTypedObject(ParsedInstant.CREATOR);
             registration.sourceStation = in.readString();
             registration.targetStation = in.readString();
             registration.railcard = in.readString();
@@ -230,8 +214,7 @@ public class Registration implements Parcelable {
 
             registration.paymentAmount = (Double) in.readValue(null);
             registration.paymentDone = (Boolean) in.readValue(null);
-            registration.paymentTime = ParcelExtensions.readLocalDate(in);
-            registration.paymentTimeString = in.readString();
+            registration.paymentTime = in.readTypedObject(ParsedLocalDate.CREATOR);
             registration.memberAbatement = (Boolean) in.readValue(null);
             registration.otherAbatement = in.readString();
 
@@ -246,52 +229,20 @@ public class Registration implements Parcelable {
         }
     };
 
+    @Getter
+    @RequiredArgsConstructor
     public enum Status {
-        PARTICIPATED, CONFIRMED, OPEN, CANCELLED;
+        PARTICIPATED(R.string.registration_status_participated, R.drawable.ic_event_member_confirmed, R.drawable.ic_registration_status_confirmed),
+        CONFIRMED(R.string.registration_status_confirmed, R.drawable.ic_event_member_confirmed, R.drawable.ic_registration_status_confirmed),
+        OPEN(R.string.registration_status_open, R.drawable.ic_event_member_open, R.drawable.ic_registration_status_open),
+        CANCELLED(R.string.registration_status_cancelled, R.drawable.ic_event_member_opt_out, R.drawable.ic_registration_status_cancelled);
 
-        @StringRes
-        public int toStringRes() {
-            switch (this) {
-                case PARTICIPATED:
-                    return R.string.registration_status_participated;
-                case CONFIRMED:
-                    return R.string.registration_status_confirmed;
-                case OPEN:
-                    return R.string.registration_status_open;
-                case CANCELLED:
-                    return R.string.registration_status_cancelled;
-                default:
-                    return -1;
-            }
-        }
+        private static final Status[] VALUES = Status.values();
+        public static Status get(int ordinal) { return VALUES[ordinal]; }
 
-        @DrawableRes
-        public int toDrawableRes() {
-            switch (this) {
-                case OPEN:
-                    return R.drawable.ic_event_member_open;
-                default:
-                case CONFIRMED:
-                case PARTICIPATED:
-                    return R.drawable.ic_event_member_confirmed;
-                case CANCELLED:
-                    return R.drawable.ic_event_member_opt_out;
-            }
-        }
-
-        @DrawableRes
-        public int toDrawableResVariant() {
-            switch (this) {
-                case OPEN:
-                    return R.drawable.ic_registration_status_open;
-                default:
-                case CONFIRMED:
-                case PARTICIPATED:
-                    return R.drawable.ic_registration_status_confirmed;
-                case CANCELLED:
-                    return R.drawable.ic_registration_status_cancelled;
-            }
-        }
+        private final @StringRes int stringRes;
+        private final @DrawableRes int drawableRes;
+        private final @DrawableRes int drawableResVariant;
     }
 
     /**

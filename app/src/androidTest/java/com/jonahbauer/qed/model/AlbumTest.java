@@ -28,7 +28,7 @@ public class AlbumTest {
         album.setName("Musteralbum");
         album.setOwner("Max Mustermann");
         album.setCreationDate("01.01.2000");
-        album.setPrivate_(false);
+        album.setPrivate(false);
 
         var person = new Person(1);
         person.setUsername("ErikaMusterfrau");

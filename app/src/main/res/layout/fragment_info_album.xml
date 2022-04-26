@@ -111,7 +111,7 @@
             <com.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{album.private_}"
+                android:visibility="@{album.private}"
                 app:icon="@drawable/ic_album_private"
                 app:title="@string/album_title_private"/>
         </LinearLayout>

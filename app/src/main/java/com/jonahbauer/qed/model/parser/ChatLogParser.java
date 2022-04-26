@@ -53,7 +53,7 @@ public final class ChatLogParser implements ObservableOnSubscribe<LongLongPair> 
             Iterator<String> lines = reader.lines().iterator();
             while (lines.hasNext() && !emitter.isDisposed()) {
                 String line = lines.next();
-                Message msg = Message.interpretJSONMessage(line);
+                Message msg = Message.parseJsonMessage(line);
 
                 if (msg != null && (lastType = msg.getType()) == Message.Type.POST) {
                     mOut.accept(msg);

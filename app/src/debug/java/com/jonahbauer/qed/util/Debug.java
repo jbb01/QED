@@ -11,6 +11,8 @@ import com.jonahbauer.qed.model.Registration;
 
 import java.time.*;
 
+import com.jonahbauer.qed.model.util.ParsedInstant;
+import com.jonahbauer.qed.model.util.ParsedLocalDate;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
@@ -21,18 +23,15 @@ public class Debug {
         person.setLastName("Mustermann");
         person.setUsername("MaxMustermann");
         person.setEmail("max.mustermann@example.org");
-        person.setBirthday(LocalDate.of(2000, 1, 1));
-        person.setBirthdayString("01.01.2000");
+        person.setBirthday(new ParsedLocalDate("01.01.2000", LocalDate.of(2000, 1, 1)));
         person.setHomeStation("Musterstadt");
         person.setRailcard("Bahncard 42");
         person.setFood("Nur leckeres Essen");
         person.setNotes("Raum für Notizen");
         person.setMember(true);
         person.setActive(true);
-        person.setDateOfJoining(LocalDate.of(2020, 3, 2));
-        person.setDateOfJoiningString("03/14/2020");
-        person.setLeavingDate(LocalDate.of(2050, 12, 31));
-        person.setLeavingDateString("31-12-2050");
+        person.setDateOfJoining(new ParsedLocalDate("03/14/2020", LocalDate.of(2020, 3, 2)));
+        person.setDateOfLeaving(new ParsedLocalDate("31-12-2050", LocalDate.of(2050, 12, 31)));
         person.getContacts().add(Pair.create("mobil", "0123456789"));
         person.getContacts().add(Pair.create("daheim", "987654321"));
         person.getContacts().add(Pair.create("skype", "max.mustermann"));
@@ -75,15 +74,9 @@ public class Debug {
         event.setCost(200d);
         event.setNotes("Raum für Notizen");
         event.setMaxParticipants(50);
-
-        event.setStart(LocalDate.of(2021, 8, 1));
-        event.setStartString("01.08.2021");
-
-        event.setEnd(LocalDate.of(2021, 8, 10));
-        event.setEndString("10.08.2021");
-
-        event.setDeadline(LocalDate.of(2021, 7, 16));
-        event.setDeadlineString("16.07.2021");
+        event.setStart(new ParsedLocalDate("01.08.2021", LocalDate.of(2021, 8, 1)));
+        event.setEnd(new ParsedLocalDate("10.08.2021", LocalDate.of(2021, 8, 10)));
+        event.setDeadline(new ParsedLocalDate("16.07.2021", LocalDate.of(2021, 7, 16)));
 
         event.setHotel("Musterunterkunft");
         event.setHotelAddress("Musterstraße 10\n12345 Musterstadt");
@@ -126,7 +119,7 @@ public class Debug {
         album.setName("Album");
         album.setOwner("Max Mustermann");
         album.setCreationDate("01.01.2000");
-        album.setPrivate_(true);
+        album.setPrivate(true);
         album.setLoaded(Instant.now());
         album.getCategories().add("Kategorie 1");
         album.getCategories().add("Kategorie 2");
@@ -166,17 +159,14 @@ public class Debug {
 
         registration.setPersonId(Person.NO_ID);
         registration.setPersonName("Max Mustermann");
-        registration.setPersonBirthday(LocalDate.now());
-        registration.setPersonBirthdayString("01.01.2000");
+        registration.setPersonBirthday(new ParsedLocalDate("01.01.2000", LocalDate.now()));
         registration.setPersonGender("männlich");
         registration.setPersonMail("max.mustermann@example.com");
         registration.setPersonAddress("Musterstraße 10\n12345 Musterstadt");
         registration.setPersonPhone("0123456789");
 
-        registration.setTimeOfArrival(LocalDate.of(2020, 1, 1).atStartOfDay(ZoneId.of("Europe/Berlin")).toInstant());
-        registration.setTimeOfArrivalString("01.01.2020 00:00");
-        registration.setTimeOfDeparture(LocalDate.of(2020, 1, 4).atStartOfDay(ZoneId.of("Europe/Berlin")).toInstant());
-        registration.setTimeOfDepartureString("04.01.2020 00:00");
+        registration.setTimeOfArrival(new ParsedInstant("01.01.2020 00:00", LocalDate.of(2020, 1, 1).atStartOfDay(ZoneId.of("Europe/Berlin")).toInstant()));
+        registration.setTimeOfDeparture(new ParsedInstant("04.01.2020 00:00", LocalDate.of(2020, 1, 4).atStartOfDay(ZoneId.of("Europe/Berlin")).toInstant()));
         registration.setSourceStation("Musterstadt HBF");
         registration.setTargetStation("Musterstadt HBF");
         registration.setRailcard("50");
@@ -184,8 +174,7 @@ public class Debug {
 
         registration.setPaymentAmount(100d);
         registration.setPaymentDone(true);
-        registration.setPaymentTime(LocalDate.of(2020, 1, 30));
-        registration.setPaymentTimeString("30.01.2020");
+        registration.setPaymentTime(new ParsedLocalDate("30.01.2020", LocalDate.of(2020, 1, 30)));
         registration.setMemberAbatement(true);
         registration.setOtherAbatement(null);
 

@@ -1,6 +1,7 @@
 package com.jonahbauer.qed.model;
 
 import android.annotation.SuppressLint;
+import android.icu.text.Collator;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -8,51 +9,36 @@ import androidx.annotation.NonNull;
 import androidx.core.util.Pair;
 
 import java.time.Instant;
-import java.time.LocalDate;
-import java.util.Comparator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.jonahbauer.qed.model.parcel.ParcelExtensions;
+import com.jonahbauer.qed.model.util.ParsedLocalDate;
 import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenCustomHashSet;
-import lombok.AccessLevel;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(of = "id")
 public class Person implements Parcelable {
     public static final long NO_ID = Long.MIN_VALUE;
-    public static final Comparator<Person> COMPARATOR_FIRST_NAME = Comparator.nullsLast(Comparator.comparing(
-            person -> {
-                if (person.mComparableFirstName == null) {
-                    person.mComparableFirstName = (person.firstName + " " + person.lastName)
-                            .replace('Ö', 'O')
-                            .replace('Ü', 'U')
-                            .replace('Ä','A');
-                }
-                return person.mComparableFirstName;
-            }));
-    public static final Comparator<Person> COMPARATOR_LAST_NAME = Comparator.nullsLast(Comparator.comparing(
-            person -> {
-                if (person.mComparableLastName == null) {
-                    person.mComparableLastName = (person.lastName + " " + person.firstName)
-                            .replace('Ö', 'O')
-                            .replace('Ü', 'U')
-                            .replace('Ä','A');
-                }
-                return person.mComparableLastName;
-            }));
 
-    @Getter(AccessLevel.NONE)
-    @Setter(AccessLevel.NONE)
-    private transient String mComparableFirstName;
-    @Getter(AccessLevel.NONE)
-    @Setter(AccessLevel.NONE)
-    private transient String mComparableLastName;
+    private static final Collator COLLATOR = Collator.getInstance(Locale.ROOT);
+    static {
+        COLLATOR.setStrength(Collator.PRIMARY);
+        COLLATOR.freeze();
+    }
+    private static final Comparator<String> COMPARATOR = Comparator.nullsLast(COLLATOR::compare);
+    public static final Comparator<Person> COMPARATOR_FIRST_NAME = Comparator.nullsLast((p1, p2) -> {
+        var out = COMPARATOR.compare(p1.getFirstName(), p2.getFirstName());
+        if (out == 0) out = COMPARATOR.compare(p1.getLastName(), p2.getLastName());
+        return out;
+    });
+    public static final Comparator<Person> COMPARATOR_LAST_NAME = Comparator.nullsLast((p1, p2) -> {
+        var out = COMPARATOR.compare(p1.getLastName(), p2.getLastName());
+        if (out == 0) out = COMPARATOR.compare(p1.getFirstName(), p2.getFirstName());
+        return out;
+    });
 
     private final long id;
     private String username;
@@ -62,9 +48,7 @@ public class Person implements Parcelable {
     private String email;
 
     private String gender;
-
-    private String birthdayString;
-    private LocalDate birthday;
+    private ParsedLocalDate birthday;
 
     private String homeStation;
     private String railcard;
@@ -73,12 +57,8 @@ public class Person implements Parcelable {
 
     private Boolean member;
     private Boolean active;
-
-    private String dateOfJoiningString;
-    private LocalDate dateOfJoining;
-
-    private String leavingDateString;
-    private LocalDate leavingDate;
+    private ParsedLocalDate dateOfJoining;
+    private ParsedLocalDate dateOfLeaving;
 
     private Instant loaded;
 
@@ -134,17 +114,18 @@ public class Person implements Parcelable {
     @Override
     public String toString() {
         List<String> entries = new LinkedList<>();
-        if (firstName != null) entries.add( "\"firstName\":\"" + firstName + "\"");
-        if (lastName != null) entries.add( "\"lastName\":\"" + lastName + "\"");
-        if (birthdayString != null) entries.add( "\"birthday\":\"" + birthdayString + "\"");
+        if (firstName != null) entries.add( "\"first_name\":\"" + firstName + "\"");
+        if (lastName != null) entries.add( "\"last_name\":\"" + lastName + "\"");
+        if (birthday != null) entries.add( "\"birthday\":\"" + birthday + "\"");
         if (gender != null) entries.add("\"gender\":\"" + gender + "\"");
         if (email != null) entries.add( "\"email\":\"" + email + "\"");
-        if (homeStation != null) entries.add( "\"homeStation\":\"" + homeStation + "\"");
+        if (homeStation != null) entries.add( "\"home_station\":\"" + homeStation + "\"");
         if (railcard != null) entries.add( "\"railcard\":\"" + railcard + "\"");
         if (id != NO_ID) entries.add( "\"id\":" + id);
         if (member != null) entries.add( "\"member\":" + member);
         if (active != null) entries.add( "\"active\":" + active);
-        if (dateOfJoining != null) entries.add( "\"memberSince\":\"" + dateOfJoining + "\"");
+        if (dateOfJoining != null) entries.add( "\"member_since\":\"" + dateOfJoining + "\"");
+        if (dateOfLeaving != null) entries.add( "\"quit_at\":\"" + dateOfLeaving + "\"");
         if (!contacts.isEmpty()) entries.add( "\"contacts\":" + contacts.stream().map(number -> "{\"note\":\"" + number.first + "\", \"number\":\"" + number.second + "\"}").collect(Collectors.joining(", ", "[", "]")));
         if (!addresses.isEmpty()) entries.add( "\"addresses\":" + addresses);
         if (!events.isEmpty()) entries.add( "\"events\":" + events.stream().map(String::valueOf).collect(Collectors.joining(", ", "[", "]")));
@@ -166,9 +147,7 @@ public class Person implements Parcelable {
         dest.writeString(email);
 
         dest.writeString(gender);
-
-        dest.writeString(birthdayString);
-        ParcelExtensions.writeLocalDate(dest, birthday);
+        dest.writeTypedObject(birthday, flags);
 
         dest.writeString(homeStation);
         dest.writeString(railcard);
@@ -177,12 +156,8 @@ public class Person implements Parcelable {
 
         dest.writeValue(member);
         dest.writeValue(active);
-
-        dest.writeString(dateOfJoiningString);
-        ParcelExtensions.writeLocalDate(dest, dateOfJoining);
-
-        dest.writeString(leavingDateString);
-        ParcelExtensions.writeLocalDate(dest, leavingDate);
+        dest.writeTypedObject(dateOfJoining, flags);
+        dest.writeTypedObject(dateOfLeaving, flags);
 
         ParcelExtensions.writeInstant(dest, loaded);
 
@@ -209,9 +184,7 @@ public class Person implements Parcelable {
             person.email = source.readString();
 
             person.gender = source.readString();
-
-            person.birthdayString = source.readString();
-            person.birthday = ParcelExtensions.readLocalDate(source);
+            person.birthday = source.readTypedObject(ParsedLocalDate.CREATOR);
 
             person.homeStation = source.readString();
             person.railcard = source.readString();
@@ -220,12 +193,8 @@ public class Person implements Parcelable {
 
             person.member = (Boolean) source.readValue(null);
             person.active = (Boolean) source.readValue(null);
-
-            person.dateOfJoiningString = source.readString();
-            person.dateOfJoining = ParcelExtensions.readLocalDate(source);
-
-            person.leavingDateString = source.readString();
-            person.leavingDate = ParcelExtensions.readLocalDate(source);
+            person.dateOfJoining = source.readTypedObject(ParsedLocalDate.CREATOR);
+            person.dateOfLeaving = source.readTypedObject(ParsedLocalDate.CREATOR);
 
             person.loaded = ParcelExtensions.readInstant(source);
 

@@ -167,8 +167,8 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
                 + "\"name\":\"" + name + "\", "
                 + "\"message\":\"" + message + "\", "
                 + "\"date\":\"" + date + "\", "
-                + "\"userId\":\"" + userId + "\", "
-                + "\"userName\":\"" + userName + "\", "
+                + "\"user_id\":\"" + userId + "\", "
+                + "\"username\":\"" + userName + "\", "
                 + "\"color\":\"" + color + "\", "
                 + "\"bottag\":\"" + bottag + "\", "
                 + "\"channel\":\"" + channel + "\"}";
@@ -216,16 +216,16 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
     }
 
     /**
-     * @see #interpretJSONMessage(JSONObject)
+     * @see #parseJsonMessage(JSONObject)
      */
     @Nullable
     @Contract("null -> null")
-    public static Message interpretJSONMessage(@Nullable String jsonMessage) {
+    public static Message parseJsonMessage(@Nullable String jsonMessage) {
         if (jsonMessage == null) return null;
 
         try {
             JSONObject json = new JSONObject(jsonMessage);
-            return interpretJSONMessage(json);
+            return parseJsonMessage(json);
         } catch (JSONException e) {
             Log.e(LOG_TAG, "Could not parse message: " + jsonMessage, e);
             return null;
@@ -236,7 +236,7 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
      * Parses a string as obtained by the chat web socket to a message object.
      */
     @Nullable
-    public static Message interpretJSONMessage(@NonNull JSONObject json) {
+    public static Message parseJsonMessage(@NonNull JSONObject json) {
         try {
             String type = json.getString("type");
             switch (type) {

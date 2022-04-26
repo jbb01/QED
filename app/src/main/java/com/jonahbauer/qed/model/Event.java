@@ -7,15 +7,17 @@ import android.os.Parcelable;
 import androidx.annotation.NonNull;
 
 import java.time.Instant;
-import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import com.jonahbauer.qed.model.parcel.ParcelExtensions;
+import com.jonahbauer.qed.model.util.ParsedLocalDate;
 import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenCustomHashSet;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(of = "id")
 public class Event implements Comparable<Event>, Parcelable {
     public static final long NO_ID = Long.MIN_VALUE;
 
@@ -25,14 +27,9 @@ public class Event implements Comparable<Event>, Parcelable {
     private String notes;
     private Integer maxParticipants;
 
-    private LocalDate start;
-    private String startString;
-
-    private LocalDate end;
-    private String endString;
-
-    private LocalDate deadline;
-    private String deadlineString;
+    private ParsedLocalDate start;
+    private ParsedLocalDate end;
+    private ParsedLocalDate deadline;
 
     private String hotel;
     private String hotelAddress;
@@ -62,16 +59,16 @@ public class Event implements Comparable<Event>, Parcelable {
     public String toString() {
         List<String> entries = new LinkedList<>();
         if (title != null) entries.add( "\"title\":\"" + title + "\"");
-        if (startString != null) entries.add( "\"start\":\"" + startString + "\"");
-        if (endString != null) entries.add( "\"end\":\"" + endString + "\"");
-        if (deadlineString != null) entries.add( "\"deadline\":\"" + deadlineString + "\"");
+        if (start != null) entries.add( "\"start\":\"" + start + "\"");
+        if (end != null) entries.add( "\"end\":\"" + end + "\"");
+        if (deadline != null) entries.add( "\"deadline\":\"" + deadline + "\"");
         if (cost != null) entries.add( "\"cost\":" + cost);
-        if (maxParticipants != null) entries.add( "\"maxMember\":" + maxParticipants);
+        if (maxParticipants != null) entries.add( "\"max_participants\":" + maxParticipants);
         if (id != NO_ID) entries.add( "\"id\":" + id);
         if (hotel != null) entries.add( "\"hotel\":\"" + hotel + "\"");
-        if (hotelAddress != null) entries.add( "\"hotelAddress\":\"" + hotelAddress + "\"");
-        if (emailOrga != null) entries.add( "\"emailOrga\":\"" + emailOrga + "\"");
-        if (emailAll != null) entries.add( "\"emailAll\":\"" + emailAll + "\"");
+        if (hotelAddress != null) entries.add( "\"hotel_address\":\"" + hotelAddress + "\"");
+        if (emailOrga != null) entries.add( "\"email_orga\":\"" + emailOrga + "\"");
+        if (emailAll != null) entries.add( "\"email_all\":\"" + emailAll + "\"");
         if (!participants.isEmpty()) entries.add( "\"participants\":\"" + participants + "\"");
         return entries.stream().collect(Collectors.joining(", ", "{", "}"));
     }
@@ -92,7 +89,7 @@ public class Event implements Comparable<Event>, Parcelable {
         if (this.start != null && o.start != null) {
             return this.start.compareTo(o.start);
         } else {
-            return this.startString.compareTo(o.startString);
+            return 0;
         }
     }
 
@@ -109,14 +106,9 @@ public class Event implements Comparable<Event>, Parcelable {
         dest.writeString(notes);
         dest.writeValue(maxParticipants);
 
-        ParcelExtensions.writeLocalDate(dest, start);
-        dest.writeString(startString);
-
-        ParcelExtensions.writeLocalDate(dest, end);
-        dest.writeString(endString);
-
-        ParcelExtensions.writeLocalDate(dest, deadline);
-        dest.writeString(deadlineString);
+        dest.writeTypedObject(start, flags);
+        dest.writeTypedObject(end, flags);
+        dest.writeTypedObject(deadline, flags);
 
         dest.writeString(hotel);
         dest.writeString(hotelAddress);
@@ -138,14 +130,9 @@ public class Event implements Comparable<Event>, Parcelable {
             event.notes = source.readString();
             event.maxParticipants = (Integer) source.readValue(null);
 
-            event.start = ParcelExtensions.readLocalDate(source);
-            event.startString = source.readString();
-
-            event.end = ParcelExtensions.readLocalDate(source);
-            event.endString = source.readString();
-
-            event.deadline = ParcelExtensions.readLocalDate(source);
-            event.deadlineString = source.readString();
+            event.start = source.readTypedObject(ParsedLocalDate.CREATOR);
+            event.end = source.readTypedObject(ParsedLocalDate.CREATOR);
+            event.deadline = source.readTypedObject(ParsedLocalDate.CREATOR);
 
             event.hotel = source.readString();
             event.hotelAddress = source.readString();

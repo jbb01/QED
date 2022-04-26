@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.jonahbauer.qed.model.Person;
+import com.jonahbauer.qed.model.PersonFilter;
 import com.jonahbauer.qed.networking.Reason;
 import com.jonahbauer.qed.networking.async.QEDPageReceiver;
 import com.jonahbauer.qed.networking.pages.QEDDBPages;
@@ -23,7 +24,7 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable;
 
 public class PersonListViewModel extends ViewModel implements QEDPageReceiver<List<Person>> {
     private final MutableLiveData<StatusWrapper<List<Person>>> mPersons = new MutableLiveData<>();
-    private final MutableLiveData<Predicate<Person>> mFilter = new MutableLiveData<>(obj -> true);
+    private final MutableLiveData<PersonFilter> mFilter = new MutableLiveData<>(PersonFilter.EMPTY);
 
     private final MediatorLiveData<StatusWrapper<List<Person>>> mFilteredPersons = new MediatorLiveData<>();
 
@@ -55,18 +56,8 @@ public class PersonListViewModel extends ViewModel implements QEDPageReceiver<Li
         );
     }
 
-    public void filter(@Nullable String firstName,
-                       @Nullable String lastName,
-                       @Nullable Boolean member,
-                       @Nullable Boolean active) {
-        final String finalFirstName = firstName != null ? firstName.toLowerCase() : null;
-        final String finalLastName = lastName != null ? lastName.toLowerCase() : null;
-        mFilter.setValue(person -> {
-            return (firstName == null || person.getFirstName().toLowerCase().contains(finalFirstName))
-                    && (lastName == null || person.getLastName().toLowerCase().contains(finalLastName))
-                    && (member == null || person.getMember() == member)
-                    && (active == null || person.getActive() == active);
-        });
+    public void filter(@NonNull PersonFilter filter) {
+        mFilter.setValue(filter);
     }
 
     public LiveData<StatusWrapper<List<Person>>> getPersons() {

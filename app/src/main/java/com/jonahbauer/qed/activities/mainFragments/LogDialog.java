@@ -93,7 +93,7 @@ public class LogDialog extends DialogFragment implements AdapterView.OnItemSelec
 
         // setup mode spinner
         var adapter = new CustomArrayAdapter<>(context, android.R.layout.simple_spinner_item, Mode.values());
-        adapter.setToString((mode) -> context.getString(mode.toStringRes()));
+        adapter.setToString((mode) -> context.getString(mode.getStringRes()));
         adapter.setDropDownViewResource(android.R.layout.simple_list_item_1);
         mBinding.logDialogModeSpinner.setAdapter(adapter);
         mBinding.logDialogModeSpinner.setSelection(0);
