@@ -1,12 +1,10 @@
 package com.jonahbauer.qed.activities.mainFragments;
 
-import android.graphics.drawable.Animatable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -15,6 +13,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.databinding.FragmentChatDatabaseBinding;
 import com.jonahbauer.qed.model.Message;
+import com.jonahbauer.qed.model.MessageFilter;
 import com.jonahbauer.qed.model.adapter.MessageAdapter;
 import com.jonahbauer.qed.model.room.Database;
 import com.jonahbauer.qed.model.room.MessageDao;
@@ -31,7 +30,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 
-public class ChatDatabaseFragment extends Fragment implements CompoundButton.OnCheckedChangeListener {
+public class ChatDatabaseFragment extends Fragment {
     private static final String LOG_TAG = ChatDatabaseFragment.class.getName();
 
     private MessageAdapter mMessageAdapter;
@@ -100,22 +99,15 @@ public class ChatDatabaseFragment extends Fragment implements CompoundButton.OnC
         });
         mBinding.messageListView.setAdapter(mMessageAdapter);
 
-        mBinding.expandCheckBox.setOnCheckedChangeListener(this);
         mBinding.searchButton.setOnClickListener(v -> search());
 
-        mBinding.databaseChannelCheckbox.setOnCheckedChangeListener(this);
-        mBinding.databaseMessageCheckbox.setOnCheckedChangeListener(this);
-        mBinding.databaseNameCheckbox.setOnCheckedChangeListener(this);
-        mBinding.databaseDateFromCheckbox.setOnCheckedChangeListener(this);
-        mBinding.databaseDateToCheckbox.setOnCheckedChangeListener(this);
-        mBinding.databaseIdCheckbox.setOnCheckedChangeListener(this);
-
-        onCheckedChanged(mBinding.databaseChannelCheckbox, mBinding.databaseChannelCheckbox.isChecked());
-        onCheckedChanged(mBinding.databaseMessageCheckbox, mBinding.databaseMessageCheckbox.isChecked());
-        onCheckedChanged(mBinding.databaseNameCheckbox, mBinding.databaseNameCheckbox.isChecked());
-        onCheckedChanged(mBinding.databaseDateFromCheckbox, mBinding.databaseDateFromCheckbox.isChecked());
-        onCheckedChanged(mBinding.databaseDateToCheckbox, mBinding.databaseDateToCheckbox.isChecked());
-        onCheckedChanged(mBinding.databaseIdCheckbox, mBinding.databaseIdCheckbox.isChecked());
+        ViewUtils.setupExpandable(mBinding.expandCheckBox, mBinding.expandable);
+        ViewUtils.link(mBinding.databaseChannelCheckbox, mBinding.databaseChannelEditText);
+        ViewUtils.link(mBinding.databaseMessageCheckbox, mBinding.databaseMessageEditText);
+        ViewUtils.link(mBinding.databaseNameCheckbox, mBinding.databaseNameEditText);
+        ViewUtils.link(mBinding.databaseDateFromCheckbox, mBinding.databaseDateFromEditText, mBinding.databaseTimeFromEditText);
+        ViewUtils.link(mBinding.databaseDateToCheckbox, mBinding.databaseDateToEditText, mBinding.databaseTimeToEditText);
+        ViewUtils.link(mBinding.databaseIdCheckbox, mBinding.databaseIdEditText);
 
         ViewUtils.setupDateEditText(mBinding.databaseDateFromEditText, mDateFrom);
         ViewUtils.setupDateEditText(mBinding.databaseDateToEditText, mDateTo);
@@ -159,42 +151,6 @@ public class ChatDatabaseFragment extends Fragment implements CompoundButton.OnC
         );
     }
 
-    @Override
-    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        int id = buttonView.getId();
-        if (id == R.id.expand_checkBox) {
-            if (isChecked) {
-                buttonView.setButtonDrawable(R.drawable.ic_arrow_up_accent_animation);
-                ((Animatable) Objects.requireNonNull(buttonView.getButtonDrawable())).start();
-                ViewUtils.expand(mBinding.expandable);
-            } else {
-                buttonView.setButtonDrawable(R.drawable.ic_arrow_down_accent_animation);
-                ((Animatable) Objects.requireNonNull(buttonView.getButtonDrawable())).start();
-                ViewUtils.collapse(mBinding.expandable);
-            }
-        } else if (id == R.id.database_channel_checkbox) {
-            mBinding.databaseChannelEditText.setEnabled(isChecked);
-            if (isChecked) mBinding.databaseChannelEditText.requestFocus();
-        } else if (id == R.id.database_message_checkbox) {
-            mBinding.databaseMessageEditText.setEnabled(isChecked);
-            if (isChecked) mBinding.databaseMessageEditText.requestFocus();
-        } else if (id == R.id.database_name_checkbox) {
-            mBinding.databaseNameEditText.setEnabled(isChecked);
-            if (isChecked) mBinding.databaseNameEditText.requestFocus();
-        } else if (id == R.id.database_dateFrom_checkbox) {
-            mBinding.databaseDateFromEditText.setEnabled(isChecked);
-            mBinding.databaseTimeFromEditText.setEnabled(isChecked);
-            if (isChecked) mBinding.databaseDateFromEditText.requestFocus();
-        } else if (id == R.id.database_dateTo_checkbox) {
-            mBinding.databaseDateToEditText.setEnabled(isChecked);
-            mBinding.databaseTimeToEditText.setEnabled(isChecked);
-            if (isChecked) mBinding.databaseDateToEditText.requestFocus();
-        } else if (id == R.id.database_id_checkbox) {
-            mBinding.databaseIdEditText.setEnabled(isChecked);
-            if (isChecked) mBinding.databaseIdEditText.requestFocus();
-        }
-    }
-
     private void search() {
         if (!checkFilters()) return;
 
@@ -205,7 +161,6 @@ public class ChatDatabaseFragment extends Fragment implements CompoundButton.OnC
         Instant toDate = null;
         Long fromId = null;
         Long toId = null;
-        long limit = Preferences.chat().getDbMaxResults();
 
         if (mBinding.databaseChannelCheckbox.isChecked()) {
             channel = mBinding.databaseChannelEditText.getText().toString();
@@ -258,7 +213,7 @@ public class ChatDatabaseFragment extends Fragment implements CompoundButton.OnC
             }
         }
 
-        mMessageListViewModel.load(channel, message, name, fromDate, toDate, fromId, toId, limit);
+        mMessageListViewModel.load(new MessageFilter(channel, message, name, fromDate, toDate, fromId, toId));
     }
     
     private boolean checkFilters() {

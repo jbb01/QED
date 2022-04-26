@@ -107,7 +107,7 @@
     <string name="chat_database_dateTo_hint">yyyy-mm-dd</string>
     <string name="chat_database_timeTo_hint">HH:MM</string>
     <string name="chat_database_id_checkbox">ID</string>
-    <string name="chat_database_id_hint">from</string>
+    <string name="chat_database_id_hint">fromID-toID</string>
     <string-array name="chat_database_max_entries_value_strings">
         <item>10,000</item>
         <item>20,000</item>

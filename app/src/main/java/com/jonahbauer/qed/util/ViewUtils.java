@@ -5,6 +5,7 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
+import android.graphics.drawable.Animatable;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -13,6 +14,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
@@ -310,5 +312,31 @@ public class ViewUtils {
     public static ViewModelProvider getViewModelProvider(Fragment fragment, @IdRes int destinationId) {
         NavBackStackEntry entry = NavHostFragment.findNavController(fragment).getBackStackEntry(destinationId);
         return new ViewModelProvider(entry.getViewModelStore(), entry.getDefaultViewModelProviderFactory());
+    }
+
+    public static void link(@NonNull CompoundButton button, View...views) {
+        if (views.length == 0) return;
+        var listener = (CompoundButton.OnCheckedChangeListener) (buttonView, isChecked) -> {
+            for (View view : views) {
+                view.setEnabled(isChecked);
+            }
+            if (isChecked) views[0].requestFocus();
+        };
+        button.setOnCheckedChangeListener(listener);
+        listener.onCheckedChanged(button, button.isChecked());
+    }
+
+    public static void setupExpandable(@NonNull CompoundButton button, @NonNull View expandingView) {
+        button.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                buttonView.setButtonDrawable(R.drawable.ic_arrow_up_accent_animation);
+                ((Animatable) Objects.requireNonNull(buttonView.getButtonDrawable())).start();
+                ViewUtils.expand(expandingView);
+            } else {
+                buttonView.setButtonDrawable(R.drawable.ic_arrow_down_accent_animation);
+                ((Animatable) Objects.requireNonNull(buttonView.getButtonDrawable())).start();
+                ViewUtils.collapse(expandingView);
+            }
+        });
     }
 }

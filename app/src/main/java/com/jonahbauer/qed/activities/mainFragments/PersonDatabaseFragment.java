@@ -10,7 +10,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.CompoundButton;
 import android.widget.RadioButton;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -29,9 +28,8 @@ import com.jonahbauer.qed.util.TransitionUtils;
 import com.jonahbauer.qed.util.ViewUtils;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
-public class PersonDatabaseFragment extends Fragment implements CompoundButton.OnCheckedChangeListener, AdapterView.OnItemClickListener {
+public class PersonDatabaseFragment extends Fragment implements AdapterView.OnItemClickListener {
     private PersonAdapter mPersonAdapter;
     private FragmentPersonsDatabaseBinding mBinding;
     private MenuItem mRefresh;
@@ -93,35 +91,9 @@ public class PersonDatabaseFragment extends Fragment implements CompoundButton.O
         mBinding.databaseSortFirstNameRadioButton.setOnClickListener(this::onRadioButtonClicked);
         mBinding.databaseSortLastNameRadioButton.setOnClickListener(this::onRadioButtonClicked);
 
-        mBinding.expandCheckBox.setOnCheckedChangeListener(this);
-
-        mBinding.databaseFirstNameCheckbox.setOnCheckedChangeListener(this);
-        mBinding.databaseLastNameCheckbox.setOnCheckedChangeListener(this);
-
-        onCheckedChanged(mBinding.databaseFirstNameCheckbox, mBinding.databaseFirstNameCheckbox.isChecked());
-        onCheckedChanged(mBinding.databaseLastNameCheckbox, mBinding.databaseLastNameCheckbox.isChecked());
-    }
-
-    @Override
-    public void onCheckedChanged(@NonNull CompoundButton buttonView, boolean isChecked) {
-        int id = buttonView.getId();
-        if (id == R.id.expand_checkBox) {
-            if (isChecked) {
-                buttonView.setButtonDrawable(R.drawable.ic_arrow_up_accent_animation);
-                ((Animatable) Objects.requireNonNull(buttonView.getButtonDrawable())).start();
-                ViewUtils.expand(mBinding.expandable);
-            } else {
-                buttonView.setButtonDrawable(R.drawable.ic_arrow_down_accent_animation);
-                ((Animatable) Objects.requireNonNull(buttonView.getButtonDrawable())).start();
-                ViewUtils.collapse(mBinding.expandable);
-            }
-        } else if (id == R.id.database_firstName_checkbox) {
-            mBinding.databaseFirstNameEditText.setEnabled(isChecked);
-            if (isChecked) mBinding.databaseFirstNameEditText.requestFocus();
-        } else if (id == R.id.database_lastName_checkbox) {
-            mBinding.databaseLastNameEditText.setEnabled(isChecked);
-            if (isChecked) mBinding.databaseLastNameEditText.requestFocus();
-        }
+        ViewUtils.setupExpandable(mBinding.expandCheckBox, mBinding.expandable);
+        ViewUtils.link(mBinding.databaseFirstNameCheckbox, mBinding.databaseFirstNameEditText);
+        ViewUtils.link(mBinding.databaseLastNameCheckbox, mBinding.databaseLastNameEditText);
     }
 
     private void onRadioButtonClicked(@NonNull View view) {

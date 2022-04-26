@@ -2,7 +2,6 @@ package com.jonahbauer.qed.activities.mainFragments;
 
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.graphics.drawable.Animatable;
 import android.os.Bundle;
 import android.view.*;
 import android.widget.*;
@@ -37,7 +36,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
-public class AlbumFragment extends Fragment implements CompoundButton.OnCheckedChangeListener, AdapterView.OnItemClickListener, OnActivityReenterListener {
+public class AlbumFragment extends Fragment implements AdapterView.OnItemClickListener, OnActivityReenterListener {
     private static final String SAVED_SELECTED_ITEM_ID = "selectedItemId";
 
     private AlbumViewModel mAlbumViewModel;
@@ -110,11 +109,11 @@ public class AlbumFragment extends Fragment implements CompoundButton.OnCheckedC
             }
         });
 
-        mBinding.expandCheckBox.setOnCheckedChangeListener(this);
-        mBinding.albumPhotographerCheckBox.setOnCheckedChangeListener(this);
-        mBinding.albumDateCheckBox.setOnCheckedChangeListener(this);
-        mBinding.albumUploadCheckBox.setOnCheckedChangeListener(this);
-        mBinding.albumCategoryCheckBox.setOnCheckedChangeListener(this);
+        ViewUtils.setupExpandable(mBinding.expandCheckBox, mBinding.expandable);
+        ViewUtils.link(mBinding.albumPhotographerCheckBox, mBinding.albumPhotographerSpinner);
+        ViewUtils.link(mBinding.albumDateCheckBox, mBinding.albumDateSpinner);
+        ViewUtils.link(mBinding.albumUploadCheckBox, mBinding.albumUploadSpinner);
+        ViewUtils.link(mBinding.albumCategoryCheckBox, mBinding.albumCategorySpinner);
 
         mAdapterCategory = setupSpinner(mBinding.albumCategorySpinner, Album::decodeCategory);
         mAdapterPhotographer = setupSpinner(mBinding.albumPhotographerSpinner, Person::getUsername);
@@ -326,30 +325,6 @@ public class AlbumFragment extends Fragment implements CompoundButton.OnCheckedC
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.menu_album, menu);
         super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        int id = buttonView.getId();
-        if (id == R.id.expand_checkBox) {
-            if (isChecked) {
-                buttonView.setButtonDrawable(R.drawable.ic_arrow_up_accent_animation);
-                ((Animatable) Objects.requireNonNull(buttonView.getButtonDrawable())).start();
-                ViewUtils.expand(mBinding.expandable);
-            } else {
-                buttonView.setButtonDrawable(R.drawable.ic_arrow_down_accent_animation);
-                ((Animatable) Objects.requireNonNull(buttonView.getButtonDrawable())).start();
-                ViewUtils.collapse(mBinding.expandable);
-            }
-        } else if (id == R.id.album_photographer_check_box) {
-            mBinding.albumPhotographerSpinner.setEnabled(isChecked);
-        } else if (id == R.id.album_category_check_box) {
-            mBinding.albumCategorySpinner.setEnabled(isChecked);
-        } else if (id == R.id.album_date_check_box) {
-            mBinding.albumDateSpinner.setEnabled(isChecked);
-        } else if (id == R.id.album_upload_check_box) {
-            mBinding.albumUploadSpinner.setEnabled(isChecked);
-        }
     }
 
     @Override
