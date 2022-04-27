@@ -34,34 +34,66 @@ public class Album implements Parcelable {
     public static final long NO_ID = Long.MIN_VALUE;
     public static final String CATEGORY_ETC = "Sonstige";
 
+    /**
+     * The album id.
+     */
     @PrimaryKey
     private final long id;
 
+    /**
+     * The album title.
+     */
     @ColumnInfo(name = "name")
     private String name;
 
+    /**
+     * The username of the album owner.
+     */
     @ColumnInfo(name = "owner")
     private String owner;
 
+    /**
+     * The album creation date.
+     */
     @ColumnInfo(name = "creation_date")
     private String creationDate;
 
+    /**
+     * Whether this is a private album.
+     */
     @ColumnInfo(name = "private")
     @Accessors(prefix = "_")
     private boolean _private;
 
+    /**
+     * A list of persons who contributed to this album. Typically only contains {@linkplain Person#getId() id}
+     * and {@linkplain Person#getUsername() username}.
+     */
     @ColumnInfo(name = "persons")
     private List<Person> persons = new ArrayList<>();
 
+    /**
+     * A list of dates on which images in this album were taken.
+     */
     @ColumnInfo(name = "dates")
     private List<LocalDate> dates = new ArrayList<>();
 
+    /**
+     * A list of dates on which images in this album were uploaded.
+     */
     @ColumnInfo(name = "upload_dates")
     private List<LocalDate> uploadDates = new ArrayList<>();
 
+    /**
+     * A list of url-encoded categories.
+     * @see #decodeCategory(String)
+     */
     @ColumnInfo(name = "categories")
     private List<String> categories = new ArrayList<>();
 
+    /**
+     * A list of images in this album.
+     */
     @Ignore
     private final List<Image> images = new ArrayList<>();
 
@@ -72,7 +104,11 @@ public class Album implements Parcelable {
     @ColumnInfo(name = "image_list_downloaded")
     private Instant loaded;
 
-    public void set(Album other) {
+    /**
+     * Copies all database-persisted properties (except id) from the given album to this album.
+     * @implNote This method only performs a shallow copy.
+     */
+    public void set(@NonNull Album other) {
         this.name = other.name;
         this.owner = other.owner;
         this.creationDate = other.creationDate;
@@ -101,6 +137,9 @@ public class Album implements Parcelable {
         return entries.stream().collect(Collectors.joining(", ", "{", "}"));
     }
 
+    /**
+     * Decodes an url-encoded category for displaying it to the user.
+     */
     @SneakyThrows
     public static String decodeCategory(String category) {
         if (category == null) return null;

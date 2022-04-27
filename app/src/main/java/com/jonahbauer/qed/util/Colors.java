@@ -18,6 +18,9 @@ import java.security.NoSuchAlgorithmException;
 @UtilityClass
 public class Colors {
 
+    /**
+     * Multiplies two colors component-wise.
+     */
     public static @ColorInt int multiply(@ColorInt int color1, @ColorInt int color2) {
         return Color.argb(
                 Color.alpha(color1) * Color.alpha(color2) / 255,
@@ -27,21 +30,38 @@ public class Colors {
         );
     }
 
+    /**
+     * Resolves {@link android.R.attr#colorPrimary} in the given context.
+     */
     public static @ColorInt int getPrimaryColor(@NonNull Context context) {
         return getColor(context, android.R.attr.colorPrimary);
     }
 
+    /**
+     * Resolves {@link android.R.attr#colorBackground} in the given context.
+     */
     public static @ColorInt int getBackgroundColor(@NonNull Context context) {
         return getColor(context, android.R.attr.colorBackground);
     }
 
+    /**
+     * Resolves a color attribute in the theme of the given context.
+     * @throws IllegalArgumentException when the given attribute does not resolve to a color.
+     */
     public static @ColorInt int getColor(@NonNull Context context, @AttrRes int color) {
         return getColor(context.getTheme(), color);
     }
 
+    /**
+     * Resolves a color attribute in the given theme.
+     * @throws IllegalArgumentException when the given attribute does not resolve to a color.
+     */
     public static @ColorInt int getColor(@NonNull Resources.Theme theme, @AttrRes int color) {
         TypedValue value = new TypedValue();
         theme.resolveAttribute(color, value, true);
+        if (value.type < TypedValue.TYPE_FIRST_COLOR_INT || value.type > TypedValue.TYPE_LAST_COLOR_INT) {
+            throw new IllegalArgumentException("Cannot resolve " + theme.getResources().getResourceName(color) + " as a color.");
+        }
         return value.data;
     }
 
@@ -54,7 +74,7 @@ public class Colors {
     }
 
     /**
-     * Calculates the chat color for a given name.
+     * Calculates the chat color for a given name represented as UTF-8 bytes in an array.
      */
     public static @ColorInt int getColorForName(byte[] bytes, int offset, int length) {
         try {
@@ -104,6 +124,10 @@ public class Colors {
         return alpha * alpha + red * red + green * green + blue * blue;
     }
 
+    /**
+     * Calculates the ΔE of two colors, i.e. the euclidean distance of the color vectors in the
+     * {@linkplain ColorSpace.Named#CIE_LAB CIELAB} color space.
+     */
     @RequiresApi(api = Build.VERSION_CODES.O)
     public static double deltaE(@ColorInt int a, @ColorInt int b) {
         var labA = Color.valueOf(a).convert(ColorSpace.get(ColorSpace.Named.CIE_LAB));
@@ -185,8 +209,11 @@ public class Colors {
         return out;
     }
 
-    @ColorInt
-    public static int transformColor(@ColorInt int color) {
+    /**
+     * Adjusts the given color for use on a light background by first increasing the saturation and then darkening it
+     * to ensure a minimum <a href="https://www.w3.org/TR/WCAG20/#contrast-ratiodef">contrast ratio</a> on white of 2.
+     */
+    public static @ColorInt int transformColor(@ColorInt int color) {
         float[] hsv = new float[3];
         Color.colorToHSV(color, hsv);
 

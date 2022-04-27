@@ -8,10 +8,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.jonahbauer.qed.networking.Reason;
-import com.jonahbauer.qed.util.Callback;
 
 @SuppressWarnings("unused")
-public interface QEDPageReceiver<T> extends Callback<T> {
+public interface QEDPageReceiver<T> {
     @MainThread
     void onResult(@NonNull T out);
 

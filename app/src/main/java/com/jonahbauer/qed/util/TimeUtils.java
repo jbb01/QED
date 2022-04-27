@@ -21,6 +21,11 @@ public class TimeUtils {
     public static final DateTimeFormatter TIME_MEDIUM = DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM);
     public static final DateTimeFormatter DATE_TIME_MEDIUM = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM);
 
+    /**
+     * Formats the given {@link ParsedLocalDate} using {@link #format(LocalDate)} defaulting to the
+     * {@linkplain ParsedLocalDate#getString() original value} when the date could not be parsed.
+     * @see #format(LocalDate)
+     */
     public static String format(ParsedLocalDate parsedDate) {
         if (parsedDate == null) return null;
 
@@ -29,21 +34,35 @@ public class TimeUtils {
         else return parsedDate.getString();
     }
 
+    /**
+     * Formats the given {@link LocalDate} using {@link FormatStyle#MEDIUM}.
+     */
     public static String format(LocalDate date) {
         if (date == null) return null;
         return DATE_MEDIUM.format(date);
     }
 
+    /**
+     * Formats the given {@link LocalTime} using {@link FormatStyle#MEDIUM}.
+     */
     public static String format(LocalTime time) {
         if (time == null) return null;
         return TIME_MEDIUM.format(time);
     }
 
+    /**
+     * Formats the given {@link  LocalDateTime} using {@link FormatStyle#MEDIUM}.
+     */
     public static String format(LocalDateTime dateTime) {
         if (dateTime == null) return null;
         return DATE_TIME_MEDIUM.format(dateTime);
     }
 
+    /**
+     * Formats the given {@link ParsedInstant} using {@link #format(Instant)} defaulting to the
+     * {@linkplain  ParsedInstant#getString() original value} when the instant could not be parsed.
+     * @see #format(Instant)
+     */
     public static String format(ParsedInstant parsedInstant) {
         if (parsedInstant == null) return null;
 
@@ -52,6 +71,10 @@ public class TimeUtils {
         else return parsedInstant.getString();
     }
 
+    /**
+     * Formats the given {@link Instant} as a localized date time in the
+     * {@linkplain ZoneId#systemDefault() default time zone} using {@link FormatStyle#MEDIUM}.
+     */
     public static String format(Instant instant) {
         if (instant == null) return null;
         return DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
@@ -70,11 +93,19 @@ public class TimeUtils {
         return LocalDateTime.ofInstant(serverZonedTime, ZoneId.systemDefault());
     }
 
+    /**
+     * Converts the given {@link LocalDateTime} to an {@link Instant} assuming the
+     * {@linkplain ZoneId#systemDefault() default time zone}.
+     */
     public static Instant instantFromLocal(LocalDateTime dateTime) {
         if (dateTime == null) return null;
         return ZonedDateTime.of(dateTime, ZoneId.systemDefault()).toInstant();
     }
 
+    /**
+     * Converts the given {@link Instant} to an {@link LocalDateTime} assuming the
+     * {@linkplain ZoneId#systemDefault() default time zone}.
+     */
     public LocalDateTime localFromInstant(Instant instant) {
         if (instant == null) return null;
         return ZonedDateTime.ofInstant(instant, ZoneId.systemDefault()).toLocalDateTime();

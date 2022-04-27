@@ -21,6 +21,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavBackStackEntry;
@@ -46,7 +47,8 @@ import java.util.function.Supplier;
 public class ViewUtils {
 
     /**
-     * Expands the given view.
+     * Expands the given view using an animator.
+     * The view will slide in from its top edge while increasing its alpha value from transparent to fully visible.
      */
     public static void expand(@NonNull final View view) {
         // measure view
@@ -82,7 +84,8 @@ public class ViewUtils {
     }
 
     /**
-     * Collapses the given view.
+     * Collapses the given view using an animator. The view will slide out its top edge while decreasing its alpha value
+     * from fully visible to transparent.
      */
     public static void collapse(@NonNull final View view) {
         final int duration = view.getContext().getResources().getInteger(R.integer.material_motion_duration_medium_2);
@@ -145,7 +148,20 @@ public class ViewUtils {
     }
     //</editor-fold>
 
-    public static void setupDateEditText(LifecycleOwner owner, @NonNull EditText editText, @NonNull MutableLiveData<LocalDateTime> date) {
+    /**
+     * Prepares the given {@link EditText} for input of a {@link LocalDate} using a {@link DatePickerDialog}, i.e.
+     * when the text field is clicked a date picker will be shown and the selected date will be reflected in the
+     * text field and the provided live data.
+     * Only when a {@link LifecycleOwner} is provided will changes to the live data also be reflected in the text field.
+     * Since the provided live data stores a {@link LocalDateTime} it can be shared with a
+     * {@linkplain #setupTimeEditText(LifecycleOwner, EditText, MutableLiveData) time text field}.
+     *
+     * @param owner a lifecycle owner used for observing the live data
+     * @param editText a text field
+     * @param date a live data that contains the currently selected date. {@link LiveData#getValue()} must not return {@code null}.
+     * @see #setupTimeEditText(LifecycleOwner, EditText, MutableLiveData)
+     */
+    public static void setupDateEditText(@Nullable LifecycleOwner owner, @NonNull EditText editText, @NonNull MutableLiveData<LocalDateTime> date) {
         DateTimeFormatter formatter = DateTimeFormatter
                 .ofLocalizedDate(FormatStyle.MEDIUM)
                 .withZone(ZoneId.systemDefault());
@@ -175,7 +191,20 @@ public class ViewUtils {
         });
     }
 
-    public static void setupTimeEditText(LifecycleOwner owner, @NonNull EditText editText, @NonNull MutableLiveData<LocalDateTime> time) {
+    /**
+     * Prepares the given {@link EditText} for input of a {@link LocalTime} using a {@link TimePickerDialog}, i.e.
+     * when the text field is clicked a ticker picker will be shown and the selected time will be reflected in the
+     * text field and the provided live data.
+     * Only when a {@link LifecycleOwner} is provided will changes to the live data also be reflected in the text field.
+     * Since the provided live data stores a {@link LocalDateTime} it can be shared with a
+     * {@linkplain #setupDateEditText(LifecycleOwner, EditText, MutableLiveData) date text field}.
+     *
+     * @param owner a lifecycle owner used for observing the live data
+     * @param editText a text field
+     * @param time a live data that contains the currently selected time. {@link LiveData#getValue()} must not return {@code null}.
+     * @see #setupDateEditText(LifecycleOwner, EditText, MutableLiveData)
+     */
+    public static void setupTimeEditText(@Nullable LifecycleOwner owner, @NonNull EditText editText, @NonNull MutableLiveData<LocalDateTime> time) {
         DateTimeFormatter formatter = DateTimeFormatter
                 .ofLocalizedTime(FormatStyle.MEDIUM)
                 .withZone(ZoneId.systemDefault());
@@ -269,6 +298,10 @@ public class ViewUtils {
     }
     //</editor-fold>
 
+    /**
+     * Sets the title of the {@linkplain AppCompatActivity#getSupportActionBar() action bar} when present.
+     * @throws IllegalStateException if the fragment is not attached to an activity.
+     */
     public static void setActionBarText(@NonNull Fragment fragment, CharSequence title) {
         AppCompatActivity activity = (AppCompatActivity) fragment.requireActivity();
         ActionBar actionBar = activity.getSupportActionBar();
@@ -277,6 +310,12 @@ public class ViewUtils {
         }
     }
 
+    /**
+     * Makes the status and navigation bar transparent.
+     * @throws IllegalStateException if the fragment is not attached to an activity
+     * @throws NullPointerException if the activity is not attached to a window
+     * @see #resetTransparentSystemBars(Fragment)
+     */
     public static void setTransparentSystemBars(@NonNull Fragment fragment) {
         var activity = fragment.requireActivity();
         var window = activity.getWindow();
@@ -284,6 +323,13 @@ public class ViewUtils {
         window.setNavigationBarColor(Color.TRANSPARENT);
     }
 
+    /**
+     * Resets the status and navigation bar to their default colors using the fragment's context
+     * to resolve the respective attributes
+     * ({@link android.R.attr#statusBarColor} and {@link android.R.attr#navigationBarColor}).
+     * @throws IllegalStateException if the fragment is not attached to an activity
+     * @throws NullPointerException if the activity is not attached to a window
+     */
     public static void resetTransparentSystemBars(@NonNull Fragment fragment) {
         var theme = fragment.requireContext().getTheme();
         TypedValue statusBarColor = new TypedValue();
@@ -313,6 +359,10 @@ public class ViewUtils {
         return new ViewModelProvider(entry.getViewModelStore(), entry.getDefaultViewModelProviderFactory());
     }
 
+    /**
+     * Links the button's checked to the enabled state of the provided views. When the button gets checked
+     * the first view will request focus.
+     */
     public static void link(@NonNull CompoundButton button, View...views) {
         if (views.length == 0) return;
         var listener = (CompoundButton.OnCheckedChangeListener) (buttonView, isChecked) -> {
@@ -325,6 +375,12 @@ public class ViewUtils {
         listener.onCheckedChanged(button, button.isChecked());
     }
 
+    /**
+     * Links the button's checked state to the visibility of the expanding view.
+     * Visibility changes are handled using {@link #expand(View)} and {@link #collapse(View)}.
+     * The provided live data provides access to the current state and is initially queried for the initial state, but
+     * further changes will not be reflected.
+     */
     public static void setupExpandable(@NonNull CompoundButton button, @NonNull View expandingView, @NonNull MutableLiveData<Boolean> state) {
         var checkedSetter = (BooleanConsumer) checked -> {
             button.setChecked(checked);
