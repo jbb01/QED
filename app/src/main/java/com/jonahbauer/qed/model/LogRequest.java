@@ -42,7 +42,7 @@ public abstract class LogRequest implements Parcelable {
     private final long timestamp;
     private final String query;
 
-    private static final Creator<LogRequest> CREATOR = new Creator<>() {
+    public static final Creator<LogRequest> CREATOR = new Creator<>() {
         @Override
         public LogRequest createFromParcel(Parcel source) {
             var start = source.dataPosition();
