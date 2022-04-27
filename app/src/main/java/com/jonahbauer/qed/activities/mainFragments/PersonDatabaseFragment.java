@@ -10,7 +10,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.RadioButton;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -35,8 +34,6 @@ public class PersonDatabaseFragment extends Fragment implements AdapterView.OnIt
     private MenuItem mRefresh;
 
     private PersonListViewModel mPersonListViewModel;
-
-    private boolean mSortLastName = false;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -72,6 +69,7 @@ public class PersonDatabaseFragment extends Fragment implements AdapterView.OnIt
 
             mPersonAdapter.clear();
             if (persons.getCode() == StatusWrapper.STATUS_LOADED) {
+                mPersonAdapter.setSortMode(mPersonListViewModel.getSortMode());
                 mPersonAdapter.addAll(persons.getValue());
             } else if (persons.getCode() == StatusWrapper.STATUS_ERROR) {
                 Reason reason = persons.getReason();
@@ -88,22 +86,17 @@ public class PersonDatabaseFragment extends Fragment implements AdapterView.OnIt
         });
 
         mBinding.searchButton.setOnClickListener(v -> search());
-        mBinding.databaseSortFirstNameRadioButton.setOnClickListener(this::onRadioButtonClicked);
-        mBinding.databaseSortLastNameRadioButton.setOnClickListener(this::onRadioButtonClicked);
 
-        ViewUtils.setupExpandable(mBinding.expandCheckBox, mBinding.expandable);
+        ViewUtils.setupExpandable(mBinding.expandCheckBox, mBinding.expandable, mPersonListViewModel.getExpanded());
         ViewUtils.link(mBinding.databaseFirstNameCheckbox, mBinding.databaseFirstNameEditText);
         ViewUtils.link(mBinding.databaseLastNameCheckbox, mBinding.databaseLastNameEditText);
     }
 
-    private void onRadioButtonClicked(@NonNull View view) {
-        boolean checked = ((RadioButton) view).isChecked();
-
-        int id = view.getId();
-        if (id == R.id.database_sort_first_name_radio_button) {
-            if (checked) mSortLastName = false;
-        } else if (id == R.id.database_sort_last_name_radio_button) {
-            if (checked) mSortLastName = true;
+    private PersonAdapter.SortMode getSortMode() {
+        if (mBinding.databaseSortFirstNameRadioButton.isChecked()) {
+            return PersonAdapter.SortMode.FIRST_NAME;
+        } else {
+            return PersonAdapter.SortMode.LAST_NAME;
         }
     }
 
@@ -124,7 +117,7 @@ public class PersonDatabaseFragment extends Fragment implements AdapterView.OnIt
         member = mBinding.databaseMemberCheckbox.getState().asBoolean();
         active = mBinding.databaseActiveCheckbox.getState().asBoolean();
 
-        mPersonAdapter.setSortMode(mSortLastName ? PersonAdapter.SortMode.LAST_NAME : PersonAdapter.SortMode.FIRST_NAME);
+        mPersonListViewModel.setSortMode(getSortMode());
         mPersonListViewModel.filter(new PersonFilter(firstName, lastName, member, active));
     }
 

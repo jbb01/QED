@@ -101,7 +101,7 @@ public class LogFragment extends Fragment {
         });
 
         mBinding.subtitle.setOnClickListener(v -> {
-            var dialog = LogDialog.newInstance();
+            var dialog = LogDialog.newInstance(Objects.requireNonNullElse(mLogViewModel.getLogRequest().getValue(), DEFAULT_REQUEST));
             dialog.show(getChildFragmentManager(), null);
         });
 

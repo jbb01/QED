@@ -52,6 +52,8 @@ public class AlbumFragment extends Fragment implements AdapterView.OnItemClickLi
     private Long mSelectedItemId;
     private ActivityResultLauncher<Intent> mImageActivityLauncher;
 
+    private boolean mShouldApplyFiltersToView;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,14 +65,16 @@ public class AlbumFragment extends Fragment implements AdapterView.OnItemClickLi
         Album album = args.getAlbum();
         if (album == null) album = new Album(args.getId());
 
-        AlbumFilter filter = AlbumFilter.EMPTY;
-        if (arguments != null && arguments.containsKey(NavController.KEY_DEEP_LINK_INTENT)) {
+        AlbumFilter filter = null;
+        if (savedInstanceState == null && arguments != null && arguments.containsKey(NavController.KEY_DEEP_LINK_INTENT)) {
             Intent intent = (Intent) arguments.get(NavController.KEY_DEEP_LINK_INTENT);
             filter = parseFilters(intent);
+            mShouldApplyFiltersToView = true;
         }
 
         mAlbumViewModel = ViewUtils.getViewModelProvider(this, R.id.nav_album).get(AlbumViewModel.class);
-        mAlbumViewModel.load(album, filter);
+        if (filter == null) mAlbumViewModel.load(album);
+        else mAlbumViewModel.load(album, filter);
 
         TransitionUtils.setupDefaultTransitions(this);
         TransitionUtils.setupEnterContainerTransform(this, Colors.getPrimaryColor(requireContext()));
@@ -109,7 +113,7 @@ public class AlbumFragment extends Fragment implements AdapterView.OnItemClickLi
             }
         });
 
-        ViewUtils.setupExpandable(mBinding.expandCheckBox, mBinding.expandable);
+        ViewUtils.setupExpandable(mBinding.expandCheckBox, mBinding.expandable, mAlbumViewModel.getExpanded());
         ViewUtils.link(mBinding.albumPhotographerCheckBox, mBinding.albumPhotographerSpinner);
         ViewUtils.link(mBinding.albumDateCheckBox, mBinding.albumDateSpinner);
         ViewUtils.link(mBinding.albumUploadCheckBox, mBinding.albumUploadSpinner);
@@ -133,9 +137,6 @@ public class AlbumFragment extends Fragment implements AdapterView.OnItemClickLi
         adjustColumnCount(getResources().getConfiguration());
 
         mAlbumViewModel.getAlbum().observe(getViewLifecycleOwner(), this::updateView);
-        mAlbumViewModel.getFilter().observe(getViewLifecycleOwner(), filter -> {
-            updateFilterValues(mAlbumViewModel.getAlbumValue(), filter);
-        });
         mAlbumViewModel.getOffline().observe(getViewLifecycleOwner(), offline -> {
             mBinding.setOffline(offline);
             mBinding.setForcedOfflineMode(Preferences.gallery().isOfflineMode());
@@ -225,7 +226,7 @@ public class AlbumFragment extends Fragment implements AdapterView.OnItemClickLi
 
         if (album != null) {
             updateFilters(album);
-            updateFilterValues(album, mAlbumViewModel.getFilterValue());
+            if (mShouldApplyFiltersToView) updateFilterValues(album, mAlbumViewModel.getFilterValue());
         }
 
         if (albumStatusWrapper.getCode() == StatusWrapper.STATUS_LOADED) {
@@ -243,6 +244,7 @@ public class AlbumFragment extends Fragment implements AdapterView.OnItemClickLi
         }
 
         if (albumStatusWrapper.getCode() != StatusWrapper.STATUS_PRELOADED) {
+            mShouldApplyFiltersToView = false;
             OneShotPreDrawListener.add(mBinding.imageContainer, this::startPostponedEnterTransition);
         }
 

@@ -7,6 +7,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import androidx.lifecycle.SavedStateHandle;
 import com.jonahbauer.qed.model.Message;
 import com.jonahbauer.qed.model.MessageFilter;
 import com.jonahbauer.qed.model.adapter.MessageAdapter;
@@ -15,6 +16,7 @@ import com.jonahbauer.qed.model.room.MessageDao;
 import com.jonahbauer.qed.util.Preferences;
 import com.jonahbauer.qed.util.StatusWrapper;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -23,15 +25,30 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class MessageListViewModel extends AndroidViewModel {
+    private static final String SAVED_FILTER = "message_filter";
+    private static final String SAVED_EXPANDED = "message_filter_expanded";
+    private static final String SAVED_DATETIME_FROM = "message_filter_datetime_from";
+    private static final String SAVED_DATETIME_TO = "message_filter_datetime_to";
+
     private final MessageDao mMessageDao;
-    private final MutableLiveData<MessageFilter> mFilter = new MutableLiveData<>(null);
+    private final MutableLiveData<MessageFilter> mFilter;
     private final MutableLiveData<StatusWrapper<List<Message>>> mMessages = new MutableLiveData<>();
     private final CompositeDisposable mDisposable = new CompositeDisposable();
 
     private int mCheckedItemPosition = MessageAdapter.INVALID_POSITION;
 
-    public MessageListViewModel(@NonNull Application application) {
+    // saved view state
+    private final MutableLiveData<Boolean> mExpanded;
+    private final MutableLiveData<LocalDateTime> mDateTimeFrom;
+    private final MutableLiveData<LocalDateTime> mDateTimeTo;
+
+    public MessageListViewModel(@NonNull Application application, @NonNull SavedStateHandle savedStateHandle) {
         super(application);
+
+        mFilter = savedStateHandle.getLiveData(SAVED_FILTER, null);
+        mExpanded = savedStateHandle.getLiveData(SAVED_EXPANDED, false);
+        mDateTimeFrom = savedStateHandle.getLiveData(SAVED_DATETIME_FROM, LocalDateTime.now());
+        mDateTimeTo = savedStateHandle.getLiveData(SAVED_DATETIME_TO, LocalDateTime.now());
 
         mMessageDao = Database.getInstance(application).messageDao();
         mFilter.observeForever(filter -> {
@@ -69,6 +86,18 @@ public class MessageListViewModel extends AndroidViewModel {
 
     public LiveData<StatusWrapper<List<Message>>> getMessages() {
         return mMessages;
+    }
+
+    public MutableLiveData<Boolean> getExpanded() {
+        return mExpanded;
+    }
+
+    public MutableLiveData<LocalDateTime> getDateTimeFrom() {
+        return mDateTimeFrom;
+    }
+
+    public MutableLiveData<LocalDateTime> getDateTimeTo() {
+        return mDateTimeTo;
     }
 
     @Override

@@ -10,6 +10,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import androidx.lifecycle.SavedStateHandle;
 import com.jonahbauer.qed.BuildConfig;
 import com.jonahbauer.qed.model.Album;
 import com.jonahbauer.qed.model.room.AlbumDao;
@@ -31,22 +32,29 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class AlbumViewModel extends AndroidViewModel {
     private static final String LOG_TAG = AlbumViewModel.class.getName();
+    private static final String SAVED_FILER = "album_filter";
+    private static final String SAVED_EXPANDED = "album_filter_expanded";
 
     private final AlbumDao mAlbumDao;
 
-    private final MutableLiveData<AlbumFilter> mFilter = new MutableLiveData<>();
+    private final MutableLiveData<AlbumFilter> mFilter;
     private final MutableLiveData<Boolean> mOffline = new MutableLiveData<>(false);
     private final MutableLiveData<StatusWrapper<Album>> mAlbum = new MutableLiveData<>();
 
     private final CompositeDisposable mDisposable = new CompositeDisposable();
 
-    public AlbumViewModel(@NonNull Application application) {
+    // saved view state
+    private final MutableLiveData<Boolean> mExpanded;
+
+    public AlbumViewModel(@NonNull Application application, @NonNull SavedStateHandle savedStateHandle) {
         super(application);
         mAlbumDao = Database.getInstance(application).albumDao();
+        mFilter = savedStateHandle.getLiveData(SAVED_FILER, AlbumFilter.EMPTY);
+        mExpanded = savedStateHandle.getLiveData(SAVED_EXPANDED, false);
     }
 
     public void load(@NonNull Album album) {
-        load(album, AlbumFilter.EMPTY);
+        load(album, getFilterValue());
     }
 
     public void filter(@NonNull AlbumFilter filter) {
@@ -88,6 +96,10 @@ public class AlbumViewModel extends AndroidViewModel {
 
     public LiveData<Boolean> getOffline() {
         return mOffline;
+    }
+
+    public MutableLiveData<Boolean> getExpanded() {
+        return mExpanded;
     }
 
     private void loadInternet() {

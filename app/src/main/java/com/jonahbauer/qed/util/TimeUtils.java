@@ -1,8 +1,5 @@
 package com.jonahbauer.qed.util;
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MediatorLiveData;
-
 import com.jonahbauer.qed.model.util.ParsedInstant;
 import com.jonahbauer.qed.model.util.ParsedLocalDate;
 import com.jonahbauer.qed.networking.NetworkConstants;
@@ -73,10 +70,13 @@ public class TimeUtils {
         return LocalDateTime.ofInstant(serverZonedTime, ZoneId.systemDefault());
     }
 
-    public static LiveData<LocalDateTime> combine(LiveData<LocalDate> date, LiveData<LocalTime> time) {
-        MediatorLiveData<LocalDateTime> out = new MediatorLiveData<>();
-        out.addSource(date, d -> out.setValue(LocalDateTime.of(date.getValue(), time.getValue())));
-        out.addSource(time, t -> out.setValue(LocalDateTime.of(date.getValue(), time.getValue())));
-        return out;
+    public static Instant instantFromLocal(LocalDateTime dateTime) {
+        if (dateTime == null) return null;
+        return ZonedDateTime.of(dateTime, ZoneId.systemDefault()).toInstant();
+    }
+
+    public LocalDateTime localFromInstant(Instant instant) {
+        if (instant == null) return null;
+        return ZonedDateTime.ofInstant(instant, ZoneId.systemDefault()).toLocalDateTime();
     }
 }

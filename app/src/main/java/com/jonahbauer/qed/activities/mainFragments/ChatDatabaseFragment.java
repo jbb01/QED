@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.MutableLiveData;
 import androidx.navigation.fragment.NavHostFragment;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.databinding.FragmentChatDatabaseBinding;
@@ -35,11 +34,6 @@ public class ChatDatabaseFragment extends Fragment {
 
     private MessageAdapter mMessageAdapter;
     private MessageListViewModel mMessageListViewModel;
-
-    private MutableLiveData<LocalDate> mDateFrom;
-    private MutableLiveData<LocalTime> mTimeFrom;
-    private MutableLiveData<LocalDate> mDateTo;
-    private MutableLiveData<LocalTime> mTimeTo;
 
     private FragmentChatDatabaseBinding mBinding;
 
@@ -83,11 +77,6 @@ public class ChatDatabaseFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        mDateFrom = new MutableLiveData<>(LocalDate.now());
-        mTimeFrom = new MutableLiveData<>(LocalTime.now());
-        mDateTo = new MutableLiveData<>(LocalDate.now());
-        mTimeTo = new MutableLiveData<>(LocalTime.now());
-
         // setup list view
         mMessageAdapter = new MessageAdapter(requireContext(), new ArrayList<>(), null, false, null, true);
         mBinding.messageListView.setOnItemClickListener((parent, v, position, id) -> {
@@ -101,7 +90,7 @@ public class ChatDatabaseFragment extends Fragment {
 
         mBinding.searchButton.setOnClickListener(v -> search());
 
-        ViewUtils.setupExpandable(mBinding.expandCheckBox, mBinding.expandable);
+        ViewUtils.setupExpandable(mBinding.expandCheckBox, mBinding.expandable, mMessageListViewModel.getExpanded());
         ViewUtils.link(mBinding.databaseChannelCheckbox, mBinding.databaseChannelEditText);
         ViewUtils.link(mBinding.databaseMessageCheckbox, mBinding.databaseMessageEditText);
         ViewUtils.link(mBinding.databaseNameCheckbox, mBinding.databaseNameEditText);
@@ -109,10 +98,13 @@ public class ChatDatabaseFragment extends Fragment {
         ViewUtils.link(mBinding.databaseDateToCheckbox, mBinding.databaseDateToEditText, mBinding.databaseTimeToEditText);
         ViewUtils.link(mBinding.databaseIdCheckbox, mBinding.databaseIdEditText);
 
-        ViewUtils.setupDateEditText(mBinding.databaseDateFromEditText, mDateFrom);
-        ViewUtils.setupDateEditText(mBinding.databaseDateToEditText, mDateTo);
-        ViewUtils.setupTimeEditText(mBinding.databaseTimeFromEditText, mTimeFrom);
-        ViewUtils.setupTimeEditText(mBinding.databaseTimeToEditText, mTimeTo);
+        var lifecycleOwner = getViewLifecycleOwner();
+        var dateTimeFrom = mMessageListViewModel.getDateTimeFrom();
+        var dateTimeTo = mMessageListViewModel.getDateTimeTo();
+        ViewUtils.setupDateEditText(lifecycleOwner, mBinding.databaseDateFromEditText, dateTimeFrom);
+        ViewUtils.setupTimeEditText(lifecycleOwner, mBinding.databaseTimeFromEditText, dateTimeFrom);
+        ViewUtils.setupDateEditText(lifecycleOwner, mBinding.databaseDateToEditText, dateTimeTo);
+        ViewUtils.setupTimeEditText(lifecycleOwner, mBinding.databaseTimeToEditText, dateTimeTo);
 
         mMessageListViewModel.getMessages().observe(getViewLifecycleOwner(), messages -> {
             mBinding.setStatus(messages.getCode());
@@ -175,15 +167,11 @@ public class ChatDatabaseFragment extends Fragment {
         }
         
         if (mBinding.databaseDateFromCheckbox.isChecked()) {
-            LocalDate date = mDateFrom.getValue();
-            LocalTime time = mTimeFrom.getValue();
-            fromDate = ZonedDateTime.of(date, time, ZoneId.systemDefault()).toInstant();
+            fromDate = TimeUtils.instantFromLocal(mMessageListViewModel.getDateTimeFrom().getValue());
         }
 
         if (mBinding.databaseDateToCheckbox.isChecked()) {
-            LocalDate date = mDateTo.getValue();
-            LocalTime time = mTimeTo.getValue();
-            toDate = ZonedDateTime.of(date, time, ZoneId.systemDefault()).toInstant();
+            toDate = TimeUtils.instantFromLocal(mMessageListViewModel.getDateTimeTo().getValue());
         }
 
         if (mBinding.databaseIdCheckbox.isChecked()) {

@@ -15,24 +15,24 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import androidx.annotation.IdRes;
-import androidx.annotation.NonNull;
-import androidx.annotation.Px;
-import androidx.annotation.StringRes;
+import androidx.annotation.*;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavBackStackEntry;
 import androidx.navigation.fragment.NavHostFragment;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.databinding.AlertDialogEditTextBinding;
+import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.Contract;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -145,10 +145,16 @@ public class ViewUtils {
     }
     //</editor-fold>
 
-    public static void setupDateEditText(@NonNull EditText editText, @NonNull MutableLiveData<LocalDate> date) {
+    public static void setupDateEditText(LifecycleOwner owner, @NonNull EditText editText, @NonNull MutableLiveData<LocalDateTime> date) {
         DateTimeFormatter formatter = DateTimeFormatter
                 .ofLocalizedDate(FormatStyle.MEDIUM)
                 .withZone(ZoneId.systemDefault());
+
+        if (owner != null) {
+            date.observe(owner, dateTime -> {
+                editText.setText(formatter.format(dateTime));
+            });
+        }
 
         editText.setText(formatter.format(date.getValue()));
         editText.setOnClickListener(v -> {
@@ -158,7 +164,7 @@ public class ViewUtils {
             DatePickerDialog dialog = new DatePickerDialog(
                     context,
                     (view, year, month, dayOfMonth) -> {
-                        date.setValue(LocalDate.of(year, month + 1, dayOfMonth));
+                        date.setValue(date.getValue().with(LocalDate.of(year, month + 1, dayOfMonth)));
                         editText.setText(formatter.format(date.getValue()));
                     },
                     value.getYear(),
@@ -169,10 +175,16 @@ public class ViewUtils {
         });
     }
 
-    public static void setupTimeEditText(@NonNull EditText editText, @NonNull MutableLiveData<LocalTime> time) {
+    public static void setupTimeEditText(LifecycleOwner owner, @NonNull EditText editText, @NonNull MutableLiveData<LocalDateTime> time) {
         DateTimeFormatter formatter = DateTimeFormatter
                 .ofLocalizedTime(FormatStyle.MEDIUM)
                 .withZone(ZoneId.systemDefault());
+
+        if (owner != null) {
+            time.observe(owner, dateTime -> {
+                editText.setText(formatter.format(dateTime));
+            });
+        }
 
         editText.setText(formatter.format(time.getValue()));
         editText.setOnClickListener(v -> {
@@ -182,7 +194,7 @@ public class ViewUtils {
             TimePickerDialog dialog = new TimePickerDialog(
                     context,
                     (view, hourOfDay, minute) -> {
-                        time.setValue(LocalTime.of(hourOfDay, minute));
+                        time.setValue(time.getValue().with(LocalTime.of(hourOfDay, minute)));
                         editText.setText(formatter.format(time.getValue()));
                     },
                     value.getHour(),
@@ -313,17 +325,25 @@ public class ViewUtils {
         listener.onCheckedChanged(button, button.isChecked());
     }
 
-    public static void setupExpandable(@NonNull CompoundButton button, @NonNull View expandingView) {
+    public static void setupExpandable(@NonNull CompoundButton button, @NonNull View expandingView, @NonNull MutableLiveData<Boolean> state) {
+        var checkedSetter = (BooleanConsumer) checked -> {
+            button.setChecked(checked);
+            button.setButtonDrawable(checked ? R.drawable.ic_arrow_up_accent_animation : R.drawable.ic_arrow_down_accent_animation);
+
+            var drawable = button.getButtonDrawable();
+            if (drawable instanceof Animatable) ((Animatable) drawable).start();
+
+            if (checked) expand(expandingView);
+            else collapse(expandingView);
+        };
+
+        var expanded = state.getValue();
+        if (expanded == null) expanded = false;
+        checkedSetter.accept((boolean) expanded);
+
         button.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                buttonView.setButtonDrawable(R.drawable.ic_arrow_up_accent_animation);
-                ((Animatable) Objects.requireNonNull(buttonView.getButtonDrawable())).start();
-                ViewUtils.expand(expandingView);
-            } else {
-                buttonView.setButtonDrawable(R.drawable.ic_arrow_down_accent_animation);
-                ((Animatable) Objects.requireNonNull(buttonView.getButtonDrawable())).start();
-                ViewUtils.collapse(expandingView);
-            }
+            checkedSetter.accept(isChecked);
+            state.setValue(isChecked);
         });
     }
 }

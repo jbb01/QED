@@ -2,13 +2,11 @@ package com.jonahbauer.qed.model.viewmodel;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MediatorLiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.*;
 
 import com.jonahbauer.qed.model.Person;
 import com.jonahbauer.qed.model.PersonFilter;
+import com.jonahbauer.qed.model.adapter.PersonAdapter;
 import com.jonahbauer.qed.networking.Reason;
 import com.jonahbauer.qed.networking.async.QEDPageReceiver;
 import com.jonahbauer.qed.networking.pages.QEDDBPages;
@@ -23,14 +21,26 @@ import java.util.stream.Collectors;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 
 public class PersonListViewModel extends ViewModel implements QEDPageReceiver<List<Person>> {
-    private final MutableLiveData<StatusWrapper<List<Person>>> mPersons = new MutableLiveData<>();
-    private final MutableLiveData<PersonFilter> mFilter = new MutableLiveData<>(PersonFilter.EMPTY);
+    private static final String SAVED_FILTER = "person_filter";
+    private static final String SAVED_EXPANDED = "person_filter_expanded";
+    private static final String SAVED_SORT_MODE = "person_sort_mode";
 
+    private final MutableLiveData<StatusWrapper<List<Person>>> mPersons = new MutableLiveData<>();
+
+    private final MutableLiveData<PersonFilter> mFilter;
     private final MediatorLiveData<StatusWrapper<List<Person>>> mFilteredPersons = new MediatorLiveData<>();
 
     private final CompositeDisposable mDisposable = new CompositeDisposable();
 
-    public PersonListViewModel() {
+    // saved view state
+    private final MutableLiveData<PersonAdapter.SortMode> mSortMode;
+    private final MutableLiveData<Boolean> mExpanded;
+
+    public PersonListViewModel(@NonNull SavedStateHandle savedStateHandle) {
+        mFilter = savedStateHandle.getLiveData(SAVED_FILTER, PersonFilter.EMPTY);
+        mSortMode = savedStateHandle.getLiveData(SAVED_SORT_MODE, PersonAdapter.SortMode.FIRST_NAME);
+        mExpanded = savedStateHandle.getLiveData(SAVED_EXPANDED, false);
+
         BiConsumer<StatusWrapper<List<Person>>, Predicate<Person>> observer = (wrapper, filter) -> {
             if (wrapper == null || wrapper.getValue() == null || wrapper.getValue().isEmpty()) {
                 mFilteredPersons.setValue(wrapper);
@@ -62,6 +72,22 @@ public class PersonListViewModel extends ViewModel implements QEDPageReceiver<Li
 
     public LiveData<StatusWrapper<List<Person>>> getPersons() {
         return mFilteredPersons;
+    }
+
+    public LiveData<PersonFilter> getFilter() {
+        return mFilter;
+    }
+
+    public PersonAdapter.SortMode getSortMode() {
+        return mSortMode.getValue();
+    }
+
+    public void setSortMode(PersonAdapter.SortMode sortMode) {
+        mSortMode.setValue(sortMode);
+    }
+
+    public MutableLiveData<Boolean> getExpanded() {
+        return mExpanded;
     }
 
     @Override
