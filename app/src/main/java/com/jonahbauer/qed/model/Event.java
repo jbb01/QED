@@ -11,6 +11,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import com.jonahbauer.qed.model.parcel.ParcelExtensions;
+import com.jonahbauer.qed.model.parcel.LambdaCreator;
 import com.jonahbauer.qed.model.util.ParsedLocalDate;
 import com.jonahbauer.qed.util.TextUtils;
 import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenCustomHashSet;
@@ -123,36 +124,28 @@ public class Event implements Comparable<Event>, Parcelable {
         ParcelExtensions.writeInstant(dest, loaded);
     }
 
-    public static final Parcelable.Creator<Event> CREATOR = new Parcelable.Creator<>() {
-        @Override
-        @SuppressLint("ParcelClassLoader") // no class loader required since only primitive wrappers are read
-        public Event createFromParcel(@NonNull Parcel source) {
-            Event event = new Event(source.readLong());
-            event.title = source.readString();
-            event.cost = (Double) source.readValue(null);
-            event.notes = source.readString();
-            event.maxParticipants = (Integer) source.readValue(null);
+    @SuppressLint("ParcelClassLoader")
+    public static final Creator<Event> CREATOR = new LambdaCreator<>(Event[]::new, source -> {
+        Event event = new Event(source.readLong());
+        event.title = source.readString();
+        event.cost = (Double) source.readValue(null);
+        event.notes = source.readString();
+        event.maxParticipants = (Integer) source.readValue(null);
 
-            event.start = source.readTypedObject(ParsedLocalDate.CREATOR);
-            event.end = source.readTypedObject(ParsedLocalDate.CREATOR);
-            event.deadline = source.readTypedObject(ParsedLocalDate.CREATOR);
+        event.start = source.readTypedObject(ParsedLocalDate.CREATOR);
+        event.end = source.readTypedObject(ParsedLocalDate.CREATOR);
+        event.deadline = source.readTypedObject(ParsedLocalDate.CREATOR);
 
-            event.hotel = source.readString();
-            event.hotelAddress = source.readString();
+        event.hotel = source.readString();
+        event.hotelAddress = source.readString();
 
-            event.emailOrga = source.readString();
-            event.emailAll = source.readString();
+        event.emailOrga = source.readString();
+        event.emailAll = source.readString();
 
-            ParcelExtensions.readTypedCollection(source, event.participants, Registration.CREATOR);
+        ParcelExtensions.readTypedCollection(source, event.participants, Registration.CREATOR);
 
-            event.loaded = ParcelExtensions.readInstant(source);
+        event.loaded = ParcelExtensions.readInstant(source);
 
-            return event;
-        }
-
-        @Override
-        public Event[] newArray(int size) {
-            return new Event[size];
-        }
-    };
+        return event;
+    });
 }

@@ -13,6 +13,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import com.jonahbauer.qed.model.parcel.ParcelExtensions;
+import com.jonahbauer.qed.model.parcel.LambdaCreator;
 import com.jonahbauer.qed.model.util.ParsedLocalDate;
 import com.jonahbauer.qed.util.TextUtils;
 import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenCustomHashSet;
@@ -173,50 +174,41 @@ public class Person implements Parcelable {
         ParcelExtensions.writeTypedCollection(dest, events);
     }
 
-    public static final Parcelable.Creator<Person> CREATOR = new Parcelable.Creator<>() {
-        @NonNull
-        @Override
-        @SuppressLint("ParcelClassLoader")
-        public Person createFromParcel(@NonNull Parcel source) {
-            Person person = new Person(source.readLong());
-            person.username = source.readString();
-            person.firstName = source.readString();
-            person.lastName = source.readString();
-            person.fullName = source.readString();
-            person.email = source.readString();
+    @SuppressLint("ParcelClassLoader")
+    public static final Creator<Person> CREATOR = new LambdaCreator<>(Person[]::new, source -> {
+        Person person = new Person(source.readLong());
+        person.username = source.readString();
+        person.firstName = source.readString();
+        person.lastName = source.readString();
+        person.fullName = source.readString();
+        person.email = source.readString();
 
-            person.gender = source.readString();
-            person.birthday = source.readTypedObject(ParsedLocalDate.CREATOR);
+        person.gender = source.readString();
+        person.birthday = source.readTypedObject(ParsedLocalDate.CREATOR);
 
-            person.homeStation = source.readString();
-            person.railcard = source.readString();
-            person.food = source.readString();
-            person.notes = source.readString();
+        person.homeStation = source.readString();
+        person.railcard = source.readString();
+        person.food = source.readString();
+        person.notes = source.readString();
 
-            person.member = (Boolean) source.readValue(null);
-            person.active = (Boolean) source.readValue(null);
-            person.dateOfJoining = source.readTypedObject(ParsedLocalDate.CREATOR);
-            person.dateOfQuitting = source.readTypedObject(ParsedLocalDate.CREATOR);
+        person.member = (Boolean) source.readValue(null);
+        person.active = (Boolean) source.readValue(null);
+        person.dateOfJoining = source.readTypedObject(ParsedLocalDate.CREATOR);
+        person.dateOfQuitting = source.readTypedObject(ParsedLocalDate.CREATOR);
 
-            person.loaded = ParcelExtensions.readInstant(source);
+        person.loaded = ParcelExtensions.readInstant(source);
 
-            int contactCount = source.readInt();
-            for (int i = 0; i < contactCount; i++) {
-                person.contacts.add(new Pair<>(
-                        source.readString(),
-                        source.readString()
-                ));
-            }
-
-            ParcelExtensions.readStringCollection(source, person.addresses);
-            ParcelExtensions.readTypedCollection(source, person.events, Registration.CREATOR);
-
-            return person;
+        int contactCount = source.readInt();
+        for (int i = 0; i < contactCount; i++) {
+            person.contacts.add(new Pair<>(
+                    source.readString(),
+                    source.readString()
+            ));
         }
 
-        @Override
-        public Person[] newArray(int size) {
-            return new Person[size];
-        }
-    };
+        ParcelExtensions.readStringCollection(source, person.addresses);
+        ParcelExtensions.readTypedCollection(source, person.events, Registration.CREATOR);
+
+        return person;
+    });
 }

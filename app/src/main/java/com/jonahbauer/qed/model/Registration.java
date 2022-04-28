@@ -13,6 +13,7 @@ import com.jonahbauer.qed.R;
 import java.time.Instant;
 
 import com.jonahbauer.qed.model.parcel.ParcelExtensions;
+import com.jonahbauer.qed.model.parcel.LambdaCreator;
 import com.jonahbauer.qed.model.util.ParsedLocalDate;
 import com.jonahbauer.qed.model.util.ParsedInstant;
 import com.jonahbauer.qed.util.TextUtils;
@@ -183,53 +184,45 @@ public class Registration implements Parcelable {
         ParcelExtensions.writeInstant(dest, loaded);
     }
 
-    public static final Creator<Registration> CREATOR = new Creator<>() {
-        @Override
-        @SuppressLint("ParcelClassLoader")
-        public Registration createFromParcel(Parcel in) {
-            Registration registration = new Registration(in.readLong());
+    @SuppressLint("ParcelClassLoader")
+    public static final Creator<Registration> CREATOR = new LambdaCreator<>(Registration[]::new, source -> {
+        Registration registration = new Registration(source.readLong());
 
-            registration.status = ParcelExtensions.readEnum(in, Status::get);
-            registration.organizer = (Boolean) in.readValue(null);
+        registration.status = ParcelExtensions.readEnum(source, Status::get);
+        registration.organizer = (Boolean) source.readValue(null);
 
-            registration.eventId = in.readLong();
-            registration.eventTitle = in.readString();
+        registration.eventId = source.readLong();
+        registration.eventTitle = source.readString();
 
-            registration.personId = in.readLong();
-            registration.personName = in.readString();
-            registration.personBirthday = in.readTypedObject(ParsedLocalDate.CREATOR);
-            registration.personGender = in.readString();
-            registration.personMail = in.readString();
-            registration.personAddress = in.readString();
-            registration.personPhone = in.readString();
+        registration.personId = source.readLong();
+        registration.personName = source.readString();
+        registration.personBirthday = source.readTypedObject(ParsedLocalDate.CREATOR);
+        registration.personGender = source.readString();
+        registration.personMail = source.readString();
+        registration.personAddress = source.readString();
+        registration.personPhone = source.readString();
 
-            registration.timeOfArrival = in.readTypedObject(ParsedInstant.CREATOR);
-            registration.timeOfDeparture = in.readTypedObject(ParsedInstant.CREATOR);
-            registration.sourceStation = in.readString();
-            registration.targetStation = in.readString();
-            registration.railcard = in.readString();
-            registration.overnightStays = (Integer) in.readValue(null);
+        registration.timeOfArrival = source.readTypedObject(ParsedInstant.CREATOR);
+        registration.timeOfDeparture = source.readTypedObject(ParsedInstant.CREATOR);
+        registration.sourceStation = source.readString();
+        registration.targetStation = source.readString();
+        registration.railcard = source.readString();
+        registration.overnightStays = (Integer) source.readValue(null);
 
-            registration.food = in.readString();
-            registration.talks = in.readString();
-            registration.notes = in.readString();
+        registration.food = source.readString();
+        registration.talks = source.readString();
+        registration.notes = source.readString();
 
-            registration.paymentAmount = (Double) in.readValue(null);
-            registration.paymentDone = (Boolean) in.readValue(null);
-            registration.paymentTime = in.readTypedObject(ParsedLocalDate.CREATOR);
-            registration.memberAbatement = (Boolean) in.readValue(null);
-            registration.otherAbatement = in.readString();
+        registration.paymentAmount = (Double) source.readValue(null);
+        registration.paymentDone = (Boolean) source.readValue(null);
+        registration.paymentTime = source.readTypedObject(ParsedLocalDate.CREATOR);
+        registration.memberAbatement = (Boolean) source.readValue(null);
+        registration.otherAbatement = source.readString();
 
-            registration.loaded = ParcelExtensions.readInstant(in);
+        registration.loaded = ParcelExtensions.readInstant(source);
 
-            return registration;
-        }
-
-        @Override
-        public Registration[] newArray(int size) {
-            return new Registration[size];
-        }
-    };
+        return registration;
+    });
 
     @Getter
     @RequiredArgsConstructor

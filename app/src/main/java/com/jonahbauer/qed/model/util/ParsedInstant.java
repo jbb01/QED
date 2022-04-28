@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import com.jonahbauer.qed.model.parcel.LambdaCreator;
 import com.jonahbauer.qed.model.parcel.ParcelExtensions;
 import lombok.Data;
 import lombok.experimental.ExtensionMethod;
@@ -42,18 +43,10 @@ public class ParsedInstant implements Comparable<ParsedInstant>, Parcelable {
         dest.writeInstant(instant);
     }
 
-    public static final Creator<ParsedInstant> CREATOR = new Creator<>() {
-        @Override
-        public ParsedInstant createFromParcel(Parcel source) {
-            return new ParsedInstant(
-                    source.readString(),
-                    source.readInstant()
-            );
-        }
-
-        @Override
-        public ParsedInstant[] newArray(int size) {
-            return new ParsedInstant[size];
-        }
-    };
+    public static final Creator<ParsedInstant> CREATOR = new LambdaCreator<>(ParsedInstant[]::new, source -> {
+        return new ParsedInstant(
+                source.readString(),
+                source.readInstant()
+        );
+    });
 }

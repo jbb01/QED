@@ -12,6 +12,7 @@ import java.util.List;
 
 import com.jonahbauer.qed.model.parcel.ParcelExtensions;
 import com.jonahbauer.qed.model.room.MessageDao;
+import com.jonahbauer.qed.model.parcel.LambdaCreator;
 import io.reactivex.rxjava3.core.Single;
 import lombok.Data;
 import lombok.experimental.ExtensionMethod;
@@ -49,24 +50,16 @@ public class MessageFilter implements Parcelable {
         dest.writeValue(toId);
     }
 
-    public static final Creator<MessageFilter> CREATOR = new Creator<>() {
-        @Override
-        @SuppressLint("ParcelClassLoader")
-        public MessageFilter createFromParcel(Parcel in) {
-            return new MessageFilter(
-                    in.readString(),
-                    in.readString(),
-                    in.readString(),
-                    in.readInstant(),
-                    in.readInstant(),
-                    (Long) in.readValue(null),
-                    (Long) in.readValue(null)
-            );
-        }
-
-        @Override
-        public MessageFilter[] newArray(int size) {
-            return new MessageFilter[size];
-        }
-    };
+    @SuppressLint("ParcelClassLoader")
+    public static final Creator<MessageFilter> CREATOR = new LambdaCreator<>(MessageFilter[]::new, source -> {
+        return new MessageFilter(
+                source.readString(),
+                source.readString(),
+                source.readString(),
+                source.readInstant(),
+                source.readInstant(),
+                (Long) source.readValue(null),
+                (Long) source.readValue(null)
+        );
+    });
 }

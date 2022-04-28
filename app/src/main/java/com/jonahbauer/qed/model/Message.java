@@ -18,6 +18,7 @@ import androidx.room.TypeConverters;
 
 import com.jonahbauer.qed.model.parcel.ParcelExtensions;
 import com.jonahbauer.qed.model.room.Converters;
+import com.jonahbauer.qed.model.parcel.LambdaCreator;
 import com.jonahbauer.qed.networking.NetworkConstants;
 import com.jonahbauer.qed.util.Colors;
 
@@ -300,29 +301,20 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
         ParcelExtensions.writeBoolean(dest, error);
     }
 
-    public static final Parcelable.Creator<Message> CREATOR = new Parcelable.Creator<>() {
+    public static final Creator<Message> CREATOR = new LambdaCreator<>(Message[]::new, source -> {
+        var id = source.readLong();
+        var rawName = Objects.requireNonNull(source.readString());
+        var message = Objects.requireNonNull(source.readString());
+        var date = Objects.requireNonNull(ParcelExtensions.readInstant(source));
+        var userId = source.readLong();
+        var userName = source.readString();
+        var color = Objects.requireNonNull(source.readString());
+        var channel = Objects.requireNonNull(source.readString());
+        var bottag = source.readInt();
+        var error = ParcelExtensions.readBoolean(source);
 
-        @Override
-        public Message createFromParcel(Parcel source) {
-            var id = source.readLong();
-            var rawName = Objects.requireNonNull(source.readString());
-            var message = Objects.requireNonNull(source.readString());
-            var date = Objects.requireNonNull(ParcelExtensions.readInstant(source));
-            var userId = source.readLong();
-            var userName = source.readString();
-            var color = Objects.requireNonNull(source.readString());
-            var channel = Objects.requireNonNull(source.readString());
-            var bottag = source.readInt();
-            var error = ParcelExtensions.readBoolean(source);
-
-            return new Message(id, rawName, message, date, userId, userName, color, channel, bottag, error);
-        }
-
-        @Override
-        public Message[] newArray(int size) {
-            return new Message[size];
-        }
-    };
+        return new Message(id, rawName, message, date, userId, userName, color, channel, bottag, error);
+    });
 
     public enum Type {
         PING,

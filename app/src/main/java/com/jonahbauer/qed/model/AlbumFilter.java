@@ -7,6 +7,7 @@ import android.os.Parcelable;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.jonahbauer.qed.model.parcel.ParcelExtensions;
+import com.jonahbauer.qed.model.parcel.LambdaCreator;
 import lombok.Data;
 import lombok.experimental.ExtensionMethod;
 import org.jetbrains.annotations.Contract;
@@ -89,21 +90,13 @@ public class AlbumFilter implements Parcelable {
         dest.writeString(category);
     }
 
-    public static final Creator<AlbumFilter> CREATOR = new Creator<>() {
-        @Override
-        @SuppressLint("ParcelClassLoader")
-        public AlbumFilter createFromParcel(@NonNull Parcel in) {
-            return new AlbumFilter(
-                    in.readLocalDate(),
-                    in.readLocalDate(),
-                    (Long) in.readValue(null),
-                    in.readString()
-            );
-        }
-
-        @Override
-        public AlbumFilter[] newArray(int size) {
-            return new AlbumFilter[size];
-        }
-    };
+    @SuppressLint("ParcelClassLoader")
+    public static final Creator<AlbumFilter> CREATOR = new LambdaCreator<>(AlbumFilter[]::new, source -> {
+        return new AlbumFilter(
+                source.readLocalDate(),
+                source.readLocalDate(),
+                (Long) source.readValue(null),
+                source.readString()
+        );
+    });
 }

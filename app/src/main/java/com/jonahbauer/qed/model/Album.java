@@ -21,6 +21,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.jonahbauer.qed.model.parcel.LambdaCreator;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.SneakyThrows;
@@ -173,38 +174,28 @@ public class Album implements Parcelable {
         ParcelExtensions.writeInstant(dest, loaded);
     }
 
-    public static final Parcelable.Creator<Album> CREATOR = new Parcelable.Creator<>() {
-        @NonNull
-        @Override
-        public Album createFromParcel(@NonNull Parcel source) {
-            Album album = new Album(source.readLong());
-            album.name = source.readString();
-            album.owner = source.readString();
-            album.creationDate = source.readString();
-            album._private = ParcelExtensions.readBoolean(source);
-            source.readTypedList(album.persons, Person.CREATOR);
+    public static final Creator<Album> CREATOR = new LambdaCreator<>(Album[]::new, source -> {
+        Album album = new Album(source.readLong());
+        album.name = source.readString();
+        album.owner = source.readString();
+        album.creationDate = source.readString();
+        album._private = ParcelExtensions.readBoolean(source);
+        source.readTypedList(album.persons, Person.CREATOR);
 
-            int dateSize = source.readInt();
-            for (int i = 0; i < dateSize; i++) {
-                album.dates.add(ParcelExtensions.readLocalDate(source));
-            }
-
-            int uploadDateSize = source.readInt();
-            for (int i = 0; i < uploadDateSize; i++) {
-                album.uploadDates.add(ParcelExtensions.readLocalDate(source));
-            }
-
-            source.readStringList(album.categories);
-            source.readTypedList(album.images, Image.CREATOR);
-
-            album.loaded = ParcelExtensions.readInstant(source);
-            return album;
+        int dateSize = source.readInt();
+        for (int i = 0; i < dateSize; i++) {
+            album.dates.add(ParcelExtensions.readLocalDate(source));
         }
 
-        @Override
-        public Album[] newArray(int size) {
-            return new Album[size];
+        int uploadDateSize = source.readInt();
+        for (int i = 0; i < uploadDateSize; i++) {
+            album.uploadDates.add(ParcelExtensions.readLocalDate(source));
         }
-    };
 
+        source.readStringList(album.categories);
+        source.readTypedList(album.images, Image.CREATOR);
+
+        album.loaded = ParcelExtensions.readInstant(source);
+        return album;
+    });
 }

@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import com.jonahbauer.qed.model.parcel.LambdaCreator;
 import com.jonahbauer.qed.model.parcel.ParcelExtensions;
 import lombok.Data;
 import lombok.experimental.ExtensionMethod;
@@ -42,18 +43,10 @@ public class ParsedLocalDate implements Comparable<ParsedLocalDate>, Parcelable 
         dest.writeLocalDate(localDate);
     }
 
-    public static final Creator<ParsedLocalDate> CREATOR = new Creator<>() {
-        @Override
-        public ParsedLocalDate createFromParcel(Parcel source) {
-            return new ParsedLocalDate(
-                    source.readString(),
-                    source.readLocalDate()
-            );
-        }
-
-        @Override
-        public ParsedLocalDate[] newArray(int size) {
-            return new ParsedLocalDate[size];
-        }
-    };
+    public static final Creator<ParsedLocalDate> CREATOR = new LambdaCreator<>(ParsedLocalDate[]::new, source -> {
+        return new ParsedLocalDate(
+                source.readString(),
+                source.readLocalDate()
+        );
+    });
 }

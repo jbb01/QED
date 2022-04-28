@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import java.util.Locale;
 import java.util.function.Predicate;
 
+import com.jonahbauer.qed.model.parcel.LambdaCreator;
 import lombok.Data;
 
 @Data
@@ -49,21 +50,13 @@ public class PersonFilter implements Parcelable, Predicate<Person> {
         dest.writeValue(active);
     }
 
-    public static final Creator<PersonFilter> CREATOR = new Creator<>() {
-        @Override
-        @SuppressLint("ParcelClassLoader")
-        public PersonFilter createFromParcel(Parcel in) {
-            return new PersonFilter(
-                    in.readString(),
-                    in.readString(),
-                    (Boolean) in.readValue(null),
-                    (Boolean) in.readValue(null)
-            );
-        }
-
-        @Override
-        public PersonFilter[] newArray(int size) {
-            return new PersonFilter[size];
-        }
-    };
+    @SuppressLint("ParcelClassLoader")
+    public static final Creator<PersonFilter> CREATOR = new LambdaCreator<>(PersonFilter[]::new, source -> {
+        return new PersonFilter(
+                source.readString(),
+                source.readString(),
+                (Boolean) source.readValue(null),
+                (Boolean) source.readValue(null)
+        );
+    });
 }

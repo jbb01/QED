@@ -16,6 +16,7 @@ import androidx.annotation.*;
 
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.model.parcel.ParcelExtensions;
+import com.jonahbauer.qed.model.parcel.LambdaCreator;
 import com.jonahbauer.qed.networking.NetworkConstants;
 import com.jonahbauer.qed.util.TimeUtils;
 
@@ -42,29 +43,21 @@ public abstract class LogRequest implements Parcelable {
     private final long timestamp;
     private final String query;
 
-    public static final Creator<LogRequest> CREATOR = new Creator<>() {
-        @Override
-        public LogRequest createFromParcel(Parcel source) {
-            var start = source.dataPosition();
-            var mode = source.readEnum(Mode::get);
-            source.setDataPosition(start);
+    public static final Creator<LogRequest> CREATOR = new LambdaCreator<>(LogRequest[]::new, source -> {
+        var start = source.dataPosition();
+        var mode = source.readEnum(Mode::get);
+        source.setDataPosition(start);
 
-            switch (mode) {
-                case FILE: return new FileLogRequest(source);
-                case SINCE_OWN: return new SinceOwnLogRequest(source);
-                case DATE_RECENT: return new DateRecentLogRequest(source);
-                case POST_RECENT: return new PostRecentLogRequest(source);
-                case DATE_INTERVAL: return new DateIntervalLogRequest(source);
-                case POST_INTERVAL: return new PostIntervalLogRequest(source);
-                default: throw new AssertionError("Unknown LogRequest mode: " + mode);
-            }
+        switch (mode) {
+            case FILE: return new FileLogRequest(source);
+            case SINCE_OWN: return new SinceOwnLogRequest(source);
+            case DATE_RECENT: return new DateRecentLogRequest(source);
+            case POST_RECENT: return new PostRecentLogRequest(source);
+            case DATE_INTERVAL: return new DateIntervalLogRequest(source);
+            case POST_INTERVAL: return new PostIntervalLogRequest(source);
+            default: throw new AssertionError("Unknown LogRequest mode: " + mode);
         }
-
-        @Override
-        public LogRequest[] newArray(int size) {
-            return new LogRequest[size];
-        }
-    };
+    });
 
     protected LogRequest(@NonNull Mode mode, String query) {
         this.mode = mode;

@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.jonahbauer.qed.model.parcel.LambdaCreator;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -181,31 +182,22 @@ public class Image implements Parcelable {
         ParcelExtensions.writeBoolean(dest, loaded);
     }
 
-    public static final Parcelable.Creator<Image> CREATOR = new Parcelable.Creator<>() {
-        @NonNull
-        @Override
-        public Image createFromParcel(@NonNull Parcel source) {
-            Image image = new Image(source.readLong());
-            image.albumId = source.readLong();
-            image.order = source.readLong();
-            image.albumName = source.readString();
-            image.format = source.readString();
-            image.path = source.readString();
-            image.name = source.readString();
-            image.owner = source.readString();
-            image.uploadTime = ParcelExtensions.readInstant(source);
-            image.creationTime = ParcelExtensions.readInstant(source);
-            image.original = ParcelExtensions.readBoolean(source);
-            source.readMap(image.data, Image.class.getClassLoader());
-            image.loaded = ParcelExtensions.readBoolean(source);
-            return image;
-        }
-
-        @Override
-        public Image[] newArray(int size) {
-            return new Image[size];
-        }
-    };
+    public static final Creator<Image> CREATOR = new LambdaCreator<>(Image[]::new, source -> {
+        Image image = new Image(source.readLong());
+        image.albumId = source.readLong();
+        image.order = source.readLong();
+        image.albumName = source.readString();
+        image.format = source.readString();
+        image.path = source.readString();
+        image.name = source.readString();
+        image.owner = source.readString();
+        image.uploadTime = ParcelExtensions.readInstant(source);
+        image.creationTime = ParcelExtensions.readInstant(source);
+        image.original = ParcelExtensions.readBoolean(source);
+        source.readMap(image.data, Image.class.getClassLoader());
+        image.loaded = ParcelExtensions.readBoolean(source);
+        return image;
+    });
 
     public enum Type {
         IMAGE, VIDEO, AUDIO
