@@ -6,6 +6,7 @@
         <import type="android.view.View"/>
         <import type="com.jonahbauer.qed.util.Actions"/>
         <import type="com.jonahbauer.qed.util.TimeUtils"/>
+        <import type="com.jonahbauer.qed.util.TextUtils"/>
 
         <variable name="loading" type="boolean" />
         <variable name="color" type="int" />
@@ -74,24 +75,24 @@
             <com.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{event.start != null &amp;&amp; event.end != null}"
+                android:visibility="@{!TimeUtils.isNullOrBlank(event.start) &amp;&amp; !TimeUtils.isNullOrBlank(event.end)}"
                 android:onClick="@{(view) -> Actions.recordToCalendar(view.context, event)}"
                 app:icon="@drawable/ic_event_time"
-                app:title="@{@string/event_title_time(TimeUtils.format(event.start), TimeUtils.format(event.end))}"
+                app:title="@{TextUtils.formatRange(context, TimeUtils.PARSED_LOCAL_DATE_FORMATTER, event.start, event.end)}"
                 app:subtitle="@string/event_subtitle_time"/>
 
             <com.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{event.deadline != null}"
+                android:visibility="@{!TimeUtils.isNullOrBlank(event.deadline)}"
                 app:icon="@drawable/ic_event_deadline"
-                app:title="@{@string/event_title_deadline(TimeUtils.format(event.deadline))}"
+                app:title="@{TimeUtils.format(event.deadline)}"
                 app:subtitle="@string/event_subtitle_deadline"/>
 
             <com.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{event.hotel != null}"
+                android:visibility="@{!TextUtils.isNullOrBlank(event.hotel)}"
                 app:icon="@drawable/ic_event_hotel"
                 app:title="@{event.hotel}"
                 app:subtitle="@string/event_subtitle_hotel"/>
@@ -99,7 +100,7 @@
             <com.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{event.hotelAddress != null}"
+                android:visibility="@{!TextUtils.isNullOrBlank(event.hotelAddress)}"
                 android:onClick="@{v -> Actions.showOnMap(context, event.hotelAddress)}"
                 android:onLongClick="@{v -> Actions.copy(context, v, @string/event_clip_label_hotel_address(event.title), event.hotelAddress)}"
                 app:icon="@drawable/ic_event_hotel_address"
@@ -125,7 +126,7 @@
             <com.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{event.notes != null}"
+                android:visibility="@{!TextUtils.isNullOrBlank(event.notes)}"
                 app:icon="@drawable/ic_event_notes"
                 app:title="@{event.notes}"
                 app:subtitle="@string/event_subtitle_notes"/>
@@ -151,7 +152,7 @@
             <com.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{event.emailOrga != null}"
+                android:visibility="@{!TextUtils.isNullOrBlank(event.emailOrga)}"
                 android:onClick="@{v -> Actions.sendTo(context, event.emailOrga)}"
                 android:onLongClick="@{v -> Actions.copy(context, v, @string/event_clip_label_mail_organizers(event.title), event.emailOrga)}"
                 app:icon="@drawable/ic_event_mail"
@@ -183,7 +184,7 @@
             <com.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{event.emailAll != null}"
+                android:visibility="@{!TextUtils.isNullOrBlank(event.emailAll)}"
                 android:onClick="@{v -> Actions.sendTo(context, event.emailAll)}"
                 android:onLongClick="@{v -> Actions.copy(context, v, @string/event_clip_label_mail_participants(event.title), event.emailAll)}"
                 app:icon="@drawable/ic_event_mail"
@@ -200,14 +201,14 @@
         </LinearLayout>
 
         <View
-            android:visibility="@{event.participants.size() != event.organizers.size()}"
+            android:visibility="@{event.hasParticipants()}"
             style="?dividerStyle"/>
 
         <com.jonahbauer.qed.layoutStuff.views.ListItem
             android:id="@+id/toggle_participants_button"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="@{event.participants.size() != event.organizers.size()}"
+            android:visibility="@{event.hasParticipants()}"
             app:icon="@drawable/ic_arrow_down_accent"
             app:title="@string/event_show_more" />
 

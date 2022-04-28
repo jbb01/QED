@@ -15,6 +15,7 @@ import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.databinding.AlertDialogColorBinding;
 import com.jonahbauer.qed.layoutStuff.views.ChatColorPicker;
 import com.jonahbauer.qed.model.viewmodel.ColorPickerViewModel;
+import com.jonahbauer.qed.util.MessageUtils;
 import com.jonahbauer.qed.util.Preferences;
 
 import java.util.Objects;
@@ -95,7 +96,7 @@ public class ColorPickerDialogFragment extends AppCompatDialogFragment implement
 
         var name = Preferences.chat().getName();
         mViewModel.init(name);
-        mBinding.setName(name.trim().isEmpty() ? getText(R.string.message_name_anonymous) : name.trim());
+        mBinding.setName(MessageUtils.formatName(requireContext(), name));
 
         return builder.create();
     }

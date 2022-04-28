@@ -9,6 +9,7 @@ import androidx.annotation.StyleRes;
 
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.model.Message;
+import com.jonahbauer.qed.util.MessageUtils;
 
 import java.time.Instant;
 
@@ -43,11 +44,7 @@ public interface MessageView {
     static CharSequence formatName(Context context, String name, @Nullable String username) {
         SpannableStringBuilder out = new SpannableStringBuilder();
 
-        if (name.trim().isEmpty()) {
-            out.append(context.getText(R.string.message_name_anonymous));
-        } else {
-            out.append(name);
-        }
+        out.append(MessageUtils.formatName(context, name));
 
         if (username != null) {
             out.append(" | ").append(username);

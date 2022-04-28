@@ -15,6 +15,7 @@
     <string name="retry">Retry</string>
     <string name="copied">Copied</string>
     <string name="hits">%,d Hits</string>
+    <string name="range">%s - %s</string>
     <string name="empty" translatable="false"/>
     <string name="logout_success">Logout successful</string>
 
@@ -141,12 +142,9 @@
     <string name="person_section_registrations">Registrations</string>
     <string name="person_subtitle_mail">Email Address</string>
     <string name="person_clip_label_mail">Email Address (%s)</string>
-    <string name="person_title_birthday">%s</string>
     <string name="person_subtitle_birthday">Birthday</string>
-    <string name="person_title_date_of_joining">%s</string>
     <string name="person_subtitle_date_of_joining">Date of Joining</string>
-    <string name="person_title_leaving_date">%s</string>
-    <string name="person_subtitle_leaving_date">Leaving Date</string>
+    <string name="person_subtitle_date_of_quitting">Date of Quitting</string>
     <string name="person_title_member_true">@string/yes</string>
     <string name="person_title_member_false">@string/no</string>
     <string name="person_subtitle_member">Currently Member</string>
@@ -167,9 +165,7 @@
     <string name="event_section_information">General</string>
     <string name="event_section_organization">Organizers</string>
     <string name="event_section_participants">Participants</string>
-    <string name="event_title_time">%s - %s</string>
     <string name="event_subtitle_time">Time Frame</string>
-    <string name="event_title_deadline">%s</string>
     <string name="event_subtitle_deadline">Registration Deadline</string>
     <string name="event_subtitle_hotel">Venue</string>
     <string name="event_subtitle_hotel_address">Venue Address</string>
@@ -197,7 +193,6 @@
     <string name="registration_subtitle_organizer">Organizer</string>
     <string name="registration_subtitle_status">Registration Status</string>
     <string name="registration_subtitle_birthday">Birthday</string>
-    <string name="registration_title_birthday">%s</string>
     <string name="registration_subtitle_gender">Gender</string>
     <string name="registration_subtitle_mail">Email Address</string>
     <string name="registration_clip_label_mail">Email Address (%s)</string>
@@ -206,9 +201,7 @@
     <string name="registration_subtitle_phone">Phone Number</string>
     <string name="registration_clip_label_phone">Phone (%s)</string>
     <string name="registration_subtitle_time_of_arrival">Time of Arrival</string>
-    <string name="registration_title_time_of_arrival">%s</string>
     <string name="registration_subtitle_time_of_departure">Time of Departure</string>
-    <string name="registration_title_time_of_departure">%s</string>
     <string name="registration_subtitle_overnight_stays">Overnight Stays</string>
     <string name="registration_subtitle_source_station">Arrival Station</string>
     <string name="registration_subtitle_target_station">Departure Station</string>
@@ -226,7 +219,6 @@
     <string name="registration_title_payment_membership_abatement_false">@string/no</string>
     <string name="registration_subtitle_payment_other_abatement">Other Abatement</string>
     <string name="registration_subtitle_payment_time">Payment Time</string>
-    <string name="registration_title_payment_time">%s</string>
     <string name="registration_snackbar_person_not_available">Person is not available</string>
     <string name="registration_snackbar_event_not_available">Event is not available</string>
 
@@ -236,7 +228,6 @@
     <string name="album_section_categories">Categories</string>
     <string name="album_subtitle_owner">Owner</string>
     <string name="album_subtitle_creation_date">Creation Date</string>
-    <string name="album_title_dates">%s - %s</string>
     <string name="album_subtitle_dates">Time</string>
     <string name="album_subtitle_upload_dates">Upload</string>
     <string name="album_subtitle_image_count">Image Count</string>
@@ -256,7 +247,6 @@
     <string name="message_clip_label_channel">Channel</string>
     <string name="message_subtitle_timestamp">Timestamp</string>
     <string name="message_clip_label_timestamp">Timestamp</string>
-    <string name="message_title_timestamp">%s</string>
     <string name="message_subtitle_bottag">Bottag</string>
 
     <!-- Registration -->

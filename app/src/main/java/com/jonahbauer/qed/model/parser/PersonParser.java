@@ -9,6 +9,7 @@ import com.jonahbauer.qed.model.Person;
 import com.jonahbauer.qed.model.Registration;
 import com.jonahbauer.qed.networking.parser.HtmlParser;
 
+import com.jonahbauer.qed.util.TextUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
@@ -23,7 +24,7 @@ public final class PersonParser extends HtmlParser<Person> {
     private static final String GENERAL_KEY_BIRTH_DAY = "Geburtstag:";
     private static final String GENERAL_KEY_GENDER = "Geschlecht:";
     private static final String GENERAL_KEY_DATE_OF_JOINING = "Eingetreten:";
-    private static final String GENERAL_KEY_LEAVING_DATE = "Ausgetreten:";
+    private static final String GENERAL_KEY_DATE_OF_QUITTING = "Ausgetreten:";
     private static final String GENERAL_KEY_MEMBER = "Aktuell Mitglied:";
     private static final String GENERAL_KEY_ACTIVE = "Aktiviertes Profil:";
 
@@ -87,9 +88,9 @@ public final class PersonParser extends HtmlParser<Person> {
                                person.setDateOfJoining(parseLocalDate(time));
                                break;
                            }
-                           case GENERAL_KEY_LEAVING_DATE: {
+                           case GENERAL_KEY_DATE_OF_QUITTING: {
                                Element time = value.child(0);
-                               person.setDateOfLeaving(parseLocalDate(time));
+                               person.setDateOfQuitting(parseLocalDate(time));
                                break;
                            }
                            case GENERAL_KEY_MEMBER: {
@@ -145,9 +146,11 @@ public final class PersonParser extends HtmlParser<Person> {
         if (element == null) return;
         if (element.selectFirst("i") != null) return;
 
-        element.select(".address").forEach(address ->
-                person.getAddresses().add(parseAddress(address))
-        );
+        element.select(".address").forEach(e -> {
+            var address = parseAddress(e);
+            if (TextUtils.isNullOrBlank(address)) return;
+            person.getAddresses().add(address);
+        });
     }
 
     private void parseContacts(Person person, Element element) {
@@ -162,9 +165,12 @@ public final class PersonParser extends HtmlParser<Person> {
                        //noinspection ConstantConditions
                        if (value.selectFirst("i") != null) return;
 
+                       var contact = value.text();
+                       if (TextUtils.isNullOrBlank(contact)) return;
+
                        person.getContacts().add(Pair.create(
                                key.substring(0, key.length() - 1),
-                               value.text()
+                               contact
                        ));
                    } catch (Exception e) {
                        Log.e(LOG_TAG, "Error parsing person " + person.getId() + ".", e);

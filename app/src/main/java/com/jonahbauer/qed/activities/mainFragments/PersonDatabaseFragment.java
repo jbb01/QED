@@ -107,11 +107,11 @@ public class PersonDatabaseFragment extends Fragment implements AdapterView.OnIt
         Boolean active;
 
         if (mBinding.databaseFirstNameCheckbox.isChecked()) {
-            firstName = mBinding.databaseFirstNameEditText.getText().toString().trim();
+            firstName = mBinding.databaseFirstNameEditText.getText().toString();
         }
 
         if (mBinding.databaseLastNameCheckbox.isChecked()) {
-            lastName = mBinding.databaseLastNameEditText.getText().toString().trim();
+            lastName = mBinding.databaseLastNameEditText.getText().toString();
         }
 
         member = mBinding.databaseMemberCheckbox.getState().asBoolean();

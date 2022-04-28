@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 import com.jonahbauer.qed.model.parcel.ParcelExtensions;
 import com.jonahbauer.qed.model.util.ParsedLocalDate;
+import com.jonahbauer.qed.util.TextUtils;
 import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenCustomHashSet;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -58,7 +59,7 @@ public class Person implements Parcelable {
     private Boolean member;
     private Boolean active;
     private ParsedLocalDate dateOfJoining;
-    private ParsedLocalDate dateOfLeaving;
+    private ParsedLocalDate dateOfQuitting;
 
     private Instant loaded;
 
@@ -104,10 +105,10 @@ public class Person implements Parcelable {
     }
 
     public boolean hasAdditionalInformation() {
-        return (homeStation != null && !homeStation.trim().equals(""))
-                || (railcard != null && !railcard.trim().equals(""))
-                || (food != null && !food.trim().equals(""))
-                || (notes != null && !notes.trim().equals(""));
+        return !TextUtils.isNullOrBlank(homeStation)
+                || !TextUtils.isNullOrBlank(railcard)
+                || !TextUtils.isNullOrBlank(food)
+                || !TextUtils.isNullOrBlank(notes);
     }
 
     @NonNull
@@ -126,7 +127,7 @@ public class Person implements Parcelable {
         if (member != null) entries.add( "\"member\":" + member);
         if (active != null) entries.add( "\"active\":" + active);
         if (dateOfJoining != null) entries.add( "\"member_since\":\"" + dateOfJoining + "\"");
-        if (dateOfLeaving != null) entries.add( "\"quit_at\":\"" + dateOfLeaving + "\"");
+        if (dateOfQuitting != null) entries.add( "\"quit_at\":\"" + dateOfQuitting + "\"");
         if (!contacts.isEmpty()) entries.add( "\"contacts\":" + contacts.stream().map(number -> "{\"note\":\"" + number.first + "\", \"number\":\"" + number.second + "\"}").collect(Collectors.joining(", ", "[", "]")));
         if (!addresses.isEmpty()) entries.add( "\"addresses\":" + addresses);
         if (!events.isEmpty()) entries.add( "\"events\":" + events.stream().map(String::valueOf).collect(Collectors.joining(", ", "[", "]")));
@@ -158,7 +159,7 @@ public class Person implements Parcelable {
         dest.writeValue(member);
         dest.writeValue(active);
         dest.writeTypedObject(dateOfJoining, flags);
-        dest.writeTypedObject(dateOfLeaving, flags);
+        dest.writeTypedObject(dateOfQuitting, flags);
 
         ParcelExtensions.writeInstant(dest, loaded);
 
@@ -195,7 +196,7 @@ public class Person implements Parcelable {
             person.member = (Boolean) source.readValue(null);
             person.active = (Boolean) source.readValue(null);
             person.dateOfJoining = source.readTypedObject(ParsedLocalDate.CREATOR);
-            person.dateOfLeaving = source.readTypedObject(ParsedLocalDate.CREATOR);
+            person.dateOfQuitting = source.readTypedObject(ParsedLocalDate.CREATOR);
 
             person.loaded = ParcelExtensions.readInstant(source);
 

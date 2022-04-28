@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.layoutStuff.views.MaterialListItem;
 import com.jonahbauer.qed.model.Event;
+import com.jonahbauer.qed.util.TextUtils;
 import com.jonahbauer.qed.util.Themes;
 import com.jonahbauer.qed.util.TimeUtils;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
@@ -39,15 +40,11 @@ public class EventAdapter extends ArrayAdapter<Event> implements SectionIndexer 
             item.setIcon(R.drawable.ic_event_icon);
         }
 
-        String subtitle = String.format(
-                context.getString(R.string.event_title_time),
-                TimeUtils.format(event.getStart()),
-                TimeUtils.format(event.getEnd())
-        );
+        String subtitle = TextUtils.formatRange(context, TimeUtils.PARSED_LOCAL_DATE_FORMATTER, event.getStart(), event.getEnd());
 
         item.setTitle(event.getTitle());
         item.setSubtitle(subtitle);
-        item.setIconTint(Themes.colorful(getContext(), event.getId()));
+        item.setIconTint(Themes.colorful(context, event.getId()));
         item.setTransitionName(context.getString(R.string.transition_name_event, event.getId()));
 
         return item;

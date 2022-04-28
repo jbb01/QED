@@ -22,8 +22,8 @@ public class PersonFilter implements Parcelable, Predicate<Person> {
     private final @Nullable Boolean active;
 
     public PersonFilter(@Nullable String firstName, @Nullable String lastName, @Nullable Boolean member, @Nullable Boolean active) {
-        this.firstName = firstName == null ? null : firstName.toLowerCase(Locale.ROOT);
-        this.lastName = lastName == null ? null : lastName.toLowerCase(Locale.ROOT);
+        this.firstName = firstName == null ? null : firstName.trim().toLowerCase(Locale.ROOT);
+        this.lastName = lastName == null ? null : lastName.trim().toLowerCase(Locale.ROOT);
         this.member = member;
         this.active = active;
     }

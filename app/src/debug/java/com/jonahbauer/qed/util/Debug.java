@@ -31,7 +31,7 @@ public class Debug {
         person.setMember(true);
         person.setActive(true);
         person.setDateOfJoining(new ParsedLocalDate("03/14/2020", LocalDate.of(2020, 3, 2)));
-        person.setDateOfLeaving(new ParsedLocalDate("31-12-2050", LocalDate.of(2050, 12, 31)));
+        person.setDateOfQuitting(new ParsedLocalDate("31-12-2050", LocalDate.of(2050, 12, 31)));
         person.getContacts().add(Pair.create("mobil", "0123456789"));
         person.getContacts().add(Pair.create("daheim", "987654321"));
         person.getContacts().add(Pair.create("skype", "max.mustermann"));

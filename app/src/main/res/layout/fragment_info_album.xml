@@ -6,6 +6,7 @@
         <import type="android.view.View"/>
         <import type="com.jonahbauer.qed.util.Actions"/>
         <import type="com.jonahbauer.qed.util.TimeUtils"/>
+        <import type="com.jonahbauer.qed.util.TextUtils"/>
 
         <variable name="loading" type="boolean" />
         <variable name="color" type="int" />
@@ -74,6 +75,7 @@
             <com.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:visibility="@{!TextUtils.isNullOrBlank(album.owner)}"
                 app:icon="@drawable/ic_album_owner"
                 app:title="@{album.owner}"
                 app:subtitle="@string/album_subtitle_owner"/>
@@ -81,6 +83,7 @@
             <com.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:visibility="@{!TextUtils.isNullOrBlank(album.creationDate)}"
                 app:icon="@drawable/ic_album_creation_date"
                 app:title="@{album.creationDate}"
                 app:subtitle="@string/album_subtitle_creation_date"/>
@@ -90,7 +93,7 @@
                 android:layout_height="wrap_content"
                 android:visibility="@{album.dates.size() > 0}"
                 app:icon="@drawable/ic_album_dates"
-                app:title="@{@string/album_title_dates(TimeUtils.format(album.dates[0]), TimeUtils.format(album.dates[album.dates.size() - 1]))}"
+                app:title="@{TextUtils.formatRange(context, TimeUtils.LOCAL_DATE_FORMATTER, album.dates)}"
                 app:subtitle="@string/album_subtitle_dates"/>
 
             <com.jonahbauer.qed.layoutStuff.views.ListItem
@@ -98,7 +101,7 @@
                 android:layout_height="wrap_content"
                 android:visibility="@{album.uploadDates.size() > 0}"
                 app:icon="@drawable/ic_album_dates"
-                app:title="@{@string/album_title_dates(TimeUtils.format(album.uploadDates[0]), TimeUtils.format(album.uploadDates[album.uploadDates.size() - 1]))}"
+                app:title="@{TextUtils.formatRange(context, TimeUtils.LOCAL_DATE_FORMATTER, album.uploadDates)}"
                 app:subtitle="@string/album_subtitle_upload_dates"/>
 
             <com.jonahbauer.qed.layoutStuff.views.ListItem
@@ -116,12 +119,14 @@
                 app:title="@string/album_title_private"/>
         </LinearLayout>
 
-        <View style="?dividerStyle"/>
+        <View style="?dividerStyle"
+            android:visibility="@{!album.categories.empty}"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="@{!album.categories.empty}">
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -135,12 +140,14 @@
                 app:album_categories="@{album.categories}"/>
         </LinearLayout>
 
-        <View style="?dividerStyle"/>
+        <View style="?dividerStyle"
+            android:visibility="@{!album.persons.empty}"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="@{!album.persons.empty}">
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

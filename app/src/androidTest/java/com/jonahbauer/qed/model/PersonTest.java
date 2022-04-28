@@ -41,7 +41,7 @@ public class PersonTest {
         person.setMember(true);
         person.setActive(true);
         person.setDateOfJoining(new ParsedLocalDate("01.01.2018", LocalDate.of(2018, 1, 1)));
-        person.setDateOfLeaving(new ParsedLocalDate("01.01.2019", LocalDate.of(2019, 1, 1)));
+        person.setDateOfQuitting(new ParsedLocalDate("01.01.2019", LocalDate.of(2019, 1, 1)));
         person.setLoaded(Instant.now());
         person.getContacts().add(Pair.create("mobil", "0123456789"));
         person.getContacts().add(Pair.create("daheim", "987654321"));

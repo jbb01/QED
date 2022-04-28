@@ -17,6 +17,7 @@
     <string name="hits">%,d Treffer</string>
     <string name="copied">Kopiert</string>
     <string name="logout_success">Logout erfolgreich</string>
+    <string name="range">%s - %s</string>
 
 
     <string name="cant_connect">Keine Verbindung zum Internet möglich</string>
@@ -208,9 +209,7 @@
     <string name="event_section_information">Informationen</string>
     <string name="event_section_organization">Organisatoren</string>
     <string name="event_section_participants">Teilnehmer</string>
-    <string name="event_title_time">%s - %s</string>
     <string name="event_subtitle_time">Zeitraum</string>
-    <string name="event_title_deadline">%s</string>
     <string name="event_subtitle_deadline">Anmeldeschluss</string>
     <string name="event_subtitle_hotel">Unterkunft</string>
     <string name="event_subtitle_hotel_address">Adresse der Unterkunft</string>
@@ -238,7 +237,6 @@
     <string name="registration_subtitle_organizer">Organisator</string>
     <string name="registration_subtitle_status">Anmeldestatus</string>
     <string name="registration_subtitle_birthday">Geburtstag</string>
-    <string name="registration_title_birthday">%s</string>
     <string name="registration_subtitle_gender">Geschlecht</string>
     <string name="registration_subtitle_mail">E-Mail Adresse</string>
     <string name="registration_clip_label_mail">E-Mail Adresse (%s)</string>
@@ -247,9 +245,7 @@
     <string name="registration_subtitle_phone">Telefonnummer</string>
     <string name="registration_clip_label_phone">Telefonnummer (%s)</string>
     <string name="registration_subtitle_time_of_arrival">Ankunftszeit</string>
-    <string name="registration_title_time_of_arrival">%s</string>
     <string name="registration_subtitle_time_of_departure">Abfahrtszeit</string>
-    <string name="registration_title_time_of_departure">%s</string>
     <string name="registration_subtitle_overnight_stays">Übernachtungen</string>
     <string name="registration_subtitle_source_station">Ankunftsbahnhof</string>
     <string name="registration_subtitle_target_station">Abfahrtsbahnhof</string>
@@ -267,7 +263,6 @@
     <string name="registration_title_payment_membership_abatement_false">@string/no</string>
     <string name="registration_subtitle_payment_other_abatement">Sonstige Ermäßigung</string>
     <string name="registration_subtitle_payment_time">Geldeingang</string>
-    <string name="registration_title_payment_time">%s</string>
     <string name="registration_snackbar_person_not_available">Person ist nicht verfügbar</string>
     <string name="registration_snackbar_event_not_available">Event ist nicht verfügbar</string>
 
@@ -277,7 +272,6 @@
     <string name="album_section_categories">Kategorien</string>
     <string name="album_subtitle_owner">Besitzer</string>
     <string name="album_subtitle_creation_date">Erstelldatum</string>
-    <string name="album_title_dates">%s - %s</string>
     <string name="album_subtitle_dates">Zeitraum</string>
     <string name="album_subtitle_upload_dates">Upload-Zeitraum</string>
     <string name="album_subtitle_image_count">Anzahl der Bilder</string>
@@ -297,7 +291,6 @@
     <string name="message_clip_label_channel">Channel</string>
     <string name="message_subtitle_timestamp">Zeitstempel</string>
     <string name="message_clip_label_timestamp">Zeitstempel</string>
-    <string name="message_title_timestamp">%s</string>
     <string name="message_subtitle_bottag">Bottag</string>
 
     <!-- Registration -->
@@ -330,12 +323,9 @@
     <string name="person_section_registrations">Anmeldungen</string>
     <string name="person_subtitle_mail">E-Mail Adresse</string>
     <string name="person_clip_label_mail">E-Mail Adresse (%s)</string>
-    <string name="person_title_birthday">%s</string>
     <string name="person_subtitle_birthday">Geburtstag</string>
-    <string name="person_title_date_of_joining">%s</string>
     <string name="person_subtitle_date_of_joining">Eintrittsdatum</string>
-    <string name="person_title_leaving_date">%s</string>
-    <string name="person_subtitle_leaving_date">Austrittsdatum</string>
+    <string name="person_subtitle_date_of_quitting">Austrittsdatum</string>
     <string name="person_title_member_true">Ja</string>
     <string name="person_title_member_false">Nein</string>
     <string name="person_subtitle_member">Aktuell Mitglied</string>

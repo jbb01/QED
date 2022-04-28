@@ -5,6 +5,7 @@
     <data>
         <import type="com.jonahbauer.qed.util.Actions"/>
         <import type="com.jonahbauer.qed.util.TimeUtils"/>
+        <import type="com.jonahbauer.qed.util.MessageUtils"/>
         <import type="com.jonahbauer.qed.model.Message"/>
         <import type="com.jonahbauer.qed.model.Person"/>
 
@@ -42,7 +43,7 @@
                 android:layout_height="wrap_content"
                 android:onLongClick="@{v -> Actions.copy(context, v, @string/message_clip_label_name, message.rawName)}"
                 app:icon="@drawable/ic_message_name"
-                app:title="@{message.anonymous ? @text/message_name_anonymous : message.name}"
+                app:title="@{MessageUtils.formatName(context, message)}"
                 app:subtitle="@string/message_subtitle_name"/>
 
             <com.jonahbauer.qed.layoutStuff.views.ListItem
@@ -59,7 +60,7 @@
                 android:layout_height="wrap_content"
                 android:onLongClick="@{v -> Actions.copy(context, v, @string/message_clip_label_channel, message.channel)}"
                 app:icon="@drawable/ic_message_channel"
-                app:title="@{message.channel.empty ? @text/message_channel_main : message.channel}"
+                app:title="@{MessageUtils.formatChannel(context, message)}"
                 app:subtitle="@string/message_subtitle_channel"/>
 
             <com.jonahbauer.qed.layoutStuff.views.ListItem
@@ -67,7 +68,7 @@
                 android:layout_height="wrap_content"
                 android:onLongClick="@{v -> Actions.copy(context, v, @string/message_clip_label_timestamp, TimeUtils.format(message.date))}"
                 app:icon="@drawable/ic_message_timestamp"
-                app:title="@{@string/message_title_timestamp(TimeUtils.format(message.date))}"
+                app:title="@{TimeUtils.format(message.date)}"
                 app:subtitle="@string/message_subtitle_timestamp"/>
 
             <com.jonahbauer.qed.layoutStuff.views.ListItem

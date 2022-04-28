@@ -166,6 +166,34 @@ public class MessageUtils {
         );
     }
 
+    /**
+     * Checks whether the given name is blank.
+     * @see Message#isAnonymous()
+     */
+    public static boolean isAnonymous(@NonNull String name) {
+       return name.trim().isEmpty();
+    }
+
+    /**
+     * Returns the given name or {@link R.string#message_name_anonymous} when the name is
+     * {@linkplain #isAnonymous(String) anonymous}.
+     */
+    public static CharSequence formatName(@NonNull Context context, @NonNull String name) {
+        return isAnonymous(name) ? context.getText(R.string.message_name_anonymous) : name.trim();
+    }
+
+    public static CharSequence formatChannel(@NonNull Context context, @NonNull String channel) {
+        return channel.isEmpty() ? context.getText(R.string.message_channel_main) : channel;
+    }
+
+    public static CharSequence formatName(@NonNull Context context, @NonNull Message message) {
+        return message.isAnonymous() ? context.getText(R.string.message_name_anonymous) : message.getName();
+    }
+
+    public static CharSequence formatChannel(@NonNull Context context, @NonNull Message message) {
+        return formatChannel(context, message.getChannel());
+    }
+
     @RequiredArgsConstructor
     private static class MessageActionMode implements ActionMode.Callback {
         private final @NonNull Context mContext;

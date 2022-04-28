@@ -1,5 +1,7 @@
 package com.jonahbauer.qed.util;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.jonahbauer.qed.model.util.ParsedInstant;
 import com.jonahbauer.qed.model.util.ParsedLocalDate;
 import com.jonahbauer.qed.networking.NetworkConstants;
@@ -12,6 +14,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.util.function.Function;
 
 import lombok.experimental.UtilityClass;
 
@@ -20,6 +23,8 @@ public class TimeUtils {
     public static final DateTimeFormatter DATE_MEDIUM = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM);
     public static final DateTimeFormatter TIME_MEDIUM = DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM);
     public static final DateTimeFormatter DATE_TIME_MEDIUM = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM);
+    public static final Function<LocalDate, String> LOCAL_DATE_FORMATTER = TimeUtils::format;
+    public static final Function<ParsedLocalDate, String> PARSED_LOCAL_DATE_FORMATTER = TimeUtils::format;
 
     /**
      * Formats the given {@link ParsedLocalDate} using {@link #format(LocalDate)} defaulting to the
@@ -83,10 +88,19 @@ public class TimeUtils {
     }
 
     /**
+     * Returns {@code true} when the given date is either {@code null} or its
+     * {@linkplain #format(ParsedLocalDate) string representation} is {@linkplain TextUtils#isBlank(String) blank}.
+     */
+    public static boolean isNullOrBlank(@Nullable ParsedLocalDate parsedLocalDate) {
+        return parsedLocalDate == null
+                || parsedLocalDate.getLocalDate() == null && TextUtils.isNullOrBlank(parsedLocalDate.getString());
+    }
+
+    /**
      * Simulates what would happen to the give {@link LocalDateTime} after being sent to and
      * processed by the server and then converted back to the users local time.
      */
-    public static LocalDateTime check(LocalDateTime dateTime) {
+    public static @NonNull LocalDateTime check(@NonNull LocalDateTime dateTime) {
         Instant instant = ZonedDateTime.of(dateTime, ZoneId.systemDefault()).toInstant();
         LocalDateTime serverLocalTime = ZonedDateTime.ofInstant(instant, NetworkConstants.SERVER_TIME_ZONE).toLocalDateTime();
         Instant serverZonedTime = ZonedDateTime.of(serverLocalTime, NetworkConstants.SERVER_TIME_ZONE).toInstant();

@@ -29,10 +29,7 @@ import com.jonahbauer.qed.networking.NetworkListener;
 import com.jonahbauer.qed.networking.Reason;
 import com.jonahbauer.qed.networking.exceptions.InvalidCredentialsException;
 import com.jonahbauer.qed.networking.login.QEDLogin;
-import com.jonahbauer.qed.util.MessageUtils;
-import com.jonahbauer.qed.util.Preferences;
-import com.jonahbauer.qed.util.TransitionUtils;
-import com.jonahbauer.qed.util.ViewUtils;
+import com.jonahbauer.qed.util.*;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
@@ -236,7 +233,7 @@ public class ChatFragment extends Fragment implements NetworkListener, AbsListVi
 
         String message = mBinding.messageInput.getText().toString();
 
-        if (!force && message.trim().isEmpty()) {
+        if (!force && TextUtils.isNullOrBlank(message)) {
             AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getContext());
             dialogBuilder.setMessage(R.string.chat_empty_message);
             dialogBuilder.setPositiveButton(R.string.yes, (d, which) -> {

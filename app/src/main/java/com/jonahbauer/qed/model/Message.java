@@ -198,6 +198,9 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
         return getBottag() != 0;
     }
 
+    /**
+     * @see com.jonahbauer.qed.util.MessageUtils#isAnonymous(String)
+     */
     public boolean isAnonymous() {
         return name.isEmpty();
     }

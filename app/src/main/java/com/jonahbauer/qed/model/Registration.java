@@ -15,6 +15,7 @@ import java.time.Instant;
 import com.jonahbauer.qed.model.parcel.ParcelExtensions;
 import com.jonahbauer.qed.model.util.ParsedLocalDate;
 import com.jonahbauer.qed.model.util.ParsedInstant;
+import com.jonahbauer.qed.util.TextUtils;
 import it.unimi.dsi.fastutil.Hash;
 import lombok.*;
 
@@ -124,19 +125,20 @@ public class Registration implements Parcelable {
     }
 
     public boolean hasAdditionalInformation() {
-        return (talks != null && !talks.trim().equals(""))
-                || (food != null && !food.trim().equals(""))
-                || (notes != null && !notes.trim().equals(""));
+        return !TextUtils.isNullOrBlank(talks)
+                || !TextUtils.isNullOrBlank(food)
+                || !TextUtils.isNullOrBlank(notes);
     }
 
     public boolean hasTransportInformation() {
-        return timeOfArrival != null || timeOfDeparture != null || overnightStays != null;
+        return timeOfArrival != null || timeOfDeparture != null || overnightStays != null
+                || !TextUtils.isNullOrBlank(sourceStation) || !TextUtils.isNullOrBlank(targetStation)
+                || !TextUtils.isNullOrBlank(railcard);
     }
 
     public boolean hasPaymentInformation() {
         return paymentAmount != null || paymentDone != null || paymentTime != null
-                || memberAbatement != null
-                || (otherAbatement != null && !otherAbatement.trim().equals(""));
+                || memberAbatement != null || !TextUtils.isNullOrBlank(otherAbatement);
     }
 
     @Override

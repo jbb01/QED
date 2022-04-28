@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import com.jonahbauer.qed.model.parcel.ParcelExtensions;
 import com.jonahbauer.qed.model.util.ParsedLocalDate;
+import com.jonahbauer.qed.util.TextUtils;
 import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenCustomHashSet;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -44,14 +45,16 @@ public class Event implements Comparable<Event>, Parcelable {
 
     private Instant loaded;
 
+    public boolean hasParticipants() {
+        return participants.size() != organizers.size();
+    }
+
     public boolean hasParticipantInformation() {
-        return participants.size() != organizers.size()
-                || (emailAll != null && !emailAll.trim().equals(""));
+        return hasParticipants() || !TextUtils.isNullOrBlank(emailAll);
     }
 
     public boolean hasOrganizerInformation() {
-        return !organizers.isEmpty()
-                || (emailOrga != null && !emailOrga.trim().equals(""));
+        return !organizers.isEmpty() || !TextUtils.isNullOrBlank(emailOrga);
     }
 
     @Override

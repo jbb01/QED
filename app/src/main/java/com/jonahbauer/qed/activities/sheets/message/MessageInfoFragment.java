@@ -8,11 +8,11 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.sheets.InfoFragment;
 import com.jonahbauer.qed.databinding.FragmentInfoMessageBinding;
 import com.jonahbauer.qed.model.Message;
 import com.jonahbauer.qed.model.viewmodel.MessageViewModel;
+import com.jonahbauer.qed.util.MessageUtils;
 import com.jonahbauer.qed.util.StatusWrapper;
 import com.jonahbauer.qed.util.Themes;
 
@@ -63,8 +63,7 @@ public class MessageInfoFragment extends InfoFragment {
 
     @Override
     protected CharSequence getTitle() {
-        var message = getMessage();
-        return message.isAnonymous() ? getText(R.string.message_name_anonymous) : message.getName();
+        return MessageUtils.formatName(requireContext(), getMessage());
     }
 
     @Override

@@ -88,10 +88,10 @@ public final class PersonListParser extends HtmlParser<List<Person>> {
                         } catch (Exception ignored) {}
 
 
-                        leavingDate: try {
+                        dateOfQuitting: try {
                             var element = columns.get(13).selectFirst("time");
-                            if (element == null) break leavingDate;
-                            person.setDateOfLeaving(parseLocalDate(element));
+                            if (element == null) break dateOfQuitting;
+                            person.setDateOfQuitting(parseLocalDate(element));
                         } catch (Exception ignored) {}
 
                         return person;
