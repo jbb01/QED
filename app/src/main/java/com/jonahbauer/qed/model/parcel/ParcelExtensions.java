@@ -85,32 +85,6 @@ public class ParcelExtensions {
         return source.readInt() != 0;
     }
 
-    /**
-     * Writes an {@code enum} to a parcel.
-     */
-    public static <T extends Enum<T>> void writeEnum(@NonNull Parcel dest, T value) {
-        if (value == null) {
-            dest.writeInt(VAL_NULL);
-        } else {
-            dest.writeInt(VAL_NON_NULL);
-            dest.writeInt(value.ordinal());
-        }
-    }
-
-    /**
-     * Reads an {@code enum} from a parcel.
-     */
-    public static <T extends Enum<T>> T readEnum(@NonNull Parcel source, IntFunction<T> getter) {
-        var flag = source.readInt();
-        if (flag == VAL_NULL) {
-            return null;
-        } else if (flag == VAL_NON_NULL) {
-            return getter.apply(source.readInt());
-        } else {
-            throw new RuntimeException("Could not read enum from parcel.");
-        }
-    }
-
     public static <T extends Parcelable> void writeTypedCollection(@NonNull Parcel dest, Collection<T> collection) {
         if (collection == null) {
             dest.writeInt(-1);

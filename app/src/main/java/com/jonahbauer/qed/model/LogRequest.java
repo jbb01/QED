@@ -17,6 +17,7 @@ import androidx.annotation.*;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.model.parcel.ParcelExtensions;
 import com.jonahbauer.qed.model.parcel.LambdaCreator;
+import com.jonahbauer.qed.model.parcel.ParcelableEnum;
 import com.jonahbauer.qed.networking.NetworkConstants;
 import com.jonahbauer.qed.util.TimeUtils;
 
@@ -45,7 +46,7 @@ public abstract class LogRequest implements Parcelable {
 
     public static final Creator<LogRequest> CREATOR = new LambdaCreator<>(LogRequest[]::new, source -> {
         var start = source.dataPosition();
-        var mode = source.readEnum(Mode::get);
+        var mode = source.readTypedObject(Mode.CREATOR);
         source.setDataPosition(start);
 
         switch (mode) {
@@ -66,7 +67,7 @@ public abstract class LogRequest implements Parcelable {
     }
 
     protected LogRequest(@NonNull Parcel parcel) {
-        mode = parcel.readEnum(Mode::get);
+        mode = parcel.readTypedObject(Mode.CREATOR);
         timestamp = parcel.readLong();
         query = parcel.readString();
     }
@@ -81,7 +82,7 @@ public abstract class LogRequest implements Parcelable {
     @Override
     @CallSuper
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeEnum(mode);
+        dest.writeTypedObject(mode, flags);
         dest.writeLong(timestamp);
         dest.writeString(query);
     }
@@ -133,15 +134,14 @@ public abstract class LogRequest implements Parcelable {
 
     @Getter
     @RequiredArgsConstructor
-    public enum Mode {
+    public enum Mode implements ParcelableEnum {
         POST_RECENT(R.string.log_request_mode_postrecent, "postrecent"),
         DATE_RECENT(R.string.log_request_mode_daterecent, "daterecent"),
         DATE_INTERVAL(R.string.log_request_mode_dateinterval, "dateinterval"),
         POST_INTERVAL(R.string.log_request_mode_postinterval, "postinterval"),
         SINCE_OWN(R.string.log_request_mode_sinceown, "fromownpost"),
         FILE(R.string.log_request_mode_file, "file");
-        private static final Mode[] VALUES = Mode.values();
-        public static Mode get(int ordinal) { return VALUES[ordinal]; }
+        public static final Parcelable.Creator<Mode> CREATOR = new ParcelableEnum.Creator<>(Mode.values(), Mode[]::new);
 
         private final @StringRes int stringRes;
         private final String query;

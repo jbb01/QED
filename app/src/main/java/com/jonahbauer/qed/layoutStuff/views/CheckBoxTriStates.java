@@ -14,10 +14,11 @@ import androidx.appcompat.content.res.AppCompatResources;
 
 import com.google.android.material.checkbox.MaterialCheckBox;
 import com.jonahbauer.qed.R;
-import com.jonahbauer.qed.model.parcel.ParcelExtensions;
+import com.jonahbauer.qed.model.parcel.LambdaCreator;
 
 import java.util.Objects;
 
+import com.jonahbauer.qed.model.parcel.ParcelableEnum;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -128,6 +129,8 @@ public class CheckBoxTriStates extends MaterialCheckBox {
     }
 
     static class SavedState extends BaseSavedState {
+        public static final Parcelable.Creator<SavedState> CREATOR = new LambdaCreator<>(SavedState[]::new, SavedState::new);
+
         State mState;
 
         SavedState(Parcelable superState) {
@@ -136,35 +139,22 @@ public class CheckBoxTriStates extends MaterialCheckBox {
 
         private SavedState(Parcel in) {
             super(in);
-            mState = ParcelExtensions.readEnum(in, State::get);
+            mState = in.readTypedObject(State.CREATOR);
         }
 
         @Override
         public void writeToParcel(Parcel out, int flags) {
             super.writeToParcel(out, flags);
-            ParcelExtensions.writeEnum(out, mState);
+            out.writeTypedObject(mState, flags);
         }
-
-        public static final Parcelable.Creator<SavedState> CREATOR = new Parcelable.Creator<>() {
-            @Override
-            public SavedState createFromParcel(Parcel in) {
-                return new SavedState(in);
-            }
-
-            @Override
-            public SavedState[] newArray(int size) {
-                return new SavedState[size];
-            }
-        };
     }
 
     @RequiredArgsConstructor
-    public enum State {
+    public enum State implements ParcelableEnum {
         UNKNOWN(null),
         UNCHECKED(false),
         CHECKED(true);
-        private static final State[] VALUES = State.values();
-        public static State get(int ordinal) { return VALUES[ordinal]; }
+        public static final Creator<State> CREATOR = new Creator<>(State.values(), State[]::new);
 
         private final Boolean value;
 

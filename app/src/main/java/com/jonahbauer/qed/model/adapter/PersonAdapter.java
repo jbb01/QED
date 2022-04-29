@@ -1,6 +1,7 @@
 package com.jonahbauer.qed.model.adapter;
 
 import android.content.Context;
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,7 @@ import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.databinding.ListItemPersonBinding;
 import com.jonahbauer.qed.layoutStuff.FixedHeaderAdapter;
 import com.jonahbauer.qed.model.Person;
+import com.jonahbauer.qed.model.parcel.ParcelableEnum;
 
 import java.util.List;
 import java.util.function.Function;
@@ -121,7 +123,8 @@ public class PersonAdapter extends FixedHeaderAdapter<Person, Character> {
         return true;
     }
 
-    public enum SortMode {
-        FIRST_NAME, LAST_NAME
+    public enum SortMode implements ParcelableEnum {
+        FIRST_NAME, LAST_NAME;
+        public static final Parcelable.Creator<SortMode> CREATOR = new Creator<>(SortMode.values(), SortMode[]::new);
     }
 }

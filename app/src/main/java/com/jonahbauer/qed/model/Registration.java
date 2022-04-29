@@ -14,6 +14,7 @@ import java.time.Instant;
 
 import com.jonahbauer.qed.model.parcel.ParcelExtensions;
 import com.jonahbauer.qed.model.parcel.LambdaCreator;
+import com.jonahbauer.qed.model.parcel.ParcelableEnum;
 import com.jonahbauer.qed.model.util.ParsedLocalDate;
 import com.jonahbauer.qed.model.util.ParsedInstant;
 import com.jonahbauer.qed.util.TextUtils;
@@ -150,7 +151,7 @@ public class Registration implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(id);
-        ParcelExtensions.writeEnum(dest, status);
+        dest.writeTypedObject(status, flags);
         dest.writeValue(organizer);
 
         dest.writeLong(eventId);
@@ -188,7 +189,7 @@ public class Registration implements Parcelable {
     public static final Creator<Registration> CREATOR = new LambdaCreator<>(Registration[]::new, source -> {
         Registration registration = new Registration(source.readLong());
 
-        registration.status = ParcelExtensions.readEnum(source, Status::get);
+        registration.status = source.readTypedObject(Status.CREATOR);
         registration.organizer = (Boolean) source.readValue(null);
 
         registration.eventId = source.readLong();
@@ -226,14 +227,12 @@ public class Registration implements Parcelable {
 
     @Getter
     @RequiredArgsConstructor
-    public enum Status {
+    public enum Status implements ParcelableEnum {
         PARTICIPATED(R.string.registration_status_participated, R.drawable.ic_event_member_confirmed, R.drawable.ic_registration_status_confirmed),
         CONFIRMED(R.string.registration_status_confirmed, R.drawable.ic_event_member_confirmed, R.drawable.ic_registration_status_confirmed),
         OPEN(R.string.registration_status_open, R.drawable.ic_event_member_open, R.drawable.ic_registration_status_open),
         CANCELLED(R.string.registration_status_cancelled, R.drawable.ic_event_member_opt_out, R.drawable.ic_registration_status_cancelled);
-
-        private static final Status[] VALUES = Status.values();
-        public static Status get(int ordinal) { return VALUES[ordinal]; }
+        public static final Parcelable.Creator<Status> CREATOR = new ParcelableEnum.Creator<>(Status.values(), Status[]::new);
 
         private final @StringRes int stringRes;
         private final @DrawableRes int drawableRes;

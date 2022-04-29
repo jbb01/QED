@@ -8,6 +8,12 @@ import lombok.RequiredArgsConstructor;
 import java.util.function.Function;
 import java.util.function.IntFunction;
 
+/**
+ * This class can be used to reduce the boilerplate of implementing the {@link Parcelable} interface.
+ * When the implementing class has a constructor that accepts a {@link Parcel} as its single argument,
+ * the {@link Parcelable.Creator} can be implemented like this
+ * <pre>public static final Creator&lt;T&gt; CREATOR = new LambdaCreator&lt;&gt;(T[]::new, T::new)</pre>
+ */
 @RequiredArgsConstructor
 public class LambdaCreator<T> implements Parcelable.Creator<T> {
     private final @NonNull IntFunction<T[]> newArray;
