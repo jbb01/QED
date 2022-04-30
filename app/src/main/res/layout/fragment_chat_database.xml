@@ -237,7 +237,7 @@
             android:visibility="@{status == StatusWrapper.STATUS_PRELOADED}" />
 
         <ListView
-            android:id="@+id/message_list_view"
+            android:id="@+id/list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/database_search_filters"

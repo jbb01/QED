@@ -21,7 +21,6 @@ import com.jonahbauer.qed.util.*;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 import java.time.*;
-import java.util.ArrayList;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -78,15 +77,15 @@ public class ChatDatabaseFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         // setup list view
-        mMessageAdapter = new MessageAdapter(requireContext(), new ArrayList<>(), null, false, null, true);
-        mBinding.messageListView.setOnItemClickListener((parent, v, position, id) -> {
+        mMessageAdapter = new MessageAdapter(mBinding.list, null, false, null, true);
+        mBinding.list.setOnItemClickListener((parent, v, position, id) -> {
             setCheckedItem(MessageAdapter.INVALID_POSITION);
         });
-        mBinding.messageListView.setOnItemLongClickListener((parent, v, position, id) -> {
+        mBinding.list.setOnItemLongClickListener((parent, v, position, id) -> {
             setCheckedItem(position);
             return true;
         });
-        mBinding.messageListView.setAdapter(mMessageAdapter);
+        mBinding.list.setAdapter(mMessageAdapter);
 
         mBinding.searchButton.setOnClickListener(v -> search());
 
@@ -134,7 +133,7 @@ public class ChatDatabaseFragment extends Fragment {
         mMessageListViewModel.setCheckedItemPosition(position);
         MessageUtils.setCheckedItem(
                 this,
-                mBinding.messageListView,
+                mBinding.list,
                 mMessageAdapter,
                 (mode, msg) -> NavHostFragment.findNavController(this)
                                               .navigate(ChatDatabaseFragmentDirections.showMessage(msg)),

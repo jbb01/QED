@@ -64,7 +64,8 @@
                     android:scrollbarStyle="outsideInset"
                     android:transcriptMode="normal"
                     android:transitionGroup="true"
-                    android:visibility="@{!loading}" />
+                    android:visibility="@{!loading}"
+                    tools:listitem="@layout/list_item_message"/>
             </FrameLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout

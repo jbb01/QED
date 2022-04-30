@@ -110,7 +110,7 @@ public class ChatFragment extends Fragment implements NetworkListener, AbsListVi
         mBinding.quickSettings.setOnClickListener(this::toggleQuickSettingsShown);
         setQuickSettingsShown(mQuickSettingsShown);
 
-        mMessageAdapter = new MessageAdapter(view.getContext(), new ArrayList<>(), mBinding.mathPreload);
+        mMessageAdapter = new MessageAdapter(mBinding.list, mBinding.mathPreload);
         mBinding.list.setAdapter(mMessageAdapter);
         mBinding.list.setOnScrollListener(this);
         mBinding.list.setOnItemClickListener((parent, v, position, id) -> {

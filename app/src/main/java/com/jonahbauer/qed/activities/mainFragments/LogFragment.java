@@ -24,7 +24,6 @@ import com.jonahbauer.qed.util.*;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
-import java.util.ArrayList;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -90,7 +89,7 @@ public class LogFragment extends Fragment {
              .getLiveData(LOG_REQUEST_KEY, DEFAULT_REQUEST)
              .observe(getViewLifecycleOwner(), mLogViewModel::load);
 
-        mMessageAdapter = new MessageAdapter(requireContext(), new ArrayList<>(), null, false, null, false);
+        mMessageAdapter = new MessageAdapter(mBinding.list, null, false, null, false);
         mBinding.list.setAdapter(mMessageAdapter);
         mBinding.list.setOnItemClickListener((parent, view1, position, id) -> {
             setCheckedItem(MessageAdapter.INVALID_POSITION);

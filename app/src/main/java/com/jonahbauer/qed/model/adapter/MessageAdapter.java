@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
@@ -23,7 +24,6 @@ import com.jonahbauer.qed.model.Message;
 import com.jonahbauer.qed.util.Preferences;
 import com.jonahbauer.qed.util.ViewUtils;
 
-import java.lang.ref.WeakReference;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -33,14 +33,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
-import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-
 public class MessageAdapter extends ArrayAdapter<Message> {
     public static final int INVALID_POSITION = -1;
 
     private final Context mContext;
-    private final List<Message> mMessageList;
+    private final ListView mListView;
+    private final List<Message> mData;
 
     // Date Banners
     private final DateTimeFormatter mDateBannerFormat = DateTimeFormatter
@@ -63,16 +61,20 @@ public class MessageAdapter extends ArrayAdapter<Message> {
     private final LinearLayout mathPreload;
 
     private int mCheckedItemPosition = INVALID_POSITION;
-    private final Int2ObjectMap<WeakReference<View>> mViews = new Int2ObjectArrayMap<>();
 
-    public MessageAdapter(Context context, @NonNull List<Message> messageList, @Nullable LinearLayout mathPreload) {
-        this(context, messageList, mathPreload, null, null, false);
+    public MessageAdapter(@NonNull ListView list, @Nullable LinearLayout mathPreload) {
+        this(list, mathPreload, null, null, false);
     }
 
-    public MessageAdapter(Context context, @NonNull List<Message> messageList, @Nullable LinearLayout mathPreload, @Nullable Boolean katex, @Nullable Boolean linkify, boolean extended) {
-        super(context, 0, messageList);
-        this.mContext = context;
-        this.mMessageList = messageList;
+    public MessageAdapter(@NonNull ListView list, @Nullable LinearLayout mathPreload, @Nullable Boolean katex, @Nullable Boolean linkify, boolean extended) {
+        this(list, new ArrayList<>(100), mathPreload, katex, linkify, extended);
+    }
+
+    private MessageAdapter(@NonNull ListView list, @NonNull List<Message> data, @Nullable LinearLayout mathPreload, @Nullable Boolean katex, @Nullable Boolean linkify, boolean extended) {
+        super(list.getContext(), 0, data);
+        this.mContext = list.getContext();
+        this.mListView = list;
+        this.mData = data;
         this.mathPreload = mathPreload;
 
         this.mExtended = extended;
@@ -143,7 +145,7 @@ public class MessageAdapter extends ArrayAdapter<Message> {
         binding.message.setLayoutParams(lp);
 
         var previousMessage = position == 0 ? null : getItem(position - 1);
-        if (previousMessage == null || message.getLocalDate().isAfter(previousMessage.getLocalDate())) {
+        if (previousMessage == null || !Objects.equals(message.getLocalDate(), previousMessage.getLocalDate())) {
             binding.messageDateBanner.setVisibility(View.VISIBLE);
             binding.messageDateBanner.setText(formatBanner(message.getLocalDate()));
         } else {
@@ -176,13 +178,13 @@ public class MessageAdapter extends ArrayAdapter<Message> {
         view.setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
 
         var root = mExtended ? view : (View) view.getParent();
-        savePosition(position, view);
+        savePosition(position, root);
         root.setActivated(position == mCheckedItemPosition);
         return root;
     }
 
     public List<Message> getData() {
-        return new ArrayList<>(mMessageList);
+        return new ArrayList<>(mData);
     }
 
     @Override
@@ -233,7 +235,7 @@ public class MessageAdapter extends ArrayAdapter<Message> {
         MathView.clearCache();
         if (mathPreload != null) mathPreload.removeAllViews();
         if (mKatex && !mExtended) {
-            for (Message message : mMessageList) {
+            for (Message message : mData) {
                 preloadMath(message);
             }
         }
@@ -261,13 +263,6 @@ public class MessageAdapter extends ArrayAdapter<Message> {
     }
 
     private void savePosition(int position, View view) {
-        var oldPosition = (int) Objects.requireNonNullElse(view.getTag(R.id.tag_position), -1);
-        var oldPositionViewRef = mViews.get(oldPosition);
-        if (oldPositionViewRef != null && oldPositionViewRef.get() == view) {
-            mViews.remove(oldPosition);
-        }
-
-        mViews.put(position, new WeakReference<>(view));
         view.setTag(R.id.tag_position, position);
     }
 
@@ -292,16 +287,17 @@ public class MessageAdapter extends ArrayAdapter<Message> {
     }
 
     private @Nullable View getViewForPosition(int position) {
-        var viewRef = mViews.get(position);
-        if (viewRef != null) {
-            var view = viewRef.get();
-            if (view != null) {
-                return view;
-            } else {
-                mViews.remove(position);
-            }
+        var firstPosition = mListView.getFirstVisiblePosition();
+        var lastPosition = firstPosition + mListView.getChildCount() - 1;
+
+        if (position < firstPosition || position > lastPosition) {
+            return null;
+        } else {
+            var out = mListView.getChildAt(position - firstPosition);
+            var viewPosition = (int) out.getTag(R.id.tag_position);
+            if (viewPosition != position) throw new RuntimeException();
+            return out;
         }
-        return null;
     }
 
 }
