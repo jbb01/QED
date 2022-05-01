@@ -17,17 +17,22 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-import io.reactivex.rxjava3.core.ObservableEmitter;
-import io.reactivex.rxjava3.core.ObservableOnSubscribe;
+import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.exceptions.Exceptions;
+import io.reactivex.rxjava3.functions.Consumer;
+import io.reactivex.rxjava3.internal.util.ExceptionHelper;
+import io.reactivex.rxjava3.observables.ConnectableObservable;
+import io.reactivex.rxjava3.subjects.PublishSubject;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
 
-public class ChatWebSocket extends WebSocketListener implements ObservableOnSubscribe<Message> {
+public class ChatWebSocket extends ConnectableObservable<Message> {
     private static final String LOG_TAG = ChatWebSocket.class.getName();
 
     private static final String PING = "{\"type\":\"ping\"}";
@@ -35,28 +40,30 @@ public class ChatWebSocket extends WebSocketListener implements ObservableOnSubs
 
     private final String mChannel;
 
-    private ObservableEmitter<Message> mEmitter;
-
     private WebSocket mWebSocket;
+    private final Listener mWebSocketListener = new Listener();
 
-    private long mPosition = -100;
-    private boolean mSending;
+    private volatile long mPosition = -100;
+    private final AtomicBoolean mSending = new AtomicBoolean(true);
+    private final AtomicBoolean mConnected = new AtomicBoolean(false);
+    private final AtomicBoolean mOpen = new AtomicBoolean(false);
+
+    private PublishSubject<Message> mPublishSubject = PublishSubject.create();
 
     public ChatWebSocket(String channel) {
         this.mChannel = channel;
-        this.mSending = true;
     }
 
     @Override
-    public void subscribe(@NonNull ObservableEmitter<Message> emitter) {
-        mEmitter = emitter;
-        mEmitter.setDisposable(Disposable.fromRunnable(this::close));
-
-        connect();
+    protected void subscribeActual(@NonNull Observer<? super Message> observer) {
+        mPublishSubject.subscribe(observer);
     }
 
-    private void connect() {
-        mPosition = - 100;
+    @Override
+    public void connect(@NonNull Consumer<? super Disposable> connection) {
+        if (!mConnected.compareAndSet(false, true)) {
+            throw new IllegalStateException();
+        }
 
         OkHttpClient client = new OkHttpClient.Builder()
                 .pingInterval(30, TimeUnit.SECONDS)
@@ -79,74 +86,42 @@ public class ChatWebSocket extends WebSocketListener implements ObservableOnSubs
         } catch (URISyntaxException | IOException ignored) {}
 
         // start socket
-        mWebSocket = client.newWebSocket(request.build(), this);
+        mWebSocket = client.newWebSocket(request.build(), mWebSocketListener);
         mWebSocket.send(PING);
+
+        try {
+            connection.accept(Disposable.fromAction(this::close));
+        } catch (Throwable ex) {
+            Exceptions.throwIfFatal(ex);
+            throw ExceptionHelper.wrapOrThrow(ex);
+        }
     }
 
-    private void close() {
+    @Override
+    public void reset() {
+        if (mPublishSubject.hasComplete() || mPublishSubject.hasThrowable()) {
+            mPosition = -100;
+            mWebSocket = null;
+            mConnected.set(false);
+            mOpen.set(false);
+            mPublishSubject = PublishSubject.create();
+        }
+    }
+
+    public void close() {
         if (mWebSocket != null) {
             mWebSocket.close(1001, null);
-        }
-    }
-
-    @Override
-    public void onOpen(@NonNull WebSocket webSocket, @NonNull Response response) {
-        if (BuildConfig.DEBUG) Log.d(LOG_TAG, "WebSocket opened.");
-    }
-
-    @Override
-    public void onMessage(@NonNull WebSocket webSocket, @NonNull String text) {
-        if (BuildConfig.DEBUG) Log.d(LOG_TAG, text);
-
-        Message message = Message.parseJsonMessage(text);
-        if (message == null) return;
-
-        switch (message.getType()) {
-            case PING:
-                webSocket.send(PONG);
-                break;
-            case ACK:
-                mSending = false;
-                break;
-            case PONG:
-                mSending = false;
-                mEmitter.onNext(message);
-                break;
-            case POST:
-                if (message.getId() < mPosition) break;
-                mPosition = message.getId() + 1;
-                mEmitter.onNext(message);
-                break;
-        }
-    }
-
-    @Override
-    public void onClosing(@NonNull WebSocket webSocket, int code, @NonNull String reason) {
-        webSocket.close(code, reason);
-    }
-
-    @Override
-    public void onClosed(@NonNull WebSocket webSocket, int code, @NonNull String reason) {
-        if (BuildConfig.DEBUG) Log.d(LOG_TAG, "WebSocket closed.");
-
-        if (code == 4000 && reason.contains("Ungültige Anmeldedaten")) {
-            mEmitter.onError(new InvalidCredentialsException());
         } else {
-            mEmitter.onComplete();
+            mPublishSubject.onComplete();
         }
     }
 
-    @Override
-    public void onFailure(@NonNull WebSocket webSocket, @NonNull Throwable t, Response response) {
-        if (BuildConfig.DEBUG) Log.d(LOG_TAG, "WebSocket failure.", t);
-
-        mEmitter.onError(t);
+    public boolean isOpen() {
+        return mOpen.get();
     }
 
     public boolean send(String name, String message, boolean publicId) {
-        if (!mSending) try {
-            mSending = true;
-
+        if (mSending.compareAndSet(false, true)) try {
             JSONObject json = new JSONObject();
             json.put("channel", mChannel);
             json.put("name", name);
@@ -155,10 +130,71 @@ public class ChatWebSocket extends WebSocketListener implements ObservableOnSubs
             json.put("publicid", publicId ? 1 : 0);
             return mWebSocket.send(json.toString());
         } catch (JSONException e) {
-            mSending = false;
+            mSending.set(false);
             Log.e(LOG_TAG, "Unable to create JSON message.", e);
             return false;
         }
         return false;
+    }
+
+    private class Listener extends WebSocketListener {
+
+        @Override
+        public void onOpen(@NonNull WebSocket webSocket, @NonNull Response response) {
+            if (BuildConfig.DEBUG) Log.d(LOG_TAG, "WebSocket opened.");
+            mOpen.set(true);
+        }
+
+        @Override
+        public void onMessage(@NonNull WebSocket webSocket, @NonNull String text) {
+            if (BuildConfig.DEBUG) Log.d(LOG_TAG, text);
+
+            Message message = Message.parseJsonMessage(text);
+            if (message == null) return;
+
+            switch (message.getType()) {
+                case PING:
+                    webSocket.send(PONG);
+                    break;
+                case ACK:
+                    mSending.set(false);
+                    break;
+                case PONG:
+                    mSending.set(false);
+                    mPublishSubject.onNext(message);
+                    break;
+                case POST:
+                    if (message.getId() < mPosition) break;
+                    mPosition = message.getId() + 1;
+                    mPublishSubject.onNext(message);
+                    break;
+            }
+        }
+
+        @Override
+        public void onClosing(@NonNull WebSocket webSocket, int code, @NonNull String reason) {
+            webSocket.close(code, reason);
+        }
+
+        @Override
+        public void onClosed(@NonNull WebSocket webSocket, int code, @NonNull String reason) {
+            if (BuildConfig.DEBUG) Log.d(LOG_TAG, "WebSocket closed.");
+
+            if (code == 4000 && reason.contains("Ungültige Anmeldedaten")) {
+                mPublishSubject.onError(new InvalidCredentialsException());
+            } else {
+                mPublishSubject.onComplete();
+            }
+
+            mOpen.set(false);
+        }
+
+        @Override
+        public void onFailure(@NonNull WebSocket webSocket, @NonNull Throwable t, Response response) {
+            if (BuildConfig.DEBUG) Log.d(LOG_TAG, "WebSocket failure.", t);
+
+            mPublishSubject.onError(t);
+            mOpen.set(false);
+        }
     }
 }

@@ -1,15 +1,11 @@
 package com.jonahbauer.qed.activities.mainFragments;
 
-import android.app.Activity;
-import android.content.Context;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.util.Log;
 import android.view.*;
 import android.widget.AbsListView;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -18,49 +14,28 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 import com.google.android.material.snackbar.Snackbar;
 import com.jonahbauer.qed.R;
-import com.jonahbauer.qed.activities.MainActivity;
 import com.jonahbauer.qed.databinding.FragmentChatBinding;
 import com.jonahbauer.qed.model.Message;
 import com.jonahbauer.qed.model.adapter.MessageAdapter;
-import com.jonahbauer.qed.model.room.Database;
-import com.jonahbauer.qed.networking.ChatWebSocket;
-import com.jonahbauer.qed.networking.Feature;
+import com.jonahbauer.qed.model.viewmodel.ChatViewModel;
 import com.jonahbauer.qed.networking.NetworkListener;
-import com.jonahbauer.qed.networking.Reason;
-import com.jonahbauer.qed.networking.exceptions.InvalidCredentialsException;
-import com.jonahbauer.qed.networking.login.QEDLogin;
 import com.jonahbauer.qed.util.*;
+
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
-import io.reactivex.rxjava3.schedulers.Schedulers;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class ChatFragment extends Fragment implements NetworkListener, AbsListView.OnScrollListener {
-    private static final String LOG_TAG = ChatFragment.class.getName();
-
-    private final Handler mHandler = new Handler(Looper.getMainLooper());
-
+    private ChatViewModel mChatViewModel;
     private FragmentChatBinding mBinding;
 
-    private ChatWebSocket mWebSocket;
-    private final CompositeDisposable mDisposable = new CompositeDisposable();
-
-    private boolean mInitDone = false;
-    private List<Message> mInitMessages;
     private MessageAdapter mMessageAdapter;
-
-    private long mTopPosition = Long.MAX_VALUE;
-    private long mLastPostId;
-
     private boolean mQuickSettingsShown = false;
 
     @Nullable
     private MenuItem mRefreshButton;
-    private int mRetryCount = 0;
+
+    private @NonNull Disposable mDisposable = Disposable.disposed();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -74,23 +49,18 @@ public class ChatFragment extends Fragment implements NetworkListener, AbsListVi
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mBinding = FragmentChatBinding.inflate(inflater, container, false);
+        mChatViewModel = ViewUtils.getViewModelProvider(this, R.id.nav_chat).get(ChatViewModel.class);
         return mBinding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        mBinding.messageInput.setOnClickListener(v -> {
-            if (mBinding.list.getLastVisiblePosition() >= mMessageAdapter.getCount() - 1) {
-                mHandler.postDelayed(() -> mBinding.list.setSelection(mMessageAdapter.getCount() - 1), 100);
-            }
-        });
         mBinding.buttonSend.setOnClickListener(v -> send());
 
-        Context context = requireContext();
         // setup quick settings
         mBinding.quickSettingsName.setOnClickListener(v -> {
             ViewUtils.showPreferenceDialog(
-                    context,
+                    requireContext(),
                     R.string.preferences_chat_name_title,
                     () -> Preferences.chat().getName(),
                     (str) -> Preferences.chat().edit().setName(str).apply()
@@ -98,13 +68,10 @@ public class ChatFragment extends Fragment implements NetworkListener, AbsListVi
         });
         mBinding.quickSettingsChannel.setOnClickListener(v -> {
             ViewUtils.showPreferenceDialog(
-                    context,
+                    requireContext(),
                     R.string.preferences_chat_channel_title,
                     () -> Preferences.chat().getChannel(),
-                    (str) -> {
-                        Preferences.chat().edit().setChannel(str).apply();
-                        reload();
-                    }
+                    (str) -> Preferences.chat().edit().setChannel(str).apply()
             );
         });
         mBinding.quickSettings.setOnClickListener(this::toggleQuickSettingsShown);
@@ -120,21 +87,29 @@ public class ChatFragment extends Fragment implements NetworkListener, AbsListVi
             setCheckedItem(position);
             return true;
         });
-        mInitMessages = new ArrayList<>(100);
 
-        mBinding.scrollDownButton.setOnClickListener(v -> scrollDown());
+        mBinding.scrollDownButton.setOnClickListener(v -> smoothScrollDown());
+
+        mChatViewModel.getMessageRX().observe(getViewLifecycleOwner(), observable -> {
+            if (observable != null) {
+                reloadView(observable);
+            }
+        });
+        mChatViewModel.getReady().observe(getViewLifecycleOwner(), mBinding::setReady);
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        reload();
+        if (!mChatViewModel.isOpen()) {
+            reconnect();
+        }
     }
 
     @Override
-    public void onStop() {
-        mDisposable.clear();
-        super.onStop();
+    public void onDestroyView() {
+        super.onDestroyView();
+        mDisposable.dispose();
     }
 
     @Override
@@ -148,74 +123,63 @@ public class ChatFragment extends Fragment implements NetworkListener, AbsListVi
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.menu_refresh) {
             mRefreshButton = item;
-            item.setEnabled(false);
+            mRefreshButton.setEnabled(false);
 
             Drawable icon = mRefreshButton.getIcon();
             if (icon instanceof Animatable) ((Animatable) icon).start();
 
-            mRetryCount = 0;
-
-            reload();
+            reconnect();
             return true;
         }
-        return super.onOptionsItemSelected(item);
+        return false;
     }
 
     /**
      * Reconnects to the chat web socket
      */
-    private void reload() {
-        Activity activity = getActivity();
-        if (activity instanceof MainActivity) {
-            MainActivity mainActivity = (MainActivity) activity;
-            mainActivity.finishActionMode();
-        }
+    private void reconnect() {
+        mChatViewModel.disconnect();
+        mChatViewModel.connect();
+    }
 
-        mDisposable.clear();
-
-        assert activity != null;
-
-        mInitMessages.clear();
-        mMessageAdapter.clear();
+    /**
+     * Reloads the view and reconnect to the view model without affecting the underlying websocket connection
+     */
+    private void reloadView(Observable<Message> messageRx) {
         setCheckedItem(MessageAdapter.INVALID_POSITION);
-        mInitDone = false;
-        mBinding.setLoading(true);
-
-        mWebSocket = new ChatWebSocket(Preferences.chat().getChannel());
-        mDisposable.addAll(
-                Observable.create(mWebSocket)
-                          .subscribeOn(Schedulers.io())
-                          .observeOn(Schedulers.computation())
-                          .map(MessageUtils.dateFixer()::apply)
-                          .observeOn(AndroidSchedulers.mainThread())
-                          .subscribe(
-                                  msg -> {
-                                      addPost(msg, mInitDone);
-                                      if (mLastPostId < msg.getId()) mLastPostId = msg.getId();
-                                  },
-                                  err -> {
-                                      error(getString(Reason.guess(err).getStringRes()));
-                                      if (err instanceof InvalidCredentialsException) {
-                                          if (mRetryCount++ == 0) {
-                                              mDisposable.add(
-                                                      QEDLogin.loginAsync(Feature.CHAT, success -> reload())
-                                              );
-                                          }
-                                      }
-                                  },
-                                  () -> error(getString(R.string.chat_websocket_closed))
-                          ),
-                Disposable.fromRunnable(() -> mWebSocket = null)
-        );
-
-        mBinding.setReady(true);
-        ViewUtils.setError(mBinding.messageInput, false);
-
+        mMessageAdapter.clear();
         mMessageAdapter.notifyDataSetChanged();
+        if (mRefreshButton != null) mRefreshButton.setEnabled(true);
+        ViewUtils.setError(mBinding.messageInput, false);
+        mDisposable.dispose();
 
-        if (mRefreshButton != null) {
-            mRefreshButton.setEnabled(true);
-        }
+        mBinding.setLoading(true);
+        mDisposable = messageRx
+                .filter(message -> !message.isBot() || !Preferences.chat().isSense())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(message -> {
+                    var oldCount = mMessageAdapter.getCount();
+
+                    switch (message.getType()) {
+                        case POST: {
+                            mMessageAdapter.add(message);
+                            if (!mBinding.getLoading()) {
+                                mMessageAdapter.notifyDataSetChanged();
+                                maybeScrollDown(oldCount);
+                            }
+                            break;
+                        }
+                        case ERROR:
+                            mMessageAdapter.add(message);
+                            // fall through
+                        case PONG: {
+                            mBinding.setLoading(false);
+                            mMessageAdapter.notifyDataSetChanged();
+                            scrollDown();
+                            break;
+                        }
+                    }
+                });
     }
 
     private void send() {
@@ -245,12 +209,7 @@ public class ChatFragment extends Fragment implements NetworkListener, AbsListVi
             return;
         }
 
-        boolean success = mWebSocket.send(
-                Preferences.chat().getName(),
-                message,
-                Preferences.chat().isPublicId()
-        );
-        if (success) {
+        if (mChatViewModel.send(message)) {
             ViewUtils.setError(mBinding.messageInput, false);
             mBinding.messageInput.setText("");
             mBinding.messageInput.requestFocus();
@@ -260,66 +219,9 @@ public class ChatFragment extends Fragment implements NetworkListener, AbsListVi
     }
 
     /**
-     * Appends the given message to the list. The post will also be written to the chat database
-     *
-     * @param message the message to be appended
-     * @param notify if {@link MessageAdapter#notifyDataSetChanged()} should be called
+     * Copies the message in {@linkplain MessageUtils#copyFormat(Message) reply format} and inserts
+     * it at the beginning of the message input.
      */
-    private void addPost(@NonNull Message message, boolean notify) {
-        if (getContext() == null) return;
-
-        // insert recent messages in bulk
-        if (message.getType() == Message.Type.PONG) {
-            if (!mInitDone) {
-                mInitDone = true;
-                mInitMessages.removeIf(msg -> msg.getType() != Message.Type.POST);
-                if (Preferences.chat().isSense()) {
-                    mInitMessages.removeIf(Message::isBot);
-                }
-
-                mMessageAdapter.clear();
-                mMessageAdapter.addAll(mInitMessages);
-                mMessageAdapter.notifyDataSetChanged();
-                setCheckedItem(MessageAdapter.INVALID_POSITION);
-
-                mBinding.list.setSelection(mInitMessages.size() - 1);
-
-                //noinspection ResultOfMethodCallIgnored
-                Database.getInstance(requireContext()).messageDao().insert(mInitMessages)
-                        .doFinally(() -> mInitMessages.clear())
-                        .subscribeOn(Schedulers.io())
-                        .subscribe(
-                                () -> {},
-                                e -> Log.e(LOG_TAG, "Error inserting messages into database.", e)
-                        );
-
-                mBinding.setLoading(false);
-            }
-
-            return;
-        }
-
-        if (!mInitDone) {
-            mInitMessages.add(message);
-            return;
-        }
-
-        if (message.getType() == Message.Type.POST) {
-            //noinspection ResultOfMethodCallIgnored
-            Database.getInstance(requireContext()).messageDao().insert(message)
-                    .subscribeOn(Schedulers.io())
-                    .subscribe(() -> {}, e -> Log.e(LOG_TAG, "Error inserting message into database.", e));
-        }
-
-        if (message.getId() < mTopPosition) mTopPosition = message.getId();
-        if (message.isBot() && Preferences.chat().isSense()) return;
-
-        mHandler.post(() -> {
-            mMessageAdapter.add(message);
-            if (notify) mMessageAdapter.notifyDataSetChanged();
-        });
-    }
-
     private void reply(@NonNull ActionMode actionMode, @NonNull Message message) {
         var reply = MessageUtils.copyFormat(message);
         var text = mBinding.messageInput.getEditableText();
@@ -353,8 +255,11 @@ public class ChatFragment extends Fragment implements NetworkListener, AbsListVi
 
     @Override
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-        if (totalItemCount - visibleItemCount - firstVisibleItem > 0) mBinding.scrollDownButton.show();
-        else mBinding.scrollDownButton.hide();
+        if (totalItemCount - visibleItemCount - firstVisibleItem > 0) {
+            mBinding.scrollDownButton.show();
+        } else {
+            mBinding.scrollDownButton.hide();
+        }
     }
 
     //<editor-fold desc="Network Listener" defaultstate="collapsed">
@@ -365,7 +270,7 @@ public class ChatFragment extends Fragment implements NetworkListener, AbsListVi
 
     @Override
     public void onConnectionRegain() {
-        reload();
+        reconnect();
     }
     //</editor-fold>
 
@@ -387,23 +292,21 @@ public class ChatFragment extends Fragment implements NetworkListener, AbsListVi
         );
     }
 
-    private void scrollDown() {
+    private void smoothScrollDown() {
         mBinding.list.smoothScrollToPositionFromTop(mMessageAdapter.getCount(), 0, 250);
     }
 
-    /**
-     * Appends a chat post that resembles an error with the given error message
-     *
-     * @param message a meaningful error message
-     */
-    private void error(String message) {
-        mDisposable.clear();
-        mInitDone = true;
+    private void maybeScrollDown(int oldCount) {
+        int newCount = mMessageAdapter.getCount();
+        mBinding.list.post(() -> {
+            if (mBinding.list.getLastVisiblePosition() >= oldCount) {
+                mBinding.list.setSelection(newCount - 1);
+            }
+        });
+    }
 
-        addPost(Message.newErrorMessage(message), true);
-
-        mBinding.setReady(false);
-        mBinding.setLoading(false);
+    private void scrollDown() {
+        mBinding.list.setSelection(mMessageAdapter.getCount() - 1);
     }
     //</editor-fold>
 }

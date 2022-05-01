@@ -18,7 +18,7 @@ public class Preferences {
     private static Gallery mGallery;
 
     public static void init(SharedPreferences sharedPreferences, Resources resources) {
-        if (mInitialized) throw new IllegalStateException("PasswordStorage is already initialized.");
+        if (mInitialized) throw new IllegalStateException("Preferences are already initialized.");
         mSharedPreferences = sharedPreferences;
 
         mGeneral = new General(resources);
@@ -41,6 +41,11 @@ public class Preferences {
     public static Gallery gallery() {
         if (!mInitialized) throw new IllegalStateException("Preferences are not initialized.");
         return mGallery;
+    }
+
+    public static SharedPreferences getSharedPreferences() {
+        if (!mInitialized) throw new IllegalStateException("Preferences are not initialized.");
+        return mSharedPreferences;
     }
 
     public static class General {
