@@ -89,6 +89,7 @@ public class MaterialListItem extends ViewGroup {
 
         this.mIconView = new ImageView(context);
         this.mIconView.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
+        this.mIconView.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
         this.mIconTextView = new TextView(context);
         this.mIconTextView.setSingleLine();

@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.Animatable;
+import android.os.SystemClock;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -235,25 +236,90 @@ public class ViewUtils {
         });
     }
 
-    public static void showPreferenceDialog(@NonNull Context context, @StringRes int title, @NonNull Supplier<String> getter, Consumer<String> setter) {
-        AlertDialog.Builder dialog = new AlertDialog.Builder(context);
-        dialog.setTitle(title);
+    @NonNull
+    public static AlertDialog createPreferenceDialog(
+            @NonNull Context context,
+            @StringRes int title,
+            @NonNull Supplier<String> getter,
+            @NonNull Consumer<String> setter
+    ) {
+        var builder = new AlertDialog.Builder(context);
+        builder.setTitle(title);
 
         var binding = AlertDialogEditTextBinding.inflate(LayoutInflater.from(context));
-        binding.input.setText(getter.get());
-        binding.input.requestFocus();
-        binding.input.setSelection(binding.input.getText().length());
+        builder.setView(binding.getRoot());
 
         var imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,0);
-
-        dialog.setView(binding.getRoot());
-        dialog.setPositiveButton(R.string.ok, (d, which) -> {
-            setter.accept(binding.input.getText().toString());
-            d.dismiss();
+        builder.setPositiveButton(R.string.ok, (d, which) -> {
+            var value = binding.input.getText().toString();
+            setter.accept(value);
+            // hiding the ime in onDismiss would be nicer but doesn't work, so we have to do it
+            // in both button listeners
+            imm.hideSoftInputFromWindow(binding.getRoot().getWindowToken(), 0);
         });
-        dialog.setNegativeButton(R.string.cancel, (d, which) -> d.cancel());
-        dialog.show();
+        builder.setNegativeButton(R.string.cancel, (d, which) -> {
+            imm.hideSoftInputFromWindow(binding.getRoot().getWindowToken(), 0);
+        });
+
+        // handle showing the ime analogous to EditTextPreferenceDialogFragmentCompat
+        var showSoftInputRunnable = new Runnable() {
+            private static final long SHOW_REQUEST_TIMEOUT = 1000;
+            private long mShowRequestTime = -1;
+
+            private boolean hasPendingShowSoftInputRequest() {
+                return (mShowRequestTime != -1 && ((mShowRequestTime + SHOW_REQUEST_TIMEOUT)
+                        > SystemClock.currentThreadTimeMillis()));
+            }
+
+            private void setPendingShowSoftInputRequest(boolean pendingShowSoftInputRequest) {
+                mShowRequestTime = pendingShowSoftInputRequest ? SystemClock.currentThreadTimeMillis() : -1;
+            }
+
+            private void scheduleShowSoftInput() {
+                setPendingShowSoftInputRequest(true);
+                scheduleShowSoftInputInner();
+            }
+
+            private void scheduleShowSoftInputInner() {
+                var editText = binding.input;
+                if (hasPendingShowSoftInputRequest()) {
+                    if (!editText.isFocused()) {
+                        setPendingShowSoftInputRequest(false);
+                        return;
+                    }
+                    // Schedule showSoftInput once the input connection of the editor established.
+                    if (imm.showSoftInput(editText, 0)) {
+                        setPendingShowSoftInputRequest(false);
+                    } else {
+                        editText.removeCallbacks(this);
+                        editText.postDelayed(this, 50);
+                    }
+                }
+            }
+
+            @Override
+            public void run() {
+                scheduleShowSoftInputInner();
+            }
+        };
+
+        var dialog = builder.create();
+        dialog.setOnShowListener(d -> {
+            binding.input.setText(getter.get());
+            binding.input.requestFocus();
+            binding.input.setSelection(binding.input.getText().length());
+            showSoftInputRunnable.scheduleShowSoftInput();
+        });
+        return dialog;
+    }
+
+    public static void showPreferenceDialog(
+            @NonNull Context context,
+            @StringRes int title,
+            @NonNull Supplier<String> getter,
+            @NonNull Consumer<String> setter
+    ) {
+        createPreferenceDialog(context, title, getter, setter).show();
     }
 
     public static void setError(@NonNull EditText editText, boolean error) {
