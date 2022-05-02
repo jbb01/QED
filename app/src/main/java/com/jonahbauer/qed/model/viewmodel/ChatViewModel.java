@@ -1,7 +1,5 @@
 package com.jonahbauer.qed.model.viewmodel;
 
-import android.app.Application;
-
 import android.content.SharedPreferences;
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
@@ -10,6 +8,8 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.jonahbauer.qed.Application;
+import com.jonahbauer.qed.ConnectionStateMonitor;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.model.Message;
 import com.jonahbauer.qed.model.room.Database;
@@ -31,6 +31,8 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 
+import static com.jonahbauer.qed.ConnectionStateMonitor.State.*;
+
 public class ChatViewModel extends AndroidViewModel {
 
     private final MutableLiveData<String> mChannel = new MutableLiveData<>();
@@ -46,7 +48,10 @@ public class ChatViewModel extends AndroidViewModel {
 
     private final SharedPreferenceListener mPreferenceListener = new SharedPreferenceListener();
 
-    public ChatViewModel(@NonNull Application application) {
+    private final LiveData<ConnectionStateMonitor.State> mConnectionState;
+    private final ConnectionStateObserver mConnectionStateObserver = new ConnectionStateObserver();
+
+    public ChatViewModel(@NonNull android.app.Application application) {
         super(application);
 
         // insert incoming message into the database
@@ -59,6 +64,10 @@ public class ChatViewModel extends AndroidViewModel {
                 .subscribe(messageDao::insert);
 
         Preferences.getSharedPreferences().registerOnSharedPreferenceChangeListener(mPreferenceListener);
+
+        var app = (Application) getApplication();
+        mConnectionState = app.getConnectionStateMonitor().getConnectionState();
+        mConnectionState.observeForever(mConnectionStateObserver);
     }
 
     @MainThread
@@ -134,6 +143,7 @@ public class ChatViewModel extends AndroidViewModel {
         mDisposable.clear();
         mDatabaseDisposable.dispose();
         Preferences.getSharedPreferences().unregisterOnSharedPreferenceChangeListener(mPreferenceListener);
+        mConnectionState.removeObserver(mConnectionStateObserver);
     }
 
     private class WebSocketObserver implements Observer<Message> {
@@ -172,6 +182,17 @@ public class ChatViewModel extends AndroidViewModel {
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
             if (Preferences.chat().keys().channel().equals(key)) {
                 connect(Preferences.chat().getChannel());
+            }
+        }
+    }
+
+    private class ConnectionStateObserver implements androidx.lifecycle.Observer<ConnectionStateMonitor.State> {
+        @Override
+        public void onChanged(ConnectionStateMonitor.State state) {
+            if (state == NOT_CONNECTED) {
+                publishError(R.string.error_network);
+            } else if (state == CONNECTED || state == CONNECTED_METERED) {
+                connect();
             }
         }
     }

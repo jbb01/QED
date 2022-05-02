@@ -8,7 +8,6 @@ import android.security.keystore.KeyGenParameterSpec;
 import android.util.Log;
 import android.widget.Toast;
 
-import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.preference.PreferenceManager;
@@ -17,7 +16,6 @@ import androidx.security.crypto.MasterKeys;
 import com.jonahbauer.qed.crypt.EncryptedSharedPreferences;
 import com.jonahbauer.qed.crypt.MyEncryptedSharedPreferences;
 import com.jonahbauer.qed.crypt.PasswordStorage;
-import com.jonahbauer.qed.networking.NetworkListener;
 import com.jonahbauer.qed.networking.cookies.QEDCookieHandler;
 import com.jonahbauer.qed.util.Preferences;
 
@@ -26,8 +24,6 @@ import org.jetbrains.annotations.Contract;
 import java.io.IOException;
 import java.lang.ref.SoftReference;
 import java.security.GeneralSecurityException;
-import java.util.HashSet;
-import java.util.Set;
 
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.exceptions.UndeliverableException;
@@ -43,10 +39,7 @@ public class Application extends android.app.Application implements android.app.
 
     private static SoftReference<Application> sContext;
 
-    private Boolean mOnline = null;
-
     private Activity mActivity;
-    private final Set<Activity> mExistingActivities = new HashSet<>();
     private ConnectionStateMonitor mConnectionStateMonitor;
 
     @Override
@@ -115,7 +108,6 @@ public class Application extends android.app.Application implements android.app.
     @Override
     public void onActivityCreated(@NonNull Activity activity, Bundle savedInstanceState) {
         this.mActivity = activity;
-        this.mExistingActivities.add(activity);
     }
 
     @Override
@@ -138,9 +130,7 @@ public class Application extends android.app.Application implements android.app.
     public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState) {}
 
     @Override
-    public void onActivityDestroyed(@NonNull Activity activity) {
-        this.mExistingActivities.remove(activity);
-    }
+    public void onActivityDestroyed(@NonNull Activity activity) {}
     //</editor-fold>
 
     @Contract(pure = true)
@@ -149,20 +139,8 @@ public class Application extends android.app.Application implements android.app.
         return sContext;
     }
 
-    /**
-     * Sets the online status of the app and calls all {@code NetworkListener}.
-     * @param online the new online status
-     */
-    @MainThread
-    public void setOnline(boolean online) {
-        if (mActivity instanceof NetworkListener) {
-            NetworkListener listener = (NetworkListener) mActivity;
-
-            if (mOnline != null && !mOnline && online) listener.onConnectionRegain();
-            else if ((mOnline == null || mOnline) && !online) listener.onConnectionFail();
-        }
-
-        mOnline = online;
+    public ConnectionStateMonitor getConnectionStateMonitor() {
+        return mConnectionStateMonitor;
     }
 
     /**
@@ -171,10 +149,6 @@ public class Application extends android.app.Application implements android.app.
      */
     public Activity getActivity() {
         return mActivity;
-    }
-
-    public void finish() {
-        for (Activity activity : mExistingActivities) activity.finish();
     }
 
     private EncryptedSharedPreferences getEncryptedSharedPreferences(String name) {

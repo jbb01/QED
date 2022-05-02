@@ -34,7 +34,6 @@ import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.mainFragments.OnActivityReenterListener;
 import com.jonahbauer.qed.databinding.ActivityMainBinding;
 import com.jonahbauer.qed.layoutStuff.CustomActionMode;
-import com.jonahbauer.qed.networking.NetworkListener;
 import com.jonahbauer.qed.networking.login.QEDLogout;
 import com.jonahbauer.qed.util.Colors;
 import it.unimi.dsi.fastutil.ints.IntSet;
@@ -43,7 +42,7 @@ import lombok.Getter;
 import java.util.List;
 import java.util.Objects;
 
-public class MainActivity extends AppCompatActivity implements NetworkListener, NavController.OnDestinationChangedListener {
+public class MainActivity extends AppCompatActivity implements NavController.OnDestinationChangedListener {
     private static final String LOG_TAG = MainActivity.class.getName();
 
     private static final String SAVED_ACTION_BAR_COLOR = "actionBarColor";
@@ -231,30 +230,6 @@ public class MainActivity extends AppCompatActivity implements NetworkListener, 
     public void finishActionMode() {
         if (mActionMode != null) {
             mActionMode.finish();
-        }
-    }
-    //</editor-fold>
-
-    //<editor-fold desc="Network Listener" defaultstate="collapsed">
-    /**
-     * Relays a network connection failure event to the content mFragment
-     */
-    @Override
-    public void onConnectionFail() {
-        Fragment fragment = getFragment();
-        if (fragment instanceof NetworkListener) {
-            ((NetworkListener) fragment).onConnectionFail();
-        }
-    }
-
-    /**
-     * Relays a network connection regain event to the content mFragment
-     */
-    @Override
-    public void onConnectionRegain() {
-        Fragment fragment = getFragment();
-        if (fragment instanceof NetworkListener) {
-            ((NetworkListener) fragment).onConnectionFail();
         }
     }
     //</editor-fold>

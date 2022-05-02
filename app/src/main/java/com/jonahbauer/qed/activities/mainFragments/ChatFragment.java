@@ -18,14 +18,13 @@ import com.jonahbauer.qed.databinding.FragmentChatBinding;
 import com.jonahbauer.qed.model.Message;
 import com.jonahbauer.qed.model.adapter.MessageAdapter;
 import com.jonahbauer.qed.model.viewmodel.ChatViewModel;
-import com.jonahbauer.qed.networking.NetworkListener;
 import com.jonahbauer.qed.util.*;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.disposables.Disposable;
 
-public class ChatFragment extends Fragment implements NetworkListener, AbsListView.OnScrollListener {
+public class ChatFragment extends Fragment implements AbsListView.OnScrollListener {
     private ChatViewModel mChatViewModel;
     private FragmentChatBinding mBinding;
 
@@ -261,18 +260,6 @@ public class ChatFragment extends Fragment implements NetworkListener, AbsListVi
             mBinding.scrollDownButton.hide();
         }
     }
-
-    //<editor-fold desc="Network Listener" defaultstate="collapsed">
-    @Override
-    public void onConnectionFail() {
-        // network connection fails are already detected via websocket failure
-    }
-
-    @Override
-    public void onConnectionRegain() {
-        reconnect();
-    }
-    //</editor-fold>
 
     //<editor-fold desc="Utility Methods" defaultstate="collapsed">
     /**

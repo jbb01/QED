@@ -13,7 +13,6 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.databinding.FragmentLoginBinding;
 import com.jonahbauer.qed.networking.Feature;
-import com.jonahbauer.qed.networking.NetworkListener;
 import com.jonahbauer.qed.networking.Reason;
 import com.jonahbauer.qed.networking.async.QEDPageReceiver;
 import com.jonahbauer.qed.networking.exceptions.InvalidCredentialsException;
@@ -23,7 +22,7 @@ import com.jonahbauer.qed.util.TransitionUtils;
 import com.jonahbauer.qed.util.ViewUtils;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 
-public class LoginFragment extends Fragment implements NetworkListener, QEDPageReceiver<Boolean> {
+public class LoginFragment extends Fragment implements QEDPageReceiver<Boolean> {
 
     private FragmentLoginBinding mBinding;
 
@@ -85,16 +84,6 @@ public class LoginFragment extends Fragment implements NetworkListener, QEDPageR
         mDisposable.add(
                 QEDLogin.loginAsync(username, password, mFeature, this)
         );
-    }
-
-    @Override
-    public void onConnectionFail() {
-        setError(getString(R.string.cant_connect));
-    }
-
-    @Override
-    public void onConnectionRegain() {
-        setError(null);
     }
 
     @Override
