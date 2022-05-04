@@ -344,15 +344,22 @@ public abstract class LogRequest implements Parcelable {
     @EqualsAndHashCode(callSuper = true)
     public static class FileLogRequest extends LogRequest {
         private final @NonNull Uri file;
+        private final @Nullable LogRequest root;
 
         public FileLogRequest(@NonNull Uri file) {
+            this(file, null);
+        }
+
+        public FileLogRequest(@NonNull Uri file, @Nullable LogRequest root) {
             super(FILE, null);
             this.file = file;
+            this.root = root;
         }
 
         public FileLogRequest(@NonNull Parcel parcel) {
             super(parcel);
             this.file = parcel.readTypedObject(Uri.CREATOR);
+            this.root = parcel.readTypedObject(LogRequest.CREATOR);
         }
 
         @Override
@@ -362,13 +369,18 @@ public abstract class LogRequest implements Parcelable {
 
         @Override
         public String getSubtitle(@NonNull Resources resources) {
-            return resources.getString(R.string.log_subtitle_file);
+            if (root == null) {
+                return resources.getString(R.string.log_subtitle_file);
+            } else {
+                return root.getSubtitle(resources);
+            }
         }
 
         @Override
         public void writeToParcel(Parcel dest, int flags) {
             super.writeToParcel(dest, flags);
             dest.writeTypedObject(file, flags);
+            dest.writeTypedObject(root, flags);
         }
     }
 }

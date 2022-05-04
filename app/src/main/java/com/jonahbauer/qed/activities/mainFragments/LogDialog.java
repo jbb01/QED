@@ -134,9 +134,9 @@ public class LogDialog extends DialogFragment implements AdapterView.OnItemSelec
         mBinding.logDialogModeSpinner.setOnItemSelectedListener(this);
 
         // setup file
+        mFile.observe(this, uri -> mBinding.logDialogFile.setText(uri != null ? uri.getPath() : ""));
         mBinding.logDialogFile.setOnClickListener(v -> {
             mFileChooser.launch(new String[]{"*/*"});
-            mFile.observe(this, uri -> mBinding.logDialogFile.setText(uri != null ? uri.getPath() : ""));
         });
 
         // setup date interval
@@ -169,6 +169,12 @@ public class LogDialog extends DialogFragment implements AdapterView.OnItemSelec
     }
 
     private void updateView(@NonNull LogRequest request) {
+        // unpack file log request
+        if (request instanceof FileLogRequest) {
+            var fileRequest = (FileLogRequest) request;
+            if (fileRequest.getRoot() != null) request = fileRequest.getRoot();
+        }
+
         var mode = request.getMode();
         mBinding.setMode(mode);
         mBinding.logDialogModeSpinner.setSelection(mode.ordinal());

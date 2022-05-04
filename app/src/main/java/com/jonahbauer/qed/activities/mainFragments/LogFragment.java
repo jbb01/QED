@@ -1,7 +1,6 @@
 package com.jonahbauer.qed.activities.mainFragments;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.*;
 import android.widget.Toast;
@@ -49,20 +48,23 @@ public class LogFragment extends Fragment {
 
         // handle deep link
         Bundle arguments = getArguments();
-        if (arguments != null && arguments.containsKey(NavController.KEY_DEEP_LINK_INTENT)) {
-            Intent intent = (Intent) arguments.get(NavController.KEY_DEEP_LINK_INTENT);
-            if (intent != null) {
-                Uri uri = intent.getData();
-                LogRequest logRequest = LogRequest.parse(uri);
-                if (logRequest != null) {
-                    NavBackStackEntry entry = NavHostFragment.findNavController(this)
-                                                             .getCurrentBackStackEntry();
-                    if (entry != null) {
-                        entry.getSavedStateHandle()
-                             .set(LOG_REQUEST_KEY, logRequest);
-                    } else {
+        if (arguments != null) {
+            var request = LogFragmentArgs.fromBundle(arguments).getLogRequest();
+
+            if (request == null && arguments.containsKey(NavController.KEY_DEEP_LINK_INTENT)) {
+                var intent = (Intent) arguments.get(NavController.KEY_DEEP_LINK_INTENT);
+                if (intent != null) {
+                    request = LogRequest.parse(intent.getData());
+                    if (request == null) {
                         Toast.makeText(requireContext(), R.string.error, Toast.LENGTH_SHORT).show();
                     }
+                }
+            }
+
+            if (request != null) {
+                var entry = NavHostFragment.findNavController(this).getCurrentBackStackEntry();
+                if (entry != null) {
+                    entry.getSavedStateHandle().set(LOG_REQUEST_KEY, request);
                 } else {
                     Toast.makeText(requireContext(), R.string.error, Toast.LENGTH_SHORT).show();
                 }
