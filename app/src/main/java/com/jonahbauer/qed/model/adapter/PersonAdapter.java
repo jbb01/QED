@@ -112,6 +112,15 @@ public class PersonAdapter extends FixedHeaderAdapter<Person, Character> {
         this.mSort = sort;
     }
 
+    @Nullable
+    @Override
+    public Person getItem(int position) {
+        if (position < 0 || position >= getCount()) {
+            return null;
+        }
+        return super.getItem(position);
+    }
+
     @Override
     public long getItemId(int position) {
         var item = getItem(position);

@@ -23,6 +23,7 @@ import com.jonahbauer.qed.layoutStuff.views.SimpleMessageView;
 import com.jonahbauer.qed.model.Message;
 import com.jonahbauer.qed.util.Preferences;
 import com.jonahbauer.qed.util.ViewUtils;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -210,6 +211,15 @@ public class MessageAdapter extends ArrayAdapter<Message> {
     @Override
     public boolean hasStableIds() {
         return true;
+    }
+
+    @Nullable
+    @Override
+    public Message getItem(int position) {
+        if (position < 0 || position >= getCount()) {
+            return null;
+        }
+        return super.getItem(position);
     }
 
     @Override

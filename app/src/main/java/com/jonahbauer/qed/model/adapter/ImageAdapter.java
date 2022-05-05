@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.content.res.AppCompatResources;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.databinding.ListItemImageBinding;
@@ -174,6 +175,15 @@ public class ImageAdapter extends ArrayAdapter<Image> {
 
     public List<Image> getImages() {
         return mImageList;
+    }
+
+    @Nullable
+    @Override
+    public Image getItem(int position) {
+        if (position < 0 || position >= getCount()) {
+            return null;
+        }
+        return super.getItem(position);
     }
 
     @Override

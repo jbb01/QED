@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.SectionIndexer;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.layoutStuff.views.MaterialListItem;
 import com.jonahbauer.qed.model.Event;
@@ -122,6 +123,16 @@ public class EventAdapter extends ArrayAdapter<Event> implements SectionIndexer 
         return mSectionForPosition[position];
     }
     //</editor-fold>
+
+
+    @Nullable
+    @Override
+    public Event getItem(int position) {
+        if (position < 0 || position >= getCount()) {
+            return null;
+        }
+        return super.getItem(position);
+    }
 
     @Override
     public long getItemId(int position) {

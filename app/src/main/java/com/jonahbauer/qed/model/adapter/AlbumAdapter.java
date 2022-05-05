@@ -5,6 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.layoutStuff.views.MaterialListItem;
 import com.jonahbauer.qed.model.Album;
@@ -39,6 +40,15 @@ public class AlbumAdapter extends ArrayAdapter<Album> {
         item.setTransitionName(context.getString(R.string.transition_name_album, album.getId()));
 
         return item;
+    }
+
+    @Nullable
+    @Override
+    public Album getItem(int position) {
+        if (position < 0 || position >= getCount()) {
+            return null;
+        }
+        return super.getItem(position);
     }
 
     @Override
