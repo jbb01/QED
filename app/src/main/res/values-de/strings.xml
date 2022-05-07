@@ -94,9 +94,10 @@
 
     <!-- Chat Fragment -->
     <string name="title_fragment_chat">Chat</string>
+    <string name="title_fragment_chat_with_channel">Chat – %s</string>
     <string name="chat_button_send">Senden</string>
     <string name="chat_empty_message">Du bist im Begriff eine leere Nachricht zu senden. Möchtest du fortfahren?</string>
-    <string name="chat_message_hint">Nachricht schreiben</string>
+    <string name="chat_message_hint">Schreibe als</string>
     <string name="chat_scroll_down_button_content_description">Nach unten scrollen</string>
     <string name="chat_websocket_closed">Websocket geschlossen</string>
 

@@ -3,6 +3,7 @@ package com.jonahbauer.qed.activities.mainFragments;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.text.SpannableStringBuilder;
 import android.view.*;
 import android.widget.AbsListView;
 
@@ -23,6 +24,9 @@ import com.jonahbauer.qed.util.*;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.disposables.Disposable;
+
+import static com.jonahbauer.qed.util.MessageUtils.formatName;
+import static com.jonahbauer.qed.util.MessageUtils.isMainChannel;
 
 public class ChatFragment extends Fragment implements AbsListView.OnScrollListener {
     private ChatViewModel mChatViewModel;
@@ -95,6 +99,22 @@ public class ChatFragment extends Fragment implements AbsListView.OnScrollListen
             }
         });
         mChatViewModel.getReady().observe(getViewLifecycleOwner(), mBinding::setReady);
+        mChatViewModel.getChannel().observe(getViewLifecycleOwner(), channel -> {
+            if (isMainChannel(channel)) {
+                ViewUtils.setActionBarText(this, getString(R.string.title_fragment_chat));
+            } else {
+                ViewUtils.setActionBarText(this, getString(R.string.title_fragment_chat_with_channel, channel));
+            }
+        });
+
+        mChatViewModel.getName().observe(getViewLifecycleOwner(), name -> {
+            var formattedName = formatName(requireContext(), name);
+            var builder = new SpannableStringBuilder();
+            builder.append(getString(R.string.chat_message_hint));
+            builder.append(' ');
+            builder.append(formattedName);
+            mBinding.setHint(builder);
+        });
     }
 
     @Override

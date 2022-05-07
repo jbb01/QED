@@ -36,6 +36,7 @@ import static com.jonahbauer.qed.ConnectionStateMonitor.State.*;
 public class ChatViewModel extends AndroidViewModel {
 
     private final MutableLiveData<String> mChannel = new MutableLiveData<>();
+    private final MutableLiveData<String> mName = new MutableLiveData<>();
     private final MutableLiveData<Boolean> mReady = new MutableLiveData<>(false);
     private final PublishSubject<Message> mMessageRX = PublishSubject.create();
     private final MutableLiveData<Observable<Message>> mReplayMessageRX = new MutableLiveData<>();
@@ -68,6 +69,8 @@ public class ChatViewModel extends AndroidViewModel {
         var app = (Application) getApplication();
         mConnectionState = app.getConnectionStateMonitor().getConnectionState();
         mConnectionState.observeForever(mConnectionStateObserver);
+
+        mName.setValue(Preferences.chat().getName());
     }
 
     @MainThread
@@ -122,6 +125,10 @@ public class ChatViewModel extends AndroidViewModel {
 
     public LiveData<String> getChannel() {
         return mChannel;
+    }
+
+    public LiveData<String> getName() {
+        return mName;
     }
 
     /**
@@ -182,10 +189,11 @@ public class ChatViewModel extends AndroidViewModel {
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
             if (Preferences.chat().keys().channel().equals(key)) {
                 connect(Preferences.chat().getChannel());
+            } else if (Preferences.chat().keys().name().equals(key)) {
+                mName.setValue(Preferences.chat().getName());
             }
         }
     }
-
     private class ConnectionStateObserver implements androidx.lifecycle.Observer<ConnectionStateMonitor.State> {
         @Override
         public void onChanged(ConnectionStateMonitor.State state) {

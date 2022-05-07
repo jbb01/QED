@@ -6,6 +6,7 @@
     <data>
         <variable name="loading" type="boolean" />
         <variable name="ready" type="boolean" />
+        <variable name="hint" type="CharSequence" />
     </data>
 
     <RelativeLayout
@@ -140,26 +141,46 @@
             android:orientation="horizontal"
             android:padding="6dp" >
 
-            <EditText
-                android:id="@+id/message_input"
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@drawable/background_send"
-                android:clickable="true"
                 android:elevation="6dp"
-                android:enabled="@{ready}"
-                android:focusable="true"
-                android:hint="@string/chat_message_hint"
-                android:importantForAutofill="no"
-                android:inputType="textMultiLine"
-                android:maxLines="5"
+                android:hint="@{hint}"
                 android:minHeight="48dp"
-                android:paddingHorizontal="12dp"
-                android:paddingVertical="3dp"
-                android:scrollbars="vertical"
-                android:selectAllOnFocus="false"
-                android:singleLine="false" />
+                app:boxBackgroundColor="?colorSurface"
+                app:boxBackgroundMode="filled"
+                app:boxCollapsedPaddingTop="6dp"
+                app:boxCornerRadiusBottomEnd="18dp"
+                app:boxCornerRadiusBottomStart="18dp"
+                app:boxCornerRadiusTopEnd="18dp"
+                app:boxCornerRadiusTopStart="18dp"
+                app:boxStrokeWidth="0dp"
+                app:boxStrokeWidthFocused="0dp"
+                app:errorEnabled="false"
+                app:hintTextColor="?android:textColorSecondary"
+                tools:hint="@string/chat_message_hint">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/message_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@null"
+                    android:clickable="true"
+                    android:enabled="@{ready}"
+                    android:focusable="true"
+                    android:importantForAutofill="no"
+                    android:inputType="textMultiLine"
+                    android:maxLines="5"
+                    android:paddingBottom="6dp"
+                    android:paddingHorizontal="16dp"
+                    android:paddingTop="20dp"
+                    android:scrollbars="vertical"
+                    android:selectAllOnFocus="false"
+                    android:singleLine="false"
+                    tools:text="Kesslernachricht"/>
+            </com.google.android.material.textfield.TextInputLayout>
 
             <Space
                 android:layout_width="6dp"

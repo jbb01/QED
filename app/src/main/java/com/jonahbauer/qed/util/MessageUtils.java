@@ -183,7 +183,7 @@ public class MessageUtils {
     }
 
     public static CharSequence formatChannel(@NonNull Context context, @NonNull String channel) {
-        return channel.isEmpty() ? context.getText(R.string.message_channel_main) : channel;
+        return isMainChannel(channel) ? context.getText(R.string.message_channel_main) : channel;
     }
 
     public static CharSequence formatName(@NonNull Context context, @NonNull Message message) {
@@ -192,6 +192,19 @@ public class MessageUtils {
 
     public static CharSequence formatChannel(@NonNull Context context, @NonNull Message message) {
         return formatChannel(context, message.getChannel());
+    }
+
+    public static boolean isMainChannel(@Nullable String channel) {
+        if (channel == null || channel.isEmpty()) {
+            return true;
+        }
+        var length = channel.length();
+        for (int i = 0; i < length; i++) {
+            if (channel.charAt(i) != ' ') {
+                return false;
+            }
+        }
+        return true;
     }
 
     @RequiredArgsConstructor

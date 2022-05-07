@@ -55,9 +55,10 @@
 
     <!-- Chat Fragment -->
     <string name="title_fragment_chat">Chat</string>
+    <string name="title_fragment_chat_with_channel">Chat – %s</string>
     <string name="chat_button_send">Send</string>
     <string name="chat_empty_message">You are about to send an empty message. Do you wish to continue?</string>
-    <string name="chat_message_hint">Write a message</string>
+    <string name="chat_message_hint">Write as</string>
     <string name="chat_scroll_down_button_content_description">Scroll Down</string>
     <string name="chat_websocket_closed">Websocket closed</string>
 
