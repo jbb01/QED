@@ -1,25 +1,26 @@
 package com.jonahbauer.qed.crypt;
 
+import android.content.SharedPreferences;
 import android.util.Pair;
 
 import java.util.Arrays;
-import java.util.Optional;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
+@SuppressWarnings("UnusedReturnValue")
 public class PasswordStorage {
     private static final String KEY_USERNAME = "username";
     private static final String KEY_PASSWORD = "password";
 
-    private static EncryptedSharedPreferences mSharedPreferences;
+    private static SharedPreferences mSharedPreferences;
 
     private static final ReentrantLock lock = new ReentrantLock();
     private static final Condition ready = lock.newCondition();
 
-    public void init(EncryptedSharedPreferences sharedPreferences) {
+    public void init(SharedPreferences sharedPreferences) {
         if (mSharedPreferences != null) throw new IllegalStateException("PasswordStorage is already initialized.");
 
         lock.lock();
@@ -37,7 +38,7 @@ public class PasswordStorage {
         try {
             mSharedPreferences.edit()
                               .putString(KEY_USERNAME, username)
-                              .putByteArray(KEY_PASSWORD, PasswordUtils.toBytes(password))
+                              .putString(KEY_PASSWORD, String.valueOf(password))
                               .apply();
             return true;
         } finally {
@@ -49,9 +50,8 @@ public class PasswordStorage {
         awaitInit();
 
         String username = mSharedPreferences.getString(KEY_USERNAME, null);
-        char[] password = Optional.ofNullable(mSharedPreferences.getByteArray(KEY_PASSWORD, null))
-                                  .map(PasswordUtils::toChars)
-                                  .orElse(null);
+        var passwordString = mSharedPreferences.getString(KEY_PASSWORD, null);
+        var password = passwordString != null ? passwordString.toCharArray() : null;
 
         return Pair.create(username, password);
     }

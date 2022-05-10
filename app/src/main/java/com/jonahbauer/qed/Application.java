@@ -11,10 +11,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.preference.PreferenceManager;
+import androidx.security.crypto.EncryptedSharedPreferences;
 import androidx.security.crypto.MasterKeys;
 
-import com.jonahbauer.qed.crypt.EncryptedSharedPreferences;
-import com.jonahbauer.qed.crypt.MyEncryptedSharedPreferences;
 import com.jonahbauer.qed.crypt.PasswordStorage;
 import com.jonahbauer.qed.networking.cookies.QEDCookieHandler;
 import com.jonahbauer.qed.util.Preferences;
@@ -78,7 +77,7 @@ public class Application extends android.app.Application implements android.app.
             QEDCookieHandler.init(cookieSharedPreferences);
 
             // Setup password storage
-            EncryptedSharedPreferences passwordSharedPreferences = Application.this.getEncryptedSharedPreferences(ENCRYPTED_SHARED_PREFERENCE_FILE);
+            SharedPreferences passwordSharedPreferences = Application.this.getEncryptedSharedPreferences(ENCRYPTED_SHARED_PREFERENCE_FILE);
             PasswordStorage.init(passwordSharedPreferences);
         }).subscribeOn(Schedulers.computation()).subscribe();
 
@@ -151,17 +150,17 @@ public class Application extends android.app.Application implements android.app.
         return mActivity;
     }
 
-    private EncryptedSharedPreferences getEncryptedSharedPreferences(String name) {
+    private SharedPreferences getEncryptedSharedPreferences(String name) {
         try {
             KeyGenParameterSpec keyGenParameterSpec = MasterKeys.AES256_GCM_SPEC;
             String masterKeyAlias = MasterKeys.getOrCreate(keyGenParameterSpec);
 
-            return MyEncryptedSharedPreferences.create(
+            return EncryptedSharedPreferences.create(
                     name,
                     masterKeyAlias,
                     this,
-                    MyEncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                    MyEncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+                    EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                    EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
             );
         } catch (GeneralSecurityException | IOException e) {
             Toast.makeText(this, R.string.master_key_error, Toast.LENGTH_SHORT).show();

@@ -1,9 +1,5 @@
 package com.jonahbauer.qed.activities.imageActivity;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.*;
@@ -27,10 +23,7 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.databinding.FragmentImageBinding;
 import com.jonahbauer.qed.model.Image;
-import com.jonahbauer.qed.util.Preferences;
-import com.jonahbauer.qed.util.StatusWrapper;
-import com.jonahbauer.qed.util.TransitionUtils;
-import com.jonahbauer.qed.util.ViewUtils;
+import com.jonahbauer.qed.util.*;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectList;
@@ -38,7 +31,6 @@ import it.unimi.dsi.fastutil.objects.ObjectList;
 import java.io.File;
 import java.lang.ref.SoftReference;
 import java.util.Collections;
-import java.util.List;
 
 public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickListener {
     private static final String SAVED_EXTENDED = "extended";
@@ -197,20 +189,7 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
             return true;
         } else if (id == R.id.image_open_with) {
             Uri uri = FileProvider.getUriForFile(requireContext(), "com.jonahbauer.qed.fileprovider", new File(mImage.getPath()));
-
-            Intent intent = new Intent();
-            intent.setAction(Intent.ACTION_VIEW);
-            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            intent.setDataAndType(uri, mImage.getFormat());
-
-            Activity activity = requireActivity();
-            List<ResolveInfo> resInfoList = activity.getPackageManager().queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
-            for (ResolveInfo resolveInfo : resInfoList) {
-                String packageName = resolveInfo.activityInfo.packageName;
-                activity.grantUriPermission(packageName, uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            }
-
-            startActivity(intent);
+            Actions.openContent(requireContext(), uri, mImage.getFormat());
             return true;
         }
         return false;
