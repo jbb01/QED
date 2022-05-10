@@ -90,12 +90,12 @@ public class ChatDatabaseFragment extends Fragment {
         mBinding.searchButton.setOnClickListener(v -> search());
 
         ViewUtils.setupExpandable(mBinding.expandCheckBox, mBinding.expandable, mMessageListViewModel.getExpanded());
-        ViewUtils.link(mBinding.databaseChannelCheckbox, mBinding.databaseChannelEditText);
-        ViewUtils.link(mBinding.databaseMessageCheckbox, mBinding.databaseMessageEditText);
-        ViewUtils.link(mBinding.databaseNameCheckbox, mBinding.databaseNameEditText);
-        ViewUtils.link(mBinding.databaseDateFromCheckbox, mBinding.databaseDateFromEditText, mBinding.databaseTimeFromEditText);
-        ViewUtils.link(mBinding.databaseDateToCheckbox, mBinding.databaseDateToEditText, mBinding.databaseTimeToEditText);
-        ViewUtils.link(mBinding.databaseIdCheckbox, mBinding.databaseIdEditText);
+        ViewUtils.link(mBinding.databaseChannelCheckbox, mBinding.databaseChannelRow, mBinding.databaseChannelEditText);
+        ViewUtils.link(mBinding.databaseMessageCheckbox, mBinding.databaseMessageRow, mBinding.databaseMessageEditText);
+        ViewUtils.link(mBinding.databaseNameCheckbox, mBinding.databaseNameRow, mBinding.databaseNameEditText);
+        ViewUtils.link(mBinding.databaseDateFromCheckbox, mBinding.databaseDateFromRow, mBinding.databaseDateFromEditText, mBinding.databaseTimeFromEditText);
+        ViewUtils.link(mBinding.databaseDateToCheckbox, mBinding.databaseDateToRow, mBinding.databaseDateToEditText, mBinding.databaseTimeToEditText);
+        ViewUtils.link(mBinding.databaseIdCheckbox, mBinding.databaseIdRow, mBinding.databaseIdEditText);
 
         var lifecycleOwner = getViewLifecycleOwner();
         var dateTimeFrom = mMessageListViewModel.getDateTimeFrom();

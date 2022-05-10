@@ -36,7 +36,8 @@
                 android:layout_height="wrap_content"
                 tools:visibility="visible">
 
-                <TableRow
+                <com.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
+                    android:id="@+id/database_channel_row"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
                     <CheckBox
@@ -55,9 +56,10 @@
                         android:hint="@string/chat_database_channel_hint"
                         android:inputType="text"
                         android:importantForAutofill="no" />
-                </TableRow>
+                </com.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
 
-                <TableRow
+                <com.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
+                    android:id="@+id/database_message_row"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
                     <CheckBox
@@ -76,9 +78,10 @@
                         android:hint="@string/chat_database_message_hint"
                         android:inputType="text"
                         android:importantForAutofill="no" />
-                </TableRow>
+                </com.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
 
-                <TableRow
+                <com.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
+                    android:id="@+id/database_name_row"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
                     <CheckBox
@@ -97,9 +100,10 @@
                         android:hint="@string/chat_database_name_hint"
                         android:inputType="text"
                         android:importantForAutofill="no" />
-                </TableRow>
+                </com.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
 
-                <TableRow
+                <com.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
+                    android:id="@+id/database_dateFrom_row"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
                     <CheckBox
@@ -129,9 +133,10 @@
                         android:hint="@string/chat_database_timeFrom_hint"
                         android:inputType="time"
                         android:importantForAutofill="no" />
-                </TableRow>
+                </com.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
 
-                <TableRow
+                <com.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
+                    android:id="@+id/database_dateTo_row"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
                     <CheckBox
@@ -161,9 +166,10 @@
                         android:hint="@string/chat_database_timeTo_hint"
                         android:inputType="time"
                         android:importantForAutofill="no" />
-                </TableRow>
+                </com.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
 
-                <TableRow
+                <com.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
+                    android:id="@+id/database_id_row"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
                     <CheckBox
@@ -184,7 +190,7 @@
                         android:digits="0123456789-"
                         android:imeActionId="6"
                         android:importantForAutofill="no" />
-                </TableRow>
+                </com.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
             </TableLayout>
 
             <View style="?dividerStyle"/>

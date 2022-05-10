@@ -58,7 +58,8 @@
                 android:visibility="gone"
                 tools:visibility="visible">
 
-                <TableRow
+                <com.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
+                    android:id="@+id/album_photographer_row"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
                     <CheckBox
@@ -74,9 +75,10 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:spinnerMode="dialog"/>
-                </TableRow>
+                </com.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
 
-                <TableRow
+                <com.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
+                    android:id="@+id/album_date_row"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
                     <CheckBox
@@ -92,9 +94,10 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:spinnerMode="dialog" />
-                </TableRow>
+                </com.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
 
-                <TableRow
+                <com.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
+                    android:id="@+id/album_upload_row"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
                     <CheckBox
@@ -110,9 +113,10 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:spinnerMode="dialog" />
-                </TableRow>
+                </com.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
 
-                <TableRow
+                <com.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
+                    android:id="@+id/album_category_row"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
                     <CheckBox
@@ -128,7 +132,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:spinnerMode="dialog"/>
-                </TableRow>
+                </com.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
             </TableLayout>
 
             <View style="?dividerStyle"/>

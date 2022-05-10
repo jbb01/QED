@@ -6,11 +6,13 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.graphics.drawable.Animatable;
 import android.os.SystemClock;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -29,7 +31,9 @@ import androidx.navigation.NavBackStackEntry;
 import androidx.navigation.fragment.NavHostFragment;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.databinding.AlertDialogEditTextBinding;
+import com.jonahbauer.qed.layoutStuff.views.InterceptingView;
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.Contract;
 
@@ -427,11 +431,21 @@ public class ViewUtils {
 
     /**
      * Links the button's checked to the enabled state of the provided views. When the button gets checked
-     * the first view will request focus.
+     * the first view will request focus. When an {@link InterceptingView} is provided and the button is not checked,
+     * all touch events on the view will be intercepted and clicks will check the button.
+     * @param parent an intercepting view. must be a parent of the button and all the specified target views
      */
-    public static void link(@NonNull CompoundButton button, View...views) {
+    public static void link(@NonNull CompoundButton button, @Nullable InterceptingView parent, View...views) {
+        var interceptListener = new InterceptClickListener(button, views, v -> {
+            if (v != button) {
+                button.setChecked(true);
+                if (v != null) v.performClick();
+            }
+        });
+
         if (views.length == 0) return;
         var listener = (CompoundButton.OnCheckedChangeListener) (buttonView, isChecked) -> {
+            if (parent != null) parent.setOnInterceptTouchListener(isChecked ? null : interceptListener);
             for (View view : views) {
                 view.setEnabled(isChecked);
             }
@@ -467,5 +481,53 @@ public class ViewUtils {
             checkedSetter.accept(isChecked);
             state.setValue(isChecked);
         });
+    }
+
+    @RequiredArgsConstructor
+    private static class InterceptClickListener implements InterceptingView.OnInterceptTouchListener {
+        private static final Object NO_TARGET = new Object();
+
+        private final View[] mViews;
+        private final Rect mRect = new Rect();
+
+        private Object mDownTarget = NO_TARGET;
+        private final @NonNull Consumer<View> mOnClick;
+
+        private InterceptClickListener(@NonNull View button, @NonNull View[] views, @NonNull Consumer<View> onClick) {
+            mViews = new View[views.length + 1];
+            mViews[0] = button;
+            System.arraycopy(views, 0, mViews, 1, views.length);
+            mOnClick = onClick;
+        }
+
+        @Override
+        public boolean onInterceptTouchEvent(MotionEvent event) {
+            var x = (int) event.getX();
+            var y = (int) event.getY();
+
+            switch (event.getActionMasked()) {
+                case MotionEvent.ACTION_DOWN:
+                    mDownTarget = getTarget(x, y);
+                    break;
+                case MotionEvent.ACTION_UP:
+                    var target = getTarget(x, y);
+                    if (mDownTarget == target) {
+                        mOnClick.accept(target);
+                    }
+                    mDownTarget = NO_TARGET;
+                    break;
+            }
+            return false;
+        }
+
+        private @Nullable View getTarget(int x, int y) {
+            for (var view : mViews) {
+                view.getHitRect(mRect);
+                if (mRect.contains(x, y)) {
+                    return view;
+                }
+            }
+            return null;
+        }
     }
 }

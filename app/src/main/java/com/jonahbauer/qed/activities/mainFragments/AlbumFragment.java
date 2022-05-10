@@ -114,10 +114,10 @@ public class AlbumFragment extends Fragment implements AdapterView.OnItemClickLi
         });
 
         ViewUtils.setupExpandable(mBinding.expandCheckBox, mBinding.expandable, mAlbumViewModel.getExpanded());
-        ViewUtils.link(mBinding.albumPhotographerCheckBox, mBinding.albumPhotographerSpinner);
-        ViewUtils.link(mBinding.albumDateCheckBox, mBinding.albumDateSpinner);
-        ViewUtils.link(mBinding.albumUploadCheckBox, mBinding.albumUploadSpinner);
-        ViewUtils.link(mBinding.albumCategoryCheckBox, mBinding.albumCategorySpinner);
+        ViewUtils.link(mBinding.albumPhotographerCheckBox, mBinding.albumPhotographerRow, mBinding.albumPhotographerSpinner);
+        ViewUtils.link(mBinding.albumDateCheckBox, mBinding.albumDateRow, mBinding.albumDateSpinner);
+        ViewUtils.link(mBinding.albumUploadCheckBox, mBinding.albumUploadRow, mBinding.albumUploadSpinner);
+        ViewUtils.link(mBinding.albumCategoryCheckBox, mBinding.albumCategoryRow, mBinding.albumCategorySpinner);
 
         mAdapterCategory = setupSpinner(mBinding.albumCategorySpinner, Album::decodeCategory);
         mAdapterPhotographer = setupSpinner(mBinding.albumPhotographerSpinner, Person::getUsername);

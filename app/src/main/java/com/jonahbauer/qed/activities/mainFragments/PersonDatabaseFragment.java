@@ -88,8 +88,8 @@ public class PersonDatabaseFragment extends Fragment implements AdapterView.OnIt
         mBinding.searchButton.setOnClickListener(v -> search());
 
         ViewUtils.setupExpandable(mBinding.expandCheckBox, mBinding.expandable, mPersonListViewModel.getExpanded());
-        ViewUtils.link(mBinding.databaseFirstNameCheckbox, mBinding.databaseFirstNameEditText);
-        ViewUtils.link(mBinding.databaseLastNameCheckbox, mBinding.databaseLastNameEditText);
+        ViewUtils.link(mBinding.databaseFirstNameCheckbox, mBinding.databaseFirstNameRow, mBinding.databaseFirstNameEditText);
+        ViewUtils.link(mBinding.databaseLastNameCheckbox, mBinding.databaseLastNameRow, mBinding.databaseLastNameEditText);
     }
 
     private PersonAdapter.SortMode getSortMode() {
