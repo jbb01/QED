@@ -47,6 +47,9 @@ public interface MessageDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     Completable insert(Collection<Message> messages);
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertSync(Collection<Message> messages);
+
     @Query("DELETE FROM message")
     Completable clear();
 

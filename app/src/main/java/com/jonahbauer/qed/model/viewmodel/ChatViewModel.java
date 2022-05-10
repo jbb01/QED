@@ -62,7 +62,7 @@ public class ChatViewModel extends AndroidViewModel {
                 .observeOn(Schedulers.io())
                 .filter(message -> message.getType() == Message.Type.POST)
                 .buffer(debounced)
-                .subscribe(messageDao::insert);
+                .subscribe(messageDao::insertSync);
 
         Preferences.getSharedPreferences().registerOnSharedPreferenceChangeListener(mPreferenceListener);
 
