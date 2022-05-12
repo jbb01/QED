@@ -212,13 +212,9 @@ public class PersonInfoFragment extends InfoFragment {
 
     @BindingAdapter("person_addresses")
     public static void bindAddresses(ViewGroup parent, Person person) {
-        parent.removeAllViews();
-        if (person == null) return;
-
-        var context = parent.getContext();
         var addresses = person.getAddresses();
-        addresses.forEach((address) -> {
-            ListItem item = new ListItem(context);
+        var context = parent.getContext();
+        bindList(parent, addresses, (address, item) -> {
             item.setIcon(R.drawable.ic_person_location);
             item.setTitle(address);
             item.setOnClickListener(v -> Actions.showOnMap(context, address));
@@ -227,19 +223,14 @@ public class PersonInfoFragment extends InfoFragment {
                 Actions.copy(context, parent, context.getString(R.string.person_clip_label_address, name), address);
                 return true;
             });
-            parent.addView(item);
         });
     }
 
     @BindingAdapter("person_contacts")
     public static void bindContacts(ViewGroup parent, Person person) {
-        parent.removeAllViews();
-        if (person == null) return;
-
-        var context = parent.getContext();
         var contacts = person.getContacts();
-        contacts.forEach((contact) -> {
-            ListItem item = new ListItem(context);
+        var context = parent.getContext();
+        bindList(parent, contacts, (contact, item) -> {
             item.setIcon(CONTACT_ICONS.getInt(contact.first.toLowerCase()));
             item.setTitle(contact.second);
             item.setSubtitle(contact.first);
@@ -247,6 +238,8 @@ public class PersonInfoFragment extends InfoFragment {
             BiConsumer<Context, String> action = CONTACT_ACTIONS.get(contact.first.toLowerCase());
             if (action != null) {
                 item.setOnClickListener(v -> action.accept(context, contact.second));
+            } else {
+                item.setOnClickListener(null);
             }
 
             item.setOnLongClickListener(v -> {
@@ -254,24 +247,17 @@ public class PersonInfoFragment extends InfoFragment {
                 Actions.copy(context, parent, context.getString(R.string.person_clip_label_contact, contact.first, name), contact.second);
                 return true;
             });
-
-            parent.addView(item);
         });
     }
 
     @BindingAdapter("person_registrations")
     public static void bindRegistrations(ViewGroup parent, Collection<Registration> registrations) {
-        Context context = parent.getContext();
-        parent.removeAllViews();
-        registrations.forEach(registration -> {
+        bindList(parent, registrations, (registration, item) -> {
             var status = Objects.requireNonNull(registration.getStatus());
-            ListItem item = new ListItem(context);
             item.setIcon(R.drawable.ic_person_event);
             item.setTitle(registration.getEventTitle());
             item.setSubtitle(status.getStringRes());
             item.setOnClickListener(v -> showRegistration(v, registration));
-            parent.addView(item);
-            // TODO subtitle orga
         });
     }
 

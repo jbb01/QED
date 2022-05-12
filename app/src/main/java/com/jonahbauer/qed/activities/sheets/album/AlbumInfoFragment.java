@@ -1,6 +1,5 @@
 package com.jonahbauer.qed.activities.sheets.album;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,7 +8,6 @@ import android.view.ViewGroup;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.sheets.InfoFragment;
 import com.jonahbauer.qed.databinding.FragmentInfoAlbumBinding;
-import com.jonahbauer.qed.layoutStuff.views.ListItem;
 import com.jonahbauer.qed.model.Album;
 import com.jonahbauer.qed.model.Person;
 import com.jonahbauer.qed.model.viewmodel.AlbumViewModel;
@@ -111,25 +109,17 @@ public class AlbumInfoFragment extends InfoFragment {
 
     @BindingAdapter("album_categories")
     public static void bindCategories(ViewGroup parent, Collection<String> categories) {
-        Context context = parent.getContext();
-        parent.removeAllViews();
-        categories.forEach((category) -> {
-            ListItem item = new ListItem(context);
+        bindList(parent, categories, (category, item) -> {
             item.setIcon(R.drawable.ic_album_category);
             item.setTitle(Album.decodeCategory(category));
-            parent.addView(item);
         });
     }
 
     @BindingAdapter("album_persons")
     public static void bindPersons(ViewGroup parent, Collection<Person> persons) {
-        Context context = parent.getContext();
-        parent.removeAllViews();
-        persons.forEach((person) -> {
-            ListItem item = new ListItem(context);
+        bindList(parent, persons, (person, item) -> {
             item.setIcon(R.drawable.ic_album_person);
             item.setTitle(person.getUsername());
-            parent.addView(item);
         });
     }
 }

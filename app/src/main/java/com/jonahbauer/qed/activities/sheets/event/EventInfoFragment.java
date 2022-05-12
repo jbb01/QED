@@ -1,7 +1,6 @@
 package com.jonahbauer.qed.activities.sheets.event;
 
 import android.app.PendingIntent;
-import android.content.Context;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -26,6 +25,7 @@ import com.jonahbauer.qed.util.Themes;
 
 import java.util.Collection;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -151,31 +151,23 @@ public class EventInfoFragment extends InfoFragment {
 
     @BindingAdapter("event_organizers")
     public static void bindOrganizers(ViewGroup parent, Collection<Registration> organizers) {
-        Context context = parent.getContext();
-        parent.removeAllViews();
-        organizers.forEach(registration -> {
-            ListItem item = new ListItem(context);
+        bindList(parent, organizers, (registration, item) -> {
             item.setIcon(R.drawable.ic_event_orga);
             item.setTitle(registration.getPersonName());
             item.setSubtitle(R.string.registration_orga);
             item.setOnClickListener(v -> showRegistration(parent, registration));
-            parent.addView(item);
         });
     }
 
     @BindingAdapter("event_participants")
     public static void bindParticipants(ViewGroup parent, Collection<Registration> participants) {
-        Context context = parent.getContext();
-        parent.removeAllViews();
-        participants.forEach(registration -> {
-            if (registration.isOrganizer()) return;
+        var nonOrganizers = participants.stream().filter(r -> !r.isOrganizer()).collect(Collectors.toList());
+        bindList(parent, nonOrganizers, (registration, item) -> {
             var status = Objects.requireNonNull(registration.getStatus());
-            ListItem item = new ListItem(context);
             item.setIcon(status.getDrawableRes());
             item.setTitle(registration.getPersonName());
             item.setSubtitle(status.getStringRes());
             item.setOnClickListener(v -> showRegistration(parent, registration));
-            parent.addView(item);
         });
     }
 
