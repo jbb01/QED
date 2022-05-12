@@ -7,10 +7,11 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.jonahbauer.qed.model.Event;
+import com.jonahbauer.qed.model.Person;
 import com.jonahbauer.qed.model.Registration;
 import com.jonahbauer.qed.model.util.ParsedLocalDate;
 import com.jonahbauer.qed.networking.parser.HtmlParseException;
-import com.jonahbauer.qed.networking.parser.HtmlParser;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -18,7 +19,7 @@ import org.jsoup.nodes.Element;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public final class RegistrationParser extends HtmlParser<Registration> {
+public final class RegistrationParser extends DatabaseParser<Registration> {
     private static final String LOG_TAG = RegistrationParser.class.getName();
 
     private static final Pattern COST_PATTERN = Pattern.compile("(\\d+(?:,\\d+)?)\\s*€");
@@ -83,7 +84,7 @@ public final class RegistrationParser extends HtmlParser<Registration> {
                             case GENERAL_KEY_EVENT: {
                                 var eventElement = value.selectFirst("a");
                                 if (eventElement == null) throw new HtmlParseException("Registration " + registration.getId() + " does not seem to contain an event.");
-                                var id = Long.parseLong(eventElement.attr("href").substring("/events/".length()));
+                                var id = parseIdFromHref(eventElement, Event.NO_ID);
                                 registration.setEventId(id);
                                 registration.setEventTitle(eventElement.text());
                                 break;
@@ -91,7 +92,7 @@ public final class RegistrationParser extends HtmlParser<Registration> {
                             case GENERAL_KEY_PERSON: {
                                 var personElement = value.selectFirst("a");
                                 if (personElement == null) throw new HtmlParseException("Registration " + registration.getId() + " does not seem to contain a person.");
-                                var id = Long.parseLong(personElement.attr("href").substring("/people/".length()));
+                                var id = parseIdFromHref(personElement, Person.NO_ID);
                                 registration.setPersonId(id);
                                 registration.setPersonName(personElement.text());
                                 break;

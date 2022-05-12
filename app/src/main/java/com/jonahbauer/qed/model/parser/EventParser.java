@@ -7,7 +7,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.jonahbauer.qed.model.Event;
 import com.jonahbauer.qed.model.Registration;
-import com.jonahbauer.qed.networking.parser.HtmlParser;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -16,7 +15,7 @@ import org.jsoup.select.Elements;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public final class EventParser extends HtmlParser<Event> {
+public final class EventParser extends DatabaseParser<Event> {
     private static final String LOG_TAG = EventParser.class.getName();
 
     private static final Pattern COST_PATTERN = Pattern.compile("(\\d+(?:,\\d+)?)\\s*€");
@@ -136,7 +135,7 @@ public final class EventParser extends HtmlParser<Event> {
                            Elements divs = dt.nextElementSibling().select("li div");
                            divs.forEach(div -> {
                                try {
-                                   long id = Long.parseLong(div.child(0).attr("href").substring("/registrations/".length()));
+                                   long id = parseIdFromHref(div.child(0), Registration.NO_ID);
                                    String participant = div.child(0).text();
 
                                    Element statusElement = div.selectFirst("i");

@@ -15,8 +15,7 @@ import com.jonahbauer.qed.model.parcel.LambdaCreator;
 import com.jonahbauer.qed.model.util.ParsedLocalDate;
 import com.jonahbauer.qed.util.TextUtils;
 import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenCustomHashSet;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 @Data
 @EqualsAndHashCode(of = "id")
@@ -42,6 +41,8 @@ public class Event implements Comparable<Event>, Parcelable {
 
     private transient List<Registration> organizers;
     // hash code of participants map for calculated organizers
+    @Getter(AccessLevel.PRIVATE)
+    @Setter(AccessLevel.PRIVATE)
     private transient int organizersValid = 0;
 
     private Instant loaded;

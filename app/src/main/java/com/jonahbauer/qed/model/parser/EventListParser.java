@@ -5,7 +5,6 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.jonahbauer.qed.model.Event;
-import com.jonahbauer.qed.networking.parser.HtmlParser;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -15,7 +14,7 @@ import java.util.Objects;
 
 import static com.jonahbauer.qed.model.parser.EventParser.parseCost;
 
-public final class EventListParser extends HtmlParser<List<Event>> {
+public final class EventListParser extends DatabaseParser<List<Event>> {
     private static final String LOG_TAG = EventListParser.class.getName();
     public static final EventListParser INSTANCE = new EventListParser();
 
@@ -32,7 +31,7 @@ public final class EventListParser extends HtmlParser<List<Event>> {
                     try {
                         Elements columns = tr.select("td");
 
-                        long id = Long.parseLong(columns.get(1).select("a").attr("href").substring("/events/".length()));
+                        long id = parseIdFromHref(columns.get(1).selectFirst("a"), Event.NO_ID);
                         Event event = new Event(id);
 
                         title: try {

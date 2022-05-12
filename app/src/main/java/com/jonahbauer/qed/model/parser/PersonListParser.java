@@ -5,7 +5,6 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.jonahbauer.qed.model.Person;
-import com.jonahbauer.qed.networking.parser.HtmlParser;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -13,7 +12,7 @@ import org.jsoup.select.Elements;
 import java.util.List;
 import java.util.Objects;
 
-public final class PersonListParser extends HtmlParser<List<Person>> {
+public final class PersonListParser extends DatabaseParser<List<Person>> {
     private static final String LOG_TAG = PersonListParser.class.getName();
     
     public static final PersonListParser INSTANCE = new PersonListParser();

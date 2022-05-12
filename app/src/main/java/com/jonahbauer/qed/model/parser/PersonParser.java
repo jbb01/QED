@@ -7,13 +7,12 @@ import androidx.core.util.Pair;
 
 import com.jonahbauer.qed.model.Person;
 import com.jonahbauer.qed.model.Registration;
-import com.jonahbauer.qed.networking.parser.HtmlParser;
 
 import com.jonahbauer.qed.util.TextUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-public final class PersonParser extends HtmlParser<Person> {
+public final class PersonParser extends DatabaseParser<Person> {
     private static final String LOG_TAG = PersonParser.class.getName();
     
     public static final PersonParser INSTANCE = new PersonParser();
@@ -184,7 +183,7 @@ public final class PersonParser extends HtmlParser<Person> {
 
         element.select("ul li").forEach(li -> {
             try {
-                long id = Long.parseLong(li.child(0).attr("href").substring("/registrations/".length()));
+                var id = parseIdFromHref(li.child(0), Registration.NO_ID);
                 String event = li.child(0).text();
 
                 Element statusElement = li.selectFirst("i");
