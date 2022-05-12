@@ -1,11 +1,9 @@
 package com.jonahbauer.qed.model;
 
 import android.os.Parcel;
-import androidx.core.util.Pair;
 import org.junit.Test;
 
-import java.time.Instant;
-import java.time.LocalDate;
+import java.lang.reflect.Modifier;
 
 import static org.junit.Assert.assertEquals;
 
@@ -14,14 +12,33 @@ public class RegistrationTest {
     @Test
     public void testParcelableConsistentWithEquals() {
         var registration = dummyRegistration();
+        var copy = cloneWithParcelable(registration);
+        assertEquals(registration, copy);
+    }
 
+    @Test
+    public void testParcelableContainsAllNonTransientFields() throws IllegalAccessException {
+        var registration = dummyRegistration();
+        var copy = cloneWithParcelable(registration);
+
+        var fields = Registration.class.getDeclaredFields();
+        for (var field : fields) {
+            field.setAccessible(true);
+            if ((field.getModifiers() & Modifier.STATIC) != 0) continue;
+            if ((field.getModifiers() & Modifier.TRANSIENT) != 0) continue;
+            assertEquals(field.getName(), field.get(registration), field.get(copy));
+        }
+    }
+
+    private Registration cloneWithParcelable(Registration registration) {
         var parcel = Parcel.obtain();
-        registration.writeToParcel(parcel, 0);
-
-        parcel.setDataPosition(0);
-
-        var out = Registration.CREATOR.createFromParcel(parcel);
-        assertEquals(registration, out);
+        try {
+            registration.writeToParcel(parcel, 0);
+            parcel.setDataPosition(0);
+            return Registration.CREATOR.createFromParcel(parcel);
+        } finally {
+            parcel.recycle();
+        }
     }
 
     private static Registration dummyRegistration() {

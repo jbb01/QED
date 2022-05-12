@@ -15,10 +15,7 @@ import com.jonahbauer.qed.model.parcel.ParcelExtensions;
 import com.jonahbauer.qed.model.room.Converters;
 
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.jonahbauer.qed.model.parcel.LambdaCreator;
@@ -120,20 +117,20 @@ public class Image implements Parcelable {
     @Override
     @NonNull
     public String toString() {
-        LinkedList<String> entries = new LinkedList<>();
-        if (id != NO_ID) entries.add("\"id\":" + id);
-        if (format != null) entries.add("\"format\":\"" + format + "\"");
-        if (path != null) entries.add("\"path\":\"" + path + "\"");
-        if (name != null) entries.add("\"name\":\"" + name + "\"");
-        if (owner != null) entries.add("\"owner\":\"" + owner + "\"");
-        if (uploadTime != null) entries.add("\"uploadDate\":" + uploadTime.getEpochSecond());
-        if (creationTime != null) entries.add("\"creationDate\":" + creationTime.getEpochSecond());
-        entries.add("\"original\":" + original);
-        entries.add("\"loaded\":" + loaded);
-        if (!data.isEmpty()) entries.add(data.entrySet().stream().map(e -> "\"" + e.getKey() + "\":\"" + e.getValue() + "\"").collect(Collectors.joining(",")));
-        if (albumName != null) entries.add("\"albumName\":\"" + albumName + "\"");
-        if (albumId != Album.NO_ID) entries.add("\"albumId\":" + albumId);
-        return entries.stream().collect(Collectors.joining(", ", "{", "}"));
+        var joiner = new StringJoiner(", ", "{", "}");
+        if (id != NO_ID) joiner.add("\"id\":" + id);
+        if (format != null) joiner.add("\"format\":\"" + format + "\"");
+        if (path != null) joiner.add("\"path\":\"" + path + "\"");
+        if (name != null) joiner.add("\"name\":\"" + name + "\"");
+        if (owner != null) joiner.add("\"owner\":\"" + owner + "\"");
+        if (uploadTime != null) joiner.add("\"uploadDate\":" + uploadTime.getEpochSecond());
+        if (creationTime != null) joiner.add("\"creationDate\":" + creationTime.getEpochSecond());
+        joiner.add("\"original\":" + original);
+        joiner.add("\"loaded\":" + loaded);
+        if (!data.isEmpty()) joiner.add(data.entrySet().stream().map(e -> "\"" + e.getKey() + "\":\"" + e.getValue() + "\"").collect(Collectors.joining(",")));
+        if (albumName != null) joiner.add("\"albumName\":\"" + albumName + "\"");
+        if (albumId != Album.NO_ID) joiner.add("\"albumId\":" + albumId);
+        return joiner.toString();
     }
 
     public Type getType() {

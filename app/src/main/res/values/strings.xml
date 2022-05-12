@@ -140,12 +140,16 @@
     <string name="person_section_additional">Additional Information</string>
     <string name="person_section_addresses">Addresses</string>
     <string name="person_section_contacts">Contact Information</string>
+    <string name="person_section_payments">Payments</string>
     <string name="person_section_registrations">Registrations</string>
     <string name="person_subtitle_mail">Email Address</string>
     <string name="person_clip_label_mail">Email Address (%s)</string>
     <string name="person_subtitle_birthday">Birthday</string>
+    <string name="person_subtitle_gender">Gender</string>
     <string name="person_subtitle_date_of_joining">Date of Joining</string>
     <string name="person_subtitle_date_of_quitting">Date of Quitting</string>
+    <string name="person_subtitle_member_until">Member Until</string>
+    <string name="person_subtitle_paid_until">Paid Until</string>
     <string name="person_title_member_true">@string/yes</string>
     <string name="person_title_member_false">@string/no</string>
     <string name="person_subtitle_member">Currently Member</string>
@@ -156,8 +160,27 @@
     <string name="person_subtitle_railcard">Railcard</string>
     <string name="person_subtitle_food">Food Preferences</string>
     <string name="person_subtitle_notes">Notes</string>
+    <string name="person_subtitle_groups">Groups</string>
+    <string name="person_subtitle_privacy">Privacy</string>
     <string name="person_clip_label_address">Address (%s)</string>
     <string name="person_clip_label_contact">%s (%s)</string>
+
+    <string name="person_gender_male">male</string>
+    <string name="person_gender_female">female</string>
+    <string name="person_gender_other">other</string>
+
+    <string name="person_payment_membership">Membership Fee</string>
+    <string name="person_payment_sponsorship">Sponsorship</string>
+    <string name="person_payment_donation">Donation</string>
+    <string name="person_payment_other">Other Purpose</string>
+
+    <string name="person_privacy_none"><i>none</i></string>
+    <string name="person_privacy_newsletter">Newsletter Subscription</string>
+    <string name="person_privacy_photos">Photos Allowed</string>
+    <string name="person_privacy_public_birthday">Public Birthday</string>
+    <string name="person_privacy_public_email">Public Mail</string>
+    <string name="person_privacy_public_address">Public Address and Contact Information</string>
+    <string name="person_privacy_public_profile">Public Profile</string>
 
     <!-- Events Database Fragment -->
     <string name="title_fragment_events_database">Events</string>

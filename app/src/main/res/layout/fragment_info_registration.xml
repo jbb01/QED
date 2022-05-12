@@ -135,6 +135,15 @@
             <com.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:visibility="@{registration.personGender != null}"
+                app:icon="@{registration.personGender.drawableRes}"
+                app:title="@{registration.personGender.stringRes}"
+                app:subtitle="@string/registration_subtitle_gender"
+                tools:icon="@drawable/ic_person_gender_male"/>
+
+            <com.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:visibility="@{!TextUtils.isNullOrBlank(registration.personMail)}"
                 android:onClick="@{v -> Actions.sendTo(context, registration.personMail)}"
                 android:onLongClick="@{v -> Actions.copy(context, v, @string/registration_clip_label_mail(registration.personName), registration.personMail)}"

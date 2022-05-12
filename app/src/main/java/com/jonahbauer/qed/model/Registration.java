@@ -44,7 +44,7 @@ public class Registration implements Parcelable {
     private long personId = Person.NO_ID;
     private String personName;
     private ParsedLocalDate personBirthday;
-    private String personGender;
+    private Person.Gender personGender;
     private String personMail;
     private String personAddress;
     private String personPhone;
@@ -160,7 +160,7 @@ public class Registration implements Parcelable {
         dest.writeLong(personId);
         dest.writeString(personName);
         dest.writeTypedObject(personBirthday, flags);
-        dest.writeString(personGender);
+        dest.writeTypedObject(personGender, flags);
         dest.writeString(personMail);
         dest.writeString(personAddress);
         dest.writeString(personPhone);
@@ -198,7 +198,7 @@ public class Registration implements Parcelable {
         registration.personId = source.readLong();
         registration.personName = source.readString();
         registration.personBirthday = source.readTypedObject(ParsedLocalDate.CREATOR);
-        registration.personGender = source.readString();
+        registration.personGender = source.readTypedObject(Person.Gender.CREATOR);
         registration.personMail = source.readString();
         registration.personAddress = source.readString();
         registration.personPhone = source.readString();

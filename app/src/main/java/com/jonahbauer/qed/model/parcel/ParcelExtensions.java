@@ -10,7 +10,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.function.IntFunction;
+import java.util.EnumSet;
 
 @UtilityClass
 public class ParcelExtensions {
@@ -130,6 +130,32 @@ public class ParcelExtensions {
             var array = new String[size];
             source.readStringArray(array);
             collection.addAll(Arrays.asList(array));
+        }
+    }
+
+    public static <T extends Enum<T> & ParcelableEnum> void writeEnumSet(@NonNull Parcel dest, @Nullable EnumSet<T> set) {
+        if (set == null) {
+            dest.writeInt(VAL_NULL);
+        } else {
+            dest.writeInt(VAL_NON_NULL);
+
+            long out = 0;
+            for (T t : set) {
+                out |= (1L << t.ordinal());
+            }
+            dest.writeLong(out);
+        }
+    }
+
+    @Nullable
+    public static <T extends Enum<T> & ParcelableEnum> EnumSet<T> readEnumSet(@NonNull Parcel source, @NonNull ParcelableEnum.Creator<T> creator) {
+        var flag = source.readInt();
+        if (flag == VAL_NULL) {
+            return null;
+        } else if (flag == VAL_NON_NULL) {
+            return creator.createEnumSet(source.readLong());
+        } else {
+            throw new RuntimeException("Could not read EnumSet from parcel.");
         }
     }
 }

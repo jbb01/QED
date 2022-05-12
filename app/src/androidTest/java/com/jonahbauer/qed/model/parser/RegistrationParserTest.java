@@ -1,5 +1,6 @@
 package com.jonahbauer.qed.model.parser;
 
+import com.jonahbauer.qed.model.Person;
 import com.jonahbauer.qed.model.Registration;
 import com.jonahbauer.qed.networking.NetworkUtils;
 import org.junit.Test;
@@ -57,7 +58,7 @@ public class RegistrationParserTest {
         assertEquals("Test User", registration.getPersonName());
         assertNotNull(registration.getPersonBirthday());
         assertEquals(LocalDate.of(2001, 2, 3), registration.getPersonBirthday().getLocalDate());
-        assertEquals("männlich", registration.getPersonGender());
+        assertEquals(Person.Gender.MALE, registration.getPersonGender());
         assertEquals("test.user@example.org", registration.getPersonMail());
         assertEquals("Musterstraße 12\n98765 Musterstadt", registration.getPersonAddress());
         assertEquals("0123/456789", registration.getPersonPhone());

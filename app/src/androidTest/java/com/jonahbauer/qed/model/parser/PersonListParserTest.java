@@ -31,7 +31,7 @@ public class PersonListParserTest {
         assertEquals(0, list.get(0).getId());
         assertEquals("Stefani", list.get(0).getFirstName());
         assertEquals("Rivas", list.get(0).getLastName());
-        assertEquals("männlich", list.get(0).getGender());
+        assertEquals(Person.Gender.MALE, list.get(0).getGender());
         assertNotNull(list.get(0).getBirthday());
         assertEquals(LocalDate.of(1983, 6, 29), list.get(0).getBirthday().getLocalDate());
         assertEquals("stefani.rivas@example.org", list.get(0).getEmail());
@@ -45,7 +45,7 @@ public class PersonListParserTest {
         assertEquals(1, list.get(1).getId());
         assertEquals("Assol", list.get(1).getFirstName());
         assertEquals("Vespa", list.get(1).getLastName());
-        assertEquals("männlich", list.get(1).getGender());
+        assertEquals(Person.Gender.MALE, list.get(1).getGender());
         assertNotNull(list.get(1).getBirthday());
         assertEquals(LocalDate.of(2002, 10, 7), list.get(1).getBirthday().getLocalDate());
         assertEquals("assol.vespa@example.org", list.get(1).getEmail());
@@ -59,7 +59,7 @@ public class PersonListParserTest {
         assertEquals(2, list.get(2).getId());
         assertEquals("Natasha", list.get(2).getFirstName());
         assertEquals("Susskind", list.get(2).getLastName());
-        assertEquals("männlich", list.get(2).getGender());
+        assertEquals(Person.Gender.MALE, list.get(2).getGender());
         assertNotNull(list.get(2).getBirthday());
         assertEquals(LocalDate.of(2001, 12, 2), list.get(2).getBirthday().getLocalDate());
         assertEquals("natasha.susskind@example.org", list.get(2).getEmail());
@@ -73,7 +73,7 @@ public class PersonListParserTest {
         assertEquals(3, list.get(3).getId());
         assertEquals("Rayna", list.get(3).getFirstName());
         assertEquals("Oláh", list.get(3).getLastName());
-        assertEquals("weiblich", list.get(3).getGender());
+        assertEquals(Person.Gender.FEMALE, list.get(3).getGender());
         assertNull(list.get(3).getBirthday());
         assertNull(list.get(3).getEmail());
         assertEquals("RaynaOlah", list.get(3).getUsername());

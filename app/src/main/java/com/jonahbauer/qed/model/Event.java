@@ -62,20 +62,20 @@ public class Event implements Comparable<Event>, Parcelable {
     @Override
     @NonNull
     public String toString() {
-        List<String> entries = new LinkedList<>();
-        if (title != null) entries.add( "\"title\":\"" + title + "\"");
-        if (start != null) entries.add( "\"start\":\"" + start + "\"");
-        if (end != null) entries.add( "\"end\":\"" + end + "\"");
-        if (deadline != null) entries.add( "\"deadline\":\"" + deadline + "\"");
-        if (cost != null) entries.add( "\"cost\":" + cost);
-        if (maxParticipants != null) entries.add( "\"max_participants\":" + maxParticipants);
-        if (id != NO_ID) entries.add( "\"id\":" + id);
-        if (hotel != null) entries.add( "\"hotel\":\"" + hotel + "\"");
-        if (hotelAddress != null) entries.add( "\"hotel_address\":\"" + hotelAddress + "\"");
-        if (emailOrga != null) entries.add( "\"email_orga\":\"" + emailOrga + "\"");
-        if (emailAll != null) entries.add( "\"email_all\":\"" + emailAll + "\"");
-        if (!participants.isEmpty()) entries.add( "\"participants\":\"" + participants + "\"");
-        return entries.stream().collect(Collectors.joining(", ", "{", "}"));
+        var joiner = new StringJoiner(", ", "{", "}");
+        if (title != null) joiner.add( "\"title\":\"" + title + "\"");
+        if (start != null) joiner.add( "\"start\":\"" + start + "\"");
+        if (end != null) joiner.add( "\"end\":\"" + end + "\"");
+        if (deadline != null) joiner.add( "\"deadline\":\"" + deadline + "\"");
+        if (cost != null) joiner.add( "\"cost\":" + cost);
+        if (maxParticipants != null) joiner.add( "\"max_participants\":" + maxParticipants);
+        if (id != NO_ID) joiner.add( "\"id\":" + id);
+        if (hotel != null) joiner.add( "\"hotel\":\"" + hotel + "\"");
+        if (hotelAddress != null) joiner.add( "\"hotel_address\":\"" + hotelAddress + "\"");
+        if (emailOrga != null) joiner.add( "\"email_orga\":\"" + emailOrga + "\"");
+        if (emailAll != null) joiner.add( "\"email_all\":\"" + emailAll + "\"");
+        if (!participants.isEmpty()) joiner.add( "\"participants\":\"" + participants + "\"");
+        return joiner.toString();
     }
 
     public List<Registration> getOrganizers() {

@@ -94,6 +94,15 @@
             <com.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:visibility="@{person.gender != null}"
+                app:icon="@{person.gender.drawableRes}"
+                app:title="@{person.gender.stringRes}"
+                app:subtitle="@string/person_subtitle_gender"
+                tools:icon="@drawable/ic_person_gender_male"/>
+
+            <com.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:visibility="@{!TimeUtils.isNullOrBlank(person.dateOfJoining)}"
                 app:icon="@drawable/ic_person_date_of_joining"
                 app:title="@{TimeUtils.format(person.dateOfJoining)}"
@@ -106,6 +115,22 @@
                 app:icon="@drawable/ic_person_date_of_quitting"
                 app:title="@{TimeUtils.format(person.dateOfQuitting)}"
                 app:subtitle="@string/person_subtitle_date_of_quitting"/>
+
+            <com.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="@{!TimeUtils.isNullOrBlank(person.memberUntil)}"
+                app:icon="@drawable/ic_person_member_until"
+                app:title="@{TimeUtils.format(person.memberUntil)}"
+                app:subtitle="@string/person_subtitle_member_until"/>
+
+            <com.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="@{!TimeUtils.isNullOrBlank(person.paidUntil)}"
+                app:icon="@drawable/ic_person_paid_until"
+                app:title="@{TimeUtils.format(person.paidUntil)}"
+                app:subtitle="@string/person_subtitle_paid_until"/>
 
             <com.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
@@ -167,6 +192,22 @@
             <com.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:visibility="@{!person.groups.empty}"
+                app:icon="@drawable/ic_person_groups"
+                app:title="@{String.join(`, `, person.groups)}"
+                app:subtitle="@string/person_subtitle_groups" />
+
+            <com.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="@{person.privacy != null}"
+                app:icon="@drawable/ic_person_privacy"
+                app:person_privacy="@{person.privacy}"
+                app:subtitle="@string/person_subtitle_privacy" />
+
+            <com.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:visibility="@{!TextUtils.isNullOrBlank(person.notes)}"
                 app:icon="@drawable/ic_person_notes"
                 app:title="@{person.notes}"
@@ -215,6 +256,29 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 app:person_contacts="@{person}"/>
+        </LinearLayout>
+
+        <View
+            android:visibility="@{!person.payments.empty}"
+            style="?dividerStyle"/>
+
+        <LinearLayout
+            android:visibility="@{!person.payments.empty}"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/person_section_payments"
+                style="@style/Widget.App.TextView.SectionHeading"/>
+
+            <LinearLayout
+                android:id="@+id/payment_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:person_payments="@{person.payments}"/>
         </LinearLayout>
 
         <View

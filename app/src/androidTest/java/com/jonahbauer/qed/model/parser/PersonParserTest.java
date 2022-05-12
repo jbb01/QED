@@ -54,7 +54,7 @@ public class PersonParserTest {
         assertNotNull(person.getBirthday());
         assertEquals(LocalDate.of(2001, 2, 3), person.getBirthday().getLocalDate());
 
-        assertEquals("männlich", person.getGender());
+        assertEquals(Person.Gender.MALE, person.getGender());
 
         assertNotNull(person.getDateOfJoining());
         assertEquals(LocalDate.of(2020, 4, 5), person.getDateOfJoining().getLocalDate());
@@ -73,6 +73,25 @@ public class PersonParserTest {
     }
 
     private void selfChecks(Person person) {
+        assertNotNull(person.getMemberUntil());
+        assertEquals(LocalDate.of(2024, 12, 31), person.getMemberUntil().getLocalDate());
+        assertNotNull(person.getPaidUntil());
+        assertEquals(LocalDate.of(2022, 12, 31), person.getPaidUntil().getLocalDate());
 
+        assertEquals(3, person.getPayments().size());
+        assertTrue(person.getGroups().contains("Mitglieder"));
+        assertTrue(person.getGroups().contains("Newsletter an"));
+        assertTrue(person.getGroups().contains("QED-Chat-Users"));
+        assertTrue(person.getGroups().contains("QED-Gallery-Editors"));
+        assertTrue(person.getGroups().contains("QED-Gallery-Viewers"));
+        assertTrue(person.getGroups().contains("QED-Kalender"));
+
+        assertNotNull(person.getPrivacy());
+        assertTrue(person.getPrivacy().contains(Person.Privacy.PHOTOS));
+        assertTrue(person.getPrivacy().contains(Person.Privacy.PUBLIC_BIRTHDAY));
+        assertTrue(person.getPrivacy().contains(Person.Privacy.PUBLIC_EMAIL));
+        assertTrue(person.getPrivacy().contains(Person.Privacy.PUBLIC_ADDRESS));
+        assertTrue(person.getPrivacy().contains(Person.Privacy.NEWSLETTER));
+        assertTrue(person.getPrivacy().contains(Person.Privacy.PUBLIC_PROFILE));
     }
 }

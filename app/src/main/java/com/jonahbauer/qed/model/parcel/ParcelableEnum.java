@@ -3,8 +3,8 @@ package com.jonahbauer.qed.model.parcel;
 import android.os.Parcel;
 import android.os.Parcelable;
 import androidx.annotation.NonNull;
-import lombok.RequiredArgsConstructor;
 
+import java.util.EnumSet;
 import java.util.function.IntFunction;
 
 /**
@@ -33,15 +33,34 @@ public interface ParcelableEnum extends Parcelable {
         dest.writeInt(ordinal());
     }
 
-    @RequiredArgsConstructor
     class Creator<T extends Enum<T> & ParcelableEnum> implements Parcelable.Creator<T> {
+        private final @NonNull Class<T> clazz;
         private final @NonNull T[] values;
         private final @NonNull IntFunction<T[]> newArray;
 
+        public Creator(@NonNull T[] values, @NonNull IntFunction<T[]> newArray) {
+            this.values = values;
+            this.newArray = newArray;
+            //noinspection ConstantConditions,unchecked
+            this.clazz = (Class<T>) values.getClass().getComponentType();
+            if (values.length > 64) throw new IllegalArgumentException("ParcelableEnum only supports up to 64 enum values.");
+        }
 
         @Override
         public T createFromParcel(Parcel source) {
             return values[source.readInt()];
+        }
+
+        public EnumSet<T> createEnumSet(long values) {
+            var out = EnumSet.noneOf(clazz);
+
+            for (int i = 0; values != 0; values >>>= 1, i++) {
+                if ((values & 1) == 1) {
+                    out.add(this.values[i]);
+                }
+            }
+
+            return out;
         }
 
         @Override

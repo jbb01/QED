@@ -321,12 +321,16 @@
     <string name="person_section_additional">Weitere Informationen</string>
     <string name="person_section_addresses">Adressen</string>
     <string name="person_section_contacts">Kontaktinformationen</string>
+    <string name="person_section_payments">Überweisungen</string>
     <string name="person_section_registrations">Anmeldungen</string>
     <string name="person_subtitle_mail">E-Mail Adresse</string>
     <string name="person_clip_label_mail">E-Mail Adresse (%s)</string>
     <string name="person_subtitle_birthday">Geburtstag</string>
+    <string name="person_subtitle_gender">Geschlecht</string>
     <string name="person_subtitle_date_of_joining">Eintrittsdatum</string>
     <string name="person_subtitle_date_of_quitting">Austrittsdatum</string>
+    <string name="person_subtitle_member_until">Mitglied bis</string>
+    <string name="person_subtitle_paid_until">Bezahlt bis</string>
     <string name="person_title_member_true">Ja</string>
     <string name="person_title_member_false">Nein</string>
     <string name="person_subtitle_member">Aktuell Mitglied</string>
@@ -337,8 +341,27 @@
     <string name="person_subtitle_railcard">Bahnermäßigung</string>
     <string name="person_subtitle_food">Essenswünsche</string>
     <string name="person_subtitle_notes">Anmerkungen</string>
+    <string name="person_subtitle_groups">Gruppen</string>
+    <string name="person_subtitle_privacy">Datenschutz</string>
     <string name="person_clip_label_address">Adresse (%s)</string>
     <string name="person_clip_label_contact">%s (%s)</string>
+
+    <string name="person_gender_male">männlich</string>
+    <string name="person_gender_female">weiblich</string>
+    <string name="person_gender_other">andere</string>
+
+    <string name="person_payment_membership">Mitgliedsbeitrag</string>
+    <string name="person_payment_sponsorship">Förderbeitrag</string>
+    <string name="person_payment_donation">Spende an den Verein</string>
+    <string name="person_payment_other">Anderer Verwendungszweck</string>
+
+    <string name="person_privacy_none"><i>keine</i></string>
+    <string name="person_privacy_newsletter">Newsletter abonniert</string>
+    <string name="person_privacy_photos">Fotos erlaubt</string>
+    <string name="person_privacy_public_birthday">Geburtstag einsehbar</string>
+    <string name="person_privacy_public_email">Email einsehbar</string>
+    <string name="person_privacy_public_address">Adressen und Kontakte einsehbar</string>
+    <string name="person_privacy_public_profile">Profil einsehbar</string>
 
     <!-- Log Dialog Activity -->
     <string name="title_activity_log_dialog">Logs</string>

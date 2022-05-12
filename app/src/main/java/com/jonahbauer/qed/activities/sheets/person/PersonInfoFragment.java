@@ -21,12 +21,11 @@ import com.jonahbauer.qed.layoutStuff.views.ListItem;
 import com.jonahbauer.qed.model.Person;
 import com.jonahbauer.qed.model.Registration;
 import com.jonahbauer.qed.model.viewmodel.PersonViewModel;
-import com.jonahbauer.qed.util.Actions;
-import com.jonahbauer.qed.util.StatusWrapper;
-import com.jonahbauer.qed.util.Themes;
+import com.jonahbauer.qed.util.*;
 
 import java.util.Collection;
-import java.util.Objects;
+import java.util.EnumSet;
+import java.util.StringJoiner;
 import java.util.function.BiConsumer;
 
 import androidx.annotation.NonNull;
@@ -213,8 +212,8 @@ public class PersonInfoFragment extends InfoFragment {
     @BindingAdapter("person_addresses")
     public static void bindAddresses(ViewGroup parent, Person person) {
         var addresses = person.getAddresses();
-        var context = parent.getContext();
         bindList(parent, addresses, (address, item) -> {
+            var context = item.getContext();
             item.setIcon(R.drawable.ic_person_location);
             item.setTitle(address);
             item.setOnClickListener(v -> Actions.showOnMap(context, address));
@@ -229,8 +228,8 @@ public class PersonInfoFragment extends InfoFragment {
     @BindingAdapter("person_contacts")
     public static void bindContacts(ViewGroup parent, Person person) {
         var contacts = person.getContacts();
-        var context = parent.getContext();
         bindList(parent, contacts, (contact, item) -> {
+            var context = item.getContext();
             item.setIcon(CONTACT_ICONS.getInt(contact.first.toLowerCase()));
             item.setTitle(contact.second);
             item.setSubtitle(contact.first);
@@ -250,15 +249,42 @@ public class PersonInfoFragment extends InfoFragment {
         });
     }
 
+    @BindingAdapter("person_payments")
+    public static void bindPayments(ViewGroup parent, Collection<Person.Payment> payments) {
+        bindList(parent, payments, (payment, item) -> {
+            var context = item.getContext();
+            var type = payment.getType();
+            item.setIcon(R.drawable.ic_person_payment);
+            item.setTitle(TextUtils.formatRange(context, TimeUtils::format, payment.getStart(), payment.getEnd()));
+            item.setSubtitle(type != null ? type.getStringRes() : R.string.empty);
+        });
+    }
+
     @BindingAdapter("person_registrations")
     public static void bindRegistrations(ViewGroup parent, Collection<Registration> registrations) {
         bindList(parent, registrations, (registration, item) -> {
-            var status = Objects.requireNonNull(registration.getStatus());
+            var status = registration.getStatus();
             item.setIcon(R.drawable.ic_person_event);
             item.setTitle(registration.getEventTitle());
-            item.setSubtitle(status.getStringRes());
+            item.setSubtitle(status != null ? status.getStringRes() : R.string.empty);
             item.setOnClickListener(v -> showRegistration(v, registration));
         });
+    }
+
+    @BindingAdapter("person_privacy")
+    public static void bindPrivacy(ListItem item, EnumSet<Person.Privacy> privacy) {
+        if (privacy == null) {
+            item.setTitle(null);
+            return;
+        }
+
+        var context = item.getContext();
+        var joiner = new StringJoiner(", ");
+        joiner.setEmptyValue(context.getText(R.string.person_privacy_none));
+        for (var p : privacy) {
+            joiner.add(context.getString(p.getStringRes()));
+        }
+        item.setTitle(joiner.toString());
     }
 
     private static void showRegistration(View view, Registration registration) {

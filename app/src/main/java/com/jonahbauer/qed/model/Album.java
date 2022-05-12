@@ -17,9 +17,8 @@ import java.net.URLDecoder;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.StringJoiner;
 
 import com.jonahbauer.qed.model.parcel.LambdaCreator;
 import lombok.Data;
@@ -124,18 +123,18 @@ public class Album implements Parcelable {
     @NonNull
     @Override
     public String toString() {
-        LinkedList<String> entries = new LinkedList<>();
-        if (id != NO_ID) entries.add("\"id\":" + id);
-        if (name != null) entries.add("\"name\":\"" + name + "\"");
-        if (owner != null) entries.add("\"owner\":\"" + owner + "\"");
-        if (creationDate != null) entries.add("\"creationDate\":\"" + creationDate + "\"");
-        entries.add("\"private\": " + _private);
-        entries.add("\"loaded\": " + loaded);
-        if (!persons.isEmpty()) entries.add("\"persons\":" + persons);
-        if (!dates.isEmpty()) entries.add("\"dates\":" + dates);
-        if (!uploadDates.isEmpty()) entries.add("\"upload_dates\":" + uploadDates);
-        if (!categories.isEmpty()) entries.add("\"categories\":" + categories);
-        return entries.stream().collect(Collectors.joining(", ", "{", "}"));
+        var joiner = new StringJoiner(", ", "{", "}");
+        if (id != NO_ID) joiner.add("\"id\":" + id);
+        if (name != null) joiner.add("\"name\":\"" + name + "\"");
+        if (owner != null) joiner.add("\"owner\":\"" + owner + "\"");
+        if (creationDate != null) joiner.add("\"creationDate\":\"" + creationDate + "\"");
+        joiner.add("\"private\": " + _private);
+        joiner.add("\"loaded\": " + loaded);
+        if (!persons.isEmpty()) joiner.add("\"persons\":" + persons);
+        if (!dates.isEmpty()) joiner.add("\"dates\":" + dates);
+        if (!uploadDates.isEmpty()) joiner.add("\"upload_dates\":" + uploadDates);
+        if (!categories.isEmpty()) joiner.add("\"categories\":" + categories);
+        return joiner.toString();
     }
 
     /**

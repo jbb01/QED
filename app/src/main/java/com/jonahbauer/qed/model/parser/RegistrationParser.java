@@ -111,7 +111,7 @@ public final class RegistrationParser extends DatabaseParser<Registration> {
                                 break;
                             }
                             case GENERAL_KEY_GENDER: {
-                                var gender = value.text();
+                                var gender = PersonParser.parseGender(value.text());
                                 registration.setPersonGender(gender);
                                 break;
                             }

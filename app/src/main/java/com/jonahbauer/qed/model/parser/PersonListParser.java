@@ -47,7 +47,7 @@ public final class PersonListParser extends DatabaseParser<List<Person>> {
                         gender: try {
                             var element = columns.get(3);
                             if (element == null) break gender;
-                            person.setGender(element.text());
+                            person.setGender(PersonParser.parseGender(element.text()));
                         } catch (Exception ignored) {}
 
                         birthday: try {

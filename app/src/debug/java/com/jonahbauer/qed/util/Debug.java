@@ -160,7 +160,7 @@ public class Debug {
         registration.setPersonId(Person.NO_ID);
         registration.setPersonName("Max Mustermann");
         registration.setPersonBirthday(new ParsedLocalDate("01.01.2000", LocalDate.now()));
-        registration.setPersonGender("männlich");
+        registration.setPersonGender(Person.Gender.MALE);
         registration.setPersonMail("max.mustermann@example.com");
         registration.setPersonAddress("Musterstraße 10\n12345 Musterstadt");
         registration.setPersonPhone("0123456789");

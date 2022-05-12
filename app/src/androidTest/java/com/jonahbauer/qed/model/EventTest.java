@@ -4,6 +4,7 @@ import android.os.Parcel;
 import com.jonahbauer.qed.model.util.ParsedLocalDate;
 import org.junit.Test;
 
+import java.lang.reflect.Modifier;
 import java.time.Instant;
 import java.time.LocalDate;
 
@@ -14,14 +15,33 @@ public class EventTest {
     @Test
     public void testParcelableConsistentWithEquals() {
         var event = dummyEvent();
+        var copy = cloneWithParcelable(event);
+        assertEquals(event, copy);
+    }
 
+    @Test
+    public void testParcelableContainsAllNonTransientFields() throws IllegalAccessException {
+        var event = dummyEvent();
+        var copy = cloneWithParcelable(event);
+
+        var fields = Event.class.getDeclaredFields();
+        for (var field : fields) {
+            field.setAccessible(true);
+            if ((field.getModifiers() & Modifier.STATIC) != 0) continue;
+            if ((field.getModifiers() & Modifier.TRANSIENT) != 0) continue;
+            assertEquals(field.getName(), field.get(event), field.get(copy));
+        }
+    }
+
+    private Event cloneWithParcelable(Event event) {
         var parcel = Parcel.obtain();
-        event.writeToParcel(parcel, 0);
-
-        parcel.setDataPosition(0);
-
-        var out = Event.CREATOR.createFromParcel(parcel);
-        assertEquals(event, out);
+        try {
+            event.writeToParcel(parcel, 0);
+            parcel.setDataPosition(0);
+            return Event.CREATOR.createFromParcel(parcel);
+        } finally {
+            parcel.recycle();
+        }
     }
 
     private static Event dummyEvent() {
