@@ -108,6 +108,7 @@ public final class AlbumParser extends HtmlParser<Album> {
     private void parseFilters(Album album, Elements elements) {
         album.getPersons().clear();
         album.getDates().clear();
+        album.getUploadDates().clear();
         album.getCategories().clear();
 
         elements.forEach(b -> {
