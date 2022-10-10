@@ -443,9 +443,13 @@
     <string name="image_not_downloaded">This picture is not downloaded</string>
     <string name="image_download_non_picture">You are about to download an audio or video file. A WLAN connection is recommanded. Do you wish to continue?</string>
     <string name="image_overwrite_offline_mode">You are in offline mode. Do you want to download the image nevertheless?</string>
+
     <string name="image_info">@string/info</string>
     <string name="image_open_with">Open With…</string>
+    <string name="image_share">Share</string>
+    <string name="image_copy_link">Copy Link</string>
     <string name="image_download_original">Download Original</string>
+    <string name="image_clip_label_link">Image #%d</string>
 
     <!-- Image Info Activity -->
     <string name="title_activity_image_info">Details</string>

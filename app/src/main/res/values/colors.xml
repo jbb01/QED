@@ -8,6 +8,11 @@
     <color name="colorSecondaryDark">#C60055</color>
     <color name="colorSecondaryLight">#FF79B0</color>
 
+    <color name="dateBannerBackground">#E0E0FF</color>
+
+    <color name="colorBackground">#FAFAFA</color>
+    <color name="colorSurface">@android:color/white</color>
+
     <color name="accentColor0">#33b5e5</color>
     <color name="accentColor1">#99cc00</color>
     <color name="accentColor2">#ff4444</color>
@@ -18,15 +23,6 @@
     <color name="accentColor7">#ffbb33</color>
     <color name="accentColor8">#ff8800</color>
     <color name="accentColor9">#00ddff</color>
-
-    <color name="colorAccent2">#009688</color>
-    <color name="colorAccentDark2">#00675B</color>
-    <color name="colorAccentLight2">#52C7B8</color>
-
-    <color name="colorBackground">#FAFAFA</color>
-    <color name="colorSurface">@android:color/white</color>
-
-    <color name="dateBannerBackground">#E0E0FF</color>
 
     <color name="accent_charm_purple_dark">#ff9798d8</color>
     <color name="accent_charm_purple_light">#ff9066af</color>
@@ -63,4 +59,12 @@
 
     <color name="colorBackgroundNight">#2F3136</color>
     <color name="colorSurfaceNight">#36393f</color>
+
+    <!-- Dark/Black Theme (Image Activity) -->
+    <color name="colorSecondaryBlack">#009688</color>
+    <color name="colorSecondaryDarkBlack">#00675B</color>
+    <color name="colorSecondaryLightBlack">#52C7B8</color>
+
+    <color name="colorBackgroundBlack">#000000</color>
+    <color name="colorSurfaceBlack">#202225</color>
 </resources>

@@ -34,7 +34,7 @@ import java.time.ZonedDateTime;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
-@SuppressWarnings({"UnusedReturnValue", "JavadocLinkAsPlainText"})
+@SuppressWarnings({"UnusedReturnValue"})
 public class Actions {
     public static boolean sendTo(@NonNull Context context, String...emails) {
         Intent intent = new Intent(Intent.ACTION_SENDTO);
@@ -146,6 +146,26 @@ public class Actions {
         var intent = new Intent(Intent.ACTION_VIEW);
         intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         intent.setDataAndType(uri, type);
+
+        var infos = context.getPackageManager().queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+        for (var info : infos) {
+            var packageName = info.activityInfo.packageName;
+            context.grantUriPermission(packageName, uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        }
+
+        return tryStartActivity(context, intent);
+    }
+
+    /**
+     * Launches an {@link Intent} to {@linkplain Intent#ACTION_SEND share} the given uri granting read permission to
+     * the receiving activity.
+     * @return {@code true} when a suitable activity was found and started
+     */
+    public static boolean shareContent(@NonNull Context context, Uri uri, String type) {
+        var intent = new Intent(Intent.ACTION_SEND);
+        intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        intent.setType(type);
+        intent.putExtra(Intent.EXTRA_STREAM, uri);
 
         var infos = context.getPackageManager().queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
         for (var info : infos) {

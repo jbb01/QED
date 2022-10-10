@@ -23,6 +23,7 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.databinding.FragmentImageBinding;
 import com.jonahbauer.qed.model.Image;
+import com.jonahbauer.qed.networking.NetworkConstants;
 import com.jonahbauer.qed.util.*;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -31,6 +32,7 @@ import it.unimi.dsi.fastutil.objects.ObjectList;
 import java.io.File;
 import java.lang.ref.SoftReference;
 import java.util.Collections;
+import java.util.Locale;
 
 public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickListener {
     private static final String SAVED_EXTENDED = "extended";
@@ -46,6 +48,8 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
 
     private MenuItem mOpenWithButton;
     private MenuItem mDownloadButton;
+    private MenuItem mShareButton;
+    private MenuItem mCopyLinkButton;
     private MenuItem mInfoButton;
 
     private boolean mExtended = false;
@@ -89,6 +93,8 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
         mOpenWithButton = menu.findItem(R.id.image_open_with);
         mDownloadButton = menu.findItem(R.id.image_download_original);
         mInfoButton = menu.findItem(R.id.image_info);
+        mShareButton = menu.findItem(R.id.image_share);
+        mCopyLinkButton = menu.findItem(R.id.image_copy_link);
 
         setExtended(mExtended);
         return mBinding.getRoot();
@@ -191,6 +197,14 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
             Uri uri = FileProvider.getUriForFile(requireContext(), "com.jonahbauer.qed.fileprovider", new File(mImage.getPath()));
             Actions.openContent(requireContext(), uri, mImage.getFormat());
             return true;
+        } else if (id == R.id.image_copy_link) {
+            String link = String.format(Locale.ROOT, NetworkConstants.GALLERY_SERVER_IMAGE_VIEW, mImage.getId());
+            Actions.copy(requireContext(), getView(), getString(R.string.image_clip_label_link, mImage.getId()), link);
+            return true;
+        } else if (id == R.id.image_share) {
+            Uri uri = FileProvider.getUriForFile(requireContext(), "com.jonahbauer.qed.fileprovider", new File(mImage.getPath()));
+            Actions.shareContent(requireContext(), uri, mImage.getFormat());
+            return true;
         }
         return false;
     }
@@ -215,8 +229,10 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
 
         // update buttons
         mOpenWithButton.setEnabled(image != null && image.getPath() != null);
+        mShareButton.setEnabled(image != null && image.getPath() != null && image.getFormat() != null);
         mDownloadButton.setEnabled(image != null);
         mInfoButton.setEnabled(image != null);
+        mCopyLinkButton.setEnabled(image != null);
     }
 
     private void onPageSelected(int position) {
@@ -271,6 +287,7 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
 
     private class ImageAdapter extends ListAdapter<Image, ImageViewHolder> {
         private final Int2ObjectMap<SoftReference<ImageViewHolder>> mViewHolderCache = new Int2ObjectOpenHashMap<>();
+        private final View.OnClickListener mOnClickListener = v -> toggleExtended();
 
         protected ImageAdapter() {
             super(new DiffUtil.ItemCallback<>() {
@@ -290,7 +307,7 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
         @Override
         public ImageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             ImageViewHolder viewHolder = new ImageViewHolder(LayoutInflater.from(parent.getContext()));
-            viewHolder.setOnClickListener(v -> toggleExtended());
+            viewHolder.setOnClickListener(mOnClickListener);
             return viewHolder;
         }
 

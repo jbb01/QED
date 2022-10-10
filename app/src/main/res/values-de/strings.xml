@@ -154,7 +154,10 @@
 
     <string name="image_info">@string/info</string>
     <string name="image_open_with">Öffnen mit…</string>
+    <string name="image_share">Teilen</string>
+    <string name="image_copy_link">Link kopieren</string>
     <string name="image_download_original">Original herunterladen</string>
+    <string name="image_clip_label_link">Bild #%d</string>
 
     <!-- Image Info Activity -->
     <string name="title_activity_image_info">Informationen</string>
