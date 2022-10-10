@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
@@ -11,6 +12,7 @@ import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
 
+import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.model.parcel.ParcelExtensions;
 import com.jonahbauer.qed.model.room.Converters;
 
@@ -29,8 +31,6 @@ import lombok.EqualsAndHashCode;
 @TypeConverters(Converters.class)
 public class Image implements Parcelable {
     public static final long NO_ID = Long.MIN_VALUE;
-    public static final Set<String> VIDEO_FILE_EXTENSIONS;
-    public static final Set<String> AUDIO_FILE_EXTENSIONS;
 
     public static final String DATA_KEY_ALBUM = "album";
     public static final String DATA_KEY_OWNER = "owner";
@@ -49,9 +49,36 @@ public class Image implements Parcelable {
     public static final String DATA_KEY_VISITS = "visits";
     public static final String DATA_KEY_RESOLUTION = "resolution";
 
+    private static final Set<String> VIDEO_FILE_EXTENSIONS;
+    private static final Set<String> AUDIO_FILE_EXTENSIONS;
+    private static final Set<String> IMAGE_FILE_EXTENSIONS;
+    private static final Map<Image.Type, Integer> THUMBNAIL_BY_TYPE;
+    private static final Map<Image.Type, Integer> THUMBNAIL_ERROR_BY_TYPE;
+
     static {
         VIDEO_FILE_EXTENSIONS = ObjectSet.of("mp4", "mkv", "flv", "mov", "avi", "wmv", "mpeg", "webm");
         AUDIO_FILE_EXTENSIONS = ObjectSet.of("wav", "mp3", "ogg", "m4a", "flac", "opus");
+        IMAGE_FILE_EXTENSIONS = ObjectSet.of("jpg", "jpeg", "png", "webp", "gif", "tif", "bmp", "ico", "svg");
+    }
+
+    static {
+        var thumbnail = new EnumMap<Image.Type, Integer>(Image.Type.class);
+        thumbnail.put(Image.Type.IMAGE, R.drawable.ic_gallery_image);
+        thumbnail.put(Image.Type.OTHER, R.drawable.ic_gallery_other);
+        thumbnail.put(Image.Type.AUDIO, R.drawable.ic_gallery_audio);
+        thumbnail.put(Image.Type.VIDEO, R.drawable.ic_gallery_video);
+        THUMBNAIL_BY_TYPE = Collections.unmodifiableMap(thumbnail);
+
+        var thumbnailError = new EnumMap<Image.Type, Integer>(Image.Type.class);
+        thumbnailError.put(Image.Type.IMAGE, R.drawable.ic_gallery_empty_image);
+        thumbnailError.put(Image.Type.OTHER, R.drawable.ic_gallery_empty_other);
+        thumbnailError.put(Image.Type.AUDIO, R.drawable.ic_gallery_empty_audio);
+        thumbnailError.put(Image.Type.VIDEO, R.drawable.ic_gallery_empty_video);
+        THUMBNAIL_ERROR_BY_TYPE = Collections.unmodifiableMap(thumbnailError);
+    }
+
+    public static @DrawableRes int getThumbnail(@NonNull Image.Type type, boolean success) {
+        return Objects.requireNonNull((success ? THUMBNAIL_BY_TYPE : THUMBNAIL_ERROR_BY_TYPE).get(type));
     }
 
     @PrimaryKey
@@ -133,28 +160,34 @@ public class Image implements Parcelable {
         return joiner.toString();
     }
 
-    public Type getType() {
+    public @NonNull Type getType() {
         if (getFormat() != null) {
             String format = getFormat().split("/")[0];
             if ("audio".equals(format)) {
                 return Type.AUDIO;
             } else if ("video".equals(format)) {
                 return Type.VIDEO;
-            } else {
+            } else if ("image".equals(format)) {
                 return Type.IMAGE;
+            } else {
+                return Type.OTHER;
             }
         } else if (getName() != null) {
             String suffix = getName();
-            suffix = suffix.substring(suffix.lastIndexOf('.') + 1);
+            suffix = suffix.substring(suffix.lastIndexOf('.') + 1).toLowerCase(Locale.ROOT);
 
             if (Image.VIDEO_FILE_EXTENSIONS.contains(suffix)) {
                 return Type.VIDEO;
             } else if (Image.AUDIO_FILE_EXTENSIONS.contains(suffix)) {
                 return Type.AUDIO;
+            } else if (Image.IMAGE_FILE_EXTENSIONS.contains(suffix)) {
+                return Type.IMAGE;
+            } else {
+                return Type.OTHER;
             }
         }
 
-        return Type.IMAGE;
+        return Type.OTHER;
     }
 
     @Override
@@ -197,6 +230,6 @@ public class Image implements Parcelable {
     });
 
     public enum Type {
-        IMAGE, VIDEO, AUDIO
+        IMAGE, VIDEO, AUDIO, OTHER
     }
 }

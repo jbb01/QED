@@ -23,6 +23,7 @@ import com.jonahbauer.qed.networking.async.QEDPageStreamReceiver;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -34,6 +35,7 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class QEDGalleryPages extends QEDPages {
+    private static final String HEADER_CONTENT_TYPE = "Content-Type";
 
     @NonNull
     @CheckReturnValue
@@ -67,7 +69,7 @@ public class QEDGalleryPages extends QEDPages {
 
         AsyncLoadQEDPage network = new AsyncLoadQEDPage(
                 Feature.GALLERY,
-                NetworkConstants.GALLERY_SERVER_ALBUM + album.getId() + filterString
+                String.format(Locale.ROOT, NetworkConstants.GALLERY_SERVER_ALBUM, album.getId(), filterString)
         );
 
         return run(
@@ -88,7 +90,7 @@ public class QEDGalleryPages extends QEDPages {
 
         AsyncLoadQEDPage network = new AsyncLoadQEDPage(
                 Feature.GALLERY,
-                NetworkConstants.GALLERY_SERVER_IMAGE_INFO + image.getId()
+                String.format(Locale.ROOT, NetworkConstants.GALLERY_SERVER_IMAGE_INFO, image.getId())
         );
 
         return run(
@@ -109,8 +111,16 @@ public class QEDGalleryPages extends QEDPages {
 
         AsyncLoadQEDPageToStream network = new AsyncLoadQEDPageToStream(
                 Feature.GALLERY,
-                String.format(NetworkConstants.GALLERY_SERVER_IMAGE, mode.mQuery, image.getId()),
-                outputStream
+                String.format(Locale.ROOT, NetworkConstants.GALLERY_SERVER_IMAGE, mode.mQuery, image.getId()),
+                outputStream,
+                connection -> {
+                    if (image.getFormat() != null) return;
+
+                    var contentType = connection.getHeaderField(HEADER_CONTENT_TYPE);
+                    if (contentType != null && !contentType.startsWith("text")) {
+                        image.setFormat(contentType);
+                    }
+                }
         );
 
         return run(
@@ -129,7 +139,7 @@ public class QEDGalleryPages extends QEDPages {
 
         AsyncLoadQEDPageToImage network = new AsyncLoadQEDPageToImage(
                 Feature.GALLERY,
-                String.format(NetworkConstants.GALLERY_SERVER_IMAGE, Mode.THUMBNAIL.mQuery, image.getId())
+                String.format(Locale.ROOT, NetworkConstants.GALLERY_SERVER_IMAGE, Mode.THUMBNAIL.mQuery, image.getId())
         );
 
         return Single.fromCallable(network)

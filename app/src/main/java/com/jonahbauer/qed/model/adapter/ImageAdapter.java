@@ -26,9 +26,6 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 import java.io.IOException;
 import java.util.List;
 
-import static com.jonahbauer.qed.model.Image.AUDIO_FILE_EXTENSIONS;
-import static com.jonahbauer.qed.model.Image.VIDEO_FILE_EXTENSIONS;
-
 public class ImageAdapter extends ArrayAdapter<Image> {
     private static final String LOG_TAG = ImageAdapter.class.getName();
 
@@ -78,7 +75,7 @@ public class ImageAdapter extends ArrayAdapter<Image> {
         binding.getDisposable().clear();
 
         if (image == null) {
-            applyThumbnail(binding, AppCompatResources.getDrawable(getContext(), R.drawable.ic_gallery_image));
+            applyThumbnail(binding, AppCompatResources.getDrawable(getContext(), R.drawable.ic_gallery_other));
             return;
         }
 
@@ -153,22 +150,8 @@ public class ImageAdapter extends ArrayAdapter<Image> {
             return new BitmapDrawable(mContext.getResources(), thumbnail);
         }
 
-        String fileExtension = null;
-        if (image.getName() != null) {
-            fileExtension = image.getName();
-            fileExtension = fileExtension.substring(fileExtension.lastIndexOf('.') + 1);
-        }
-
         boolean available = (!error && !mOfflineMode) || image.getPath() != null;
-        int resource;
-
-        if (VIDEO_FILE_EXTENSIONS.contains(fileExtension)) {
-            resource = available ? R.drawable.ic_gallery_video : R.drawable.ic_gallery_empty_video;
-        } else if (AUDIO_FILE_EXTENSIONS.contains(fileExtension)) {
-            resource = available ? R.drawable.ic_gallery_audio : R.drawable.ic_gallery_empty_audio;
-        } else {
-            resource = available ? R.drawable.ic_gallery_image : R.drawable.ic_gallery_empty_image;
-        }
+        int resource = Image.getThumbnail(image.getType(), available);
 
         return AppCompatResources.getDrawable(mContext, resource);
     }

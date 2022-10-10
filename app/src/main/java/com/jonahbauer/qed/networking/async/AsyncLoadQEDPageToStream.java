@@ -2,35 +2,41 @@ package com.jonahbauer.qed.networking.async;
 
 import androidx.annotation.NonNull;
 
+import androidx.annotation.Nullable;
 import com.jonahbauer.qed.networking.Feature;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.util.function.Consumer;
 
 import javax.net.ssl.HttpsURLConnection;
 
 import io.reactivex.rxjava3.core.ObservableEmitter;
 import io.reactivex.rxjava3.core.ObservableOnSubscribe;
 import it.unimi.dsi.fastutil.longs.LongLongPair;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 public final class AsyncLoadQEDPageToStream extends BaseAsyncLoadQEDPage implements ObservableOnSubscribe<LongLongPair> {
 
-    private final Feature mFeature;
-    private final String mUrl;
-    private final OutputStream mOutputStream;
-
-    public AsyncLoadQEDPageToStream(@NonNull Feature mFeature,
-                                    @NonNull String mUrl,
-                                    @NonNull OutputStream mOutputStream) {
-        this.mFeature = mFeature;
-        this.mUrl = mUrl;
-        this.mOutputStream = mOutputStream;
-    }
+    private final @NonNull Feature mFeature;
+    private final @NonNull String mUrl;
+    private final @NonNull OutputStream mOutputStream;
+    private final @Nullable Consumer<HttpsURLConnection> processor;
 
     @Override
     public void subscribe(@NonNull ObservableEmitter<LongLongPair> emitter) throws Throwable {
         HttpsURLConnection httpsURLConnection = connectAndLogin(mUrl, mFeature);
+        if (httpsURLConnection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+            emitter.onError(new IOException("Status Code is not 200."));
+            return;
+        }
+
+        if (processor != null && !emitter.isDisposed()) {
+            processor.accept(httpsURLConnection);
+        }
 
         // copy input stream to output stream
         try (InputStream inputStream = httpsURLConnection.getInputStream(); mOutputStream) {

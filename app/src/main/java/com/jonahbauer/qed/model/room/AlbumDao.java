@@ -49,8 +49,8 @@ public interface AlbumDao {
     @Query("UPDATE image SET thumbnail = :thumbnail WHERE id = :id")
     Completable insertThumbnail(long id, Bitmap thumbnail);
 
-    @Query("UPDATE image SET path = :path, original = :original WHERE id = :id")
-    Completable insertImagePath(long id, String path, boolean original);
+    @Query("UPDATE image SET path = :path, original = :original, format = :format WHERE id = :id")
+    Completable insertImagePath(long id, String path, String format, boolean original);
 
 
     @Query("DELETE FROM image")

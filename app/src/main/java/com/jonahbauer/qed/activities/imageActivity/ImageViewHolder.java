@@ -9,7 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.RelativeLayout;
+import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.lifecycle.LiveData;
@@ -17,6 +19,8 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.rxjava3.EmptyResultSetException;
 import androidx.viewpager2.widget.ViewPager2;
+import com.jonahbauer.qed.Application;
+import com.jonahbauer.qed.ConnectionStateMonitor;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.databinding.ViewHolderImageBinding;
 import com.jonahbauer.qed.model.Image;
@@ -38,7 +42,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Locale;
+import java.util.*;
 
 import static com.jonahbauer.qed.networking.pages.QEDGalleryPages.Mode.NORMAL;
 import static com.jonahbauer.qed.networking.pages.QEDGalleryPages.Mode.ORIGINAL;
@@ -103,13 +107,16 @@ public class ImageViewHolder extends RecyclerView.ViewHolder implements QEDPageR
         return root;
     }
 
+    @MainThread
     public void load(Image image) {
         this.mMode = NORMAL;
         this.mTarget = null;
         this.mDownloadTmp = null;
+        this.mPendingDialog = null;
         setImage(image);
     }
 
+    @MainThread
     private void setImage(Image image) {
         setImage(image, false);
     }
@@ -119,9 +126,10 @@ public class ImageViewHolder extends RecyclerView.ViewHolder implements QEDPageR
      * <br><br>
      * If the image is downloaded already and {@code forceDownload} is false the downloaded image
      * (or an icon for non-image resources) will be displayed. Otherwise the image will be downloaded.
-     * @see #downloadImage(Image)
-     * @see #downloadNonImage(Image)
+     * @see #download(Image)
+     * @see #downloadWithPrompt(Image)
      */
+    @MainThread
     private void setImage(Image image, boolean forceDownload) {
         mDisposable.clear();
 
@@ -154,33 +162,41 @@ public class ImageViewHolder extends RecyclerView.ViewHolder implements QEDPageR
             return;
         }
 
-        Image.Type type = image.getType();
         if (!forceDownload && image.getPath() != null && new File(image.getPath()).exists()) {
-            switch (type) {
-                default:
-                case IMAGE:
-                    setImageFromFile(image);
-                    break;
-                case VIDEO:
-                    this.mBinding.setDrawable(AppCompatResources.getDrawable(mContext, R.drawable.ic_gallery_video));
-                    this.mStatus.setValue(StatusWrapper.loaded(image));
-                    break;
-                case AUDIO:
-                    this.mBinding.setDrawable(AppCompatResources.getDrawable(mContext, R.drawable.ic_gallery_audio));
-                    this.mStatus.setValue(StatusWrapper.loaded(image));
-                    break;
-            }
+            setResult(image);
         } else {
             this.mStatus.setValue(StatusWrapper.preloaded(image));
-            if (type == Image.Type.IMAGE) {
-                downloadImage(image);
+            if (image.getType() == Image.Type.IMAGE) {
+                download(image);
+            } else if (!isMeteredConnection()) {
+                mMode = ORIGINAL;
+                download(image);
             } else {
-                downloadNonImage(image);
+                downloadWithPrompt(image);
             }
         }
     }
 
-    private void setImageFromFile(Image image) {
+    private void setResult(@NonNull Image image) {
+        setResult(image, null);
+    }
+
+    private void setResult(@NonNull Image image, @Nullable Reason reason) {
+        var type = image.getType();
+        if (reason == null && type == Image.Type.IMAGE) {
+            setImageFromFile(image);
+        } else if (image.getThumbnail() != null) {
+            mBinding.setDrawable(new BitmapDrawable(mContext.getResources(), image.getThumbnail()));
+        } else if (reason == null) {
+            mBinding.setDrawable(AppCompatResources.getDrawable(mContext, Image.getThumbnail(type, true)));
+            mStatus.setValue(StatusWrapper.loaded(image));
+        } else {
+            mBinding.setDrawable(AppCompatResources.getDrawable(mContext, Image.getThumbnail(type, false)));
+            mStatus.setValue(StatusWrapper.error(image, reason));
+        }
+    }
+
+    private void setImageFromFile(@NonNull Image image) {
         mDisposable.add(
                 Single.fromCallable(() -> BitmapFactory.decodeFile(image.getPath()))
                       .subscribeOn(Schedulers.io())
@@ -188,9 +204,12 @@ public class ImageViewHolder extends RecyclerView.ViewHolder implements QEDPageR
                       .subscribe(
                               bitmap -> {
                                   mStatus.setValue(StatusWrapper.loaded(image));
-                                  this.mBinding.setDrawable(new BitmapDrawable(mContext.getResources(), bitmap));
+                                  mBinding.setDrawable(new BitmapDrawable(mContext.getResources(), bitmap));
                               },
-                              t -> this.mBinding.setDrawable(AppCompatResources.getDrawable(mContext, R.drawable.ic_gallery_image))
+                              t -> {
+                                  mStatus.setValue(StatusWrapper.loaded(image));
+                                  mBinding.setDrawable(AppCompatResources.getDrawable(mContext, R.drawable.ic_gallery_image));
+                              }
                       )
         );
     }
@@ -217,8 +236,7 @@ public class ImageViewHolder extends RecyclerView.ViewHolder implements QEDPageR
     /**
      * starts an async download for the specified image
      */
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    private void downloadImage(Image image) {
+    private void download(Image image) {
         // when in offline mode show confirmation dialog
         if (Preferences.getGallery().isOfflineMode()) {
             onError(image, Reason.NETWORK, null);
@@ -228,14 +246,17 @@ public class ImageViewHolder extends RecyclerView.ViewHolder implements QEDPageR
         String suffix = image.getName();
         suffix = suffix.substring(suffix.lastIndexOf('.') + 1);
 
-        File dir = mContext.getExternalFilesDir(mContext.getString(R.string.gallery_folder_images));
-        File dir2 = new File(mContext.getExternalCacheDir(), mContext.getString(R.string.gallery_folder_images));
-        assert dir != null;
-        if (!dir.exists()) dir.mkdirs();
-        if (!dir2.exists()) dir2.mkdirs();
+        File targetDir = mContext.getExternalFilesDir(mContext.getString(R.string.gallery_folder_images));
+        File cacheDir = new File(mContext.getExternalCacheDir(), mContext.getString(R.string.gallery_folder_images));
+        assert targetDir != null;
 
-        mTarget = new File(dir, image.getId() + "." + suffix);
-        mDownloadTmp = new File(dir2, image.getId() + "." + suffix + ".tmp");
+        if (!((targetDir.exists() || targetDir.mkdirs()) && (cacheDir.exists() || cacheDir.mkdirs()))) {
+            onError(image, Reason.UNKNOWN, new IOException("Could not create target directories."));
+            return;
+        }
+
+        mTarget = new File(targetDir, image.getId() + "." + suffix);
+        mDownloadTmp = new File(cacheDir, image.getId() + "." + suffix + ".tmp");
 
         try {
             FileOutputStream fos = new FileOutputStream(mDownloadTmp);
@@ -243,14 +264,14 @@ public class ImageViewHolder extends RecyclerView.ViewHolder implements QEDPageR
                     QEDGalleryPages.getImage(image, image, mMode, fos, this)
             );
         } catch (IOException e) {
-            Log.e(LOG_TAG, e.getMessage(), e);
+            onError(image, Reason.UNKNOWN, e);
         }
     }
 
     /**
      * starts an async download for the specified non image resource after prompting the user for confirmation
      */
-    private void downloadNonImage(final Image image) {
+    private void downloadWithPrompt(final Image image) {
         // when in offline mode show confirmation dialog
         if (Preferences.getGallery().isOfflineMode()) {
             onError(image, Reason.NETWORK, null);
@@ -262,7 +283,7 @@ public class ImageViewHolder extends RecyclerView.ViewHolder implements QEDPageR
         builder.setPositiveButton(R.string.yes, (dialog, which) -> {
             mMode = ORIGINAL;
             image.setOriginal(true);
-            downloadImage(image);
+            download(image);
         });
         builder.setNegativeButton(R.string.no, (dialog, which) -> onError(image, Reason.USER, null));
         builder.setCancelable(false);
@@ -297,7 +318,7 @@ public class ImageViewHolder extends RecyclerView.ViewHolder implements QEDPageR
             if (mTarget.exists()) mTarget.delete();
 
             if (!mDownloadTmp.renameTo(mTarget)) {
-                onError(image, Reason.UNKNOWN, new Exception("Unable to rename file."));
+                onError(image, Reason.UNKNOWN, new IOException("Unable to rename file."));
                 return;
             }
             if (mDownloadTmp != null) {
@@ -310,25 +331,12 @@ public class ImageViewHolder extends RecyclerView.ViewHolder implements QEDPageR
 
         image.setPath(mTarget.getAbsolutePath());
         image.setOriginal(mMode == ORIGINAL);
-        mAlbumDao.insertImagePath(image.getId(), image.getPath(), image.isOriginal())
+        mAlbumDao.insertImagePath(image.getId(), image.getPath(), image.getFormat(), image.isOriginal())
                  .subscribeOn(Schedulers.io())
                  .observeOn(AndroidSchedulers.mainThread())
                  .subscribe(() -> {}, err -> Log.e(LOG_TAG, "Could not save image path to database.", err));
 
-        switch (image.getType()) {
-            case IMAGE:
-                setImageFromFile(image);
-                break;
-            case VIDEO:
-                mBinding.setDrawable(AppCompatResources.getDrawable(mContext, R.drawable.ic_gallery_video));
-                mStatus.setValue(StatusWrapper.loaded(image));
-                break;
-            case AUDIO:
-                mBinding.setDrawable(AppCompatResources.getDrawable(mContext, R.drawable.ic_gallery_audio));
-                mStatus.setValue(StatusWrapper.loaded(image));
-                break;
-        }
-
+        setResult(image);
         this.mBinding.setProgress(null);
         this.mBinding.setProgressText(null);
     }
@@ -338,25 +346,7 @@ public class ImageViewHolder extends RecyclerView.ViewHolder implements QEDPageR
     public void onError(Image image, @NonNull Reason reason, Throwable cause) {
         QEDPageStreamReceiver.super.onError(image, reason, cause);
         if (mDownloadTmp != null) mDownloadTmp.delete();
-
-        mStatus.setValue(StatusWrapper.error(image, reason));
-
-        switch (image.getType()) {
-            default:
-            case IMAGE:
-                if (image.getThumbnail() != null) {
-                    mBinding.setDrawable(new BitmapDrawable(mContext.getResources(), image.getThumbnail()));
-                } else {
-                    mBinding.setDrawable(AppCompatResources.getDrawable(mContext, R.drawable.ic_gallery_empty_image));
-                }
-                break;
-            case AUDIO:
-                mBinding.setDrawable(AppCompatResources.getDrawable(mContext, R.drawable.ic_gallery_empty_audio));
-                break;
-            case VIDEO:
-                mBinding.setDrawable(AppCompatResources.getDrawable(mContext, R.drawable.ic_gallery_empty_video));
-                break;
-        }
+        setResult(image, reason);
     }
 
     @Override
@@ -386,5 +376,14 @@ public class ImageViewHolder extends RecyclerView.ViewHolder implements QEDPageR
         } else {
             mPendingDialog = dialog;
         }
+    }
+
+    private boolean isMeteredConnection() {
+        Context applicationContext = mContext.getApplicationContext();
+        if (applicationContext instanceof Application) {
+            var state = ((Application) applicationContext).getConnectionStateMonitor().getConnectionState().getValue();
+            return state == ConnectionStateMonitor.State.CONNECTED_METERED;
+        }
+        return true;
     }
 }

@@ -31,14 +31,7 @@ public final class AsyncLoadQEDPageToImage extends BaseAsyncLoadQEDPage implemen
 
         // thumbnails for image and video get redirected
         if (httpsURLConnection.getResponseCode() == 302) {
-            String location = httpsURLConnection.getHeaderField("Location");
-            if (location != null) {
-                if (location.contains("video-x-generic.png")) {
-                    return Optional.empty();
-                } else if (location.contains("audio-x-generic.png")) {
-                    return Optional.empty();
-                }
-            }
+            return Optional.empty();
         }
 
         byte[] data = NetworkUtils.readAllBytes(httpsURLConnection.getInputStream());

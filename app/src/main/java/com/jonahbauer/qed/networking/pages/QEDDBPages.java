@@ -18,6 +18,7 @@ import com.jonahbauer.qed.networking.async.QEDPageReceiver;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import io.reactivex.rxjava3.annotations.CheckReturnValue;
 import io.reactivex.rxjava3.disposables.Disposable;
@@ -36,7 +37,7 @@ public class QEDDBPages extends QEDPages {
 
         AsyncLoadQEDPage network = new AsyncLoadQEDPage(
                 Feature.DATABASE,
-                NetworkConstants.DATABASE_SERVER_EVENT + event.getId()
+                String.format(Locale.ROOT, NetworkConstants.DATABASE_SERVER_EVENT, event.getId())
         );
 
         return run(
@@ -75,7 +76,7 @@ public class QEDDBPages extends QEDPages {
 
         AsyncLoadQEDPage network = new AsyncLoadQEDPage(
                 Feature.DATABASE,
-                NetworkConstants.DATABASE_SERVER_PERSON + person.getId()
+                String.format(Locale.ROOT, NetworkConstants.DATABASE_SERVER_PERSON, person.getId())
         );
 
         return run(
@@ -113,7 +114,7 @@ public class QEDDBPages extends QEDPages {
 
         AsyncLoadQEDPage network = new AsyncLoadQEDPage(
                 Feature.DATABASE,
-                NetworkConstants.DATABASE_SERVER_REGISTRATION + registration.getId()
+                String.format(Locale.ROOT, NetworkConstants.DATABASE_SERVER_REGISTRATION, registration.getId())
         );
 
         return run(

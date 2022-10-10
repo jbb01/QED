@@ -7,6 +7,7 @@ import com.jonahbauer.qed.networking.NetworkUtils;
 import com.jonahbauer.qed.networking.exceptions.InvalidCredentialsException;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.util.concurrent.Callable;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -25,6 +26,9 @@ public final class AsyncLoadQEDPage extends BaseAsyncLoadQEDPage implements Call
     @Override
     public String call() throws IOException, InvalidCredentialsException {
         HttpsURLConnection httpsURLConnection = connectAndLogin(mUrl, mFeature);
+        if (httpsURLConnection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+            throw new IOException("Status Code is not 200.");
+        }
 
         String out = NetworkUtils.readPage(httpsURLConnection);
         httpsURLConnection.disconnect();
