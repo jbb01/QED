@@ -43,7 +43,7 @@ public class AlbumListViewModel extends AndroidViewModel implements QEDPageRecei
     }
 
     public void load() {
-        if (Preferences.gallery().isOfflineMode()) {
+        if (Preferences.getGallery().isOfflineMode()) {
             mOffline.setValue(true);
             loadFromDatabase();
         } else {

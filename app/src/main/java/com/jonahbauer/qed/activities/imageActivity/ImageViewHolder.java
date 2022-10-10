@@ -220,7 +220,7 @@ public class ImageViewHolder extends RecyclerView.ViewHolder implements QEDPageR
     @SuppressWarnings("ResultOfMethodCallIgnored")
     private void downloadImage(Image image) {
         // when in offline mode show confirmation dialog
-        if (Preferences.gallery().isOfflineMode()) {
+        if (Preferences.getGallery().isOfflineMode()) {
             onError(image, Reason.NETWORK, null);
             return;
         }
@@ -252,7 +252,7 @@ public class ImageViewHolder extends RecyclerView.ViewHolder implements QEDPageR
      */
     private void downloadNonImage(final Image image) {
         // when in offline mode show confirmation dialog
-        if (Preferences.gallery().isOfflineMode()) {
+        if (Preferences.getGallery().isOfflineMode()) {
             onError(image, Reason.NETWORK, null);
             return;
         }

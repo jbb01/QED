@@ -86,7 +86,7 @@ public class Application extends android.app.Application implements android.app.
         Preferences.init(preferences, this.getResources());
 
         // Activate Night Mode
-        if (Preferences.general().isNightMode()) {
+        if (Preferences.getGeneral().isNightMode()) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         } else {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);

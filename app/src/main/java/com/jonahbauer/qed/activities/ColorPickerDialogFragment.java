@@ -69,7 +69,7 @@ public class ColorPickerDialogFragment extends AppCompatDialogFragment implement
         builder.setPositiveButton(R.string.ok, (dialog, which) -> {
             var result = mViewModel.getResult().getValue();
             if (result != null) {
-                Preferences.chat().edit().setName(result.first).apply();
+                Preferences.getChat().setName(result.first);
             }
             this.dismiss();
         });
@@ -94,7 +94,7 @@ public class ColorPickerDialogFragment extends AppCompatDialogFragment implement
         });
         mViewModel.getDeltaE().observe(this, mBinding::setDeltaE);
 
-        var name = Preferences.chat().getName();
+        var name = Preferences.getChat().getName();
         mViewModel.init(name);
         mBinding.setName(MessageUtils.formatName(requireContext(), name));
 

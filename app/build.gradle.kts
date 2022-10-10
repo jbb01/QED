@@ -90,6 +90,9 @@ dependencies {
 
     annotationProcessor("androidx.room:room-compiler:2.4.2")
 
+    implementation("eu.jonahbauer:android-preference-annotations:1.1.2")
+    annotationProcessor("eu.jonahbauer:android-preference-annotations:1.1.2")
+
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test:core:1.4.0")
     androidTestImplementation("androidx.test.ext:junit:1.1.3")

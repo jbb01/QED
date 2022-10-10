@@ -28,15 +28,15 @@ public class GeneralPreferenceFragment extends AbstractPreferenceFragment implem
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.preferences_general, rootKey);
 
-        bugReport = findPreference(Preferences.general().keys().bugReport());
+        bugReport = findPreference(Preferences.getGeneral().getKeys().getBugReport());
         assert bugReport != null;
         bugReport.setOnPreferenceClickListener(this);
 
-        github = findPreference(Preferences.general().keys().github());
+        github = findPreference(Preferences.getGeneral().getKeys().getGithub());
         assert github != null;
         github.setOnPreferenceClickListener(this);
 
-        nightMode = findPreference(Preferences.general().keys().nightMode());
+        nightMode = findPreference(Preferences.getGeneral().getKeys().getNightMode());
         assert nightMode != null;
         nightMode.setOnPreferenceChangeListener(this);
     }

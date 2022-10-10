@@ -45,7 +45,7 @@ public class ImageAdapter extends ArrayAdapter<Image> {
         this.mAlbumDao = Database.getInstance(context.getApplicationContext()).albumDao();
 
         this.mImageList = imageList;
-        this.mOfflineMode = Preferences.gallery().isOfflineMode();
+        this.mOfflineMode = Preferences.getGallery().isOfflineMode();
     }
 
     @NonNull

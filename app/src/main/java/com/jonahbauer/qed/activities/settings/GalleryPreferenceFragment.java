@@ -29,19 +29,19 @@ public class GalleryPreferenceFragment extends AbstractPreferenceFragment implem
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.preferences_gallery, rootKey);
 
-        deleteThumbnails = findPreference(Preferences.gallery().keys().deleteThumbnails());
+        deleteThumbnails = findPreference(Preferences.getGallery().getKeys().getDeleteThumbnails());
         assert deleteThumbnails != null;
         deleteThumbnails.setOnPreferenceClickListener(this);
 
-        deleteImages = findPreference(Preferences.gallery().keys().deleteImages());
+        deleteImages = findPreference(Preferences.getGallery().getKeys().getDeleteImages());
         assert deleteImages != null;
         deleteImages.setOnPreferenceClickListener(this);
 
-        showDir = findPreference(Preferences.gallery().keys().showDir());
+        showDir = findPreference(Preferences.getGallery().getKeys().getShowDir());
         assert showDir != null;
         showDir.setOnPreferenceClickListener(this);
 
-        deleteDatabase = findPreference(Preferences.gallery().keys().deleteDatabase());
+        deleteDatabase = findPreference(Preferences.getGallery().getKeys().getDeleteDb());
         assert deleteDatabase != null;
         deleteDatabase.setOnPreferenceClickListener(this);
     }

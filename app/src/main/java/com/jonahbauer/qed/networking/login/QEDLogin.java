@@ -277,7 +277,7 @@ public final class QEDLogin {
             try {
                 login(username, password, feature);
 
-                if (Preferences.general().isRememberMe()) {
+                if (Preferences.getGeneral().isRememberMe()) {
                     PasswordStorage.saveUsernameAndPassword(username, password);
                 }
             } finally {
@@ -296,18 +296,7 @@ public final class QEDLogin {
 
     public static Disposable loginAsync(@NonNull Feature feature, QEDPageReceiver<Boolean> listener) {
         var observable = Single.fromCallable(() -> {
-            if (!Preferences.general().isRememberMe()) throw new InvalidCredentialsException("Remember me is deactivated.");
-            switch (feature) {
-                case CHAT:
-                    QEDLogin.loginChat();
-                    break;
-                case GALLERY:
-                    QEDLogin.loginGallery();
-                    break;
-                case DATABASE:
-                    QEDLogin.loginDatabase();
-                    break;
-            }
+            login(feature, false);
             return true;
         });
 
@@ -342,7 +331,7 @@ public final class QEDLogin {
      */
     public static void login(@NonNull Feature feature, boolean promptIfNecessary) throws InvalidCredentialsException, NetworkException {
         try {
-            if (!Preferences.general().isRememberMe()) throw new InvalidCredentialsException("Remember me is deactivated.");
+            if (!Preferences.getGeneral().isRememberMe()) throw new InvalidCredentialsException("Remember me is deactivated.");
             switch (feature) {
                 case CHAT:
                     QEDLogin.loginChat();

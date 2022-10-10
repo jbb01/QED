@@ -51,9 +51,9 @@ public class LoginFragment extends Fragment implements QEDPageReceiver<Boolean> 
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        mBinding.rememberMeCheckbox.setChecked(Preferences.general().isRememberMe());
+        mBinding.rememberMeCheckbox.setChecked(Preferences.getGeneral().isRememberMe());
         mBinding.rememberMeCheckbox.setOnCheckedChangeListener(
-                (buttonView, isChecked) -> Preferences.general().edit().setRememberMe(isChecked).apply()
+                (buttonView, isChecked) -> Preferences.getGeneral().setRememberMe(isChecked)
         );
 
         mBinding.password.setOnEditorActionListener((textView, id, keyEvent) -> {

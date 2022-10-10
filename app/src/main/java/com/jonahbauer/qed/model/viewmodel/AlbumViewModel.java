@@ -62,7 +62,7 @@ public class AlbumViewModel extends AndroidViewModel {
     }
 
     public void load(@NonNull Album album, @NonNull AlbumFilter filter) {
-        load(album, filter, Preferences.gallery().isOfflineMode());
+        load(album, filter, Preferences.getGallery().isOfflineMode());
     }
 
     public void load(@NonNull Album album, @NonNull AlbumFilter filter, boolean offline) {

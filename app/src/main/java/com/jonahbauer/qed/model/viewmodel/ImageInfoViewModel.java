@@ -69,7 +69,7 @@ public class ImageInfoViewModel extends AndroidViewModel implements QEDPageRecei
     }
 
     private void loadFromInternet(Image image) {
-        if (Preferences.gallery().isOfflineMode()) {
+        if (Preferences.getGallery().isOfflineMode()) {
             onError(image, Reason.USER, null);
         } else {
             mDisposable.add(

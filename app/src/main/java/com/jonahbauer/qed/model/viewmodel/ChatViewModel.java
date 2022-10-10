@@ -70,12 +70,12 @@ public class ChatViewModel extends AndroidViewModel {
         mConnectionState = app.getConnectionStateMonitor().getConnectionState();
         mConnectionState.observeForever(mConnectionStateObserver);
 
-        mName.setValue(Preferences.chat().getName());
+        mName.setValue(Preferences.getChat().getName());
     }
 
     @MainThread
     public void connect() {
-        connect(Preferences.chat().getChannel());
+        connect(Preferences.getChat().getChannel());
     }
 
     @MainThread
@@ -108,7 +108,7 @@ public class ChatViewModel extends AndroidViewModel {
     }
 
     public boolean send(String message) {
-        return send(Preferences.chat().getName(), message, Preferences.chat().isPublicId());
+        return send(Preferences.getChat().getName(), message, Preferences.getChat().isPublicId());
     }
 
     public boolean send(String name, String message, boolean publicId) {
@@ -187,10 +187,10 @@ public class ChatViewModel extends AndroidViewModel {
 
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-            if (Preferences.chat().keys().channel().equals(key)) {
-                connect(Preferences.chat().getChannel());
-            } else if (Preferences.chat().keys().name().equals(key)) {
-                mName.setValue(Preferences.chat().getName());
+            if (Preferences.getChat().getKeys().getChannel().equals(key)) {
+                connect(Preferences.getChat().getChannel());
+            } else if (Preferences.getChat().getKeys().getName().equals(key)) {
+                mName.setValue(Preferences.getChat().getName());
             }
         }
     }

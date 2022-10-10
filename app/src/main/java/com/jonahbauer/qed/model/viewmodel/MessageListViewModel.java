@@ -58,7 +58,7 @@ public class MessageListViewModel extends AndroidViewModel {
                 mMessages.setValue(StatusWrapper.loaded(Collections.emptyList()));
             } else {
                 mMessages.setValue(StatusWrapper.preloaded(Collections.emptyList()));
-                var disposable = filter.search(mMessageDao, Preferences.chat().getDbMaxResults())
+                var disposable = filter.search(mMessageDao, Preferences.getChat().getDbMaxResult())
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(

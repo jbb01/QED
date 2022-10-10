@@ -167,7 +167,7 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
     public boolean onMenuItemClick(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.image_download_original) {
-            if (Preferences.gallery().isOfflineMode()) {
+            if (Preferences.getGallery().isOfflineMode()) {
                 Toast.makeText(requireContext(), R.string.offline_mode_not_available, Toast.LENGTH_SHORT).show();
                 return true;
             }

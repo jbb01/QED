@@ -236,11 +236,11 @@ public class MessageAdapter extends ArrayAdapter<Message> {
     }
 
     public void reload() {
-        mColorful = Preferences.chat().isColorful();
+        mColorful = Preferences.getChat().isColorful();
         if (!mLinkifySet)
-            mLinkify = Preferences.chat().isLinkify();
+            mLinkify = Preferences.getChat().isLinkify();
         if (!mKatexSet)
-            mKatex = Preferences.chat().isKatex();
+            mKatex = Preferences.getChat().isKatex();
 
         MathView.clearCache();
         if (mathPreload != null) mathPreload.removeAllViews();

@@ -30,7 +30,7 @@ import static com.jonahbauer.qed.model.LogRequest.DateRecentLogRequest;
 
 public class LogFragment extends Fragment {
     public static final String LOG_REQUEST_KEY = "logRequest";
-    private final LogRequest DEFAULT_REQUEST = new DateRecentLogRequest(Preferences.chat().getChannel(), 24, TimeUnit.HOURS);
+    private final LogRequest DEFAULT_REQUEST = new DateRecentLogRequest(Preferences.getChat().getChannel(), 24, TimeUnit.HOURS);
 
     private static final int STATUS_PENDING = 0;
     private static final int STATUS_RUNNING = 1;

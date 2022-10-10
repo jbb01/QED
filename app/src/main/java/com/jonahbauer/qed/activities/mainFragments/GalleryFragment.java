@@ -61,8 +61,8 @@ public class GalleryFragment extends Fragment implements AdapterView.OnItemClick
         mBinding.list.setAdapter(mAlbumAdapter);
 
         mBinding.setOnOfflineClick(v -> {
-            if (Preferences.gallery().isOfflineMode()) {
-                Preferences.gallery().edit().setOfflineMode(false).apply();
+            if (Preferences.getGallery().isOfflineMode()) {
+                Preferences.getGallery().setOfflineMode(false);
             }
             mAlbumListViewModel.load();
         });
@@ -87,7 +87,7 @@ public class GalleryFragment extends Fragment implements AdapterView.OnItemClick
         mAlbumListViewModel.getOffline().observe(getViewLifecycleOwner(), offline -> {
             mBinding.setOffline(offline);
 
-            mBinding.setForcedOfflineMode(Preferences.gallery().isOfflineMode());
+            mBinding.setForcedOfflineMode(Preferences.getGallery().isOfflineMode());
         });
     }
 

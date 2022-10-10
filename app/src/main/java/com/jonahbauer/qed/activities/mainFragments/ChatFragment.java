@@ -65,16 +65,16 @@ public class ChatFragment extends Fragment implements AbsListView.OnScrollListen
             ViewUtils.showPreferenceDialog(
                     requireContext(),
                     R.string.preferences_chat_name_title,
-                    () -> Preferences.chat().getName(),
-                    (str) -> Preferences.chat().edit().setName(str).apply()
+                    () -> Preferences.getChat().getName(),
+                    (str) -> Preferences.getChat().setName(str)
             );
         });
         mBinding.quickSettingsChannel.setOnClickListener(v -> {
             ViewUtils.showPreferenceDialog(
                     requireContext(),
                     R.string.preferences_chat_channel_title,
-                    () -> Preferences.chat().getChannel(),
-                    (str) -> Preferences.chat().edit().setChannel(str).apply()
+                    () -> Preferences.getChat().getChannel(),
+                    (str) -> Preferences.getChat().setChannel(str)
             );
         });
         mBinding.quickSettings.setOnClickListener(this::toggleQuickSettingsShown);
@@ -174,7 +174,7 @@ public class ChatFragment extends Fragment implements AbsListView.OnScrollListen
 
         mBinding.setLoading(true);
         mDisposable = messageRx
-                .filter(message -> !message.isBot() || !Preferences.chat().isSense())
+                .filter(message -> !message.isBot() || !Preferences.getChat().isSense())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(message -> {
                     var oldCount = mMessageAdapter.getCount();

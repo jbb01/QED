@@ -35,26 +35,26 @@ public class ChatPreferenceFragment extends AbstractPreferenceFragment implement
         setPreferencesFromResource(R.xml.preferences_chat, rootKey);
         setHasOptionsMenu(true);
 
-        name = findPreference(Preferences.chat().keys().name());
+        name = findPreference(Preferences.getChat().getKeys().getName());
         assert name != null;
 
-        katex = findPreference(Preferences.chat().keys().katex());
+        katex = findPreference(Preferences.getChat().getKeys().getKatex());
         assert katex != null;
         katex.setOnPreferenceChangeListener(this);
 
-        links = findPreference(Preferences.chat().keys().linkify());
+        links = findPreference(Preferences.getChat().getKeys().getLinkify());
         assert links != null;
         links.setOnPreferenceChangeListener(this);
 
-        deleteDatabase = findPreference(Preferences.chat().keys().dbClear());
+        deleteDatabase = findPreference(Preferences.getChat().getKeys().getDeleteDb());
         assert deleteDatabase != null;
         deleteDatabase.setOnPreferenceClickListener(this);
 
-        color = findPreference(Preferences.chat().keys().color());
+        color = findPreference(Preferences.getChat().getKeys().getColor());
         assert color != null;
         color.setOnPreferenceClickListener(this);
 
-        SeekBarPreference maxShownRows = findPreference(Preferences.chat().keys().dbMaxResults());
+        SeekBarPreference maxShownRows = findPreference(Preferences.getChat().getKeys().getDbMaxResult());
         assert maxShownRows != null;
         maxShownRows.setExternalValues(MAX_SHOWN_ROWS_VALUES, MAX_SHOWN_ROWS_STRING_VALUES);
     }
@@ -83,7 +83,7 @@ public class ChatPreferenceFragment extends AbstractPreferenceFragment implement
         } else if (preference == color) {
             var dialog = new ColorPickerDialogFragment();
             dialog.show(getChildFragmentManager(), null);
-            dialog.setOnDismissListener(() -> name.setText(Preferences.chat().getName()));
+            dialog.setOnDismissListener(() -> name.setText(Preferences.getChat().getName()));
         }
         return false;
     }

@@ -127,8 +127,8 @@ public class AlbumFragment extends Fragment implements AdapterView.OnItemClickLi
         mBinding.searchButton.setOnClickListener(v -> search());
 
         mBinding.setOnOfflineClick(v -> {
-            if (Preferences.gallery().isOfflineMode()) {
-                Preferences.gallery().edit().setOfflineMode(false).apply();
+            if (Preferences.getGallery().isOfflineMode()) {
+                Preferences.getGallery().setOfflineMode(false);
                 mImageAdapter.setOfflineMode(false);
             }
             search();
@@ -139,7 +139,7 @@ public class AlbumFragment extends Fragment implements AdapterView.OnItemClickLi
         mAlbumViewModel.getAlbum().observe(getViewLifecycleOwner(), this::updateView);
         mAlbumViewModel.getOffline().observe(getViewLifecycleOwner(), offline -> {
             mBinding.setOffline(offline);
-            mBinding.setForcedOfflineMode(Preferences.gallery().isOfflineMode());
+            mBinding.setForcedOfflineMode(Preferences.getGallery().isOfflineMode());
         });
     }
 
