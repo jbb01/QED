@@ -299,6 +299,9 @@
     <string name="preferences_general_github_key" translatable="false">general.github</string>
     <string name="preferences_general_remember_me_key" translatable="false">general.remember_me</string>
     <string name="preferences_general_night_mode_key" translatable="false">general.night_mode</string>
+    <string name="preferences_general_update_check_enabled_key" translatable="false">general.update_check.enabled</string>
+    <string name="preferences_general_update_check_includes_prereleases_key" translatable="false">general.update_check.includes_prereleases</string>
+    <string name="preferences_general_update_check_dont_suggest_key" translatable="false">general.update_check.dont_suggest</string>
 
     <string name="preferences_gallery_delete_thumbnails_key" translatable="false">gallery.delete_thumbnails</string>
     <string name="preferences_gallery_delete_images_key" translatable="false">gallery.delete_images</string>
@@ -314,6 +317,7 @@
     <string name="preferences_header_debug">Debug</string>
 
     <string name="preferences_general_group_appearance">Appearance</string>
+    <string name="preferences_general_group_update_check">Update Check</string>
     <string name="preferences_general_bug_report_title">Bug Report</string>
     <string name="preferences_general_bug_report_summary">Please use the GitHub Issue Tracker for reporting bugs. Include as much information as possible (Android and app version, steps to reproduce, …).</string>
     <string name="preferences_general_github_title">GitHub Project</string>
@@ -321,6 +325,12 @@
     <string name="preferences_general_remember_me_title">Remember Me</string>
     <string name="preferences_general_night_mode_title">Night Mode</string>
     <string name="preferences_general_night_mode_summary">A theme as black as your soul.</string>
+    <string name="preferences_general_update_check_enabled_title">Check for Updates</string>
+    <string name="preferences_general_update_check_enabled_true_summary">You will be notified about new versions.</string>
+    <string name="preferences_general_update_check_enabled_false_summary">You will not be notified about new versions.</string>
+    <string name="preferences_general_update_check_includes_prereleases_title">Beta Releases</string>
+    <string name="preferences_general_update_check_includes_prereleases_true_summary">You will receive notifications for new beta versions.</string>
+    <string name="preferences_general_update_check_includes_prereleases_false_summary">You will only receive notifications for new release versions.</string>
 
     <string name="preferences_chat_group_database">Chat Database</string>
     <string name="preferences_chat_group_appearance">Appearance</string>
@@ -497,6 +507,14 @@
     </string>
     <string name="color_picker_help_hint">Help</string>
     <string name="color_picker_mode_hint">Toggle Mode</string>
+
+    <!-- Update Dialog -->
+    <string name="update_dialog_title">Update Available</string>
+    <string name="update_dialog_message">A new version of the app is available: &lt;font face="monospace">%s&lt;/font></string>
+    <string name="update_dialog_message_prerelease">A new beta version of the app is available: &lt;font face="monospace">%s&lt;/font></string>
+    <string name="update_dialog_remind_later">Remind me later</string>
+    <string name="update_dialog_show">Show</string>
+    <string name="update_dialog_ignore">Ignore</string>
 
     <!-- Sonstiges -->
 

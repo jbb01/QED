@@ -1,5 +1,6 @@
 @file:Suppress("UnstableApiUsage")
 
+import com.android.build.api.dsl.ApplicationBuildType
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 
 plugins {
@@ -35,6 +36,12 @@ android {
     }
 
     buildTypes {
+        fun ApplicationBuildType.buildConfigFields(prerelease: Boolean) {
+            buildConfigField("java.time.Instant", "TIMESTAMP", "java.time.Instant.ofEpochMilli(" + System.currentTimeMillis() + "L)")
+            buildConfigField("boolean", "PRERELEASE", prerelease.toString())
+            resValue("string", "preferences_general_update_check_includes_prerelease_default", prerelease.toString())
+        }
+
         getByName("release") {
             postprocessing {
                 isRemoveUnusedCode = true
@@ -43,11 +50,13 @@ android {
             }
 
             signingConfig = signingConfigs.getByName("release")
+            buildConfigFields(false)
         }
 
         getByName("debug") {
             isMinifyEnabled = false
             isDebuggable = true
+            buildConfigFields(true)
         }
     }
 
@@ -95,6 +104,7 @@ dependencies {
     annotationProcessor("eu.jonahbauer:android-preference-annotations:1.1.2")
 
     testImplementation("junit:junit:4.13.2")
+    testImplementation("org.mockito:mockito-core:4.8.1")
     androidTestImplementation("androidx.test:core:1.4.0")
     androidTestImplementation("androidx.test.ext:junit:1.1.3")
     androidTestImplementation("androidx.test:runner:1.4.0")

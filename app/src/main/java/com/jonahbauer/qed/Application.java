@@ -18,6 +18,8 @@ import com.jonahbauer.qed.crypt.PasswordStorage;
 import com.jonahbauer.qed.networking.cookies.QEDCookieHandler;
 import com.jonahbauer.qed.util.Preferences;
 
+import com.jonahbauer.qed.util.UpdateChecker;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import org.jetbrains.annotations.Contract;
 
 import java.io.IOException;
@@ -40,6 +42,9 @@ public class Application extends android.app.Application implements android.app.
 
     private Activity mActivity;
     private ConnectionStateMonitor mConnectionStateMonitor;
+
+    private boolean mUpdateCheckPending = true;
+    private final CompositeDisposable mActivityDisposable = new CompositeDisposable();
 
     @Override
     public void onCreate() {
@@ -112,6 +117,13 @@ public class Application extends android.app.Application implements android.app.
     @Override
     public void onActivityStarted(@NonNull Activity activity) {
         this.mActivity = activity;
+
+        if (mUpdateCheckPending) {
+            mUpdateCheckPending = false;
+            mActivityDisposable.add(UpdateChecker.getUpdateRelease().subscribe(release -> {
+                UpdateChecker.showUpdateDialog(activity, release);
+            }));
+        }
     }
 
     @Override
@@ -123,7 +135,9 @@ public class Application extends android.app.Application implements android.app.
     public void onActivityPaused(@NonNull Activity activity) {}
 
     @Override
-    public void onActivityStopped(@NonNull Activity activity) {}
+    public void onActivityStopped(@NonNull Activity activity) {
+        mActivityDisposable.clear();
+    }
 
     @Override
     public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState) {}

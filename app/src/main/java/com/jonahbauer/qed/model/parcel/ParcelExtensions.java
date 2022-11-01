@@ -18,19 +18,20 @@ public class ParcelExtensions {
     private static final int VAL_NON_NULL = 1;
 
     /**
-     * Writes an {@link Instant} to a parcel. Limitations of {@link Instant#toEpochMilli()} apply.
+     * Writes an {@link Instant} to a parcel.
      */
     public static void writeInstant(@NonNull Parcel dest, @Nullable Instant instant) {
         if (instant == null) {
             dest.writeInt(VAL_NULL);
         } else {
             dest.writeInt(VAL_NON_NULL);
-            dest.writeLong(instant.toEpochMilli());
+            dest.writeLong(instant.getEpochSecond());
+            dest.writeInt(instant.getNano());
         }
     }
 
     /**
-     * Reads an {@link Instant} from a parcel. Limitations of {@link Instant#toEpochMilli()} apply.
+     * Reads an {@link Instant} from a parcel.
      */
     @Nullable
     public static Instant readInstant(@NonNull Parcel source) {
@@ -38,7 +39,10 @@ public class ParcelExtensions {
         if (flag == VAL_NULL) {
             return null;
         } else if (flag == VAL_NON_NULL) {
-            return Instant.ofEpochMilli(source.readLong());
+            return Instant.ofEpochSecond(
+                    source.readLong(),
+                    source.readInt()
+            );
         } else {
             throw new RuntimeException("Could not read Instant from parcel.");
         }

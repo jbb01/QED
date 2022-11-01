@@ -395,6 +395,7 @@
     <string name="preferences_header_debug">Debug</string>
 
     <string name="preferences_general_group_appearance">Darstellung</string>
+    <string name="preferences_general_group_update_check">Updates</string>
     <string name="preferences_general_bug_report_title">Fehler melden</string>
     <string name="preferences_general_bug_report_summary">Bitte benutze den GitHub Issue Tracker für Fehlerberichte. Füge so viele Informationen wie möglich bei (Android und App-Version, Schritte zum reproduzieren, …).</string>
     <string name="preferences_general_github_title">GitHub-Projekt</string>
@@ -402,6 +403,12 @@
     <string name="preferences_general_remember_me_title">Passwort speichern</string>
     <string name="preferences_general_night_mode_title">Nachtmodus</string>
     <string name="preferences_general_night_mode_summary">Ein Theme so schwarz wie deine Seele</string>
+    <string name="preferences_general_update_check_enabled_title">Auf Updates prüfen</string>
+    <string name="preferences_general_update_check_enabled_true_summary">Du wirst Benachrichtigungen über neue Versionen erhalten.</string>
+    <string name="preferences_general_update_check_enabled_false_summary">Du wirst keine Benachrichtigungen über neue Versionen erhalten.</string>
+    <string name="preferences_general_update_check_includes_prereleases_title">Beta-Versionen</string>
+    <string name="preferences_general_update_check_includes_prereleases_true_summary">Du wirst Benachrichtigungen über neue Beta-Versionen erhalten.</string>
+    <string name="preferences_general_update_check_includes_prereleases_false_summary">Du wirst keine Benachrichtigungen über neue Beta-Versionen erhalten.</string>
 
     <string name="preferences_chat_group_database">Chat-Datenbank</string>
     <string name="preferences_chat_group_appearance">Darstellung</string>
@@ -446,4 +453,12 @@
     </string>
     <string name="color_picker_help_hint">Hilfe</string>
     <string name="color_picker_mode_hint">Modus wechseln</string>
+
+    <!-- Update Dialog -->
+    <string name="update_dialog_title">Update verfügbar</string>
+    <string name="update_dialog_message">Eine neue Version der App ist verfügbar: &lt;font face="monospace">%s&lt;/font></string>
+    <string name="update_dialog_message_prerelease">Eine neue Beta-Version der App ist verfügbar: &lt;font face="monospace">%s&lt;/font></string>
+    <string name="update_dialog_remind_later">Später erinnern</string>
+    <string name="update_dialog_show">Anzeigen</string>
+    <string name="update_dialog_ignore">Ignorieren</string>
 </resources>

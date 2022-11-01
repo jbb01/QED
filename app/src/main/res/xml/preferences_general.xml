@@ -6,8 +6,6 @@
         <Preference
             android:defaultValue="false"
             android:key="@string/preferences_general_github_key"
-            android:selectAllOnFocus="true"
-            android:singleLine="true"
             android:title="@string/preferences_general_github_title"
             android:icon="@drawable/ic_settings_github"
             android:summary="@string/preferences_general_github_summary"/>
@@ -15,8 +13,6 @@
         <Preference
             android:defaultValue="false"
             android:key="@string/preferences_general_bug_report_key"
-            android:selectAllOnFocus="true"
-            android:singleLine="true"
             android:title="@string/preferences_general_bug_report_title"
             android:summary="@string/preferences_general_bug_report_summary"
             android:icon="@drawable/ic_settings_bug_report" />
@@ -27,10 +23,26 @@
         <SwitchPreference
             android:defaultValue="false"
             android:key="@string/preferences_general_night_mode_key"
-            android:selectAllOnFocus="true"
-            android:singleLine="true"
             android:title="@string/preferences_general_night_mode_title"
             android:icon="@drawable/ic_settings_night_mode"
             android:summary="@string/preferences_general_night_mode_summary"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:title="@string/preferences_general_group_update_check">
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="@string/preferences_general_update_check_enabled_key"
+            android:title="@string/preferences_general_update_check_enabled_title"
+            android:icon="@drawable/ic_settings_update_check_enabled"
+            android:summaryOn="@string/preferences_general_update_check_enabled_true_summary"
+            android:summaryOff="@string/preferences_general_update_check_enabled_false_summary"/>
+        <SwitchPreference
+            android:defaultValue="@string/preferences_general_update_check_includes_prerelease_default"
+            android:key="@string/preferences_general_update_check_includes_prereleases_key"
+            android:title="@string/preferences_general_update_check_includes_prereleases_title"
+            android:icon="@drawable/ic_settings_update_check_beta"
+            android:summaryOn="@string/preferences_general_update_check_includes_prereleases_true_summary"
+            android:summaryOff="@string/preferences_general_update_check_includes_prereleases_false_summary"/>
     </PreferenceCategory>
 </androidx.preference.PreferenceScreen>
