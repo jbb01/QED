@@ -6,7 +6,9 @@ import android.view.*;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Lifecycle;
 import androidx.navigation.NavBackStackEntry;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
@@ -28,7 +30,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.jonahbauer.qed.model.LogRequest.DateRecentLogRequest;
 
-public class LogFragment extends Fragment {
+public class LogFragment extends Fragment implements MenuProvider {
     public static final String LOG_REQUEST_KEY = "logRequest";
     private final LogRequest DEFAULT_REQUEST = new DateRecentLogRequest(Preferences.getChat().getChannel(), 24, TimeUnit.HOURS);
 
@@ -44,7 +46,6 @@ public class LogFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
 
         // handle deep link
         Bundle arguments = getArguments();
@@ -84,6 +85,8 @@ public class LogFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        requireActivity().addMenuProvider(this, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
+
         NavController navController = NavHostFragment.findNavController(this);
         NavBackStackEntry entry = navController.getBackStackEntry(R.id.nav_chat_log);
         Objects.requireNonNull(entry);
@@ -188,13 +191,12 @@ public class LogFragment extends Fragment {
     }
 
     @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+    public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.menu_log, menu);
-        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+    public boolean onMenuItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.log_save) {
             mBinding.setSaving(true);
             item.setEnabled(false);

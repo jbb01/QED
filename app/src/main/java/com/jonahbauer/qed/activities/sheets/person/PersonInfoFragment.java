@@ -69,6 +69,7 @@ public class PersonInfoFragment extends InfoFragment {
         icons.put("matrix", R.drawable.ic_person_contact_matrix);
         icons.put("mobil", R.drawable.ic_person_contact_phone);
         icons.put("mumble", R.drawable.ic_person_contact_mumble);
+        icons.put("phön", R.drawable.ic_person_contact_phoen);
         icons.put("signal", R.drawable.ic_person_contact_signal);
         icons.put("skype", R.drawable.ic_person_contact_skype);
         icons.put("teamspeak", R.drawable.ic_person_contact_teamspeak);
@@ -91,6 +92,7 @@ public class PersonInfoFragment extends InfoFragment {
         actions.put("jabber", Actions::openXmpp);
         actions.put("matrix", Actions::openMatrix);
         actions.put("mobil", Actions::dial);
+        actions.put("phön", Actions::dial);
         actions.put("skype", Actions::openSkype);
         actions.put("telegram", Actions::openTelegram);
         actions.put("telefon", Actions::dial);

@@ -12,8 +12,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.app.SharedElementCallback;
+import androidx.core.view.MenuProvider;
 import androidx.core.view.OneShotPreDrawListener;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Lifecycle;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import com.google.android.material.snackbar.Snackbar;
@@ -36,7 +38,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
-public class AlbumFragment extends Fragment implements AdapterView.OnItemClickListener, OnActivityReenterListener {
+public class AlbumFragment extends Fragment implements AdapterView.OnItemClickListener, OnActivityReenterListener, MenuProvider {
     private static final String SAVED_SELECTED_ITEM_ID = "selectedItemId";
 
     private AlbumViewModel mAlbumViewModel;
@@ -57,7 +59,6 @@ public class AlbumFragment extends Fragment implements AdapterView.OnItemClickLi
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
 
         Bundle arguments = getArguments();
 
@@ -98,6 +99,7 @@ public class AlbumFragment extends Fragment implements AdapterView.OnItemClickLi
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         postponeEnterTransition(200, TimeUnit.MILLISECONDS);
+        requireActivity().addMenuProvider(this, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
 
         mImageAdapter = new ImageAdapter(requireContext(), new ArrayList<>());
         mBinding.imageContainer.setAdapter(mImageAdapter);
@@ -311,7 +313,12 @@ public class AlbumFragment extends Fragment implements AdapterView.OnItemClickLi
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_album, menu);
+    }
+
+    @Override
+    public boolean onMenuItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.album_info) {
             var album = mAlbumViewModel.getAlbumValue();
             if (album.getId() != Album.NO_ID) {
@@ -321,12 +328,6 @@ public class AlbumFragment extends Fragment implements AdapterView.OnItemClickLi
             return true;
         }
         return false;
-    }
-
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_album, menu);
-        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override

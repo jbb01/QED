@@ -12,7 +12,9 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Lifecycle;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.FragmentNavigator;
 import com.google.android.material.snackbar.Snackbar;
@@ -29,7 +31,7 @@ import com.jonahbauer.qed.util.ViewUtils;
 
 import java.util.ArrayList;
 
-public class GalleryFragment extends Fragment implements AdapterView.OnItemClickListener {
+public class GalleryFragment extends Fragment implements AdapterView.OnItemClickListener, MenuProvider {
     private AlbumAdapter mAlbumAdapter;
     private FragmentGalleryBinding mBinding;
     private MenuItem mRefresh;
@@ -39,8 +41,6 @@ public class GalleryFragment extends Fragment implements AdapterView.OnItemClick
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-
         TransitionUtils.setupDefaultTransitions(this);
     }
 
@@ -55,6 +55,7 @@ public class GalleryFragment extends Fragment implements AdapterView.OnItemClick
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         TransitionUtils.postponeEnterAnimationToPreDraw(this, view);
+        requireActivity().addMenuProvider(this, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
 
         mAlbumAdapter = new AlbumAdapter(getContext(), new ArrayList<>());
         mBinding.list.setOnItemClickListener(this);
@@ -116,13 +117,13 @@ public class GalleryFragment extends Fragment implements AdapterView.OnItemClick
     }
 
     @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+    public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.menu_gallery, menu);
         mRefresh = menu.findItem(R.id.menu_refresh);
     }
 
     @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+    public boolean onMenuItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.menu_refresh) {
             mAlbumListViewModel.load();
 

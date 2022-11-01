@@ -11,7 +11,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.view.ActionMode;
+import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Lifecycle;
 import androidx.navigation.fragment.NavHostFragment;
 import com.google.android.material.snackbar.Snackbar;
 import com.jonahbauer.qed.R;
@@ -28,7 +30,7 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import static com.jonahbauer.qed.util.MessageUtils.formatName;
 import static com.jonahbauer.qed.util.MessageUtils.isMainChannel;
 
-public class ChatFragment extends Fragment implements AbsListView.OnScrollListener {
+public class ChatFragment extends Fragment implements AbsListView.OnScrollListener, MenuProvider {
     private ChatViewModel mChatViewModel;
     private FragmentChatBinding mBinding;
 
@@ -43,8 +45,6 @@ public class ChatFragment extends Fragment implements AbsListView.OnScrollListen
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-
         TransitionUtils.setupDefaultTransitions(this);
     }
 
@@ -58,6 +58,8 @@ public class ChatFragment extends Fragment implements AbsListView.OnScrollListen
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        requireActivity().addMenuProvider(this, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
+
         mBinding.buttonSend.setOnClickListener(v -> send());
 
         // setup quick settings
@@ -132,14 +134,13 @@ public class ChatFragment extends Fragment implements AbsListView.OnScrollListen
     }
 
     @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+    public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.menu_chat, menu);
         mRefreshButton = menu.findItem(R.id.menu_refresh);
-        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+    public boolean onMenuItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.menu_refresh) {
             mRefreshButton = item;
             mRefreshButton.setEnabled(false);
