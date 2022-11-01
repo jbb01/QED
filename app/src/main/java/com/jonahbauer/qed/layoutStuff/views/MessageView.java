@@ -2,8 +2,10 @@ package com.jonahbauer.qed.layoutStuff.views;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.graphics.Typeface;
 import android.text.SpannableStringBuilder;
 
+import android.text.style.StyleSpan;
 import androidx.annotation.Nullable;
 import androidx.annotation.StyleRes;
 
@@ -15,6 +17,8 @@ import java.time.Instant;
 
 @SuppressWarnings("unused")
 public interface MessageView {
+    StyleSpan USERNAME_STYLE = new StyleSpan(Typeface.ITALIC);
+
     void setName(CharSequence name);
     CharSequence getName();
 
@@ -47,7 +51,7 @@ public interface MessageView {
         out.append(MessageUtils.formatName(context, name));
 
         if (username != null) {
-            out.append(" | ").append(username);
+            out.append(" | ").append(username, USERNAME_STYLE, 0);
         }
 
         return out;
