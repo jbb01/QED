@@ -161,5 +161,6 @@
     </style>
     <style name="ThemeOverlay.App.BottomSheetDialog" parent="ThemeOverlay.MaterialComponents.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/Widget.App.BottomSheet.Modal</item>
+        <item name="snackbarStyle">@style/Widget.App.Snackbar.BottomSheet</item>
     </style>
 </resources>

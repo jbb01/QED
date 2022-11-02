@@ -53,6 +53,8 @@ public class ColorfulBottomSheetCallback extends BottomSheetBehavior.BottomSheet
         if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
             if (mTouchOutside != null) mTouchOutside.setBackground(null);
             if (mRootWindow != null) mRootWindow.setStatusBarColor(mOldStatusBarColor);
+        } else if (newState == BottomSheetBehavior.STATE_EXPANDED) {
+            onSlide(bottomSheet, 1);
         }
     }
 }

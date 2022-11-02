@@ -85,6 +85,13 @@
         <item name="ringWidth">30dp</item>
     </style>
 
+    <style name="Widget.App.Snackbar.BottomSheet" parent="Widget.MaterialComponents.Snackbar">
+        <!-- Snackbar needs to be elevated above the bottom sheet -->
+        <!-- bottom sheet elevation is 16dp -->
+        <!-- snackbar elevation is 6dp -->
+        <item name="elevation">22dp</item>
+    </style>
+
     <!-- TextAppearance -->
     <style name="TextAppearance.App.Button" parent="android:TextAppearance.Material.Button">
         <item name="android:textColor">?colorSecondary</item>

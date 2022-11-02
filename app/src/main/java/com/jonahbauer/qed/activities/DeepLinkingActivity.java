@@ -27,7 +27,10 @@ public class DeepLinkingActivity extends AppCompatActivity {
         Intent intent = getIntent();
         if (intent == null) return;
 
-        if (Intent.ACTION_VIEW.equals(intent.getAction())) {
+        var fragment = getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG);
+        if (fragment != null) {
+            mBottomSheet = (BottomSheetDialogFragment) fragment;
+        } else if (Intent.ACTION_VIEW.equals(intent.getAction())) {
             Uri data = intent.getData();
             if (data == null) return;
 

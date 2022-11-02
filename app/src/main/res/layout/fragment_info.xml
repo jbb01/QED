@@ -4,77 +4,68 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".activities.sheets.InfoBottomSheet">
 
-    <FrameLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <androidx.coordinatorlayout.widget.CoordinatorLayout
-            android:id="@+id/coordinator"
+        android:layout_height="match_parent"
+        android:clipChildren="false">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-            <RelativeLayout
+            android:layout_height="?actionBarSize"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:clickable="false"
+            android:focusable="false"
+            app:titleTextColor="?colorOnAccentColor"
+            tools:background="@android:color/holo_green_light"/>
+
+        <RelativeLayout
+            android:id="@+id/background"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            tools:layout_height="115dp">
+            <View
+                android:id="@+id/background_solid"
+                android:layout_height="0dp"
+                android:layout_width="0dp"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentBottom="true" />
+
+            <ImageView
+                android:id="@+id/background_pattern"
+                android:layout_height="0dp"
+                android:layout_width="0dp"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentBottom="true"
+                android:scaleType="centerCrop"
+                android:tintMode="multiply"
+                android:importantForAccessibility="no"
+                tools:src="@drawable/background_4"
+                tools:tint="@android:color/holo_green_light"/>
+        </RelativeLayout>
+
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/common"
+            android:transitionName="common"
+            android:layout_below="@id/background"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="vertical">
+            <androidx.fragment.app.FragmentContainerView
+                android:id="@+id/fragment"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:clipChildren="false">
-
-                <com.google.android.material.appbar.MaterialToolbar
-                    android:id="@+id/toolbar"
-                    android:layout_width="match_parent"
-                    android:layout_height="?actionBarSize"
-                    android:layout_alignParentStart="true"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentTop="true"
-                    android:clickable="false"
-                    android:focusable="false"
-                    app:titleTextColor="?colorOnAccentColor"
-                    tools:background="@android:color/holo_green_light"/>
-
-                <RelativeLayout
-                    android:id="@+id/background"
-                    android:layout_alignParentTop="true"
-                    android:layout_alignParentStart="true"
-                    android:layout_alignParentEnd="true"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    tools:layout_height="115dp">
-                    <View
-                        android:id="@+id/background_solid"
-                        android:layout_height="0dp"
-                        android:layout_width="0dp"
-                        android:layout_alignParentStart="true"
-                        android:layout_alignParentEnd="true"
-                        android:layout_alignParentTop="true"
-                        android:layout_alignParentBottom="true" />
-
-                    <ImageView
-                        android:id="@+id/background_pattern"
-                        android:layout_height="0dp"
-                        android:layout_width="0dp"
-                        android:layout_alignParentStart="true"
-                        android:layout_alignParentEnd="true"
-                        android:layout_alignParentTop="true"
-                        android:layout_alignParentBottom="true"
-                        android:scaleType="centerCrop"
-                        android:tintMode="multiply"
-                        android:importantForAccessibility="no"
-                        tools:src="@drawable/background_4"
-                        tools:tint="@android:color/holo_green_light"/>
-                </RelativeLayout>
-
-
-                <androidx.core.widget.NestedScrollView
-                    android:id="@+id/common"
-                    android:transitionName="common"
-                    android:layout_below="@id/background"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:scrollbars="vertical">
-                    <androidx.fragment.app.FragmentContainerView
-                        android:id="@+id/fragment"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"/>
-                </androidx.core.widget.NestedScrollView>
-            </RelativeLayout>
-        </androidx.coordinatorlayout.widget.CoordinatorLayout>
-    </FrameLayout>
+                android:layout_height="wrap_content"
+                android:orientation="vertical"/>
+        </androidx.core.widget.NestedScrollView>
+    </RelativeLayout>
 </layout>

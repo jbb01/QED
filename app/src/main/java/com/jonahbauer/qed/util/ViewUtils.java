@@ -153,6 +153,45 @@ public class ViewUtils {
     }
     //</editor-fold>
 
+    public static void setWidth(@NonNull View view, int width) {
+        setWidth(view, width, ViewGroup.LayoutParams.WRAP_CONTENT);
+    }
+
+    public static void setWidth(@NonNull View view, int width, int fallbackHeight) {
+        var params = view.getLayoutParams();
+        if (params == null) {
+            params = new ViewGroup.LayoutParams(width, fallbackHeight);
+        } else {
+            params.width = width;
+        }
+        view.setLayoutParams(params);
+    }
+
+    public static void setHeight(@NonNull View view, int height) {
+        setHeight(view, height, ViewGroup.LayoutParams.MATCH_PARENT);
+    }
+
+    public static void setHeight(@NonNull View view, int height, int fallbackWidth) {
+        var params = view.getLayoutParams();
+        if (params == null) {
+            params = new ViewGroup.LayoutParams(fallbackWidth, height);
+        } else {
+            params.height = height;
+        }
+        view.setLayoutParams(params);
+    }
+
+    public static void setSize(@NonNull View view, int width, int height) {
+        var params = view.getLayoutParams();
+        if (params == null) {
+            params = new ViewGroup.LayoutParams(width, height);
+        } else {
+            params.width = width;
+            params.height = height;
+        }
+        view.setLayoutParams(params);
+    }
+
     /**
      * Prepares the given {@link EditText} for input of a {@link LocalDate} using a {@link DatePickerDialog}, i.e.
      * when the text field is clicked a date picker will be shown and the selected date will be reflected in the

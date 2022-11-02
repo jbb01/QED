@@ -40,26 +40,18 @@
                 tools:tint="@android:color/holo_green_light"/>
         </RelativeLayout>
 
-        <androidx.coordinatorlayout.widget.CoordinatorLayout
-            android:id="@+id/coordinator"
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/common"
+            android:transitionName="common"
             android:layout_toEndOf="@id/background"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <androidx.core.widget.NestedScrollView
-                android:id="@+id/common"
-                android:transitionName="common"
-                android:layout_toEndOf="@id/background"
+            android:layout_height="match_parent"
+            android:scrollbars="vertical">
+            <androidx.fragment.app.FragmentContainerView
+                android:id="@+id/fragment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:scrollbars="vertical">
-                <androidx.fragment.app.FragmentContainerView
-                    android:id="@+id/fragment"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"/>
-            </androidx.core.widget.NestedScrollView>
-
-        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+                android:orientation="vertical"/>
+        </androidx.core.widget.NestedScrollView>
     </RelativeLayout>
 </layout>
