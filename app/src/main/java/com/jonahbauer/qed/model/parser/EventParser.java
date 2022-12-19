@@ -31,6 +31,7 @@ public final class EventParser extends DatabaseParser<Event> {
     private static final String GENERAL_KEY_EMAIL_ORGA = "Email an Orgas:";
     private static final String GENERAL_KEY_EMAIL_ALL = "Email an Teilnehmer:";
     private static final String GENERAL_KEY_NOTES = "Anmerkungen:";
+    private static final String GENERAL_KEY_PAYMENT_REFERENCE = "Verwendungszweck";
 
     private static final String REGISTRATIONS_KEY_ORGA = "Orga";
 
@@ -77,6 +78,11 @@ public final class EventParser extends DatabaseParser<Event> {
                            }
                            case GENERAL_KEY_COST: {
                                event.setCost(parseCost(value));
+                               break;
+                           }
+                           case GENERAL_KEY_PAYMENT_REFERENCE: {
+                               String paymentReference = value.text();
+                               event.setPaymentReference(paymentReference);
                                break;
                            }
                            case GENERAL_KEY_MAX_PARTICIPANTS: {

@@ -27,6 +27,7 @@ public class Event implements Comparable<Event>, Parcelable {
     private Double cost;
     private String notes;
     private Integer maxParticipants;
+    private String paymentReference;
 
     private ParsedLocalDate start;
     private ParsedLocalDate end;
@@ -108,6 +109,7 @@ public class Event implements Comparable<Event>, Parcelable {
         dest.writeLong(id);
         dest.writeString(title);
         dest.writeValue(cost);
+        dest.writeString(paymentReference);
         dest.writeString(notes);
         dest.writeValue(maxParticipants);
 
@@ -130,6 +132,7 @@ public class Event implements Comparable<Event>, Parcelable {
         Event event = new Event(source.readLong());
         event.title = source.readString();
         event.cost = (Double) source.readValue(null);
+        event.paymentReference = source.readString();
         event.notes = source.readString();
         event.maxParticipants = (Integer) source.readValue(null);
 

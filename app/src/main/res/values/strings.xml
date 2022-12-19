@@ -198,6 +198,8 @@
     <string name="event_clip_label_hotel_address">Venue Address (%s)</string>
     <string name="event_title_cost">%.2f €</string>
     <string name="event_subtitle_cost">Costs</string>
+    <string name="event_subtitle_payment_reference">Payment Reference</string>
+    <string name="event_clip_label_payment_reference">Payment Reference (%s)</string>
     <string name="event_subtitle_max_participants">Maximum Number of Participants</string>
     <string name="event_subtitle_notes">Notes</string>
     <string name="event_subtitle_mail_organizers">Email Organizers</string>
