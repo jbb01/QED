@@ -276,10 +276,13 @@ public class Person implements Parcelable {
         @Getter
         @RequiredArgsConstructor
         public enum Type implements ParcelableEnum {
-            REGULAR_MEMBER(R.string.person_payment_membership),
-            SPONSOR_MEMBER(R.string.person_payment_sponsorship),
+            REGULAR_MEMBER(R.string.person_payment_regular_member),
+            SPONSOR_MEMBER(R.string.person_payment_sponsor_member),
             DONATION(R.string.person_payment_donation),
-            OTHER(R.string.person_payment_other);
+            OTHER(R.string.person_payment_other),
+            FREE_MEMBER(R.string.person_payment_free_member),
+            SPONSOR_AND_MEMBER(R.string.person_payment_sponsor_member);
+
             public static final Parcelable.Creator<Type> CREATOR = new ParcelableEnum.Creator<>(Type.values(), Type[]::new);
 
             private final @StringRes int stringRes;

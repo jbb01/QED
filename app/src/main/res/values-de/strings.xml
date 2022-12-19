@@ -353,10 +353,12 @@
     <string name="person_gender_female">weiblich</string>
     <string name="person_gender_other">andere</string>
 
-    <string name="person_payment_membership">Mitgliedsbeitrag</string>
-    <string name="person_payment_sponsorship">Förderbeitrag</string>
+    <string name="person_payment_regular_member">Mitgliedsbeitrag</string>
+    <string name="person_payment_sponsor_member">Förderbeitrag</string>
     <string name="person_payment_donation">Spende an den Verein</string>
     <string name="person_payment_other">Anderer Verwendungszweck</string>
+    <string name="person_payment_free_member">Freimitgliedschaft</string>
+    <string name="person_payment_sponsor_and_member">Fördermitglied</string>
 
     <string name="person_privacy_none"><i>keine</i></string>
     <string name="person_privacy_newsletter">Newsletter abonniert</string>

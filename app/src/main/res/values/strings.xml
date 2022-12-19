@@ -169,10 +169,12 @@
     <string name="person_gender_female">female</string>
     <string name="person_gender_other">other</string>
 
-    <string name="person_payment_membership">Membership Fee</string>
-    <string name="person_payment_sponsorship">Sponsorship</string>
+    <string name="person_payment_regular_member">Membership Fee</string>
+    <string name="person_payment_sponsor_member">Sponsorship</string>
     <string name="person_payment_donation">Donation</string>
     <string name="person_payment_other">Other Purpose</string>
+    <string name="person_payment_free_member">Free Membership</string>
+    <string name="person_payment_sponsor_and_member">Sponsor- and Membership</string>
 
     <string name="person_privacy_none"><i>none</i></string>
     <string name="person_privacy_newsletter">Newsletter Subscription</string>

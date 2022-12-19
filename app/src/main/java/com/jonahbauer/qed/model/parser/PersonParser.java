@@ -49,6 +49,8 @@ public final class PersonParser extends DatabaseParser<Person> {
     private static final String PAYMENT_TYPE_SPONSOR_MEMBER = "Förderbeitrag";
     private static final String PAYMENT_TYPE_DONATION = "Spende an den Verein";
     private static final String PAYMENT_TYPE_OTHER = "Anderer Verwendungszweck";
+    private static final String PAYMENT_TYPE_FREE_MEMBER = "Freimitgliedschaft";
+    private static final String PAYMENT_TYPE_SPONSOR_AND_MEMBER = "Fördermitglied";
 
     private static final String GENDER_MALE = "männlich";
     private static final String GENDER_FEMALE = "weiblich";
@@ -360,6 +362,10 @@ public final class PersonParser extends DatabaseParser<Person> {
                 return Person.Payment.Type.REGULAR_MEMBER;
             case PAYMENT_TYPE_SPONSOR_MEMBER:
                 return Person.Payment.Type.SPONSOR_MEMBER;
+            case PAYMENT_TYPE_SPONSOR_AND_MEMBER:
+                return Person.Payment.Type.SPONSOR_AND_MEMBER;
+            case PAYMENT_TYPE_FREE_MEMBER:
+                return Person.Payment.Type.FREE_MEMBER;
             default:
                 return null;
         }
