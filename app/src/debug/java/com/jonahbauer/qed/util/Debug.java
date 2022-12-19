@@ -11,6 +11,7 @@ import com.jonahbauer.qed.model.Registration;
 
 import java.time.*;
 
+import com.jonahbauer.qed.model.Registration.Status;
 import com.jonahbauer.qed.model.util.ParsedInstant;
 import com.jonahbauer.qed.model.util.ParsedLocalDate;
 import lombok.experimental.UtilityClass;
@@ -41,27 +42,33 @@ public class Debug {
         Registration registration;
 
         registration = new Registration(Registration.NO_ID);
-        registration.setStatus(Registration.Status.OPEN);
+        registration.setStatus(Status.PENDING);
         registration.setEventTitle("Akademie 2021");
         registration.setPerson(person);
         person.getEvents().add(registration);
 
         registration = new Registration(Registration.NO_ID);
-        registration.setStatus(Registration.Status.CONFIRMED);
+        registration.setStatus(Status.CONFIRMED);
         registration.setEventTitle("Musterstadt 2020");
         registration.setPerson(person);
         person.getEvents().add(registration);
 
         registration = new Registration(Registration.NO_ID);
-        registration.setStatus(Registration.Status.CANCELLED);
+        registration.setStatus(Status.CANCELLED);
         registration.setEventTitle("Musterstadt 2019");
         registration.setPerson(person);
         person.getEvents().add(registration);
 
         registration = new Registration(Registration.NO_ID);
-        registration.setStatus(Registration.Status.CONFIRMED);
+        registration.setStatus(Status.CONFIRMED);
         registration.setOrganizer(true);
         registration.setEventTitle("Testseminar");
+        registration.setPerson(person);
+        person.getEvents().add(registration);
+
+        registration = new Registration(Registration.NO_ID);
+        registration.setStatus(Status.REJECTED);
+        registration.setEventTitle("Musterdorf 2017");
         registration.setPerson(person);
         person.getEvents().add(registration);
 
@@ -86,14 +93,14 @@ public class Debug {
 
         Registration registration;
         registration = new Registration(Registration.NO_ID);
-        registration.setStatus(Registration.Status.CONFIRMED);
+        registration.setStatus(Status.CONFIRMED);
         registration.setOrganizer(true);
         registration.setPersonName("Max Mustermann");
         registration.setEvent(event);
         event.getParticipants().add(registration);
 
         registration = new Registration(Registration.NO_ID);
-        registration.setStatus(Registration.Status.OPEN);
+        registration.setStatus(Status.PENDING);
         registration.setOrganizer(true);
         registration.setPersonName("Erika Musterfrau");
         registration.setEvent(event);
@@ -101,11 +108,7 @@ public class Debug {
 
         for (int i = 0; i < 10; i++) {
             registration = new Registration(Registration.NO_ID);
-            registration.setStatus(
-                    Math.random() > 0.5 ? Registration.Status.OPEN
-                            : Math.random() > 0 ? Registration.Status.CONFIRMED
-                            : Registration.Status.CANCELLED
-            );
+            registration.setStatus(Status.values()[(int) (Math.random() * Status.values().length)]);
             registration.setPersonName("Testteilnehmer " + i);
             registration.setEvent(event);
             event.getParticipants().add(registration);
@@ -151,7 +154,7 @@ public class Debug {
 
     public static Registration dummyRegistration() {
         var registration = new Registration(Registration.NO_ID);
-        registration.setStatus(Registration.Status.OPEN);
+        registration.setStatus(Status.PENDING);
         registration.setOrganizer(true);
 
         registration.setEventId(Event.NO_ID);

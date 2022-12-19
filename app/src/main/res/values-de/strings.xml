@@ -301,7 +301,8 @@
     <string name="registration_orga">Orga</string>
     <string name="registration_status_participated">teilgenommen</string>
     <string name="registration_status_confirmed">bestätigt</string>
-    <string name="registration_status_open">offen</string>
+    <string name="registration_status_pending">offen</string>
+    <string name="registration_status_rejected">abgelehnt</string>
     <string name="registration_status_cancelled">abgemeldet</string>
 
     <!-- Persons Database Fragment -->

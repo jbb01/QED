@@ -39,8 +39,6 @@ public final class PersonParser extends DatabaseParser<Person> {
     private static final String ADDITIONAL_KEY_NOTES = "Anmerkungen:";
     private static final String ADDITIONAL_KEY_FOOD = "Essenswünsche:";
 
-    private static final String REGISTRATIONS_KEY_CANCELLED = "abgesagt";
-    private static final String REGISTRATIONS_KEY_OPEN = "offen";
     private static final String REGISTRATIONS_KEY_ORGA = "Orga";
 
     private static final String PAYMENT_AMOUNT = "Betrag";
@@ -318,17 +316,10 @@ public final class PersonParser extends DatabaseParser<Person> {
                 var id = parseIdFromHref(li.child(0), Registration.NO_ID);
                 String event = li.child(0).text();
 
-                Element statusElement = li.selectFirst("i");
-                String statusString = statusElement != null ? statusElement.text() : "";
-
-                boolean orga = statusString.contains(REGISTRATIONS_KEY_ORGA);
-
-                Registration.Status status = Registration.Status.CONFIRMED;
-                if (statusString.contains(REGISTRATIONS_KEY_CANCELLED)) {
-                    status = Registration.Status.CANCELLED;
-                } else if (statusString.contains(REGISTRATIONS_KEY_OPEN)) {
-                    status = Registration.Status.OPEN;
-                }
+                var statusElement = li.selectFirst("i");
+                var statusString = statusElement != null ? statusElement.text() : "";
+                var orga = statusString.contains(REGISTRATIONS_KEY_ORGA);
+                var status = RegistrationStatusParser.INSTANCE.parseLenient(statusString, Registration.Status.CONFIRMED);
 
                 Registration registration = new Registration(id);
                 registration.setStatus(status);

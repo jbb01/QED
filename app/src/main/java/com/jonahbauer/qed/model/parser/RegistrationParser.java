@@ -5,7 +5,6 @@ import static com.jonahbauer.qed.model.parser.PersonParser.parseAddress;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.jonahbauer.qed.model.Event;
 import com.jonahbauer.qed.model.Person;
@@ -50,10 +49,6 @@ public final class RegistrationParser extends DatabaseParser<Registration> {
     private static final String ADDITIONAL_KEY_FOOD = "Essenswünsche:";
     private static final String ADDITIONAL_KEY_TALKS = "Vorträge:";
     private static final String ADDITIONAL_KEY_NOTES = "Anmerkungen:";
-
-    private static final String STATUS_CANCELLED = "abgesagt";
-    private static final String STATUS_OPEN = "offen";
-    private static final String STATUS_CONFIRMED = "bestätigt";
 
     public static final RegistrationParser INSTANCE = new RegistrationParser();
 
@@ -102,7 +97,7 @@ public final class RegistrationParser extends DatabaseParser<Registration> {
                                 break;
                             }
                             case GENERAL_KEY_STATUS: {
-                                registration.setStatus(parseRegistrationStatus(value.text()));
+                                registration.setStatus(RegistrationStatusParser.INSTANCE.parse(value.text()));
                                 break;
                             }
                             case GENERAL_KEY_BIRTHDAY: {
@@ -257,18 +252,5 @@ public final class RegistrationParser extends DatabaseParser<Registration> {
                         Log.e(LOG_TAG, "Error parsing registration " + registration.getId() + ".", e);
                     }
                 });
-    }
-
-    @Nullable
-    public static Registration.Status parseRegistrationStatus(String status) {
-        switch (status) {
-            case STATUS_OPEN:
-                return Registration.Status.OPEN;
-            case STATUS_CONFIRMED:
-                return Registration.Status.CONFIRMED;
-            case STATUS_CANCELLED:
-                return Registration.Status.CANCELLED;
-        }
-        return null;
     }
 }

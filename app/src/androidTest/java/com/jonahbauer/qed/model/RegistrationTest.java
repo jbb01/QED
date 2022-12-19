@@ -44,7 +44,7 @@ public class RegistrationTest {
     private static Registration dummyRegistration() {
         var registration = new Registration(1);
         registration.setOrganizer(true);
-        registration.setStatus(Registration.Status.OPEN);
+        registration.setStatus(Registration.Status.PENDING);
         return registration;
     }
 }

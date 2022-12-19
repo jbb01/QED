@@ -279,7 +279,8 @@
     <string name="registration_orga">Organizer</string>
     <string name="registration_status_participated">participated</string>
     <string name="registration_status_confirmed">confirmed</string>
-    <string name="registration_status_open">open</string>
+    <string name="registration_status_pending">pending</string>
+    <string name="registration_status_rejected">rejected</string>
     <string name="registration_status_cancelled">cancelled</string>
 
     <!-- Preference Keys -->

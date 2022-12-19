@@ -96,8 +96,8 @@
                 app:icon="@{registration.status.drawableResVariant}"
                 app:title="@{registration.status.stringRes}"
                 app:subtitle="@string/registration_subtitle_status"
-                tools:icon="@drawable/ic_registration_status_open"
-                tools:title="@string/registration_status_open"/>
+                tools:icon="@drawable/ic_registration_status_pending"
+                tools:title="@string/registration_status_pending"/>
 
         </LinearLayout>
 

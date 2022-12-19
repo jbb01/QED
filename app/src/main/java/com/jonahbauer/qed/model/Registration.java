@@ -228,10 +228,10 @@ public class Registration implements Parcelable {
     @Getter
     @RequiredArgsConstructor
     public enum Status implements ParcelableEnum {
-        PARTICIPATED(R.string.registration_status_participated, R.drawable.ic_event_member_confirmed, R.drawable.ic_registration_status_confirmed),
-        CONFIRMED(R.string.registration_status_confirmed, R.drawable.ic_event_member_confirmed, R.drawable.ic_registration_status_confirmed),
-        OPEN(R.string.registration_status_open, R.drawable.ic_event_member_open, R.drawable.ic_registration_status_open),
-        CANCELLED(R.string.registration_status_cancelled, R.drawable.ic_event_member_opt_out, R.drawable.ic_registration_status_cancelled);
+        PENDING(R.string.registration_status_pending, R.drawable.ic_event_registration_pending, R.drawable.ic_registration_status_pending),
+        CONFIRMED(R.string.registration_status_confirmed, R.drawable.ic_event_registration_confirmed, R.drawable.ic_registration_status_confirmed),
+        REJECTED(R.string.registration_status_rejected, R.drawable.ic_event_registration_rejected, R.drawable.ic_registration_status_rejected),
+        CANCELLED(R.string.registration_status_cancelled, R.drawable.ic_event_registration_cancelled, R.drawable.ic_registration_status_cancelled);
         public static final Parcelable.Creator<Status> CREATOR = new ParcelableEnum.Creator<>(Status.values(), Status[]::new);
 
         private final @StringRes int stringRes;
