@@ -1,18 +1,15 @@
 package com.jonahbauer.qed.crypt;
 
 import android.content.SharedPreferences;
-import android.util.Pair;
+import lombok.experimental.UtilityClass;
 
 import java.util.Arrays;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
-import lombok.experimental.UtilityClass;
-
 @UtilityClass
 @SuppressWarnings("UnusedReturnValue")
 public class PasswordStorage {
-    private static final String KEY_USERNAME = "username";
     private static final String KEY_PASSWORD = "password";
 
     private static SharedPreferences mSharedPreferences;
@@ -32,12 +29,11 @@ public class PasswordStorage {
         }
     }
 
-    public boolean saveUsernameAndPassword(String username, char[] password) {
+    public boolean savePassword(char[] password) {
         awaitInit();
 
         try {
             mSharedPreferences.edit()
-                              .putString(KEY_USERNAME, username)
                               .putString(KEY_PASSWORD, String.valueOf(password))
                               .apply();
             return true;
@@ -46,23 +42,19 @@ public class PasswordStorage {
         }
     }
 
-    public Pair<String, char[]> loadUsernameAndPassword() {
+    public char[] loadPassword() {
         awaitInit();
 
-        String username = mSharedPreferences.getString(KEY_USERNAME, null);
         var passwordString = mSharedPreferences.getString(KEY_PASSWORD, null);
-        var password = passwordString != null ? passwordString.toCharArray() : null;
-
-        return Pair.create(username, password);
+        return passwordString != null ? passwordString.toCharArray() : null;
     }
 
     public boolean clearCredentials() {
         awaitInit();
 
         return mSharedPreferences.edit()
-                                 .remove(KEY_USERNAME)
-                                 .remove(KEY_PASSWORD)
-                                 .commit();
+                .remove(KEY_PASSWORD)
+                .commit();
     }
 
     private void awaitInit() {

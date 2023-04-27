@@ -64,6 +64,7 @@
 
     <string name="chat_quick_settings_name">Quick Settings - Name</string>
     <string name="chat_quick_settings_channel">Quick Settings - Channel</string>
+    <string name="chat_quick_settings_public_id">Quick Settings - Public ID</string>
     <string name="chat_quick_settings">Quick Settings</string>
 
     <string name="message_info">@string/info</string>
@@ -323,6 +324,7 @@
     <string name="preferences_general_update_check_enabled_key" translatable="false">general.update_check.enabled</string>
     <string name="preferences_general_update_check_includes_prereleases_key" translatable="false">general.update_check.includes_prereleases</string>
     <string name="preferences_general_update_check_dont_suggest_key" translatable="false">general.update_check.dont_suggest</string>
+    <string name="preferences_general_username_key" translatable="false">general.username</string>
 
     <string name="preferences_gallery_delete_thumbnails_key" translatable="false">gallery.delete_thumbnails</string>
     <string name="preferences_gallery_delete_images_key" translatable="false">gallery.delete_images</string>

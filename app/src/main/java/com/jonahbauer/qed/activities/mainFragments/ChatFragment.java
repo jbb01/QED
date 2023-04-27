@@ -27,7 +27,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.disposables.Disposable;
 
-import static com.jonahbauer.qed.util.MessageUtils.formatName;
+import static com.jonahbauer.qed.layoutStuff.views.MessageView.formatName;
 import static com.jonahbauer.qed.util.MessageUtils.isMainChannel;
 
 public class ChatFragment extends Fragment implements AbsListView.OnScrollListener, MenuProvider {
@@ -63,24 +63,7 @@ public class ChatFragment extends Fragment implements AbsListView.OnScrollListen
         mBinding.buttonSend.setOnClickListener(v -> send());
 
         // setup quick settings
-        mBinding.quickSettingsName.setOnClickListener(v -> {
-            ViewUtils.showPreferenceDialog(
-                    requireContext(),
-                    R.string.preferences_chat_name_title,
-                    () -> Preferences.getChat().getName(),
-                    (str) -> Preferences.getChat().setName(str)
-            );
-        });
-        mBinding.quickSettingsChannel.setOnClickListener(v -> {
-            ViewUtils.showPreferenceDialog(
-                    requireContext(),
-                    R.string.preferences_chat_channel_title,
-                    () -> Preferences.getChat().getChannel(),
-                    (str) -> Preferences.getChat().setChannel(str)
-            );
-        });
-        mBinding.quickSettings.setOnClickListener(this::toggleQuickSettingsShown);
-        setQuickSettingsShown(mQuickSettingsShown);
+        initQuickSettings();
 
         mMessageAdapter = new MessageAdapter(mBinding.list, mBinding.mathPreload);
         mBinding.list.setAdapter(mMessageAdapter);
@@ -110,13 +93,60 @@ public class ChatFragment extends Fragment implements AbsListView.OnScrollListen
         });
 
         mChatViewModel.getName().observe(getViewLifecycleOwner(), name -> {
-            var formattedName = formatName(requireContext(), name);
-            var builder = new SpannableStringBuilder();
-            builder.append(getString(R.string.chat_message_hint));
-            builder.append(' ');
-            builder.append(formattedName);
-            mBinding.setHint(builder);
+            //noinspection DataFlowIssue
+            updateHint(name, mChatViewModel.getPublicID().getValue());
         });
+
+        mChatViewModel.getPublicID().observe(getViewLifecycleOwner(), publicID -> {
+            var icon = publicID ? R.drawable.ic_quick_settings_public_id_on : R.drawable.ic_quick_settings_public_id_off;
+            mBinding.quickSettingsPublicId.setImageResource(icon);
+
+            //noinspection DataFlowIssue
+            updateHint(mChatViewModel.getName().getValue(), publicID);
+        });
+    }
+
+    private void initQuickSettings() {
+        // Name
+        mBinding.quickSettingsName.setOnClickListener(v -> {
+            ViewUtils.showPreferenceDialog(
+                    requireContext(),
+                    R.string.preferences_chat_name_title,
+                    () -> Preferences.getChat().getName(),
+                    (str) -> Preferences.getChat().setName(str)
+            );
+        });
+
+        // Channel
+        mBinding.quickSettingsChannel.setOnClickListener(v -> {
+            ViewUtils.showPreferenceDialog(
+                    requireContext(),
+                    R.string.preferences_chat_channel_title,
+                    () -> Preferences.getChat().getChannel(),
+                    (str) -> Preferences.getChat().setChannel(str)
+            );
+        });
+
+        // Public ID
+        mBinding.quickSettingsPublicId.setOnClickListener(v -> {
+            var publicID = !Preferences.getChat().isPublicId();
+            Preferences.getChat().setPublicId(publicID);
+        });
+
+        mBinding.quickSettings.setOnClickListener(this::toggleQuickSettingsShown);
+        setQuickSettingsShown(mQuickSettingsShown);
+    }
+
+    private void updateHint(@NonNull String name, boolean publicId) {
+        var builder = new SpannableStringBuilder();
+        builder.append(getString(R.string.chat_message_hint));
+        builder.append(' ');
+
+        var username = publicId ? Preferences.getGeneral().getUsername() : null;
+        var formattedName = formatName(requireContext(), name, username);
+
+        builder.append(formattedName);
+        mBinding.setHint(builder);
     }
 
     @Override
@@ -264,9 +294,11 @@ public class ChatFragment extends Fragment implements AbsListView.OnScrollListen
         if (shown) {
             mBinding.quickSettingsName.show();
             mBinding.quickSettingsChannel.show();
+            mBinding.quickSettingsPublicId.show();
         } else {
             mBinding.quickSettingsName.hide();
             mBinding.quickSettingsChannel.hide();
+            mBinding.quickSettingsPublicId.hide();
         }
     }
 

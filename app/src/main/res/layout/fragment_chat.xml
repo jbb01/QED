@@ -103,6 +103,18 @@
                     app:fabSize="mini" />
 
                 <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/quick_settings_public_id"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="6dp"
+                    android:contentDescription="@string/chat_quick_settings_public_id"
+                    android:src="@drawable/ic_quick_settings_public_id_on"
+                    android:visibility="invisible"
+                    app:layout_constraintEnd_toStartOf="@id/quick_settings"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:fabSize="mini" />
+
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
                     android:id="@+id/quick_settings_channel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -110,7 +122,7 @@
                     android:contentDescription="@string/chat_quick_settings_channel"
                     android:src="@drawable/ic_quick_settings_channel"
                     android:visibility="invisible"
-                    app:layout_constraintEnd_toStartOf="@id/quick_settings"
+                    app:layout_constraintEnd_toStartOf="@id/quick_settings_public_id"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:fabSize="mini" />
 

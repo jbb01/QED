@@ -103,6 +103,7 @@
 
     <string name="chat_quick_settings_name">Schnelleinstellungen - Name</string>
     <string name="chat_quick_settings_channel">Schnelleinstellungen - Channel</string>
+    <string name="chat_quick_settings_public_id">Schnelleinstellungen - Öffentliche ID</string>
     <string name="chat_quick_settings">Schnelleinstellungen</string>
 
     <string name="message_info">@string/info</string>

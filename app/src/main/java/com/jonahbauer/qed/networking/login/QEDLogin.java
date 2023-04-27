@@ -276,10 +276,7 @@ public final class QEDLogin {
         var observable = Single.fromCallable(() -> {
             try {
                 login(username, password, feature);
-
-                if (Preferences.getGeneral().isRememberMe()) {
-                    PasswordStorage.saveUsernameAndPassword(username, password);
-                }
+                saveUsernameAndPassword(username, password);
             } finally {
                 PasswordUtils.wipe(password);
             }
@@ -384,13 +381,21 @@ public final class QEDLogin {
         }
     }
 
-    private static Pair<String, char[]> loadUsernameAndPassword() throws InvalidCredentialsException {
-        Pair<String, char[]> out = PasswordStorage.loadUsernameAndPassword();
+    private static void saveUsernameAndPassword(String username, char[] password) {
+        Preferences.getGeneral().setUsername(username);
+        if (Preferences.getGeneral().isRememberMe()) {
+            PasswordStorage.savePassword(password);
+        }
+    }
 
-        if (out.first == null || out.second == null) {
+    private static Pair<String, char[]> loadUsernameAndPassword() throws InvalidCredentialsException {
+        String username = Preferences.getGeneral().getUsername();
+        char[] password = PasswordStorage.loadPassword();
+
+        if (username == null || password == null) {
             throw new InvalidCredentialsException("Could not obtain credentials.");
         }
 
-        return out;
+        return Pair.create(username, password);
     }
 }

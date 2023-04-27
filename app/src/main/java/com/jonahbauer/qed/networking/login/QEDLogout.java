@@ -15,6 +15,7 @@ import java.util.function.Consumer;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import com.jonahbauer.qed.util.Preferences;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.disposables.Disposable;
@@ -77,6 +78,7 @@ public class QEDLogout {
         try {
             return logoutChat() & logoutDatabase() & logoutGallery();
         } finally {
+            Preferences.getGeneral().setUsername(null);
             PasswordStorage.clearCredentials();
             QEDCookieHandler.invalidate();
         }

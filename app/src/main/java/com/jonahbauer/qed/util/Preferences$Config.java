@@ -19,7 +19,8 @@ import java.util.Set;
                 @Preference(name = "night_mode", type = boolean.class),
                 @Preference(name = "update_check_enabled", type = boolean.class, defaultValue = "true"),
                 @Preference(name = "update_check_includes_prereleases", type = boolean.class, defaultValue = "" + BuildConfig.PRERELEASE),
-                @Preference(name = "update_check_dont_suggest", type = Set.class)
+                @Preference(name = "update_check_dont_suggest", type = Set.class),
+                @Preference(name = "username", type = String.class)
         }),
         @PreferenceGroup(name = "chat", prefix = "preferences_chat_", suffix = "_key", value = {
                 @Preference(name = "name", type = String.class, defaultValue = ""),

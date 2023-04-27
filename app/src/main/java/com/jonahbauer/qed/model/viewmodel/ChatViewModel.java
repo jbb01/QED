@@ -4,9 +4,7 @@ import android.content.SharedPreferences;
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
-import androidx.lifecycle.AndroidViewModel;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.*;
 
 import com.jonahbauer.qed.Application;
 import com.jonahbauer.qed.ConnectionStateMonitor;
@@ -37,6 +35,7 @@ public class ChatViewModel extends AndroidViewModel {
 
     private final MutableLiveData<String> mChannel = new MutableLiveData<>();
     private final MutableLiveData<String> mName = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> mPublicID = new MutableLiveData<>();
     private final MutableLiveData<Boolean> mReady = new MutableLiveData<>(false);
     private final PublishSubject<Message> mMessageRX = PublishSubject.create();
     private final MutableLiveData<Observable<Message>> mReplayMessageRX = new MutableLiveData<>();
@@ -71,6 +70,7 @@ public class ChatViewModel extends AndroidViewModel {
         mConnectionState.observeForever(mConnectionStateObserver);
 
         mName.setValue(Preferences.getChat().getName());
+        mPublicID.setValue(Preferences.getChat().isPublicId());
     }
 
     @MainThread
@@ -129,6 +129,10 @@ public class ChatViewModel extends AndroidViewModel {
 
     public LiveData<String> getName() {
         return mName;
+    }
+
+    public LiveData<Boolean> getPublicID() {
+        return mPublicID;
     }
 
     /**
@@ -191,6 +195,8 @@ public class ChatViewModel extends AndroidViewModel {
                 connect(Preferences.getChat().getChannel());
             } else if (Preferences.getChat().getKeys().getName().equals(key)) {
                 mName.setValue(Preferences.getChat().getName());
+            } else if (Preferences.getChat().getKeys().getPublicId().equals(key)) {
+                mPublicID.setValue(Preferences.getChat().isPublicId());
             }
         }
     }
