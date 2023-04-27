@@ -26,8 +26,8 @@ android {
 
     defaultConfig {
         applicationId = "com.jonahbauer.qed"
-        versionCode = 1
-        versionName = "2.5.0-beta5"
+        versionCode = 2
+        versionName = "2.5.0-beta6"
 
         minSdk = 24
         targetSdk = 31
