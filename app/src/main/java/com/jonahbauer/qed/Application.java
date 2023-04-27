@@ -75,6 +75,13 @@ public class Application extends android.app.Application implements android.app.
             Log.e(LOG_TAG, "Undeliverable Exception", e);
         });
 
+        initSharedPreferences();
+
+        mConnectionStateMonitor = new ConnectionStateMonitor(this);
+        mConnectionStateMonitor.enable();
+    }
+
+    private void initSharedPreferences() {
         // handle encrypted shared preferences asynchronously
         Observable.fromRunnable(() -> {
             // Setup cookie handler
@@ -97,8 +104,9 @@ public class Application extends android.app.Application implements android.app.
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         }
 
-        mConnectionStateMonitor = new ConnectionStateMonitor(this);
-        mConnectionStateMonitor.enable();
+        // Set language
+        var language = Preferences.getGeneral().getLanguage();
+        AppCompatDelegate.setApplicationLocales(language.getLocales());
     }
 
     @Override

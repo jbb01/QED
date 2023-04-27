@@ -307,6 +307,9 @@
     <string name="registration_status_rejected">abgelehnt</string>
     <string name="registration_status_cancelled">abgemeldet</string>
 
+    <!-- Language -->
+    <string name="language_system">System</string>
+
     <!-- Persons Database Fragment -->
     <string name="title_fragment_persons_database">Personen</string>
     <string name="persons_database_active_checkbox">Aktiv</string>
@@ -403,6 +406,7 @@
     <string name="preferences_general_group_update_check">Updates</string>
     <string name="preferences_general_bug_report_title">Fehler melden</string>
     <string name="preferences_general_bug_report_summary">Bitte benutze den GitHub Issue Tracker für Fehlerberichte. Füge so viele Informationen wie möglich bei (Android und App-Version, Schritte zum reproduzieren, …).</string>
+    <string name="preferences_general_language_title">Sprache</string>
     <string name="preferences_general_github_title">GitHub-Projekt</string>
     <string name="preferences_general_github_summary">https://github.com/jbb01/QED</string>
     <string name="preferences_general_remember_me_title">Passwort speichern</string>

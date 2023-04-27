@@ -3,6 +3,7 @@ package com.jonahbauer.qed.util;
 import com.jonahbauer.qed.BuildConfig;
 import com.jonahbauer.qed.R;
 
+import com.jonahbauer.qed.model.Language;
 import eu.jonahbauer.android.preference.annotations.Preference;
 import eu.jonahbauer.android.preference.annotations.PreferenceGroup;
 import eu.jonahbauer.android.preference.annotations.Preferences;
@@ -13,6 +14,7 @@ import java.util.Set;
         @PreferenceGroup(name = "general", prefix = "preferences_general_", suffix = "_key", value = {
                 @Preference(name = "remember_me", type = boolean.class),
                 @Preference(name = "bug_report", type = void.class),
+                @Preference(name = "language", type = Language.class, defaultValue = "SYSTEM"),
                 @Preference(name = "github", type = void.class),
                 @Preference(name = "night_mode", type = boolean.class),
                 @Preference(name = "update_check_enabled", type = boolean.class, defaultValue = "true"),

@@ -3,10 +3,12 @@ package com.jonahbauer.qed.activities.settings;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.SwitchPreference;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.MainActivity;
+import com.jonahbauer.qed.model.Language;
 import com.jonahbauer.qed.networking.NetworkConstants;
 import com.jonahbauer.qed.util.Actions;
 import com.jonahbauer.qed.util.Colors;
@@ -16,6 +18,7 @@ public class GeneralPreferenceFragment extends AbstractPreferenceFragment implem
     private Preference bugReport;
     private Preference github;
     private SwitchPreference nightMode;
+    private ListPreference language;
 
     private SwitchPreference updateCheckEnabled;
     private SwitchPreference updateCheckIncludesPrereleases;
@@ -38,6 +41,10 @@ public class GeneralPreferenceFragment extends AbstractPreferenceFragment implem
         github = findPreference(Preferences.getGeneral().getKeys().getGithub());
         assert github != null;
         github.setOnPreferenceClickListener(this);
+
+        language = findPreference(Preferences.getGeneral().getKeys().getLanguage());
+        assert language != null;
+        language.setOnPreferenceChangeListener(this);
 
         nightMode = findPreference(Preferences.getGeneral().getKeys().getNightMode());
         assert nightMode != null;
@@ -80,6 +87,14 @@ public class GeneralPreferenceFragment extends AbstractPreferenceFragment implem
             if (!(newValue instanceof Boolean)) return false;
             boolean value = (Boolean) newValue;
             updateCheckIncludesPrereleases.setEnabled(value);
+        } else if (preference == language) {
+            Language value;
+            try {
+                value = Language.valueOf((String) newValue);
+            } catch (ClassCastException | IllegalArgumentException e) {
+                value = Language.SYSTEM;
+            }
+            AppCompatDelegate.setApplicationLocales(value.getLocales());
         }
 
         return true;

@@ -285,6 +285,21 @@
     <string name="registration_status_rejected">rejected</string>
     <string name="registration_status_cancelled">cancelled</string>
 
+    <!-- Language -->
+    <string-array name="language_names">
+        <item>@string/language_system</item>
+        <item>@string/language_german</item>
+        <item>@string/language_english</item>
+    </string-array>
+    <string-array name="language_codes">
+        <item>SYSTEM</item>
+        <item>GERMAN</item>
+        <item>ENGLISH</item>
+    </string-array>
+    <string name="language_system">System</string>
+    <string name="language_german" translatable="false">Deutsch</string>
+    <string name="language_english" translatable="false">English</string>
+
     <!-- Preference Keys -->
     <string name="preferences_chat_name_key" translatable="false">chat.name</string>
     <string name="preferences_chat_channel_key" translatable="false">chat.channel</string>
@@ -301,6 +316,7 @@
     <string name="preferences_ping_notification_server_key" translatable="false">pushPingServer</string>
 
     <string name="preferences_general_bug_report_key" translatable="false">general.bug_report</string>
+    <string name="preferences_general_language_key" translatable="false">general.language</string>
     <string name="preferences_general_github_key" translatable="false">general.github</string>
     <string name="preferences_general_remember_me_key" translatable="false">general.remember_me</string>
     <string name="preferences_general_night_mode_key" translatable="false">general.night_mode</string>
@@ -325,6 +341,7 @@
     <string name="preferences_general_group_update_check">Update Check</string>
     <string name="preferences_general_bug_report_title">Bug Report</string>
     <string name="preferences_general_bug_report_summary">Please use the GitHub Issue Tracker for reporting bugs. Include as much information as possible (Android and app version, steps to reproduce, …).</string>
+    <string name="preferences_general_language_title">Language</string>
     <string name="preferences_general_github_title">GitHub Project</string>
     <string name="preferences_general_github_summary">https://github.com/jbb01/QED</string>
     <string name="preferences_general_remember_me_title">Remember Me</string>

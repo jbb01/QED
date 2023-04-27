@@ -16,6 +16,14 @@
             android:title="@string/preferences_general_bug_report_title"
             android:summary="@string/preferences_general_bug_report_summary"
             android:icon="@drawable/ic_settings_bug_report" />
+
+        <ListPreference
+            android:key="@string/preferences_general_language_key"
+            android:title="@string/preferences_general_language_title"
+            android:icon="@drawable/ic_settings_language"
+            android:entryValues="@array/language_codes"
+            android:entries="@array/language_names"
+            android:defaultValue="SYSTEM"/>
     </PreferenceCategory>
 
     <PreferenceCategory
