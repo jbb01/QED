@@ -21,7 +21,7 @@ android {
         }
     }
 
-    compileSdk = 32
+    compileSdk = 33
     namespace = "com.jonahbauer.qed"
 
     defaultConfig {
@@ -75,38 +75,38 @@ android {
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation("androidx.appcompat:appcompat:1.5.1")
+    implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("androidx.fragment:fragment:1.5.4")
+    implementation("androidx.fragment:fragment:1.5.7")
     implementation("androidx.navigation:navigation-fragment:2.5.3")
     implementation("androidx.navigation:navigation-ui:2.5.3")
     implementation("androidx.preference:preference:1.2.0")
-    implementation("androidx.recyclerview:recyclerview:1.2.1")
-    implementation("androidx.room:room-runtime:2.4.3")
-    implementation("androidx.room:room-rxjava3:2.4.3")
+    implementation("androidx.recyclerview:recyclerview:1.3.0")
+    implementation("androidx.room:room-runtime:2.5.1")
+    implementation("androidx.room:room-rxjava3:2.5.1")
     implementation("androidx.security:security-crypto:1.0.0")
     implementation("androidx.viewpager2:viewpager2:1.0.0")
-    implementation("com.google.android.material:material:1.7.0")
+    implementation("com.google.android.material:material:1.8.0")
     implementation("com.squareup.okhttp3:okhttp:4.9.3")
     implementation("com.x5dev:chunk-templates:3.6.2")
-    implementation("org.jsoup:jsoup:1.15.3")
-    implementation("it.unimi.dsi:fastutil-core:8.5.8")
-    implementation("io.reactivex.rxjava3:rxandroid:3.0.0")
+    implementation("org.jsoup:jsoup:1.15.4")
+    implementation("it.unimi.dsi:fastutil-core:8.5.12")
+    implementation("io.reactivex.rxjava3:rxandroid:3.0.2")
 
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.1.5")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
 
-    compileOnly("org.projectlombok:lombok:1.18.24")
-    annotationProcessor("org.projectlombok:lombok:1.18.24")
+    compileOnly("org.projectlombok:lombok:1.18.26")
+    annotationProcessor("org.projectlombok:lombok:1.18.26")
 
-    annotationProcessor("androidx.room:room-compiler:2.4.3")
+    annotationProcessor("androidx.room:room-compiler:2.5.1")
 
     implementation("eu.jonahbauer:android-preference-annotations:1.1.2")
     annotationProcessor("eu.jonahbauer:android-preference-annotations:1.1.2")
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.mockito:mockito-core:4.8.1")
-    androidTestImplementation("androidx.test:core:1.4.0")
-    androidTestImplementation("androidx.test.ext:junit:1.1.3")
-    androidTestImplementation("androidx.test:runner:1.4.0")
+    androidTestImplementation("androidx.test:core:1.5.0")
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test:runner:1.5.2")
     androidTestImplementation("com.google.truth:truth:1.1.3")
 }
