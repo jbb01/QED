@@ -7,8 +7,11 @@ import com.jonahbauer.qed.model.Language;
 import eu.jonahbauer.android.preference.annotations.Preference;
 import eu.jonahbauer.android.preference.annotations.PreferenceGroup;
 import eu.jonahbauer.android.preference.annotations.Preferences;
+import eu.jonahbauer.android.preference.annotations.serializer.PreferenceSerializationException;
+import eu.jonahbauer.android.preference.annotations.serializer.PreferenceSerializer;
 
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Preferences(name = "com.jonahbauer.qed.util.Preferences", makeFile = true, fluent = false, r = R.class, value = {
         @PreferenceGroup(name = "general", prefix = "preferences_general_", suffix = "_key", value = {
@@ -24,7 +27,9 @@ import java.util.Set;
         }),
         @PreferenceGroup(name = "chat", prefix = "preferences_chat_", suffix = "_key", value = {
                 @Preference(name = "name", type = String.class, defaultValue = ""),
+                @Preference(name = "recent_names", type = String.class, serializer = Preferences$Config.LinkedSetSerializer.class),
                 @Preference(name = "channel", type = String.class, defaultValue = ""),
+                @Preference(name = "recent_channels", type = String.class, serializer = Preferences$Config.LinkedSetSerializer.class),
                 @Preference(name = "color", type = void.class),
                 @Preference(name = "sense", type = boolean.class),
                 @Preference(name = "public_id", type = boolean.class),
@@ -42,4 +47,48 @@ import java.util.Set;
                 @Preference(name = "show_dir", type = void.class)
         })
 })
-class Preferences$Config {}
+class Preferences$Config {
+
+    public static class LinkedSetSerializer implements PreferenceSerializer<Set<String>, String> {
+        @Override
+        public String serialize(Set<String> list) throws PreferenceSerializationException {
+            if (list.isEmpty()) return null;
+
+            return list.stream()
+                    .map(string -> "\"" + string.replaceAll("\"", "\"\"") + "\"")
+                    .collect(Collectors.joining(","));
+        }
+
+        @Override
+        public Set<String> deserialize(String value) throws PreferenceSerializationException {
+            if (value == null) return Collections.emptySet();
+
+            boolean quote = false;
+            Set<String> out = new LinkedHashSet<>();
+            StringBuilder current = new StringBuilder();
+
+            for (int i = 0, length = value.length(); i < length; i++) {
+                char chr = value.charAt(i);
+                if (chr == ',' && !quote) {
+                    out.add(current.toString());
+                    current.setLength(0);
+                } else if (chr == '"') {
+                    if (quote) {
+                        if (i + 1 < length && value.charAt(i + 1) == '"') {
+                            current.append('"');
+                        }
+
+                        quote = false;
+                    } else {
+                        quote = true;
+                    }
+                } else {
+                    current.append(chr);
+                }
+            }
+
+            out.add(current.toString());
+            return Collections.unmodifiableSet(out);
+        }
+    }
+}

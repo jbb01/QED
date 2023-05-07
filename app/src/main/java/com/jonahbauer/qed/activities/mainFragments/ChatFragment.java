@@ -17,6 +17,7 @@ import androidx.lifecycle.Lifecycle;
 import androidx.navigation.fragment.NavHostFragment;
 import com.google.android.material.snackbar.Snackbar;
 import com.jonahbauer.qed.R;
+import com.jonahbauer.qed.activities.settings.ChatPreferenceFragment;
 import com.jonahbauer.qed.databinding.FragmentChatBinding;
 import com.jonahbauer.qed.model.Message;
 import com.jonahbauer.qed.model.adapter.MessageAdapter;
@@ -109,22 +110,12 @@ public class ChatFragment extends Fragment implements AbsListView.OnScrollListen
     private void initQuickSettings() {
         // Name
         mBinding.quickSettingsName.setOnClickListener(v -> {
-            ViewUtils.showPreferenceDialog(
-                    requireContext(),
-                    R.string.preferences_chat_name_title,
-                    () -> Preferences.getChat().getName(),
-                    (str) -> Preferences.getChat().setName(str)
-            );
+            ChatPreferenceFragment.createNameDialog(v.getContext()).show();
         });
 
         // Channel
         mBinding.quickSettingsChannel.setOnClickListener(v -> {
-            ViewUtils.showPreferenceDialog(
-                    requireContext(),
-                    R.string.preferences_chat_channel_title,
-                    () -> Preferences.getChat().getChannel(),
-                    (str) -> Preferences.getChat().setChannel(str)
-            );
+            ChatPreferenceFragment.createChannelDialog(v.getContext()).show();
         });
 
         // Public ID

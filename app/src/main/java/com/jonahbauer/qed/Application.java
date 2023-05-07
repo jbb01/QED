@@ -19,6 +19,7 @@ import com.jonahbauer.qed.networking.cookies.QEDCookieHandler;
 import com.jonahbauer.qed.util.Preferences;
 
 import com.jonahbauer.qed.util.UpdateChecker;
+import com.jonahbauer.qed.util.preferences.RecentsSharedPreferenceListener;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import org.jetbrains.annotations.Contract;
 
@@ -107,6 +108,9 @@ public class Application extends android.app.Application implements android.app.
         // Set language
         var language = Preferences.getGeneral().getLanguage();
         AppCompatDelegate.setApplicationLocales(language.getLocales());
+
+        // Track changes to name and channel
+        preferences.registerOnSharedPreferenceChangeListener(RecentsSharedPreferenceListener.INSTANCE);
     }
 
     @Override

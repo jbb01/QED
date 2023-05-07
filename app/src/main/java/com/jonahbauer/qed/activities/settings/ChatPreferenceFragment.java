@@ -18,15 +18,22 @@ import androidx.preference.EditTextPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceManager;
 import androidx.preference.SwitchPreference;
+import com.jonahbauer.qed.util.ViewUtils;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+import lombok.EqualsAndHashCode;
+import lombok.Value;
+
+import java.util.Collections;
+import java.util.stream.Collectors;
 
 public class ChatPreferenceFragment extends AbstractPreferenceFragment implements PreferenceFragment, Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
     private static final int[] MAX_SHOWN_ROWS_VALUES = {10_000, 20_000, 50_000, 100_000, 200_000, 500_000, Integer.MAX_VALUE};
-    private static final String[] MAX_SHOWN_ROWS_STRING_VALUES = {"10.000", "20.000", "50.000", "100.000", "200.000", "500.000", "\u221E"};
+    private static final String[] MAX_SHOWN_ROWS_STRING_VALUES = {"10.000", "20.000", "50.000", "100.000", "200.000", "500.000", "∞"};
 
     private Preference deleteDatabase;
     private EditTextPreference name;
+    private EditTextPreference channel;
     private SwitchPreference katex;
     private SwitchPreference links;
     private Preference color;
@@ -43,9 +50,9 @@ public class ChatPreferenceFragment extends AbstractPreferenceFragment implement
             return MessageUtils.formatName(preference.getContext(), name);
         });
 
-        var channelPref = findPreference(Preferences.getChat().getKeys().getChannel());
-        assert channelPref != null;
-        channelPref.setSummaryProvider(preference -> {
+        channel = findPreference(Preferences.getChat().getKeys().getChannel());
+        assert channel != null;
+        channel.setSummaryProvider(preference -> {
             var channel = Preferences.getChat().getChannel();
             return MessageUtils.formatChannel(preference.getContext(), channel);
         });
@@ -101,6 +108,25 @@ public class ChatPreferenceFragment extends AbstractPreferenceFragment implement
     }
 
     @Override
+    public void onDisplayPreferenceDialog(@NonNull Preference preference) {
+        if (preference == name) {
+            var dialog = createNameDialog(requireContext());
+            dialog.setOnDismissListener(d -> {
+                name.setText(Preferences.getChat().getName());
+            });
+            dialog.show();
+        } else if (preference == channel) {
+            var dialog = createChannelDialog(requireContext());
+            dialog.setOnDismissListener(d -> {
+                channel.setText(Preferences.getChat().getChannel());
+            });
+            dialog.show();
+        } else {
+            super.onDisplayPreferenceDialog(preference);
+        }
+    }
+
+    @Override
     public boolean onPreferenceChange(@NonNull Preference preference, Object newValue) {
         if (preference == katex) {
             if (!(newValue instanceof Boolean)) return false;
@@ -144,5 +170,59 @@ public class ChatPreferenceFragment extends AbstractPreferenceFragment implement
     @Override
     public int getTitle() {
         return R.string.preferences_header_chat;
+    }
+
+    public static AlertDialog createNameDialog(@NonNull Context context) {
+        @Value
+        @EqualsAndHashCode(of = "value")
+        class NameItem implements ViewUtils.ChipItem {
+            CharSequence label;
+            String value;
+
+            public NameItem(@NonNull Context context, @NonNull String name) {
+                this.value = name;
+                this.label = MessageUtils.formatName(context, name, true);
+            }
+        }
+
+        var suggestions = Preferences.getChat().getRecentNames().stream()
+                .map(name -> new NameItem(context, name))
+                .collect(Collectors.toList());
+        Collections.reverse(suggestions);
+
+        return ViewUtils.createPreferenceDialog(
+                context,
+                R.string.preferences_chat_name_title,
+                () -> Preferences.getChat().getName(),
+                (str) -> Preferences.getChat().setName(str),
+                suggestions
+        );
+    }
+
+    public static AlertDialog createChannelDialog(@NonNull Context context) {
+        @Value
+        @EqualsAndHashCode(of = "value")
+        class ChannelItem implements ViewUtils.ChipItem {
+            CharSequence label;
+            String value;
+
+            public ChannelItem(@NonNull Context context, @NonNull String name) {
+                this.value = name;
+                this.label = MessageUtils.formatChannel(context, name);
+            }
+        }
+
+        var suggestions = Preferences.getChat().getRecentChannels().stream()
+                .map(name -> new ChannelItem(context, name))
+                .collect(Collectors.toList());
+        Collections.reverse(suggestions);
+
+        return ViewUtils.createPreferenceDialog(
+                context,
+                R.string.preferences_chat_channel_title,
+                () -> Preferences.getChat().getChannel(),
+                (str) -> Preferences.getChat().setChannel(str),
+                suggestions
+        );
     }
 }

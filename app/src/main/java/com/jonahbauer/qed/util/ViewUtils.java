@@ -2,7 +2,6 @@ package com.jonahbauer.qed.util;
 
 import android.animation.ObjectAnimator;
 import android.app.DatePickerDialog;
-import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.res.Resources;
@@ -34,6 +33,7 @@ import com.google.android.material.chip.Chip;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.databinding.AlertDialogEditTextBinding;
 import com.jonahbauer.qed.layoutStuff.views.InterceptingView;
+import it.unimi.dsi.fastutil.Pair;
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.UtilityClass;
@@ -48,9 +48,9 @@ import java.time.format.FormatStyle;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 @UtilityClass
 @SuppressWarnings("unused")
@@ -325,24 +325,16 @@ public class ViewUtils {
             imm.hideSoftInputFromWindow(binding.getRoot().getWindowToken(), 0);
         });
 
-        var dialogRef = new AtomicReference<Dialog>();
-
         // add suggestion chips
         if (!suggestions.isEmpty()) {
             binding.suggestionLayout.setVisibility(View.VISIBLE);
         }
-        for (var suggestion : suggestions) {
+        var chips = suggestions.stream().map(suggestion -> {
             var view = new Chip(context);
             view.setText(suggestion.getLabel());
-            view.setOnClickListener(v -> {
-                setter.accept(suggestion.getValue());
-                imm.hideSoftInputFromWindow(binding.getRoot().getWindowToken(), 0);
-
-                var dialog = dialogRef.get();
-                if (dialog != null) dialog.dismiss();
-            });
             binding.suggestions.addView(view);
-        }
+            return Pair.of(view, suggestion.getValue());
+        }).collect(Collectors.toList());
 
         // handle showing the ime analogous to EditTextPreferenceDialogFragmentCompat
         var showSoftInputRunnable = new Runnable() {
@@ -387,15 +379,19 @@ public class ViewUtils {
         };
 
         var dialog = builder.create();
-        dialogRef.set(dialog);
+
+        chips.forEach(chip -> chip.left().setOnClickListener(v -> {
+            setter.accept(chip.right());
+            imm.hideSoftInputFromWindow(binding.getRoot().getWindowToken(), 0);
+
+            dialog.dismiss();
+        }));
+
         dialog.setOnShowListener(d -> {
             binding.input.setText(getter.get());
             binding.input.requestFocus();
             binding.input.setSelection(binding.input.getText().length());
             showSoftInputRunnable.scheduleShowSoftInput();
-        });
-        dialog.setOnDismissListener(d -> {
-            dialogRef.set(null);
         });
         return dialog;
     }

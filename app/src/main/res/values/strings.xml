@@ -303,7 +303,9 @@
 
     <!-- Preference Keys -->
     <string name="preferences_chat_name_key" translatable="false">chat.name</string>
+    <string name="preferences_chat_recent_names_key" translatable="false">chat.recent_names</string>
     <string name="preferences_chat_channel_key" translatable="false">chat.channel</string>
+    <string name="preferences_chat_recent_channels_key" translatable="false">chat.recent_channels</string>
     <string name="preferences_chat_color_key" translatable="false">chat.color</string>
     <string name="preferences_chat_sense_key" translatable="false">chat.show_sense</string>
     <string name="preferences_chat_public_id_key" translatable="false">chat.public_id</string>

@@ -1,6 +1,10 @@
 package com.jonahbauer.qed.util;
 
 import android.content.Context;
+import android.content.res.Configuration;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -174,12 +178,29 @@ public class MessageUtils {
        return name.trim().isEmpty();
     }
 
+    public static CharSequence formatName(@NonNull Context context, @NonNull String name) {
+        return formatName(context, name, false);
+    }
+
     /**
      * Returns the given name or {@link R.string#message_name_anonymous} when the name is
      * {@linkplain #isAnonymous(String) anonymous}.
      */
-    public static CharSequence formatName(@NonNull Context context, @NonNull String name) {
-        return isAnonymous(name) ? context.getText(R.string.message_name_anonymous) : name.trim();
+    public static CharSequence formatName(@NonNull Context context, @NonNull String name, boolean colored) {
+        var text = isAnonymous(name) ? context.getText(R.string.message_name_anonymous) : name.trim();
+        if (!colored) return text;
+
+        var color = Colors.getColorForName(name);
+
+        // transform color when in light mode
+        var config = context.getResources().getConfiguration();
+        if ((config.uiMode & Configuration.UI_MODE_NIGHT_MASK) != Configuration.UI_MODE_NIGHT_YES) {
+            color = Colors.transformColor(color);
+        }
+
+        var out = new SpannableString(text);
+        out.setSpan(new ForegroundColorSpan(color), 0, out.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        return out;
     }
 
     public static CharSequence formatChannel(@NonNull Context context, @NonNull String channel) {
