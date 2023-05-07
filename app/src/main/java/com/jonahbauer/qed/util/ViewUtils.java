@@ -2,6 +2,7 @@ package com.jonahbauer.qed.util;
 
 import android.animation.ObjectAnimator;
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.res.Resources;
@@ -29,6 +30,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavBackStackEntry;
 import androidx.navigation.fragment.NavHostFragment;
+import com.google.android.material.chip.Chip;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.databinding.AlertDialogEditTextBinding;
 import com.jonahbauer.qed.layoutStuff.views.InterceptingView;
@@ -43,7 +45,10 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -279,12 +284,28 @@ public class ViewUtils {
         });
     }
 
+    public interface ChipItem {
+        @NonNull CharSequence getLabel();
+        @NonNull String getValue();
+    }
+
     @NonNull
     public static AlertDialog createPreferenceDialog(
             @NonNull Context context,
             @StringRes int title,
             @NonNull Supplier<String> getter,
             @NonNull Consumer<String> setter
+    ) {
+        return createPreferenceDialog(context, title, getter, setter, Collections.emptyList());
+    }
+
+    @NonNull
+    public static AlertDialog createPreferenceDialog(
+            @NonNull Context context,
+            @StringRes int title,
+            @NonNull Supplier<String> getter,
+            @NonNull Consumer<String> setter,
+            @NonNull Collection<? extends ChipItem> suggestions
     ) {
         var builder = new AlertDialog.Builder(context);
         builder.setTitle(title);
@@ -303,6 +324,25 @@ public class ViewUtils {
         builder.setNegativeButton(R.string.cancel, (d, which) -> {
             imm.hideSoftInputFromWindow(binding.getRoot().getWindowToken(), 0);
         });
+
+        var dialogRef = new AtomicReference<Dialog>();
+
+        // add suggestion chips
+        if (!suggestions.isEmpty()) {
+            binding.suggestionLayout.setVisibility(View.VISIBLE);
+        }
+        for (var suggestion : suggestions) {
+            var view = new Chip(context);
+            view.setText(suggestion.getLabel());
+            view.setOnClickListener(v -> {
+                setter.accept(suggestion.getValue());
+                imm.hideSoftInputFromWindow(binding.getRoot().getWindowToken(), 0);
+
+                var dialog = dialogRef.get();
+                if (dialog != null) dialog.dismiss();
+            });
+            binding.suggestions.addView(view);
+        }
 
         // handle showing the ime analogous to EditTextPreferenceDialogFragmentCompat
         var showSoftInputRunnable = new Runnable() {
@@ -347,11 +387,15 @@ public class ViewUtils {
         };
 
         var dialog = builder.create();
+        dialogRef.set(dialog);
         dialog.setOnShowListener(d -> {
             binding.input.setText(getter.get());
             binding.input.requestFocus();
             binding.input.setSelection(binding.input.getText().length());
             showSoftInputRunnable.scheduleShowSoftInput();
+        });
+        dialog.setOnDismissListener(d -> {
+            dialogRef.set(null);
         });
         return dialog;
     }
@@ -361,8 +405,19 @@ public class ViewUtils {
             @StringRes int title,
             @NonNull Supplier<String> getter,
             @NonNull Consumer<String> setter
+    )
+    {
+        showPreferenceDialog(context, title, getter, setter, Collections.emptyList());
+    }
+
+    public static void showPreferenceDialog(
+            @NonNull Context context,
+            @StringRes int title,
+            @NonNull Supplier<String> getter,
+            @NonNull Consumer<String> setter,
+            @NonNull Collection<? extends ChipItem> suggestions
     ) {
-        createPreferenceDialog(context, title, getter, setter).show();
+        createPreferenceDialog(context, title, getter, setter, suggestions).show();
     }
 
     public static void setError(@NonNull EditText editText, boolean error) {
