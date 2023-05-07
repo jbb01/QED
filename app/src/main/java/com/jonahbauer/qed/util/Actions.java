@@ -2,10 +2,7 @@ package com.jonahbauer.qed.util;
 
 import static android.content.Context.CLIPBOARD_SERVICE;
 
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.Context;
-import android.content.Intent;
+import android.content.*;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.provider.CalendarContract;
@@ -362,10 +359,10 @@ public class Actions {
     }
 
     private static boolean tryStartActivity(@NonNull Context context, Intent intent) {
-        if (intent.resolveActivity(context.getPackageManager()) != null) {
+        try {
             context.startActivity(intent);
             return true;
-        } else {
+        } catch (ActivityNotFoundException e) {
             return false;
         }
     }
