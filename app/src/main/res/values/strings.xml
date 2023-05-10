@@ -362,6 +362,8 @@
     <string name="preferences_chat_channel_title">Channel</string>
     <string name="preferences_chat_color_title">Color</string>
     <string name="preferences_chat_sense_title">Show Sense</string>
+    <string name="preferences_chat_sense_true_summary">Bot messages are hidden</string>
+    <string name="preferences_chat_sense_false_summary">Bot messages are shown</string>
     <string name="preferences_chat_public_id_title">Public ID</string>
     <string name="preferences_chat_linkify_title">Show Links</string>
     <string name="preferences_chat_katex_title">KaTeX Rendering (Beta)</string>

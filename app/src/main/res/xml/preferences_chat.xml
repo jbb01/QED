@@ -48,7 +48,9 @@
             android:selectAllOnFocus="true"
             android:singleLine="true"
             android:title="@string/preferences_chat_sense_title"
-            android:icon="@drawable/ic_settings_botblock" />
+            android:icon="@drawable/ic_settings_botblock"
+            android:summaryOn="@string/preferences_chat_sense_true_summary"
+            android:summaryOff="@string/preferences_chat_sense_false_summary"/>
 
         <SwitchPreference
             android:defaultValue="true"
