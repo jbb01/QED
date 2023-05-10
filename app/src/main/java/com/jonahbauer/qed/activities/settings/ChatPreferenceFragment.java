@@ -9,6 +9,7 @@ import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.ColorPickerDialogFragment;
 import com.jonahbauer.qed.layoutStuff.SeekBarPreference;
 import com.jonahbauer.qed.model.room.Database;
+import com.jonahbauer.qed.util.MessageUtils;
 import com.jonahbauer.qed.util.Preferences;
 
 import androidx.annotation.NonNull;
@@ -37,6 +38,17 @@ public class ChatPreferenceFragment extends AbstractPreferenceFragment implement
 
         name = findPreference(Preferences.getChat().getKeys().getName());
         assert name != null;
+        name.setSummaryProvider(preference -> {
+            var name = Preferences.getChat().getName();
+            return MessageUtils.formatName(preference.getContext(), name);
+        });
+
+        var channelPref = findPreference(Preferences.getChat().getKeys().getChannel());
+        assert channelPref != null;
+        channelPref.setSummaryProvider(preference -> {
+            var channel = Preferences.getChat().getChannel();
+            return MessageUtils.formatChannel(preference.getContext(), channel);
+        });
 
         katex = findPreference(Preferences.getChat().getKeys().getKatex());
         assert katex != null;
