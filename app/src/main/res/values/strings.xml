@@ -512,7 +512,7 @@
     <string name="image_info_album">Album</string>
     <string name="image_info_owner">Owner</string>
     <string name="image_info_upload_date">Uploaded Date</string>
-    <string name="image_info_number_of_calls">Number of Calls</string>
+    <string name="image_info_number_of_calls">Number of Views</string>
 
     <!-- Color Dialog -->
     <string name="red">Red</string>
