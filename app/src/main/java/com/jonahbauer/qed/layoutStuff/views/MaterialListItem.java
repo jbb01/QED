@@ -245,8 +245,8 @@ public class MaterialListItem extends ViewGroup {
             if (mSubtitle == null) {
                 layoutCenter(ps, width - pe, width, height, mTitleTextView);
             } else {
-                layoutBaseline(ps, pe, height / 2 - (int) dp4, width, mTitleTextView);
-                layoutBaseline(ps, pe, height / 2 + (int) (4 * dp4), width, mSubtitleTextView);
+                layoutBaseline(ps, width - pe, height / 2 - (int) dp4, width, mTitleTextView);
+                layoutBaseline(ps, width - pe, height / 2 + (int) (4 * dp4), width, mSubtitleTextView);
             }
         } else {
             layoutIcon(ps, pt, ps + iconWidth, pt + iconHeight, width);
