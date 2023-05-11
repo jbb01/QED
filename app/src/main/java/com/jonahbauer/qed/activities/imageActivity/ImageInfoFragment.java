@@ -138,7 +138,6 @@ public class ImageInfoFragment extends Fragment {
 
     private void updateView(@Nullable Image image) {
         mBinding.imageInfo.removeAllViews();
-        mBinding.otherInfos.removeAllViews();
         mBinding.qedInfos.removeAllViews();
 
         if (image == null) return;
