@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- General -->
     <string name="app_name">QED</string>
@@ -5,55 +6,128 @@
     <string name="cancel">Cancel</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
-    <string name="delete">Delete</string>
-    <string name="deleted">Deleted</string>
-    <string name="delete_error">Deletion failed</string>
-    <string name="save">Save</string>
-    <string name="saved">Saved</string>
-    <string name="save_error">Saving failed</string>
-    <string name="search">Search</string>
-    <string name="retry">Retry</string>
+    <string name="coming_soon">Coming soon™</string>
     <string name="copied">Copied</string>
-    <string name="hits">%,d Hits</string>
-    <string name="range">%s - %s</string>
-    <string name="logout_success">Logout successful</string>
+    <string name="delete">Delete</string>
+    <string name="delete_error">Deletion failed</string>
+    <string name="deleted">Deleted</string>
     <string name="empty" translatable="false"/>
-    <string name="undo">Undo</string>
-    <string name="settings">Settings</string>
-
-    <string name="no_internet">Something went wrong. Please check your network connection.</string>
-    <string name="not_official">This app is not related to the Quod Erat Demonstrandum e.V. in any official way.</string>
-
-    <string name="error">Error!</string>
-    <string name="error_unknown">An unknown error occurred.</string>
-    <string name="error_login">Unable to log in.</string>
-    <string name="error_network">A network error occurred.</string>
-    <string name="error_404">Requested resource could not be found.</string>
-    <string name="error_out_of_memory">Out of memory.</string>
-    <string name="error_empty">Empty</string>
-    <string name="error_user">Error in Layer 8</string>
-    <string name="error_incomplete">An error occurred. Results might be incomplete.</string>
-
+    <string name="hits">%,d Hits</string>
     <string name="info">Details</string>
-    <string name="offline_mode">Offline-Mode</string>
-    <string name="offline_mode_not_available">Not available in offline mode.</string>
-    <string name="double_back_to_exit_toast">Press again to exit</string>
-    <string name="cant_connect">No Internet Connection.</string>
-    <string name="coming_soon">Coming soon</string>
-    <string name="no_file_explorer">No file explorer was found.</string>
-    <string name="master_key_error">Password could not be saved.</string>
+    <string name="range">%s - %s</string>
     <string name="refresh">Refresh</string>
+    <string name="retry">Retry</string>
+    <string name="save">Save</string>
+    <string name="save_error">Saving failed</string>
+    <string name="saved">Saved</string>
+    <string name="search">Search</string>
+    <string name="settings">Settings</string>
+    <string name="undo">Undo</string>
+
+    <!-- Application -->
+    <string name="double_back_to_exit_toast">Press again to exit</string>
+    <string name="logout_success">Logout successful</string>
+    <string name="not_official">This app is not related to the Quod Erat Demonstrandum e.V. in any official way.</string>
+    <string name="master_key_error">Password could not be saved.</string>
+
+    <!-- Preference Keys -->
+    <string name="preferences_chat_name_key" translatable="false">chat.name</string>
+    <string name="preferences_chat_recent_names_key" translatable="false">chat.recent_names</string>
+    <string name="preferences_chat_channel_key" translatable="false">chat.channel</string>
+    <string name="preferences_chat_recent_channels_key" translatable="false">chat.recent_channels</string>
+    <string name="preferences_chat_color_key" translatable="false">chat.color</string>
+    <string name="preferences_chat_sense_key" translatable="false">chat.show_sense</string>
+    <string name="preferences_chat_public_id_key" translatable="false">chat.public_id</string>
+    <string name="preferences_chat_linkify_key" translatable="false">chat.linkify</string>
+    <string name="preferences_chat_katex_key" translatable="false">chat.katex</string>
+    <string name="preferences_chat_delete_db_key" translatable="false">chat.delete_db</string>
+    <string name="preferences_chat_colorful_key" translatable="false">chat.colorful</string>
+    <string name="preferences_chat_db_max_result_key" translatable="false">chat.db_max_results</string>
+
+    <string name="preferences_general_bug_report_key" translatable="false">general.bug_report</string>
+    <string name="preferences_general_language_key" translatable="false">general.language</string>
+    <string name="preferences_general_github_key" translatable="false">general.github</string>
+    <string name="preferences_general_remember_me_key" translatable="false">general.remember_me</string>
+    <string name="preferences_general_night_mode_key" translatable="false">general.night_mode</string>
+    <string name="preferences_general_update_check_enabled_key" translatable="false">general.update_check.enabled</string>
+    <string name="preferences_general_update_check_includes_prereleases_key" translatable="false">general.update_check.includes_prereleases</string>
+    <string name="preferences_general_update_check_dont_suggest_key" translatable="false">general.update_check.dont_suggest</string>
+    <string name="preferences_general_username_key" translatable="false">general.username</string>
+
+    <string name="preferences_gallery_delete_thumbnails_key" translatable="false">gallery.delete_thumbnails</string>
+    <string name="preferences_gallery_delete_images_key" translatable="false">gallery.delete_images</string>
+    <string name="preferences_gallery_offline_mode_key" translatable="false">gallery.offline_mode</string>
+    <string name="preferences_gallery_show_dir_key" translatable="false">gallery.show_dir</string>
+    <string name="preferences_gallery_delete_db_key" translatable="false">gallery.delete_db</string>
+
+    <!-- Language -->
+    <string-array name="language_names" translatable="false">
+        <item>@string/language_system</item>
+        <item>@string/language_german</item>
+        <item>@string/language_english</item>
+    </string-array>
+    <string-array name="language_codes" translatable="false">
+        <item>SYSTEM</item>
+        <item>GERMAN</item>
+        <item>ENGLISH</item>
+    </string-array>
+    <string name="language_system">System</string>
+    <string name="language_german" translatable="false">Deutsch</string>
+    <string name="language_english" translatable="false">English</string>
+
+    <!-- Error messages -->
+    <string name="error">Error!</string>
+    <string name="error_404">Requested resource could not be found.</string>
+    <string name="error_empty">Empty</string>
+    <string name="error_incomplete">An error occurred. Results might be incomplete.</string>
+    <string name="error_login">Unable to log in.</string>
+    <string name="error_network">A network error occurred. Please check your internet connection.</string>
+    <string name="error_out_of_memory">Out of memory.</string>
+    <string name="error_unknown">An unknown error occurred.</string>
+    <string name="error_user">Error in Layer 8</string>
+
+    <!-- Update Dialog -->
+    <string name="update_dialog_title">Update Available</string>
+    <string name="update_dialog_message">A new version of the app is available: &lt;font face="monospace">%s&lt;/font></string>
+    <string name="update_dialog_message_prerelease">A new beta version of the app is available: &lt;font face="monospace">%s&lt;/font></string>
+    <string name="update_dialog_remind_later">Remind me later</string>
+    <string name="update_dialog_show">Show</string>
+    <string name="update_dialog_ignore">Ignore</string>
 
     <!-- Transitions -->
-    <string name="transition_name_person" translatable="false">person_%d</string>
     <string name="transition_name_album" translatable="false">album_%d</string>
+    <string name="transition_name_album_fragment" translatable="false">album_content</string>
     <string name="transition_name_event" translatable="false">event_%d</string>
     <string name="transition_name_event_database_fragment" translatable="false">event_database</string>
-    <string name="transition_name_person_database_fragment" translatable="false">event_database</string>
-    <string name="transition_name_image_thumbnail" translatable="false">image_thumb_%d</string>
-    <string name="transition_name_single_fragment" translatable="false">fragment_content</string>
-    <string name="transition_name_album_fragment" translatable="false">album_content</string>
     <string name="transition_name_image_fragment_image" translatable="false">image_content_image</string>
+    <string name="transition_name_image_thumbnail" translatable="false">image_thumb_%d</string>
+    <string name="transition_name_person" translatable="false">person_%d</string>
+    <string name="transition_name_person_database_fragment" translatable="false">event_database</string>
+    <string name="transition_name_single_fragment" translatable="false">fragment_content</string>
+
+    <!-- Navigation Drawer -->
+    <string name="drawer_chat_heading">Chat</string>
+    <string name="drawer_chat">Chat</string>
+    <string name="drawer_chat_log">Log</string>
+    <string name="drawer_chat_db">Database</string>
+
+    <string name="drawer_database_heading">Database</string>
+    <string name="drawer_persons">Persons</string>
+    <string name="drawer_events">Events</string>
+
+    <string name="drawer_gallery_heading">Gallery</string>
+    <string name="drawer_gallery">Gallery</string>
+
+    <string name="drawer_settings">@string/settings</string>
+    <string name="drawer_logout">Sign Out</string>
+
+    <!-- Login Activity -->
+    <string name="title_fragment_login">Sign In</string>
+    <string name="login_prompt_username">Username</string>
+    <string name="login_prompt_password">Password</string>
+    <string name="login_action_sign_in">Sign In</string>
+    <string name="login_action_sign_in_short">Sign In</string>
+    <string name="login_error_incorrect_data">Login data is invalid</string>
 
     <!-- Chat Fragment -->
     <string name="title_fragment_chat">Chat</string>
@@ -64,39 +138,75 @@
     <string name="chat_scroll_down_button_content_description">Scroll Down</string>
     <string name="chat_websocket_closed">Websocket closed</string>
 
+    <string name="chat_quick_settings">Quick Settings</string>
     <string name="chat_quick_settings_name">Quick Settings - Name</string>
     <string name="chat_quick_settings_channel">Quick Settings - Channel</string>
     <string name="chat_quick_settings_public_id">Quick Settings - Public ID</string>
-    <string name="chat_quick_settings">Quick Settings</string>
 
     <string name="message_info">@string/info</string>
     <string name="message_copy">Copy</string>
-    <string name="message_name_anonymous"><i>Anonymous</i></string>
-    <string name="message_channel_main"><i>main</i></string>
     <string name="message_reply">Reply</string>
     <string name="message_reply_prepended">Reply inserted</string>
     <string name="message_reply_present">Reply already present</string>
 
-    <!-- Message Info Sheet -->
-    <string name="message_info_title_id">ID</string>
-    <string name="message_info_title_name">Name</string>
-    <string name="message_info_title_username">Username</string>
-    <string name="message_info_title_channel">Channel</string>
-    <string name="message_info_title_timestamp">Timestamp</string>
-    <string name="message_info_title_bottag">Bottag</string>
-    <string name="message_info_title_message">Message</string>
+    <string name="message_name_anonymous"><i>Anonymous</i></string>
+    <string name="message_channel_main"><i>main</i></string>
 
-    <!-- Login Activity -->
-    <string name="title_fragment_login">Sign In</string>
-    <string name="login_prompt_username">Username</string>
-    <string name="login_prompt_password">Password</string>
-    <string name="login_action_sign_in">Sign In</string>
-    <string name="login_action_sign_in_short">Sign In</string>
-    <string name="login_error_incorrect_data">Login data is invalid</string>
+    <!-- Message Bottom Sheet -->
+    <string name="message_section_metadata">Metadata</string>
+    <string name="message_section_message">Message</string>
+    <string name="message_subtitle_id">ID</string>
+    <string name="message_clip_label_id">ID</string>
+    <string name="message_subtitle_name">Name</string>
+    <string name="message_clip_label_name">Name</string>
+    <string name="message_title_username">%s (%d)</string>
+    <string name="message_subtitle_username">Username</string>
+    <string name="message_clip_label_username">Username</string>
+    <string name="message_subtitle_channel">Channel</string>
+    <string name="message_clip_label_channel">Channel</string>
+    <string name="message_subtitle_timestamp">Timestamp</string>
+    <string name="message_clip_label_timestamp">Timestamp</string>
+    <string name="message_subtitle_bottag">Bottag</string>
 
-    <!-- Database -->
-    <string name="database_offline">No internet connection.\nThe Database if not available when offline</string>
-    <string name="database_empty">Database seems to be empty.\nDid you pay your membership fee?</string>
+    <!-- Log Fragment -->
+    <string name="title_fragment_log">Log</string>
+    <string name="log_subtitle_date_interval">Posts from {0} until {1}</string>
+    <string name="log_subtitle_date_recent">Posts of the last {0,choice,1#|2#{0} }hour{0,choice,1#|2#s}</string>
+    <string name="log_subtitle_post_recent">Last{0,choice,1#|2# {0}} Post{0,choice,1#|2#s}</string>
+    <string name="log_subtitle_post_interval">Posts from #{0} to #{1}</string>
+    <string name="log_subtitle_since_own">Since Own Post</string>
+    <string name="log_subtitle_file">File</string>
+    <string name="log_action_save">Save to database</string>
+
+    <string name="log_status_download_pending">Download pending…</string>
+    <string name="log_status_downloading">Downloading… %.2f MiB</string>
+    <string name="log_status_download_successful">Download successful. %.2f MiB</string>
+    <string name="log_status_parse_pending">JSON Parsing pending…</string>
+    <string name="log_status_parsing">Parsing JSON… %d / %d</string>
+    <string name="log_status_parse_failed">JSON Parsing failed. %s</string>
+    <string name="log_status_likely_oom">An out-of-memory error is likely due to high number of messages.</string>
+
+    <!-- Log Dialog Activity -->
+    <string name="title_activity_log_dialog">Logs</string>
+    <string name="log_dialog_mode_label">Mode</string>
+    <string name="log_dialog_date_convert_timezone">{0} will be converted to {1} due to loss of information when converting between time zones</string>
+    <string name="log_request_postrecent_before">Last</string>
+    <string name="log_request_postrecent_after">Posts</string>
+    <string name="log_request_sinceown_before">Skip</string>
+    <string name="log_request_sinceown_after">Posts</string>
+    <string name="log_request_daterecent_before">Last</string>
+    <string name="log_request_daterecent_after">Hours</string>
+    <string name="log_request_dateinterval_from">From</string>
+    <string name="log_request_dateinterval_to">Until</string>
+    <string name="log_request_file_title">File</string>
+    <string name="log_request_channel">Channel</string>
+    <string name="log_request_mode_postrecent">postrecent</string>
+    <string name="log_request_mode_daterecent">daterecent</string>
+    <string name="log_request_mode_dateinterval">dateinterval</string>
+    <string name="log_request_mode_postinterval">postinterval</string>
+    <string name="log_request_mode_sinceown">fromownpost</string>
+    <string name="log_request_mode_file">file</string>
+
     <!-- Chat Database Fragment -->
     <string name="title_fragment_chat_database">Database</string>
     <string name="chat_database_channel_checkbox">Channel</string>
@@ -122,6 +232,9 @@
         <item>500,000</item>
         <item>\u221E</item>
     </string-array>
+
+    <!-- Database -->
+    <string name="database_empty">Database seems to be empty.\nDid you pay your membership fee?</string>
 
     <!-- Persons Database Fragment -->
     <string name="title_fragment_persons_database">Persons</string>
@@ -253,6 +366,38 @@
     <string name="registration_snackbar_person_not_available">Person is not available</string>
     <string name="registration_snackbar_event_not_available">Event is not available</string>
 
+    <!-- Registration -->
+    <string name="registration_orga">Organizer</string>
+    <string name="registration_status_confirmed">confirmed</string>
+    <string name="registration_status_pending">pending</string>
+    <string name="registration_status_rejected">rejected</string>
+    <string name="registration_status_cancelled">cancelled</string>
+
+    <!-- Gallery -->
+    <string name="offline_mode_not_available">Not available in offline mode.</string>
+
+    <!-- Gallery Fragment-->
+    <string name="gallery_folder_images" translatable="false">gallery/images</string>
+
+    <string name="title_fragment_gallery">Gallery</string>
+    <string name="gallery_empty">Gallery seems to be empty.</string>
+    <string name="gallery_offline_mode">You have lost connection to the internet. This app is offline.</string>
+    <string name="gallery_forced_offline_mode">Offline mode is enabled.</string>
+    <string name="gallery_disable_offline_mode">Disable</string>
+
+    <!-- Album Fragment -->
+    <string name="title_fragment_album">Album</string>
+    <string name="album_photographer_radio_button">Photographer</string>
+    <string name="album_date_radio_button">Date</string>
+    <string name="album_upload_radio_button">Upload</string>
+    <string name="album_category_radio_button">Category</string>
+    <string name="album_photographer_unknown">Unknown</string>
+
+    <string name="album_empty">This album seems to be empty</string>
+    <string name="album_not_downloaded">This album is not downloaded</string>
+
+    <string name="album_info">@string/info</string>
+
     <!-- Album Bottom Sheet -->
     <string name="album_section_general">General</string>
     <string name="album_section_persons">Persons</string>
@@ -264,95 +409,67 @@
     <string name="album_subtitle_image_count">Image Count</string>
     <string name="album_title_private">Private Album</string>
 
-    <!-- Message Bottom Sheet -->
-    <string name="message_section_metadata">Metadata</string>
-    <string name="message_section_message">Message</string>
-    <string name="message_subtitle_id">ID</string>
-    <string name="message_clip_label_id">ID</string>
-    <string name="message_subtitle_name">Name</string>
-    <string name="message_clip_label_name">Name</string>
-    <string name="message_title_username">%s (%d)</string>
-    <string name="message_subtitle_username">Username</string>
-    <string name="message_clip_label_username">Username</string>
-    <string name="message_subtitle_channel">Channel</string>
-    <string name="message_clip_label_channel">Channel</string>
-    <string name="message_subtitle_timestamp">Timestamp</string>
-    <string name="message_clip_label_timestamp">Timestamp</string>
-    <string name="message_subtitle_bottag">Bottag</string>
+    <!-- Image Activity -->
+    <string name="title_activity_image">Picture</string>
+    <string name="image_suffix_original">" (original)"</string>
+    <string name="image_already_original">This already is the original file. Do you wish to download it anew?</string>
+    <string name="image_not_downloaded">This picture is not downloaded</string>
+    <string name="image_download_non_picture">You are about to download an audio or video file. A WLAN connection is recommended. Do you wish to continue?</string>
 
-    <!-- Registration -->
-    <string name="registration_orga">Organizer</string>
-    <string name="registration_status_participated">participated</string>
-    <string name="registration_status_confirmed">confirmed</string>
-    <string name="registration_status_pending">pending</string>
-    <string name="registration_status_rejected">rejected</string>
-    <string name="registration_status_cancelled">cancelled</string>
+    <string name="image_info">@string/info</string>
+    <string name="image_open_with">Open With…</string>
+    <string name="image_share">Share</string>
+    <string name="image_copy_link">Copy Link</string>
+    <string name="image_download_original">Download Original</string>
+    <string name="image_clip_label_link">Image #%d</string>
 
-    <!-- Language -->
-    <string-array name="language_names">
-        <item>@string/language_system</item>
-        <item>@string/language_german</item>
-        <item>@string/language_english</item>
-    </string-array>
-    <string-array name="language_codes">
-        <item>SYSTEM</item>
-        <item>GERMAN</item>
-        <item>ENGLISH</item>
-    </string-array>
-    <string name="language_system">System</string>
-    <string name="language_german" translatable="false">Deutsch</string>
-    <string name="language_english" translatable="false">English</string>
+    <string name="no_file_explorer">No file explorer was found.</string>
 
-    <!-- Preference Keys -->
-    <string name="preferences_chat_name_key" translatable="false">chat.name</string>
-    <string name="preferences_chat_recent_names_key" translatable="false">chat.recent_names</string>
-    <string name="preferences_chat_channel_key" translatable="false">chat.channel</string>
-    <string name="preferences_chat_recent_channels_key" translatable="false">chat.recent_channels</string>
-    <string name="preferences_chat_color_key" translatable="false">chat.color</string>
-    <string name="preferences_chat_sense_key" translatable="false">chat.show_sense</string>
-    <string name="preferences_chat_public_id_key" translatable="false">chat.public_id</string>
-    <string name="preferences_chat_linkify_key" translatable="false">chat.linkify</string>
-    <string name="preferences_chat_katex_key" translatable="false">chat.katex</string>
-    <string name="preferences_chat_delete_db_key" translatable="false">chat.delete_db</string>
-    <string name="preferences_chat_colorful_key" translatable="false">chat.colorful</string>
-    <string name="preferences_chat_db_max_result_key" translatable="false">chat.db_max_results</string>
+    <!-- Image Info Activity -->
+    <string name="title_activity_image_info">Details</string>
+    <string name="image_info_details">Photo-Details</string>
+    <string name="image_info_camera_manufacturer">Manufacturer</string>
+    <string name="image_info_camera_model">Model</string>
+    <string name="image_info_iso">ISO</string>
+    <string name="image_info_focal_ratio">Focal Ratio</string>
+    <string name="image_info_focal_length">Focal Length</string>
+    <string name="image_info_exposure_time">Exposure Time</string>
+    <string name="image_info_flash">Flash</string>
+    <string name="image_info_flash_no_flash">No Flash</string>
+    <string name="image_info_flash_triggered">Flash Triggered</string>
+    <string name="image_info_orientation">Orientation</string>
+    <string name="image_info_resolution">Resolution</string>
+    <string name="image_info_creation_date">Creation Date</string>
+    <string name="image_info_format">Format</string>
+    <string name="image_info_position">Position</string>
 
-    <string name="preferences_ping_notification_key" translatable="false">pushPings</string>
-    <string name="preferences_ping_notification_server_key" translatable="false">pushPingServer</string>
+    <string name="image_info_histogram">Image-Histogram</string>
 
-    <string name="preferences_general_bug_report_key" translatable="false">general.bug_report</string>
-    <string name="preferences_general_language_key" translatable="false">general.language</string>
-    <string name="preferences_general_github_key" translatable="false">general.github</string>
-    <string name="preferences_general_remember_me_key" translatable="false">general.remember_me</string>
-    <string name="preferences_general_night_mode_key" translatable="false">general.night_mode</string>
-    <string name="preferences_general_update_check_enabled_key" translatable="false">general.update_check.enabled</string>
-    <string name="preferences_general_update_check_includes_prereleases_key" translatable="false">general.update_check.includes_prereleases</string>
-    <string name="preferences_general_update_check_dont_suggest_key" translatable="false">general.update_check.dont_suggest</string>
-    <string name="preferences_general_username_key" translatable="false">general.username</string>
-
-    <string name="preferences_gallery_delete_thumbnails_key" translatable="false">gallery.delete_thumbnails</string>
-    <string name="preferences_gallery_delete_images_key" translatable="false">gallery.delete_images</string>
-    <string name="preferences_gallery_offline_mode_key" translatable="false">gallery.offline_mode</string>
-    <string name="preferences_gallery_show_dir_key" translatable="false">gallery.show_dir</string>
-    <string name="preferences_gallery_delete_db_key" translatable="false">gallery.delete_db</string>
+    <string name="image_info_qed_details">QED</string>
+    <string name="image_info_album">Album</string>
+    <string name="image_info_owner">Owner</string>
+    <string name="image_info_upload_date">Upload Date</string>
+    <string name="image_info_number_of_calls">Number of Views</string>
 
     <!-- Preference Activity -->
     <string name="title_fragment_settings">@string/settings</string>
-    <string name="preferences_header_chat">Chat</string>
-    <string name="preferences_header_gallery">Gallery</string>
-    <string name="preferences_header_general">General</string>
     <string name="preferences_header_debug">Debug</string>
 
-    <string name="preferences_general_group_appearance">Appearance</string>
-    <string name="preferences_general_group_update_check">Update Check</string>
+    <string name="preferences_header_general">General</string>
+    <string name="preferences_general_remember_me_title">Remember Me</string>
+
+    <string name="preferences_general_group_general">General</string>
+    <string name="preferences_general_github_title">GitHub Project</string>
+    <string name="preferences_general_github_summary">https://github.com/jbb01/QED</string>
     <string name="preferences_general_bug_report_title">Bug Report</string>
     <string name="preferences_general_bug_report_summary">Please use the GitHub Issue Tracker for reporting bugs. Include as much information as possible (Android and app version, steps to reproduce, …).</string>
     <string name="preferences_general_language_title">Language</string>
-    <string name="preferences_general_github_title">GitHub Project</string>
-    <string name="preferences_general_github_summary">https://github.com/jbb01/QED</string>
-    <string name="preferences_general_remember_me_title">Remember Me</string>
+
+    <string name="preferences_general_group_appearance">Appearance</string>
     <string name="preferences_general_night_mode_title">Night Mode</string>
     <string name="preferences_general_night_mode_summary">A theme as black as your soul.</string>
+
+    <string name="preferences_general_group_update_check">Update Check</string>
     <string name="preferences_general_update_check_enabled_title">Check for Updates</string>
     <string name="preferences_general_update_check_enabled_true_summary">You will be notified about new versions.</string>
     <string name="preferences_general_update_check_enabled_false_summary">You will not be notified about new versions.</string>
@@ -360,22 +477,27 @@
     <string name="preferences_general_update_check_includes_prereleases_true_summary">You will receive notifications for new beta versions.</string>
     <string name="preferences_general_update_check_includes_prereleases_false_summary">You will only receive notifications for new release versions.</string>
 
-    <string name="preferences_chat_group_database">Chat Database</string>
-    <string name="preferences_chat_group_appearance">Appearance</string>
+    <string name="preferences_header_chat">Chat</string>
+    <string name="preferences_chat_group_general">General</string>
     <string name="preferences_chat_name_title">Name</string>
     <string name="preferences_chat_channel_title">Channel</string>
     <string name="preferences_chat_color_title">Color</string>
+    <string name="preferences_chat_public_id_title">Public ID</string>
+
+    <string name="preferences_chat_group_appearance">Appearance</string>
     <string name="preferences_chat_sense_title">Show Sense</string>
     <string name="preferences_chat_sense_true_summary">Bot messages are hidden</string>
     <string name="preferences_chat_sense_false_summary">Bot messages are shown</string>
-    <string name="preferences_chat_public_id_title">Public ID</string>
     <string name="preferences_chat_linkify_title">Show Links</string>
     <string name="preferences_chat_katex_title">KaTeX Rendering (Beta)</string>
     <string name="preferences_chat_colorful_title">Colorful Messages</string>
+
+    <string name="preferences_chat_group_database">Chat Database</string>
     <string name="preferences_chat_db_max_result_title">Maximum Number of Search Results</string>
     <string name="preferences_chat_delete_db_title">Delete Chat Database</string>
     <string name="preferences_chat_confirm_delete_db">Are you sure you want to delete the offline chat database?</string>
 
+    <string name="preferences_header_gallery">Gallery</string>
     <string name="preferences_gallery_group_fs">File System</string>
     <string name="preferences_gallery_delete_thumbnails">Delete saved thumbnails</string>
     <string name="preferences_gallery_delete_images">Delete saved pictures</string>
@@ -400,138 +522,6 @@
         <item quantity="other">Deleted %d channel suggestions.</item>
     </plurals>
 
-    <!-- Navigation Drawer -->
-    <string name="drawer_chat_heading">Chat</string>
-    <string name="drawer_chat">Chat</string>
-    <string name="drawer_chat_log">Log</string>
-    <string name="drawer_chat_db">Database</string>
-
-    <string name="drawer_database_heading">Database</string>
-    <string name="drawer_persons">Persons</string>
-    <string name="drawer_events">Events</string>
-
-    <string name="drawer_gallery_heading">Gallery</string>
-    <string name="drawer_gallery">Gallery</string>
-
-    <string name="drawer_settings">@string/settings</string>
-    <string name="drawer_logout">Sign Out</string>
-
-    <!-- Log Fragment -->
-    <string name="title_fragment_log">Log</string>
-    <string name="log_subtitle_date_interval">Posts from {0} until {1}</string>
-    <string name="log_subtitle_date_recent">Posts of the last {0,choice,1#|2#{0} }hour{0,choice,1#|2#s}</string>
-    <string name="log_subtitle_post_recent">Last{0,choice,1#|2# {0}} Post{0,choice,1#|2#s}</string>
-    <string name="log_subtitle_post_interval">Posts from #{0} to #{1}</string>
-    <string name="log_subtitle_since_own">Since Own Post</string>
-    <string name="log_subtitle_file">File</string>
-    <string name="log_action_save">Save to database</string>
-    <string name="log_wait_for_save">Please wait until saving is done.</string>
-
-    <string name="log_status_download_pending">Download pending…</string>
-    <string name="log_status_downloading">Downloading… %.2f MiB</string>
-    <string name="log_status_download_successful">Download successful. %.2f MiB</string>
-    <string name="log_status_parse_pending">JSON Parsing pending…</string>
-    <string name="log_status_parsing">Parsing JSON… %d / %d</string>
-    <string name="log_status_parse_failed">JSON Parsing failed. %s</string>
-    <string name="log_status_likely_oom">An OOM is likely due to high number of messages.</string>
-
-    <string name="log_confirm_exit">A log download is running. Do you really want to leave?</string>
-    <string name="log_confirm_exit_continue_in_background">Continue in Background</string>
-    <string name="log_confirm_exit_stay">Wait</string>
-    <string name="log_confirm_exit_cancel">Cancel</string>
-    <string name="log_download_continue_in_background_toast">Download will be continued in background.</string>
-    <string name="log_download_running_force_cancel">The running download will be canceled.</string>
-
-    <!-- Log Dialog Activity -->
-    <string name="title_activity_log_dialog">Logs</string>
-    <string name="log_dialog_mode_label">Mode</string>
-    <string name="log_dialog_date_convert_timezone">{0} will be converted to {1} due to loss of information when converting between time zones</string>
-    <string name="log_request_postrecent_before">Last</string>
-    <string name="log_request_postrecent_after">Posts</string>
-    <string name="log_request_sinceown_before">Skip</string>
-    <string name="log_request_sinceown_after">Posts</string>
-    <string name="log_request_daterecent_before">Last</string>
-    <string name="log_request_daterecent_after">Hours</string>
-    <string name="log_request_dateinterval_from">From</string>
-    <string name="log_request_dateinterval_to">Until</string>
-    <string name="log_request_file_title">File</string>
-    <string name="log_request_channel">Channel</string>
-    <string name="log_request_mode_postrecent">postrecent</string>
-    <string name="log_request_mode_daterecent">daterecent</string>
-    <string name="log_request_mode_dateinterval">dateinterval</string>
-    <string name="log_request_mode_postinterval">postinterval</string>
-    <string name="log_request_mode_sinceown">fromownpost</string>
-    <string name="log_request_mode_file">file</string>
-
-    <!-- Gallery Fragment-->
-    <string name="gallery_folder_images" translatable="false">gallery/images</string>
-
-    <string name="title_fragment_gallery">Gallery</string>
-    <string name="gallery_empty">Gallery seems to be empty.</string>
-    <string name="gallery_offline_mode">You have lost connection to the internet. This app is offline.</string>
-    <string name="gallery_forced_offline_mode">Offline mode is enabled.</string>
-    <string name="gallery_disable_offline_mode">Disable</string>
-
-    <!-- Album Fragment -->
-    <string name="album_photographer_radio_button">Photographer</string>
-    <string name="album_date_radio_button">Date</string>
-    <string name="album_upload_radio_button">Upload</string>
-    <string name="album_category_radio_button">Category</string>
-    <string name="album_photographer_unknown">Unknown</string>
-
-    <string name="title_fragment_album">Album</string>
-    <string name="album_empty">This album seems to be empty</string>
-    <string name="album_invalid">This album does not exist.</string>
-    <string name="album_not_downloaded">This album is not downloaded</string>
-    <string name="album_overwrite_offline_mode">You are in offline mode. Do you want to download the album nevertheless?</string>
-
-    <string name="album_info">@string/info</string>
-
-    <!-- Image Activity -->
-    <string name="title_activity_image">Picture</string>
-    <string name="image_suffix_original"> (original)</string>
-    <string name="image_already_original">This already is the original file. Do you wish to download it anew?</string>
-    <string name="image_async_still_running">There are still downloads running. If you leave they will be cancelled. Do you wish to continue?</string>
-    <string name="image_not_downloaded">This picture is not downloaded</string>
-    <string name="image_download_non_picture">You are about to download an audio or video file. A WLAN connection is recommanded. Do you wish to continue?</string>
-    <string name="image_overwrite_offline_mode">You are in offline mode. Do you want to download the image nevertheless?</string>
-
-    <string name="image_info">@string/info</string>
-    <string name="image_open_with">Open With…</string>
-    <string name="image_share">Share</string>
-    <string name="image_copy_link">Copy Link</string>
-    <string name="image_download_original">Download Original</string>
-    <string name="image_clip_label_link">Image #%d</string>
-
-    <!-- Image Info Activity -->
-    <string name="title_activity_image_info">Details</string>
-    <string name="image_info_details">Photo-Details</string>
-    <string name="image_info_camera_manufacturer">Manufacturer</string>
-    <string name="image_info_camera_model">Model</string>
-    <string name="image_info_iso">ISO</string>
-    <string name="image_info_focal_ratio">Focal Ratio</string>
-    <string name="image_info_focal_length">Focal Length</string>
-    <string name="image_info_exposure_time">Exposure Time</string>
-    <string name="image_info_flash">Flash</string>
-    <string name="image_info_flash_no_flash">No Flash</string>
-    <string name="image_info_flash_triggered">Flash Triggered</string>
-    <string name="image_info_orientation">Orientation</string>
-    <string name="image_info_resolution">Resolution</string>
-    <string name="image_info_creation_date">Creation Date</string>
-    <string name="image_info_format">Format</string>
-    <string name="image_info_position">Position</string>
-
-    <string name="image_info_histogram">Image-Histogram</string>
-
-    <string name="image_info_other_details">Others</string>
-    <string name="image_info_path">Path</string>
-
-    <string name="image_info_qed_details">QED</string>
-    <string name="image_info_album">Album</string>
-    <string name="image_info_owner">Owner</string>
-    <string name="image_info_upload_date">Uploaded Date</string>
-    <string name="image_info_number_of_calls">Number of Views</string>
-
     <!-- Color Dialog -->
     <string name="red">Red</string>
     <string name="green">Green</string>
@@ -549,15 +539,5 @@
     </string>
     <string name="color_picker_help_hint">Help</string>
     <string name="color_picker_mode_hint">Toggle Mode</string>
-
-    <!-- Update Dialog -->
-    <string name="update_dialog_title">Update Available</string>
-    <string name="update_dialog_message">A new version of the app is available: &lt;font face="monospace">%s&lt;/font></string>
-    <string name="update_dialog_message_prerelease">A new beta version of the app is available: &lt;font face="monospace">%s&lt;/font></string>
-    <string name="update_dialog_remind_later">Remind me later</string>
-    <string name="update_dialog_show">Show</string>
-    <string name="update_dialog_ignore">Ignore</string>
-
-    <!-- Sonstiges -->
 
 </resources>

@@ -214,7 +214,11 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
         int code = statusWrapper.getCode();
 
         if (image != null) {
-            mBinding.setTitle(image.getName());
+            if (image.isOriginal()) {
+                mBinding.setTitle(image.getName() + getString(R.string.image_suffix_original));
+            } else {
+                mBinding.setTitle(image.getName());
+            }
         }
 
         if (statusWrapper.getCode() != StatusWrapper.STATUS_PRELOADED) {

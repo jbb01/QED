@@ -55,10 +55,11 @@ public class ImageInfoFragment extends Fragment {
         priority.put(Image.DATA_KEY_FOCAL_RATIO, 8);
         priority.put(Image.DATA_KEY_EXPOSURE_TIME, 9);
         priority.put(Image.DATA_KEY_ISO, 10);
-        priority.put(Image.DATA_KEY_ALBUM, 11);
-        priority.put(Image.DATA_KEY_OWNER, 12);
-        priority.put(Image.DATA_KEY_UPLOAD_DATE, 13);
-        priority.put(Image.DATA_KEY_VISITS, 14);
+        priority.put(Image.DATA_KEY_POSITION, 11);
+        priority.put(Image.DATA_KEY_ALBUM, 12);
+        priority.put(Image.DATA_KEY_OWNER, 13);
+        priority.put(Image.DATA_KEY_UPLOAD_DATE, 14);
+        priority.put(Image.DATA_KEY_VISITS, 15);
         INFO_PRIORITY = Object2IntMaps.unmodifiable(priority);
 
         Object2IntMap<String> names = new Object2IntOpenHashMap<>();
@@ -73,6 +74,7 @@ public class ImageInfoFragment extends Fragment {
         names.put(Image.DATA_KEY_FOCAL_RATIO, R.string.image_info_focal_ratio);
         names.put(Image.DATA_KEY_EXPOSURE_TIME, R.string.image_info_exposure_time);
         names.put(Image.DATA_KEY_ISO, R.string.image_info_iso);
+        names.put(Image.DATA_KEY_POSITION, R.string.image_info_position);
         names.put(Image.DATA_KEY_ALBUM, R.string.image_info_album);
         names.put(Image.DATA_KEY_OWNER, R.string.image_info_owner);
         names.put(Image.DATA_KEY_UPLOAD_DATE, R.string.image_info_upload_date);

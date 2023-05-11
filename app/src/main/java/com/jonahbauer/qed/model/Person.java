@@ -281,7 +281,7 @@ public class Person implements Parcelable {
             DONATION(R.string.person_payment_donation),
             OTHER(R.string.person_payment_other),
             FREE_MEMBER(R.string.person_payment_free_member),
-            SPONSOR_AND_MEMBER(R.string.person_payment_sponsor_member);
+            SPONSOR_AND_MEMBER(R.string.person_payment_sponsor_and_member);
 
             public static final Parcelable.Creator<Type> CREATOR = new ParcelableEnum.Creator<>(Type.values(), Type[]::new);
 
