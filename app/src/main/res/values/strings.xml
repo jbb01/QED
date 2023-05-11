@@ -16,8 +16,10 @@
     <string name="copied">Copied</string>
     <string name="hits">%,d Hits</string>
     <string name="range">%s - %s</string>
-    <string name="empty" translatable="false"/>
     <string name="logout_success">Logout successful</string>
+    <string name="empty" translatable="false"/>
+    <string name="undo">Undo</string>
+    <string name="settings">Settings</string>
 
     <string name="no_internet">Something went wrong. Please check your network connection.</string>
     <string name="not_official">This app is not related to the Quod Erat Demonstrandum e.V. in any official way.</string>
@@ -335,7 +337,7 @@
     <string name="preferences_gallery_delete_db_key" translatable="false">gallery.delete_db</string>
 
     <!-- Preference Activity -->
-    <string name="title_fragment_settings">Settings</string>
+    <string name="title_fragment_settings">@string/settings</string>
     <string name="preferences_header_chat">Chat</string>
     <string name="preferences_header_gallery">Gallery</string>
     <string name="preferences_header_general">General</string>
@@ -386,6 +388,18 @@
     <string name="preferences_gallery_confirm_delete_images">Are you sure you want to delete all the saved images?</string>
     <string name="preferences_gallery_confirm_delete_gallery_database">Are you sure you want to delete the gallery database?</string>
 
+    <!-- Suggestion Fragment -->
+    <string name="title_fragment_name_suggestions">Name Suggestions</string>
+    <string name="title_fragment_channel_suggestions">Channel Suggestions</string>
+    <plurals name="suggestion_name_deleted">
+        <item quantity="one">Deleted name suggestion.</item>
+        <item quantity="other">Deleted %d name suggestions.</item>
+    </plurals>
+    <plurals name="suggestion_channel_deleted">
+        <item quantity="one">Deleted channel suggestion.</item>
+        <item quantity="other">Deleted %d channel suggestions.</item>
+    </plurals>
+
     <!-- Navigation Drawer -->
     <string name="drawer_chat_heading">Chat</string>
     <string name="drawer_chat">Chat</string>
@@ -399,7 +413,7 @@
     <string name="drawer_gallery_heading">Gallery</string>
     <string name="drawer_gallery">Gallery</string>
 
-    <string name="drawer_settings">Settings</string>
+    <string name="drawer_settings">@string/settings</string>
     <string name="drawer_logout">Sign Out</string>
 
     <!-- Log Fragment -->

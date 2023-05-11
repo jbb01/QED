@@ -18,7 +18,7 @@
  * The width of the value label is set to the maximum width of the external value strings
  */
 
-package com.jonahbauer.qed.layoutStuff;
+package com.jonahbauer.qed.layoutStuff.preferences;
 
 import android.content.Context;
 import android.content.res.TypedArray;

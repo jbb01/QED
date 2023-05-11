@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_settings"
     app:startDestination="@id/nav_preference_root">
 
@@ -30,7 +31,26 @@
     <fragment
         android:id="@+id/nav_preference_chat"
         android:name="com.jonahbauer.qed.activities.settings.ChatPreferenceFragment"
-        android:label="@string/preferences_header_chat" />
+        android:label="@string/preferences_header_chat" >
+        <action
+            android:id="@+id/name_suggestions"
+            app:destination="@id/nav_preference_chat_name_suggestions"/>
+        <action
+            android:id="@+id/channel_suggestions"
+            app:destination="@id/nav_preference_chat_channel_suggestions"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_preference_chat_name_suggestions"
+        android:name="com.jonahbauer.qed.activities.settings.suggestions.NameSuggestionsFragment"
+        android:label="@string/title_fragment_name_suggestions"
+        tools:layout="@layout/fragment_preference_suggestions"/>
+
+    <fragment
+        android:id="@+id/nav_preference_chat_channel_suggestions"
+        android:name="com.jonahbauer.qed.activities.settings.suggestions.ChannelSuggestionsFragment"
+        android:label="@string/title_fragment_channel_suggestions"
+        tools:layout="@layout/fragment_preference_suggestions"/>
 
     <fragment
         android:id="@+id/nav_preference_gallery"

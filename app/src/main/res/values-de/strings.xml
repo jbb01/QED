@@ -14,10 +14,12 @@
     <string name="save_error">Speichern fehlgeschlagen</string>
     <string name="search">Suchen</string>
     <string name="retry">Erneut versuchen</string>
-    <string name="hits">%,d Treffer</string>
     <string name="copied">Kopiert</string>
-    <string name="logout_success">Logout erfolgreich</string>
+    <string name="hits">%,d Treffer</string>
     <string name="range">%s - %s</string>
+    <string name="logout_success">Logout erfolgreich</string>
+    <string name="undo">Rückgängig machen</string>
+    <string name="settings">Einstellungen</string>
 
 
     <string name="cant_connect">Keine Verbindung zum Internet möglich</string>
@@ -51,7 +53,7 @@
     <string name="drawer_gallery_heading">Galerie</string>
     <string name="drawer_logout">Abmelden</string>
     <string name="drawer_persons">Personen</string>
-    <string name="drawer_settings">Einstellungen</string>
+    <string name="drawer_settings">@string/settings</string>
     <string name="error">Fehler!</string>
     <string name="info">Details</string>
     <string name="refresh">Aktualisieren</string>
@@ -397,7 +399,7 @@
     <string name="log_request_mode_file">file</string>
 
     <!-- Preference Activity -->
-    <string name="title_fragment_settings">Einstellungen</string>
+    <string name="title_fragment_settings">@string/settings</string>
     <string name="preferences_header_chat">Chat</string>
     <string name="preferences_header_gallery">Galerie</string>
     <string name="preferences_header_general">Allgemein</string>
@@ -447,6 +449,18 @@
     <string name="preferences_gallery_confirm_delete_thumbnails">Möchtest du wirklich alle gespeicherten Thumbnails löschen?</string>
     <string name="preferences_gallery_confirm_delete_images">Möchtest du wirklich alle gespeicherten Bilder löschen?</string>
     <string name="preferences_gallery_confirm_delete_gallery_database">Möchtest du wirklich die Galerie-Datenbank löschen?</string>
+
+    <!-- Suggestion Fragment -->
+    <string name="title_fragment_name_suggestions">Namensvorschläge</string>
+    <string name="title_fragment_channel_suggestions">Channelvorschläge</string>
+    <plurals name="suggestion_name_deleted">
+        <item quantity="one">Namesvorschlag gelöscht.</item>
+        <item quantity="other">%d Namensvorschläge gelöscht.</item>
+    </plurals>
+    <plurals name="suggestion_channel_deleted">
+        <item quantity="one">Channelvorschlag gelöscht.</item>
+        <item quantity="other">%d Channelvorschläge gelöscht.</item>
+    </plurals>
 
     <!-- Color Dialog -->
     <string name="red">Rot</string>

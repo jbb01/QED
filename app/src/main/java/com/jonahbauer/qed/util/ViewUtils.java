@@ -35,7 +35,9 @@ import com.jonahbauer.qed.databinding.AlertDialogEditTextBinding;
 import com.jonahbauer.qed.layoutStuff.views.InterceptingView;
 import it.unimi.dsi.fastutil.Pair;
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
+import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.Contract;
 
@@ -284,9 +286,11 @@ public class ViewUtils {
         });
     }
 
-    public interface ChipItem {
-        @NonNull CharSequence getLabel();
-        @NonNull String getValue();
+    @Value
+    @EqualsAndHashCode(of = "value")
+    public class ChipItem {
+        CharSequence label;
+        String value;
     }
 
     @NonNull

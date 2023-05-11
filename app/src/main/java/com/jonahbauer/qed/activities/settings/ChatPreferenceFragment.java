@@ -4,25 +4,24 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
+import androidx.navigation.fragment.NavHostFragment;
 import com.google.android.material.snackbar.Snackbar;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.ColorPickerDialogFragment;
-import com.jonahbauer.qed.layoutStuff.SeekBarPreference;
+import com.jonahbauer.qed.layoutStuff.preferences.AdvancedEditTextPreference;
+import com.jonahbauer.qed.layoutStuff.preferences.SeekBarPreference;
 import com.jonahbauer.qed.model.room.Database;
 import com.jonahbauer.qed.util.MessageUtils;
 import com.jonahbauer.qed.util.Preferences;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.preference.EditTextPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceManager;
 import androidx.preference.SwitchPreference;
 import com.jonahbauer.qed.util.ViewUtils;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
-import lombok.EqualsAndHashCode;
-import lombok.Value;
 
 import java.util.Collections;
 import java.util.stream.Collectors;
@@ -32,8 +31,8 @@ public class ChatPreferenceFragment extends AbstractPreferenceFragment implement
     private static final String[] MAX_SHOWN_ROWS_STRING_VALUES = {"10.000", "20.000", "50.000", "100.000", "200.000", "500.000", "∞"};
 
     private Preference deleteDatabase;
-    private EditTextPreference name;
-    private EditTextPreference channel;
+    private AdvancedEditTextPreference name;
+    private AdvancedEditTextPreference channel;
     private SwitchPreference katex;
     private SwitchPreference links;
     private Preference color;
@@ -49,12 +48,22 @@ public class ChatPreferenceFragment extends AbstractPreferenceFragment implement
             var name = Preferences.getChat().getName();
             return MessageUtils.formatName(preference.getContext(), name);
         });
+        name.setOnSettingsClickListener(preference -> {
+            var nav = ChatPreferenceFragmentDirections.nameSuggestions();
+            NavHostFragment.findNavController(this).navigate(nav);
+            return true;
+        });
 
         channel = findPreference(Preferences.getChat().getKeys().getChannel());
         assert channel != null;
         channel.setSummaryProvider(preference -> {
             var channel = Preferences.getChat().getChannel();
             return MessageUtils.formatChannel(preference.getContext(), channel);
+        });
+        channel.setOnSettingsClickListener(preference -> {
+            var nav = ChatPreferenceFragmentDirections.channelSuggestions();
+            NavHostFragment.findNavController(this).navigate(nav);
+            return true;
         });
 
         katex = findPreference(Preferences.getChat().getKeys().getKatex());
@@ -173,20 +182,8 @@ public class ChatPreferenceFragment extends AbstractPreferenceFragment implement
     }
 
     public static AlertDialog createNameDialog(@NonNull Context context) {
-        @Value
-        @EqualsAndHashCode(of = "value")
-        class NameItem implements ViewUtils.ChipItem {
-            CharSequence label;
-            String value;
-
-            public NameItem(@NonNull Context context, @NonNull String name) {
-                this.value = name;
-                this.label = MessageUtils.formatName(context, name, true);
-            }
-        }
-
         var suggestions = Preferences.getChat().getRecentNames().stream()
-                .map(name -> new NameItem(context, name))
+                .map(name -> createNameChip(context, name))
                 .collect(Collectors.toList());
         Collections.reverse(suggestions);
 
@@ -199,21 +196,16 @@ public class ChatPreferenceFragment extends AbstractPreferenceFragment implement
         );
     }
 
+    public static ViewUtils.ChipItem createNameChip(@NonNull Context context, String name) {
+        return new ViewUtils.ChipItem(
+                MessageUtils.formatName(context, name, true),
+                name
+        );
+    }
+
     public static AlertDialog createChannelDialog(@NonNull Context context) {
-        @Value
-        @EqualsAndHashCode(of = "value")
-        class ChannelItem implements ViewUtils.ChipItem {
-            CharSequence label;
-            String value;
-
-            public ChannelItem(@NonNull Context context, @NonNull String name) {
-                this.value = name;
-                this.label = MessageUtils.formatChannel(context, name);
-            }
-        }
-
         var suggestions = Preferences.getChat().getRecentChannels().stream()
-                .map(name -> new ChannelItem(context, name))
+                .map(channel -> createChannelChip(context, channel))
                 .collect(Collectors.toList());
         Collections.reverse(suggestions);
 
@@ -223,6 +215,13 @@ public class ChatPreferenceFragment extends AbstractPreferenceFragment implement
                 () -> Preferences.getChat().getChannel(),
                 (str) -> Preferences.getChat().setChannel(str),
                 suggestions
+        );
+    }
+
+    public static ViewUtils.ChipItem createChannelChip(@NonNull Context context, String channel) {
+        return new ViewUtils.ChipItem(
+                MessageUtils.formatChannel(context, channel),
+                channel
         );
     }
 }

@@ -11,7 +11,7 @@
             android:title="@string/preferences_chat_public_id_title"
             android:icon="@drawable/ic_settings_id"/>
 
-        <EditTextPreference
+        <com.jonahbauer.qed.layoutStuff.preferences.AdvancedEditTextPreference
             android:defaultValue="@null"
             android:inputType="text"
             android:key="@string/preferences_chat_name_key"
@@ -22,7 +22,7 @@
             app:useSimpleSummaryProvider="true"
             android:icon="@drawable/ic_settings_name" />
 
-        <EditTextPreference
+        <com.jonahbauer.qed.layoutStuff.preferences.AdvancedEditTextPreference
             android:defaultValue="@null"
             android:inputType="text"
             android:key="@string/preferences_chat_channel_key"
@@ -80,7 +80,7 @@
     <PreferenceCategory
         app:title="@string/preferences_chat_group_database">
 
-        <com.jonahbauer.qed.layoutStuff.SeekBarPreference
+        <com.jonahbauer.qed.layoutStuff.preferences.SeekBarPreference
             android:defaultValue="50000"
             android:key="@string/preferences_chat_db_max_result_key"
             android:singleLine="true"
