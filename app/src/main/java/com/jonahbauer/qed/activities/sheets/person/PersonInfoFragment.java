@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import androidx.core.view.MenuProvider;
 import androidx.navigation.NavDeepLinkBuilder;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.MainActivity;
@@ -21,10 +22,12 @@ import com.jonahbauer.qed.layoutStuff.views.ListItem;
 import com.jonahbauer.qed.model.Person;
 import com.jonahbauer.qed.model.Registration;
 import com.jonahbauer.qed.model.viewmodel.PersonViewModel;
+import com.jonahbauer.qed.networking.NetworkConstants;
 import com.jonahbauer.qed.util.*;
 
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.Locale;
 import java.util.StringJoiner;
 import java.util.function.BiConsumer;
 
@@ -209,6 +212,16 @@ public class PersonInfoFragment extends InfoFragment {
         if (mBinding != null) {
             mBinding.titleLayout.setVisibility(View.GONE);
         }
+    }
+
+    @Override
+    public boolean isOpenInBrowserSupported() {
+        return true;
+    }
+
+    @Override
+    public @NonNull String getOpenInBrowserLink() {
+        return String.format(Locale.ROOT, NetworkConstants.DATABASE_SERVER_PERSON, getPerson().getId());
     }
 
     @BindingAdapter("person_addresses")

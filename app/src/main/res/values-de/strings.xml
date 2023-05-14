@@ -13,6 +13,7 @@
     <string name="deleted">Gelöscht</string>
     <string name="hits">%,d Treffer</string>
     <string name="info">Details</string>
+    <string name="open_in_browser">Öffne im Browser</string>
     <string name="range">%s - %s</string>
     <string name="refresh">Aktualisieren</string>
     <string name="retry">Erneut versuchen</string>

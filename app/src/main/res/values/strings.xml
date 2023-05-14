@@ -14,6 +14,7 @@
     <string name="empty" translatable="false"/>
     <string name="hits">%,d Hits</string>
     <string name="info">Details</string>
+    <string name="open_in_browser">Open in browser</string>
     <string name="range">%s - %s</string>
     <string name="refresh">Refresh</string>
     <string name="retry">Retry</string>

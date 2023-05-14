@@ -1,13 +1,9 @@
 package com.jonahbauer.qed.activities.sheets;
 
 import android.view.ViewGroup;
-import androidx.annotation.ColorInt;
-import androidx.annotation.DrawableRes;
-import androidx.annotation.IdRes;
-import androidx.annotation.NonNull;
+import androidx.annotation.*;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-
 import com.jonahbauer.qed.layoutStuff.views.ListItem;
 import com.jonahbauer.qed.util.ViewUtils;
 
@@ -26,6 +22,14 @@ public abstract class InfoFragment extends Fragment {
     protected abstract float getTitleBottom();
 
     public abstract void hideTitle();
+
+    public boolean isOpenInBrowserSupported() {
+        return false;
+    }
+
+    public @Nullable String getOpenInBrowserLink() {
+        return null;
+    }
 
     protected ViewModelProvider getViewModelProvider(@IdRes int destinationId) {
         if (destinationId != 0) try {

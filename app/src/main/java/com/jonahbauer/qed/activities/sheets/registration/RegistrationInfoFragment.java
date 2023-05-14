@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.view.MenuProvider;
 import androidx.navigation.NavDeepLinkBuilder;
 import androidx.navigation.Navigation;
 
@@ -24,8 +25,11 @@ import com.jonahbauer.qed.model.Event;
 import com.jonahbauer.qed.model.Person;
 import com.jonahbauer.qed.model.Registration;
 import com.jonahbauer.qed.model.viewmodel.RegistrationViewModel;
+import com.jonahbauer.qed.networking.NetworkConstants;
 import com.jonahbauer.qed.util.StatusWrapper;
 import com.jonahbauer.qed.util.Themes;
+
+import java.util.Locale;
 
 public class RegistrationInfoFragment extends InfoFragment {
     private static final String SAVED_TITLE_HIDDEN = "titleHidden";
@@ -135,6 +139,16 @@ public class RegistrationInfoFragment extends InfoFragment {
         if (mBinding != null) {
             mBinding.titleLayout.setVisibility(View.GONE);
         }
+    }
+
+    @Override
+    public boolean isOpenInBrowserSupported() {
+        return true;
+    }
+
+    @Override
+    public @NonNull String getOpenInBrowserLink() {
+        return String.format(Locale.ROOT, NetworkConstants.DATABASE_SERVER_REGISTRATION, getRegistration().getId());
     }
 
     private static void showEvent(View view, Registration registration, Event event) {

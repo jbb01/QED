@@ -3,11 +3,10 @@ package com.jonahbauer.qed.activities.sheets.event;
 import android.app.PendingIntent;
 import android.os.Bundle;
 import android.util.TypedValue;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 import android.widget.LinearLayout;
 
+import androidx.core.view.MenuProvider;
 import androidx.navigation.NavDeepLinkBuilder;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.MainActivity;
@@ -20,10 +19,12 @@ import com.jonahbauer.qed.layoutStuff.views.ListItem;
 import com.jonahbauer.qed.model.Event;
 import com.jonahbauer.qed.model.Registration;
 import com.jonahbauer.qed.model.viewmodel.EventViewModel;
+import com.jonahbauer.qed.networking.NetworkConstants;
 import com.jonahbauer.qed.util.StatusWrapper;
 import com.jonahbauer.qed.util.Themes;
 
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -105,6 +106,16 @@ public class EventInfoFragment extends InfoFragment {
         if (mBinding != null) {
             mBinding.titleLayout.setVisibility(View.GONE);
         }
+    }
+
+    @Override
+    public boolean isOpenInBrowserSupported() {
+        return true;
+    }
+
+    @Override
+    public @NonNull String getOpenInBrowserLink() {
+        return String.format(Locale.ROOT, NetworkConstants.DATABASE_SERVER_EVENT, getEvent().getId());
     }
 
     @Override

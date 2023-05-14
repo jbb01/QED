@@ -134,6 +134,19 @@ public class Actions {
         return tryStartActivity(context, intent);
     }
 
+    public static boolean openInBrowser(@NonNull Context context, String url) {
+        var emptyBrowserIntent = new Intent(Intent.ACTION_VIEW);
+        emptyBrowserIntent.addCategory(Intent.CATEGORY_BROWSABLE);
+        emptyBrowserIntent.setData(Uri.fromParts("http", "", null));
+
+        var intent = new Intent(Intent.ACTION_VIEW);
+        intent.addCategory(Intent.CATEGORY_BROWSABLE);
+        intent.setData(Uri.parse(url));
+        intent.setSelector(emptyBrowserIntent);
+
+        return tryStartActivity(context, intent);
+    }
+
     /**
      * Launches an {@link Intent} to {@linkplain Intent#ACTION_VIEW view} the given uri granting read permission to
      * the receiving activity.
