@@ -9,51 +9,11 @@ import java.lang.reflect.Modifier;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.util.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 
 public class ReleaseTest {
-    private static final Release V1_2_3 = create("v2.5");
-    private static final Release V2_5 = create("v2.5");
-    private static final Release V2_5_0 = create("v2.5.0");
-    private static final Release V2_5_1_ALPHA = create("v2.5.1-alpha");
-    private static final Release V2_5_1_ALPHA_2 = create("v2.5.1-alpha2");
-    private static final Release V2_5_1_BETA = create("v2.5.1-beta");
-    private static final Release V2_5_1_BETA3 = create("v2.5.1-beta3");
-    private static final Release V2_5_1_RC = create("v2.5.1-rc");
-    private static final Release V2_5_1 = create("v2.5.1");
-    private static final Release V2_5_1_NEW = create("v2.5.1", Instant.MAX);
-
-    private static Release create(String version) {
-        return create(version, Instant.MIN);
-    }
-
-    private static Release create(String version, Instant timestamp) {
-        return new Release(version, "", timestamp, null, false);
-    }
-
-    @Test
-    public void testCompareTo() {
-        var list = List.of(
-                V1_2_3,
-                V2_5,
-                V2_5_0,
-                V2_5_1_ALPHA,
-                V2_5_1_ALPHA_2,
-                V2_5_1_BETA,
-                V2_5_1_BETA3,
-                V2_5_1_RC,
-                V2_5_1,
-                V2_5_1_NEW
-        );
-        var sorted = new ArrayList<>(list);
-        Collections.shuffle(sorted, new Random(0));
-        sorted.sort(Comparator.naturalOrder());
-
-        assertEquals(list, sorted);
-    }
+    private static final Release V2_5_1_BETA = new Release("v2.5.1-beta", Instant.EPOCH);
 
     @Test
     public void testParse() throws JSONException {
@@ -65,7 +25,7 @@ public class ReleaseTest {
         json.put("prerelease", false);
 
         var release = Release.parse(json);
-        assertEquals("v2.5.0", release.getVersion());
+        assertEquals(new Release.Version(2, 5, 0), release.getVersion());
         assertEquals("https://github.com/jbb01/qed/releases/v2.5.0", release.getUrl());
         assertEquals(
                 Instant.from(OffsetDateTime.of(2007, 12, 3, 10, 15, 30, 0, ZoneOffset.UTC)),

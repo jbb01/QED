@@ -1,6 +1,5 @@
 @file:Suppress("UnstableApiUsage")
 
-import com.android.build.api.dsl.ApplicationBuildType
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 
 plugins {
@@ -36,10 +35,19 @@ android {
     }
 
     buildTypes {
-        fun ApplicationBuildType.buildConfigFields(prerelease: Boolean) {
-            buildConfigField("java.time.Instant", "TIMESTAMP", "java.time.Instant.ofEpochMilli(" + System.currentTimeMillis() + "L)")
-            buildConfigField("boolean", "PRERELEASE", prerelease.toString())
-            resValue("string", "preferences_general_update_check_includes_prerelease_default", prerelease.toString())
+        all {
+            buildConfigField(
+                    "java.time.Instant", "BUILD_TIMESTAMP",
+                    "java.time.Instant.ofEpochMilli(${System.currentTimeMillis()}L)"
+            )
+            buildConfigField(
+                    "com.jonahbauer.qed.model.Release", "RELEASE",
+                    "new com.jonahbauer.qed.model.Release(\"v" + defaultConfig.versionName + "\", BUILD_TIMESTAMP)"
+            )
+
+            val isPrerelease = defaultConfig.versionName!!.contains(Regex("^\\d+\\.\\d+\\.\\d+-"))
+            buildConfigField("boolean", "PRERELEASE", isPrerelease.toString())
+            resValue("string", "preferences_general_update_check_includes_prerelease_default", isPrerelease.toString())
         }
 
         getByName("release") {
@@ -50,13 +58,11 @@ android {
             }
 
             signingConfig = signingConfigs.getByName("release")
-            buildConfigFields(false)
         }
 
         getByName("debug") {
             isMinifyEnabled = false
             isDebuggable = true
-            buildConfigFields(true)
         }
     }
 

@@ -8,7 +8,6 @@ import androidx.appcompat.app.AlertDialog;
 import com.jonahbauer.qed.BuildConfig;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.model.Release;
-import com.jonahbauer.qed.networking.NetworkConstants;
 import com.jonahbauer.qed.networking.pages.GitHubAPI;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Completable;
@@ -23,19 +22,12 @@ import java.util.concurrent.Callable;
 
 public class UpdateChecker implements Callable<Release> {
     private static final String LOG_TAG = UpdateChecker.class.getName();
-    private static final Release CURRENT_RELEASE = new Release(
-            "v" + BuildConfig.VERSION_NAME,
-            NetworkConstants.GIT_HUB + "/releases/v" + BuildConfig.VERSION_NAME,
-            BuildConfig.TIMESTAMP,
-            null,
-            BuildConfig.PRERELEASE
-    );
     private static final Object LOCK = new Object();
 
     /**
      * Asynchronously queries the GitHub-API for the latest prerelease or release (depending on preferences).
      * @return the latest (pre)release version if it is more recent than the current version and not
-     * {@linkplain #suppressUpdateNotifications(String) ignored}.
+     * {@linkplain #suppressUpdateNotifications(Release.Version) ignored}.
      */
     public static @NonNull Maybe<Release> getUpdateRelease() {
         var updateChecker = new UpdateChecker();
@@ -76,7 +68,7 @@ public class UpdateChecker implements Callable<Release> {
      * release version.
      * @param version a release version
      */
-    public static void suppressUpdateNotifications(@NonNull String version) {
+    public static void suppressUpdateNotifications(@NonNull Release.Version version) {
         Completable.fromAction(() -> {
             synchronized (LOCK) {
                 var set = Preferences.getGeneral().getUpdateCheckDontSuggest();
@@ -92,7 +84,7 @@ public class UpdateChecker implements Callable<Release> {
     /**
      * Queries the GitHub-API for the latest prerelease or release (depending on preferences).
      * @return the latest (pre)release version if it is more recent than the current version and not
-     * {@linkplain #suppressUpdateNotifications(String) ignored}.
+     * {@linkplain #suppressUpdateNotifications(Release.Version) ignored}.
      */
     @Override
     @WorkerThread
@@ -103,7 +95,7 @@ public class UpdateChecker implements Callable<Release> {
 
         var includesPrereleases = Preferences.getGeneral().isUpdateCheckIncludesPrereleases();
         var latestRelease = getLatestRelease(includesPrereleases);
-        if (CURRENT_RELEASE.compareTo(latestRelease) >= 0) return null;
+        if (BuildConfig.RELEASE.compareTo(latestRelease) >= 0) return null;
 
         var ignored = Preferences.getGeneral().getUpdateCheckDontSuggest();
         if (ignored != null && ignored.contains(latestRelease.getVersion())) {

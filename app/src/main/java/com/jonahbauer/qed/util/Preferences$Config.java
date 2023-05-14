@@ -4,6 +4,7 @@ import com.jonahbauer.qed.BuildConfig;
 import com.jonahbauer.qed.R;
 
 import com.jonahbauer.qed.model.Language;
+import com.jonahbauer.qed.model.Release;
 import eu.jonahbauer.android.preference.annotations.Preference;
 import eu.jonahbauer.android.preference.annotations.PreferenceGroup;
 import eu.jonahbauer.android.preference.annotations.Preferences;
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
                 @Preference(name = "night_mode", type = boolean.class),
                 @Preference(name = "update_check_enabled", type = boolean.class, defaultValue = "true"),
                 @Preference(name = "update_check_includes_prereleases", type = boolean.class, defaultValue = "" + BuildConfig.PRERELEASE),
-                @Preference(name = "update_check_dont_suggest", type = Set.class),
+                @Preference(name = "update_check_dont_suggest", type = Set.class, serializer = Preferences$Config.VersionSerializer.class),
                 @Preference(name = "username", type = String.class)
         }),
         @PreferenceGroup(name = "chat", prefix = "preferences_chat_", suffix = "_key", value = {
@@ -88,6 +89,31 @@ class Preferences$Config {
             }
 
             out.add(current.toString());
+            return Collections.unmodifiableSet(out);
+        }
+    }
+
+    public static class VersionSerializer implements PreferenceSerializer<Set<Release.Version>, Set<String>> {
+
+        @Override
+        public Set<String> serialize(Set<Release.Version> value) throws PreferenceSerializationException {
+            if (value == null) return null;
+
+            var out = new HashSet<String>(value.size(), 1.0f);
+            for (Release.Version version : value) {
+                out.add(version.toString());
+            }
+            return out;
+        }
+
+        @Override
+        public Set<Release.Version> deserialize(Set<String> value) throws PreferenceSerializationException {
+            if (value == null) return null;
+
+            var out = new TreeSet<Release.Version>();
+            for (String s : value) {
+                out.add(new Release.Version(s));
+            }
             return Collections.unmodifiableSet(out);
         }
     }
