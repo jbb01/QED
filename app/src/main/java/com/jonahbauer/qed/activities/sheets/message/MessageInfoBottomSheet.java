@@ -11,8 +11,9 @@ import com.jonahbauer.qed.activities.sheets.InfoBottomSheet;
 import com.jonahbauer.qed.activities.sheets.InfoFragment;
 import com.jonahbauer.qed.model.Message;
 import com.jonahbauer.qed.model.viewmodel.MessageViewModel;
-import com.jonahbauer.qed.util.StatusWrapper;
 import com.jonahbauer.qed.util.Themes;
+
+import java.util.Objects;
 
 public class MessageInfoBottomSheet extends InfoBottomSheet {
     private static final String ARGUMENT_MESSAGE = "message";
@@ -66,10 +67,6 @@ public class MessageInfoBottomSheet extends InfoBottomSheet {
 
     @NonNull
     private Message getMessage() {
-        StatusWrapper<Message> wrapper = mMessageViewModel.getMessage().getValue();
-        assert wrapper != null : "StatusWrapper should not be null";
-        Message message = wrapper.getValue();
-        assert message != null : "Message should not be null";
-        return message;
+        return Objects.requireNonNull(mMessageViewModel.getValue().getValue());
     }
 }

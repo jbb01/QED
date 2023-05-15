@@ -28,7 +28,7 @@ public class RegistrationFragment extends MainInfoFragment {
 
     @Override
     public void onObserveViewModel() {
-        mRegistrationViewModel.getRegistration().observe(getViewLifecycleOwner(), wrapper -> {
+        mRegistrationViewModel.getValueStatus().observe(getViewLifecycleOwner(), wrapper -> {
             Registration value = wrapper.getValue();
             if (value != null) {
                 ViewUtils.setActionBarText(this, getString(R.string.registration_title, value.getPersonName()));

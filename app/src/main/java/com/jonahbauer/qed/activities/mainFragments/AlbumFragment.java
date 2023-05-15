@@ -138,7 +138,7 @@ public class AlbumFragment extends Fragment implements AdapterView.OnItemClickLi
 
         adjustColumnCount(getResources().getConfiguration());
 
-        mAlbumViewModel.getAlbum().observe(getViewLifecycleOwner(), this::updateView);
+        mAlbumViewModel.getValueStatus().observe(getViewLifecycleOwner(), this::updateView);
         mAlbumViewModel.getOffline().observe(getViewLifecycleOwner(), offline -> {
             mBinding.setOffline(offline);
             mBinding.setForcedOfflineMode(Preferences.getGallery().isOfflineMode());

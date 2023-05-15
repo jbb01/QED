@@ -13,8 +13,9 @@ import com.jonahbauer.qed.databinding.FragmentInfoMessageBinding;
 import com.jonahbauer.qed.model.Message;
 import com.jonahbauer.qed.model.viewmodel.MessageViewModel;
 import com.jonahbauer.qed.util.MessageUtils;
-import com.jonahbauer.qed.util.StatusWrapper;
 import com.jonahbauer.qed.util.Themes;
+
+import java.util.Objects;
 
 public class MessageInfoFragment extends InfoFragment {
     private MessageViewModel mMessageViewModel;
@@ -35,7 +36,7 @@ public class MessageInfoFragment extends InfoFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mBinding = FragmentInfoMessageBinding.inflate(inflater, container, false);
-        mMessageViewModel.getMessage().observe(getViewLifecycleOwner(), messageStatusWrapper -> {
+        mMessageViewModel.getValueStatus().observe(getViewLifecycleOwner(), messageStatusWrapper -> {
             mBinding.setMessage(messageStatusWrapper.getValue());
             mBinding.setColor(messageStatusWrapper.getValue().getColor(requireContext()));
         });
@@ -44,11 +45,7 @@ public class MessageInfoFragment extends InfoFragment {
 
     @NonNull
     private Message getMessage() {
-        StatusWrapper<Message> wrapper = mMessageViewModel.getMessage().getValue();
-        assert wrapper != null : "StatusWrapper should not be null";
-        Message message = wrapper.getValue();
-        assert message != null : "Message should not be null";
-        return message;
+        return Objects.requireNonNull(mMessageViewModel.getValue().getValue());
     }
 
     @Override

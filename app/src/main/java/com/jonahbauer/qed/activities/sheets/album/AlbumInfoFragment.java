@@ -43,7 +43,7 @@ public class AlbumInfoFragment extends InfoFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mBinding = FragmentInfoAlbumBinding.inflate(inflater, container, false);
-        mAlbumViewModel.getAlbum().observe(getViewLifecycleOwner(), albumStatusWrapper -> {
+        mAlbumViewModel.getValueStatus().observe(getViewLifecycleOwner(), albumStatusWrapper -> {
             var value = albumStatusWrapper.getValue();
             var code = albumStatusWrapper.getCode();
             mBinding.setAlbum(value);
@@ -57,11 +57,7 @@ public class AlbumInfoFragment extends InfoFragment {
 
     @NonNull
     private Album getAlbum() {
-        StatusWrapper<Album> wrapper = mAlbumViewModel.getAlbum().getValue();
-        assert wrapper != null : "StatusWrapper should not be null";
-        Album album = wrapper.getValue();
-        assert album != null : "Album should not be null";
-        return album;
+        return mAlbumViewModel.getAlbumValue();
     }
 
     @Override

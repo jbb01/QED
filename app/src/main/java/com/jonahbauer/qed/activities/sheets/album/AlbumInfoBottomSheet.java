@@ -9,7 +9,6 @@ import com.jonahbauer.qed.activities.sheets.InfoBottomSheet;
 import com.jonahbauer.qed.activities.sheets.InfoFragment;
 import com.jonahbauer.qed.model.Album;
 import com.jonahbauer.qed.model.viewmodel.AlbumViewModel;
-import com.jonahbauer.qed.util.StatusWrapper;
 import com.jonahbauer.qed.util.Themes;
 
 public class AlbumInfoBottomSheet extends InfoBottomSheet {
@@ -64,10 +63,6 @@ public class AlbumInfoBottomSheet extends InfoBottomSheet {
 
     @NonNull
     private Album getAlbum() {
-        StatusWrapper<Album> wrapper = mAlbumViewModel.getAlbum().getValue();
-        assert wrapper != null : "StatusWrapper should not be null";
-        Album album = wrapper.getValue();
-        assert album != null : "Event should not be null";
-        return album;
+        return mAlbumViewModel.getAlbumValue();
     }
 }

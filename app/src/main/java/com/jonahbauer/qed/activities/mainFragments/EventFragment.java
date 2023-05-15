@@ -28,7 +28,7 @@ public class EventFragment extends MainInfoFragment {
 
     @Override
     public void onObserveViewModel() {
-        mEventViewModel.getEvent().observe(getViewLifecycleOwner(), wrapper -> {
+        mEventViewModel.getValueStatus().observe(getViewLifecycleOwner(), wrapper -> {
             Event value = wrapper.getValue();
             if (value != null) {
                 ViewUtils.setActionBarText(this, value.getTitle());

@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.view.MenuProvider;
 import androidx.navigation.NavDeepLinkBuilder;
 import androidx.navigation.Navigation;
 
@@ -30,6 +29,7 @@ import com.jonahbauer.qed.util.StatusWrapper;
 import com.jonahbauer.qed.util.Themes;
 
 import java.util.Locale;
+import java.util.Objects;
 
 public class RegistrationInfoFragment extends InfoFragment {
     private static final String SAVED_TITLE_HIDDEN = "titleHidden";
@@ -55,7 +55,7 @@ public class RegistrationInfoFragment extends InfoFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mBinding = FragmentInfoRegistrationBinding.inflate(inflater, container, false);
-        mRegistrationViewModel.getRegistration().observe(getViewLifecycleOwner(), registrationStatusWrapper -> {
+        mRegistrationViewModel.getValueStatus().observe(getViewLifecycleOwner(), registrationStatusWrapper -> {
             var value = registrationStatusWrapper.getValue();
             var code = registrationStatusWrapper.getCode();
             mBinding.setRegistration(value);
@@ -69,11 +69,7 @@ public class RegistrationInfoFragment extends InfoFragment {
 
     @NonNull
     private Registration getRegistration() {
-        var wrapper = mRegistrationViewModel.getRegistration().getValue();
-        assert wrapper != null : "StatusWrapper should not be null";
-        var registration = wrapper.getValue();
-        assert registration != null : "Registration should not be null";
-        return registration;
+        return Objects.requireNonNull(mRegistrationViewModel.getValue().getValue());
     }
 
     @Override

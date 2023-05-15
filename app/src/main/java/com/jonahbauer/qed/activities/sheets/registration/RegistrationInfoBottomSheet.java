@@ -13,6 +13,8 @@ import com.jonahbauer.qed.model.Registration;
 import com.jonahbauer.qed.model.viewmodel.RegistrationViewModel;
 import com.jonahbauer.qed.util.Themes;
 
+import java.util.Objects;
+
 public class RegistrationInfoBottomSheet extends InfoBottomSheet {
     private static final String ARGUMENT_REGISTRATION = "registration";
 
@@ -65,10 +67,6 @@ public class RegistrationInfoBottomSheet extends InfoBottomSheet {
 
     @NonNull
     private Registration getRegistration() {
-        var wrapper = mRegistrationViewModel.getRegistration().getValue();
-        assert wrapper != null : "StatusWrapper should not be null";
-        var registration = wrapper.getValue();
-        assert registration != null : "Registration should not be null";
-        return registration;
+        return Objects.requireNonNull(mRegistrationViewModel.getValue().getValue());
     }
 }

@@ -1,51 +1,40 @@
 package com.jonahbauer.qed.model.viewmodel;
 
+import android.app.Application;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
-
+import androidx.annotation.StringRes;
+import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.model.Person;
-import com.jonahbauer.qed.networking.Reason;
 import com.jonahbauer.qed.networking.async.QEDPageReceiver;
 import com.jonahbauer.qed.networking.pages.QEDDBPages;
-import com.jonahbauer.qed.util.StatusWrapper;
+import io.reactivex.rxjava3.disposables.Disposable;
 
 import java.time.Instant;
 
-import io.reactivex.rxjava3.disposables.CompositeDisposable;
+public class PersonViewModel extends DatabaseInfoViewModel<Person> {
 
-public class PersonViewModel extends ViewModel implements QEDPageReceiver<Person> {
-    private final MutableLiveData<StatusWrapper<Person>> mPerson = new MutableLiveData<>();
-    private final CompositeDisposable mDisposable = new CompositeDisposable();
-
-    public void load(@NonNull Person person) {
-        this.mPerson.setValue(StatusWrapper.preloaded(person));
-        mDisposable.add(
-                QEDDBPages.getPerson(person, this)
-        );
+    public PersonViewModel(@NonNull Application application) {
+        super(application);
     }
 
-    public LiveData<StatusWrapper<Person>> getPerson() {
-        return mPerson;
+    @Override
+    protected Disposable load(@NonNull Person person, @NonNull QEDPageReceiver<Person> receiver) {
+        return QEDDBPages.getPerson(person, receiver);
     }
 
     @Override
     public void onResult(@NonNull Person out) {
         out.setLoaded(Instant.now());
-        this.mPerson.setValue(StatusWrapper.loaded(out));
+    }
+
+    @NonNull
+    @Override
+    protected CharSequence getTitle(@NonNull Person person) {
+        return person.getFullName();
     }
 
     @Override
-    public void onError(Person out, @NonNull Reason reason, @Nullable Throwable cause) {
-        QEDPageReceiver.super.onError(out, reason, cause);
-        this.mPerson.setValue(StatusWrapper.error(out, reason));
-    }
-
-    @Override
-    protected void onCleared() {
-        super.onCleared();
-        mDisposable.clear();
+    protected @StringRes int getDefaultTitle() {
+        return R.string.title_fragment_person;
     }
 }

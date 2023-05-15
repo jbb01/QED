@@ -9,8 +9,9 @@ import com.jonahbauer.qed.activities.sheets.InfoBottomSheet;
 import com.jonahbauer.qed.activities.sheets.InfoFragment;
 import com.jonahbauer.qed.model.Person;
 import com.jonahbauer.qed.model.viewmodel.PersonViewModel;
-import com.jonahbauer.qed.util.StatusWrapper;
 import com.jonahbauer.qed.util.Themes;
+
+import java.util.Objects;
 
 public class PersonInfoBottomSheet extends InfoBottomSheet {
     private static final String ARGUMENT_PERSON = "person";
@@ -64,10 +65,6 @@ public class PersonInfoBottomSheet extends InfoBottomSheet {
 
     @NonNull
     private Person getPerson() {
-        StatusWrapper<Person> wrapper = mPersonViewModel.getPerson().getValue();
-        assert wrapper != null : "StatusWrapper should not be null";
-        Person person = wrapper.getValue();
-        assert person != null : "Person should not be null";
-        return person;
+        return Objects.requireNonNull(mPersonViewModel.getValue().getValue());
     }
 }

@@ -99,7 +99,8 @@
     <string name="message_name_anonymous"><i>Anonym</i></string>
     <string name="message_channel_main"><i>main</i></string>
 
-    <!-- Message Bottom Sheet -->
+    <!-- Message Fragment -->
+    <string name="title_fragment_message">Message</string>
     <string name="message_section_metadata">Metadaten</string>
     <string name="message_section_message">Nachricht</string>
     <string name="message_subtitle_id">ID</string>
@@ -198,7 +199,8 @@
     <string name="persons_database_non_member">(kein Mitglied)</string>
     <string name="persons_database_no_email"><i>privat</i></string>
 
-    <!-- Person Bottom Sheet -->
+    <!-- Person Fragment -->
+    <string name="title_fragment_person">Person</string>
     <string name="person_section_personal">Personendaten</string>
     <string name="person_section_additional">Weitere Informationen</string>
     <string name="person_section_addresses">Adressen</string>
@@ -250,7 +252,8 @@
     <!-- Events Database Fragment -->
     <string name="title_fragment_events_database">Veranstaltungen</string>
 
-    <!-- Event Bottom Sheet -->
+    <!-- Event Fragment -->
+    <string name="title_fragment_event">Event</string>
     <string name="event_section_information">Informationen</string>
     <string name="event_section_organization">Organisatoren</string>
     <string name="event_section_participants">Teilnehmer</string>
@@ -272,7 +275,8 @@
     <string name="event_show_more">Mehr anzeigen</string>
     <string name="event_show_less">Weniger anzeigen</string>
 
-    <!-- Registration Bottom Sheet -->
+    <!-- Registration Fragment -->
+    <string name="title_fragment_registration">Registration</string>
     <string name="registration_title">Anmeldung von %s</string>
     <string name="registration_section_information">Allgemein</string>
     <string name="registration_section_personal">Persönliche Informationen</string>

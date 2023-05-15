@@ -28,7 +28,7 @@ public class PersonFragment extends MainInfoFragment {
 
     @Override
     public void onObserveViewModel() {
-        mPersonViewModel.getPerson().observe(getViewLifecycleOwner(), wrapper -> {
+        mPersonViewModel.getValueStatus().observe(getViewLifecycleOwner(), wrapper -> {
             Person value = wrapper.getValue();
             if (value != null) {
                 ViewUtils.setActionBarText(this, value.getFullName());

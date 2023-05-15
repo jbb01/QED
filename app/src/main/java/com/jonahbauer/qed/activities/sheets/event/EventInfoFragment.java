@@ -6,7 +6,6 @@ import android.util.TypedValue;
 import android.view.*;
 import android.widget.LinearLayout;
 
-import androidx.core.view.MenuProvider;
 import androidx.navigation.NavDeepLinkBuilder;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.MainActivity;
@@ -59,7 +58,7 @@ public class EventInfoFragment extends InfoFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mBinding = FragmentInfoEventBinding.inflate(inflater, container, false);
-        mEventViewModel.getEvent().observe(getViewLifecycleOwner(), eventStatusWrapper -> {
+        mEventViewModel.getValueStatus().observe(getViewLifecycleOwner(), eventStatusWrapper -> {
             var value = eventStatusWrapper.getValue();
             var code = eventStatusWrapper.getCode();
             mBinding.setEvent(value);
@@ -73,11 +72,7 @@ public class EventInfoFragment extends InfoFragment {
 
     @NonNull
     private Event getEvent() {
-        StatusWrapper<Event> wrapper = mEventViewModel.getEvent().getValue();
-        assert wrapper != null : "StatusWrapper should not be null";
-        Event event = wrapper.getValue();
-        assert event != null : "Event should not be null";
-        return event;
+        return Objects.requireNonNull(mEventViewModel.getValue().getValue());
     }
 
     @Override

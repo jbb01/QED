@@ -6,12 +6,11 @@ import android.util.Pair;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.AndroidViewModel;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
+import androidx.annotation.StringRes;
+import androidx.lifecycle.*;
 
-import androidx.lifecycle.SavedStateHandle;
 import com.jonahbauer.qed.BuildConfig;
+import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.model.Album;
 import com.jonahbauer.qed.model.room.AlbumDao;
 import com.jonahbauer.qed.model.room.Database;
@@ -30,7 +29,7 @@ import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
-public class AlbumViewModel extends AndroidViewModel {
+public class AlbumViewModel extends InfoViewModel<Album> {
     private static final String LOG_TAG = AlbumViewModel.class.getName();
     private static final String SAVED_FILER = "album_filter";
     private static final String SAVED_EXPANDED = "album_filter_expanded";
@@ -39,7 +38,6 @@ public class AlbumViewModel extends AndroidViewModel {
 
     private final MutableLiveData<AlbumFilter> mFilter;
     private final MutableLiveData<Boolean> mOffline = new MutableLiveData<>(false);
-    private final MutableLiveData<StatusWrapper<Album>> mAlbum = new MutableLiveData<>();
 
     private final CompositeDisposable mDisposable = new CompositeDisposable();
 
@@ -73,7 +71,7 @@ public class AlbumViewModel extends AndroidViewModel {
         mDisposable.clear();
         mFilter.setValue(filter);
         mOffline.setValue(offline);
-        mAlbum.setValue(StatusWrapper.preloaded(album));
+        submit(StatusWrapper.preloaded(album));
 
         reload();
     }
@@ -86,8 +84,14 @@ public class AlbumViewModel extends AndroidViewModel {
         }
     }
 
-    public LiveData<StatusWrapper<Album>> getAlbum() {
-        return mAlbum;
+    @Override
+    protected @NonNull CharSequence getTitle(@NonNull Album album) {
+        return album.getName();
+    }
+
+    @Override
+    protected @StringRes int getDefaultTitle() {
+        return R.string.title_fragment_album;
     }
 
     public LiveData<AlbumFilter> getFilter() {
@@ -131,12 +135,12 @@ public class AlbumViewModel extends AndroidViewModel {
                                       out.getImages().addAll(pair.second);
 
                                       if (out.getImages().size() > 0) {
-                                          mAlbum.setValue(StatusWrapper.loaded(out));
+                                          submit(StatusWrapper.loaded(out));
                                       } else {
-                                          mAlbum.setValue(StatusWrapper.error(out, Reason.EMPTY));
+                                          submit(StatusWrapper.error(out, Reason.EMPTY));
                                       }
                                   },
-                                  e -> mAlbum.setValue(StatusWrapper.error(album, e))
+                                  e -> submit(StatusWrapper.error(album, e))
                           )
         );
     }
@@ -148,7 +152,7 @@ public class AlbumViewModel extends AndroidViewModel {
     }
 
     public @NonNull Album getAlbumValue() {
-        var wrapper = mAlbum.getValue();
+        var wrapper = getValueStatus().getValue();
         if (wrapper == null) return new Album(Album.NO_ID);
         var album = wrapper.getValue();
         if (album == null) return new Album(Album.NO_ID);
@@ -174,9 +178,9 @@ public class AlbumViewModel extends AndroidViewModel {
         public void onResult(@NonNull Album out) {
             var images = out.getImages();
             if (images.size() > 0)  {
-                mAlbum.setValue(StatusWrapper.loaded(out));
+                submit(StatusWrapper.loaded(out));
             } else {
-                mAlbum.setValue(StatusWrapper.error(out, Reason.EMPTY));
+                submit(StatusWrapper.error(out, Reason.EMPTY));
             }
 
             if (!mFiltered) {
@@ -204,7 +208,7 @@ public class AlbumViewModel extends AndroidViewModel {
             if (reason == Reason.NETWORK && out != null) {
                 load(out, AlbumFilter.EMPTY, true);
             } else {
-                mAlbum.setValue(StatusWrapper.error(out, reason));
+                submit(StatusWrapper.error(out, reason));
             }
         }
     }

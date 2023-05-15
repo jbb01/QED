@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
-import androidx.core.view.MenuProvider;
 import androidx.navigation.NavDeepLinkBuilder;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.MainActivity;
@@ -25,10 +24,7 @@ import com.jonahbauer.qed.model.viewmodel.PersonViewModel;
 import com.jonahbauer.qed.networking.NetworkConstants;
 import com.jonahbauer.qed.util.*;
 
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.Locale;
-import java.util.StringJoiner;
+import java.util.*;
 import java.util.function.BiConsumer;
 
 import androidx.annotation.NonNull;
@@ -122,7 +118,7 @@ public class PersonInfoFragment extends InfoFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mBinding = FragmentInfoPersonBinding.inflate(inflater, container, false);
-        mPersonViewModel.getPerson().observe(getViewLifecycleOwner(), personStatusWrapper -> {
+        mPersonViewModel.getValueStatus().observe(getViewLifecycleOwner(), personStatusWrapper -> {
             var value = personStatusWrapper.getValue();
             var code = personStatusWrapper.getCode();
             mBinding.setPerson(value);
@@ -136,11 +132,7 @@ public class PersonInfoFragment extends InfoFragment {
 
     @NonNull
     private Person getPerson() {
-        StatusWrapper<Person> wrapper = mPersonViewModel.getPerson().getValue();
-        assert wrapper != null : "StatusWrapper should not be null";
-        Person person = wrapper.getValue();
-        assert person != null : "Person should not be null";
-        return person;
+        return Objects.requireNonNull(mPersonViewModel.getValue().getValue());
     }
 
     @Override

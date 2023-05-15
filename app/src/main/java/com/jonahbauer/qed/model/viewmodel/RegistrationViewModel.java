@@ -1,51 +1,42 @@
 package com.jonahbauer.qed.model.viewmodel;
 
+import android.app.Application;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
+import androidx.annotation.StringRes;
+import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.model.Registration;
-import com.jonahbauer.qed.networking.Reason;
 import com.jonahbauer.qed.networking.async.QEDPageReceiver;
 import com.jonahbauer.qed.networking.pages.QEDDBPages;
-import com.jonahbauer.qed.util.StatusWrapper;
 
 import java.time.Instant;
 
-import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.disposables.Disposable;
 
-public class RegistrationViewModel extends ViewModel implements QEDPageReceiver<Registration> {
-    private final MutableLiveData<StatusWrapper<Registration>> mRegistration = new MutableLiveData<>();
-    private final CompositeDisposable mDisposable = new CompositeDisposable();
+public class RegistrationViewModel extends DatabaseInfoViewModel<Registration> {
 
-    public void load(@NonNull Registration registration) {
-        this.mRegistration.setValue(StatusWrapper.preloaded(registration));
-        mDisposable.add(
-                QEDDBPages.getRegistration(registration, this)
-        );
+    public RegistrationViewModel(@NonNull Application application) {
+        super(application);
     }
 
-    public LiveData<StatusWrapper<Registration>> getRegistration() {
-        return mRegistration;
+    @Override
+    protected Disposable load(@NonNull Registration registration, @NonNull QEDPageReceiver<Registration> receiver) {
+        return QEDDBPages.getRegistration(registration, receiver);
     }
 
     @Override
     public void onResult(@NonNull Registration out) {
         out.setLoaded(Instant.now());
-        this.mRegistration.setValue(StatusWrapper.loaded(out));
+    }
+
+    @NonNull
+    @Override
+    protected CharSequence getTitle(@NonNull Registration registration) {
+        return getApplication().getString(R.string.registration_title, registration.getPersonName());
     }
 
     @Override
-    public void onError(Registration out, @NonNull Reason reason, @Nullable Throwable cause) {
-        QEDPageReceiver.super.onError(out, reason, cause);
-        this.mRegistration.setValue(StatusWrapper.error(out, reason));
-    }
-
-    @Override
-    protected void onCleared() {
-        super.onCleared();
-        mDisposable.clear();
+    protected @StringRes int getDefaultTitle() {
+        return R.string.title_fragment_registration;
     }
 }

@@ -9,8 +9,9 @@ import com.jonahbauer.qed.activities.sheets.InfoBottomSheet;
 import com.jonahbauer.qed.activities.sheets.InfoFragment;
 import com.jonahbauer.qed.model.Event;
 import com.jonahbauer.qed.model.viewmodel.EventViewModel;
-import com.jonahbauer.qed.util.StatusWrapper;
 import com.jonahbauer.qed.util.Themes;
+
+import java.util.Objects;
 
 public class EventInfoBottomSheet extends InfoBottomSheet {
     private static final String ARGUMENT_EVENT = "event";
@@ -64,10 +65,6 @@ public class EventInfoBottomSheet extends InfoBottomSheet {
 
     @NonNull
     private Event getEvent() {
-        StatusWrapper<Event> wrapper = mEventViewModel.getEvent().getValue();
-        assert wrapper != null : "StatusWrapper should not be null";
-        Event event = wrapper.getValue();
-        assert event != null : "Event should not be null";
-        return event;
+        return Objects.requireNonNull(mEventViewModel.getValue().getValue());
     }
 }
