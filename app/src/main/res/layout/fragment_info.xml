@@ -27,6 +27,7 @@
             android:layout_alignParentTop="true"
             android:clickable="false"
             android:focusable="false"
+            style="@style/Widget.MaterialComponents.Toolbar.PrimarySurface"
             app:titleTextColor="?colorOnAccentColor"
             tools:background="@android:color/holo_green_light"/>
 
@@ -96,15 +97,27 @@
                     android:layout_height="wrap_content"
                     android:paddingVertical="@dimen/activity_vertical_margin"
                     android:paddingHorizontal="@dimen/activity_horizontal_margin"
-                    android:visibility="@{title != null ? View.VISIBLE : View.GONE}">
+                    android:visibility="@{title != null ? View.VISIBLE : View.GONE}"
+                    android:orientation="horizontal"
+                    tools:visibility="visible">
+
                     <TextView
                         android:id="@+id/title"
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_weight="1"
                         android:text="@{title}"
                         android:textColor="?colorOnSurface"
-                        android:textSize="30sp"
-                        tools:text="Beispielalbum"/>
+                        android:textSize="30sp"/>
+
+                    <ImageButton
+                        android:id="@+id/open_in_browser"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:scaleType="centerInside"
+                        android:background="?attr/actionBarItemBackground"
+                        android:src="@drawable/ic_menu_launch"
+                        app:tint="?colorOnSurface" />
                 </LinearLayout>
 
                 <TextView

@@ -15,6 +15,7 @@ import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
+import androidx.appcompat.widget.TooltipCompat;
 import androidx.core.view.OneShotPreDrawListener;
 import androidx.core.view.ViewCompat;
 import androidx.lifecycle.MutableLiveData;
@@ -26,6 +27,7 @@ import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.databinding.FragmentInfoBinding;
 import com.jonahbauer.qed.layoutStuff.ColorfulBottomSheetCallback;
 import com.jonahbauer.qed.model.viewmodel.InfoViewModel;
+import com.jonahbauer.qed.util.Actions;
 import com.jonahbauer.qed.util.Colors;
 import com.jonahbauer.qed.util.Themes;
 import com.jonahbauer.qed.util.ViewUtils;
@@ -42,6 +44,7 @@ public abstract class InfoBottomSheet extends BottomSheetDialogFragment {
     private final MutableLiveData<Integer> mToolbarBackgroundColor = new MutableLiveData<>(Color.TRANSPARENT);
 
     private Window mDialogWindow;
+    private MenuInflater mMenuInflater;
     private BottomSheetBehavior<?> mBottomSheetBehavior;
 
     private FragmentInfoBinding mBinding;
@@ -63,6 +66,7 @@ public abstract class InfoBottomSheet extends BottomSheetDialogFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        mMenuInflater = requireActivity().getMenuInflater();
         mBinding = FragmentInfoBinding.inflate(inflater, container, false);
         mFragment = createFragment();
         return mBinding.getRoot();
@@ -101,6 +105,24 @@ public abstract class InfoBottomSheet extends BottomSheetDialogFragment {
         });
 
         observeViewModel();
+
+        // setup open in browser button
+        if (mFragment.isOpenInBrowserSupported()) {
+            mBinding.openInBrowser.setVisibility(View.VISIBLE);
+            mBinding.openInBrowser.setOnClickListener(v -> openInBrowser());
+            TooltipCompat.setTooltipText(mBinding.openInBrowser, getString(R.string.open_in_browser));
+            if (mBinding.toolbar != null) {
+                mBinding.toolbar.setOnMenuItemClickListener(item -> {
+                    if (item.getItemId() == R.id.open_in_browser) {
+                        openInBrowser();
+                        return true;
+                    }
+                    return false;
+                });
+            }
+        } else {
+            mBinding.openInBrowser.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -193,6 +215,19 @@ public abstract class InfoBottomSheet extends BottomSheetDialogFragment {
         } else {
             mBinding.toolbar.setTitle("");
         }
+
+        // update menu
+        if (mFragment.isOpenInBrowserSupported()) {
+            mBinding.toolbar.getMenu().clear();
+            if (titleVisible) {
+                mMenuInflater.inflate(R.menu.menu_open_in_browser, mBinding.toolbar.getMenu());
+            }
+        }
+    }
+
+    private void openInBrowser() {
+        if (!mFragment.isOpenInBrowserSupported()) return;
+        Actions.openInBrowser(requireContext(), mFragment.getOpenInBrowserLink());
     }
 
     private ViewGroup getContentRoot() {
