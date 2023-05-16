@@ -51,13 +51,13 @@ public class MessageInfoBottomSheet extends InfoBottomSheet {
     }
 
     @Override
-    public int getColor() {
-        return getMessage().getColor(requireContext());
+    public long getDesignSeed() {
+        return getMessage().getId();
     }
 
     @Override
-    public int getBackground() {
-        return Themes.pattern(getMessage().getId());
+    public int getColor() {
+        return getMessage().getColor(requireContext());
     }
 
     @Override

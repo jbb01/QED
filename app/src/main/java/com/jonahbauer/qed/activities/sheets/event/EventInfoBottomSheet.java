@@ -10,7 +10,6 @@ import com.jonahbauer.qed.activities.sheets.InfoFragment;
 import com.jonahbauer.qed.model.Event;
 import com.jonahbauer.qed.model.viewmodel.EventViewModel;
 import com.jonahbauer.qed.model.viewmodel.InfoViewModel;
-import com.jonahbauer.qed.util.Themes;
 
 import java.util.Objects;
 
@@ -49,13 +48,8 @@ public class EventInfoBottomSheet extends InfoBottomSheet {
     }
 
     @Override
-    public int getColor() {
-        return Themes.colorful(requireContext(), getEvent().getId());
-    }
-
-    @Override
-    public int getBackground() {
-        return Themes.pattern(getEvent().getId());
+    public long getDesignSeed() {
+        return getEvent().getId();
     }
 
     @Override

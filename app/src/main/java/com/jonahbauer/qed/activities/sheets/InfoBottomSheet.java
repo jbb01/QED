@@ -26,6 +26,7 @@ import com.jonahbauer.qed.databinding.FragmentInfoBinding;
 import com.jonahbauer.qed.layoutStuff.ColorfulBottomSheetCallback;
 import com.jonahbauer.qed.model.viewmodel.InfoViewModel;
 import com.jonahbauer.qed.util.Colors;
+import com.jonahbauer.qed.util.Themes;
 import com.jonahbauer.qed.util.ViewUtils;
 
 import java.util.Objects;
@@ -162,14 +163,19 @@ public abstract class InfoBottomSheet extends BottomSheetDialogFragment {
         return ((ViewGroup) mFragment.requireView());
     }
 
+    public abstract long getDesignSeed();
 
-    public abstract @ColorInt int getColor();
+    public @ColorInt int getColor() {
+        return Themes.colorful(requireContext(), getDesignSeed());
+    }
 
     public @ColorInt int getDarkColor() {
         return Colors.multiply(getColor(), 0xFFCCCCCC);
     }
 
-    public abstract @DrawableRes int getBackground();
+    public @DrawableRes int getBackground() {
+        return Themes.pattern(getDesignSeed());
+    }
 
     public abstract @NonNull InfoFragment createFragment();
 

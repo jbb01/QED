@@ -10,7 +10,6 @@ import com.jonahbauer.qed.activities.sheets.InfoFragment;
 import com.jonahbauer.qed.model.Person;
 import com.jonahbauer.qed.model.viewmodel.InfoViewModel;
 import com.jonahbauer.qed.model.viewmodel.PersonViewModel;
-import com.jonahbauer.qed.util.Themes;
 
 import java.util.Objects;
 
@@ -49,13 +48,8 @@ public class PersonInfoBottomSheet extends InfoBottomSheet {
     }
 
     @Override
-    public int getColor() {
-        return Themes.colorful(requireContext(), getPerson().getId());
-    }
-
-    @Override
-    public int getBackground() {
-        return Themes.pattern(getPerson().getId());
+    public long getDesignSeed() {
+        return getPerson().getId();
     }
 
     @Override

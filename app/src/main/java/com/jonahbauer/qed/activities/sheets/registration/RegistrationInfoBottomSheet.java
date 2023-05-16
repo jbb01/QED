@@ -12,7 +12,6 @@ import com.jonahbauer.qed.activities.sheets.InfoFragment;
 import com.jonahbauer.qed.model.Registration;
 import com.jonahbauer.qed.model.viewmodel.InfoViewModel;
 import com.jonahbauer.qed.model.viewmodel.RegistrationViewModel;
-import com.jonahbauer.qed.util.Themes;
 
 import java.util.Objects;
 
@@ -51,13 +50,8 @@ public class RegistrationInfoBottomSheet extends InfoBottomSheet {
     }
 
     @Override
-    public int getColor() {
-        return Themes.colorful(requireContext(), getRegistration().getId());
-    }
-
-    @Override
-    public int getBackground() {
-        return Themes.pattern(getRegistration().getId());
+    public long getDesignSeed() {
+        return getRegistration().getId();
     }
 
     @Override

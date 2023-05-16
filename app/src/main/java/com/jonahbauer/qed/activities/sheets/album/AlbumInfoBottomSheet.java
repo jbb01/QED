@@ -10,7 +10,6 @@ import com.jonahbauer.qed.activities.sheets.InfoFragment;
 import com.jonahbauer.qed.model.Album;
 import com.jonahbauer.qed.model.viewmodel.AlbumViewModel;
 import com.jonahbauer.qed.model.viewmodel.InfoViewModel;
-import com.jonahbauer.qed.util.Themes;
 
 public class AlbumInfoBottomSheet extends InfoBottomSheet {
     private static final String ARGUMENT_ALBUM = "album";
@@ -47,13 +46,8 @@ public class AlbumInfoBottomSheet extends InfoBottomSheet {
     }
 
     @Override
-    public int getColor() {
-        return Themes.colorful(requireContext(), getAlbum().getId());
-    }
-
-    @Override
-    public int getBackground() {
-        return Themes.pattern(getAlbum().getId());
+    public long getDesignSeed() {
+        return getAlbum().getId();
     }
 
     @Override
