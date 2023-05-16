@@ -5,8 +5,8 @@ import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.sheets.InfoFragment;
 import com.jonahbauer.qed.activities.sheets.person.PersonInfoFragment;
 import com.jonahbauer.qed.model.Person;
+import com.jonahbauer.qed.model.viewmodel.InfoViewModel;
 import com.jonahbauer.qed.model.viewmodel.PersonViewModel;
-import com.jonahbauer.qed.util.StatusWrapper;
 import com.jonahbauer.qed.util.Themes;
 import com.jonahbauer.qed.util.ViewUtils;
 
@@ -27,22 +27,12 @@ public class PersonFragment extends MainInfoFragment {
     }
 
     @Override
-    public void onObserveViewModel() {
-        mPersonViewModel.getValueStatus().observe(getViewLifecycleOwner(), wrapper -> {
-            Person value = wrapper.getValue();
-            if (value != null) {
-                ViewUtils.setActionBarText(this, value.getFullName());
-            }
-
-            if (wrapper.getCode() != StatusWrapper.STATUS_PRELOADED) {
-                startPostponedEnterTransition();
-            }
-        });
+    public @NonNull InfoFragment createFragment() {
+        return PersonInfoFragment.newInstance();
     }
 
-    @NonNull
     @Override
-    public InfoFragment createFragment() {
-        return PersonInfoFragment.newInstance();
+    public @NonNull InfoViewModel<?> getInfoViewModel() {
+        return mPersonViewModel;
     }
 }

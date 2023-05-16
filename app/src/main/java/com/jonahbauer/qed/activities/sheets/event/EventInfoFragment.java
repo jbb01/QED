@@ -19,7 +19,6 @@ import com.jonahbauer.qed.model.Event;
 import com.jonahbauer.qed.model.Registration;
 import com.jonahbauer.qed.model.viewmodel.EventViewModel;
 import com.jonahbauer.qed.networking.NetworkConstants;
-import com.jonahbauer.qed.util.StatusWrapper;
 import com.jonahbauer.qed.util.Themes;
 
 import java.util.Collection;
@@ -35,12 +34,10 @@ import androidx.navigation.Navigation;
 
 public class EventInfoFragment extends InfoFragment {
     private static final String SAVED_EXPANDED = "expanded";
-    private static final String SAVED_TITLE_HIDDEN = "titleHidden";
 
     private EventViewModel mEventViewModel;
     private FragmentInfoEventBinding mBinding;
 
-    private boolean mHideTitle;
     private boolean mExpanded;
 
     public static EventInfoFragment newInstance() {
@@ -58,59 +55,9 @@ public class EventInfoFragment extends InfoFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mBinding = FragmentInfoEventBinding.inflate(inflater, container, false);
-        mEventViewModel.getValueStatus().observe(getViewLifecycleOwner(), eventStatusWrapper -> {
-            var value = eventStatusWrapper.getValue();
-            var code = eventStatusWrapper.getCode();
-            mBinding.setEvent(value);
-            mBinding.setLoading(code == StatusWrapper.STATUS_PRELOADED);
-            mBinding.setError(code == StatusWrapper.STATUS_ERROR ? getString(R.string.error_incomplete) : null);
-        });
+        mEventViewModel.getValue().observe(getViewLifecycleOwner(), mBinding::setEvent);
         mBinding.setColor(getColor());
-        if (mHideTitle) hideTitle();
         return mBinding.getRoot();
-    }
-
-    @NonNull
-    private Event getEvent() {
-        return Objects.requireNonNull(mEventViewModel.getValue().getValue());
-    }
-
-    @Override
-    public int getColor() {
-        return Themes.colorful(requireContext(), getEvent().getId());
-    }
-
-    @Override
-    protected int getBackground() {
-        return Themes.pattern(getEvent().getId());
-    }
-
-    @Override
-    protected String getTitle() {
-        return getEvent().getTitle();
-    }
-
-    @Override
-    protected float getTitleBottom() {
-        return mBinding.title.getBottom();
-    }
-
-    @Override
-    public void hideTitle() {
-        mHideTitle = true;
-        if (mBinding != null) {
-            mBinding.titleLayout.setVisibility(View.GONE);
-        }
-    }
-
-    @Override
-    public boolean isOpenInBrowserSupported() {
-        return true;
-    }
-
-    @Override
-    public @NonNull String getOpenInBrowserLink() {
-        return String.format(Locale.ROOT, NetworkConstants.DATABASE_SERVER_EVENT, getEvent().getId());
     }
 
     @Override
@@ -129,9 +76,33 @@ public class EventInfoFragment extends InfoFragment {
 
         if (savedInstanceState != null) {
             mExpanded = savedInstanceState.getBoolean(SAVED_EXPANDED);
-            if (savedInstanceState.getBoolean(SAVED_TITLE_HIDDEN)) hideTitle();
         }
         setParticipantsExpanded(mExpanded);
+    }
+
+    @NonNull
+    private Event getEvent() {
+        return Objects.requireNonNull(mEventViewModel.getValue().getValue());
+    }
+
+    @Override
+    public int getColor() {
+        return Themes.colorful(requireContext(), getEvent().getId());
+    }
+
+    @Override
+    protected int getBackground() {
+        return Themes.pattern(getEvent().getId());
+    }
+
+    @Override
+    public boolean isOpenInBrowserSupported() {
+        return true;
+    }
+
+    @Override
+    public @NonNull String getOpenInBrowserLink() {
+        return String.format(Locale.ROOT, NetworkConstants.DATABASE_SERVER_EVENT, getEvent().getId());
     }
 
     public void toggleParticipantsExpanded(@Nullable View view) {
@@ -152,7 +123,6 @@ public class EventInfoFragment extends InfoFragment {
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putBoolean(SAVED_EXPANDED, mExpanded);
-        outState.putBoolean(SAVED_TITLE_HIDDEN, mHideTitle);
     }
 
     @BindingAdapter("event_organizers")

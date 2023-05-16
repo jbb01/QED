@@ -2,15 +2,20 @@ package com.jonahbauer.qed.model.viewmodel;
 
 import android.app.Application;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import com.jonahbauer.qed.util.StatusWrapper;
 
+import java.util.function.Function;
+import java.util.function.Supplier;
+
 public abstract class InfoViewModel<T> extends AndroidViewModel {
     private final @NonNull MutableLiveData<StatusWrapper<T>> mValueStatus = new MutableLiveData<>();
     private final @NonNull MutableLiveData<CharSequence> mTitle = new MutableLiveData<>();
+    private final @NonNull MutableLiveData<CharSequence> mToolbarTitle = new MutableLiveData<>();
     private final @NonNull MutableLiveData<T> mValue = new MutableLiveData<>();
     private final @NonNull MutableLiveData<Boolean> mLoading = new MutableLiveData<>();
     private final @NonNull MutableLiveData<Boolean> mError = new MutableLiveData<>();
@@ -19,9 +24,17 @@ public abstract class InfoViewModel<T> extends AndroidViewModel {
         super(application);
     }
 
-    protected abstract @NonNull CharSequence getTitle(@NonNull T t);
+    protected abstract @Nullable CharSequence getTitle(@NonNull T value);
 
-    protected abstract @StringRes int getDefaultTitle();
+    protected @Nullable CharSequence getToolbarTitle(@NonNull T value) {
+        return getTitle(value);
+    }
+
+    protected abstract @Nullable @StringRes Integer getDefaultTitle();
+
+    protected @Nullable @StringRes Integer getDefaultToolbarTitle() {
+        return getDefaultTitle();
+    }
 
     protected void submit(@NonNull StatusWrapper<T> status) {
         mValueStatus.setValue(status);
@@ -30,7 +43,8 @@ public abstract class InfoViewModel<T> extends AndroidViewModel {
         mError.setValue(status.getCode() == StatusWrapper.STATUS_ERROR);
 
         var value = status.getValue();
-        mTitle.setValue(value == null ? getApplication().getString(getDefaultTitle()) : getTitle(value));
+        mTitle.setValue(getTitle(value, this::getTitle, this::getDefaultTitle));
+        mToolbarTitle.setValue(getTitle(value, this::getToolbarTitle, this::getDefaultToolbarTitle));
     }
 
     public @NonNull LiveData<StatusWrapper<T>> getValueStatus() {
@@ -45,11 +59,21 @@ public abstract class InfoViewModel<T> extends AndroidViewModel {
         return this.mTitle;
     }
 
+    public @NonNull LiveData<? extends CharSequence> getToolbarTitle() {
+        return this.mToolbarTitle;
+    }
+
     public @NonNull LiveData<Boolean> getLoading() {
         return this.mLoading;
     }
 
     public @NonNull LiveData<Boolean> getError() {
         return this.mError;
+    }
+
+    private @Nullable CharSequence getTitle(T value, Function<T, CharSequence> title, Supplier<Integer> defaultTitle) {
+        if (value != null) return title.apply(value);
+        var defaultTitleRes = defaultTitle.get();
+        return defaultTitleRes != null ? getApplication().getText(defaultTitleRes) : null;
     }
 }

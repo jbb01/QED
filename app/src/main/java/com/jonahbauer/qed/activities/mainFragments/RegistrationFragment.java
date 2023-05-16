@@ -5,8 +5,8 @@ import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.sheets.InfoFragment;
 import com.jonahbauer.qed.activities.sheets.registration.RegistrationInfoFragment;
 import com.jonahbauer.qed.model.Registration;
+import com.jonahbauer.qed.model.viewmodel.InfoViewModel;
 import com.jonahbauer.qed.model.viewmodel.RegistrationViewModel;
-import com.jonahbauer.qed.util.StatusWrapper;
 import com.jonahbauer.qed.util.Themes;
 import com.jonahbauer.qed.util.ViewUtils;
 
@@ -27,22 +27,12 @@ public class RegistrationFragment extends MainInfoFragment {
     }
 
     @Override
-    public void onObserveViewModel() {
-        mRegistrationViewModel.getValueStatus().observe(getViewLifecycleOwner(), wrapper -> {
-            Registration value = wrapper.getValue();
-            if (value != null) {
-                ViewUtils.setActionBarText(this, getString(R.string.registration_title, value.getPersonName()));
-            }
-
-            if (wrapper.getCode() != StatusWrapper.STATUS_PRELOADED) {
-                startPostponedEnterTransition();
-            }
-        });
+    public @NonNull InfoFragment createFragment() {
+        return RegistrationInfoFragment.newInstance();
     }
 
-    @NonNull
     @Override
-    public InfoFragment createFragment() {
-        return RegistrationInfoFragment.newInstance();
+    public @NonNull InfoViewModel<?> getInfoViewModel() {
+        return mRegistrationViewModel;
     }
 }

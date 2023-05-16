@@ -11,7 +11,6 @@ import com.jonahbauer.qed.databinding.FragmentInfoAlbumBinding;
 import com.jonahbauer.qed.model.Album;
 import com.jonahbauer.qed.model.Person;
 import com.jonahbauer.qed.model.viewmodel.AlbumViewModel;
-import com.jonahbauer.qed.util.StatusWrapper;
 import com.jonahbauer.qed.util.Themes;
 
 import java.util.Collection;
@@ -21,12 +20,7 @@ import androidx.annotation.Nullable;
 import androidx.databinding.BindingAdapter;
 
 public class AlbumInfoFragment extends InfoFragment {
-    private static final String SAVED_TITLE_HIDDEN = "titleHidden";
-
     private AlbumViewModel mAlbumViewModel;
-    private FragmentInfoAlbumBinding mBinding;
-
-    private boolean mHideTitle;
 
     public static AlbumInfoFragment newInstance() {
         return new AlbumInfoFragment();
@@ -42,21 +36,13 @@ public class AlbumInfoFragment extends InfoFragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mBinding = FragmentInfoAlbumBinding.inflate(inflater, container, false);
-        mAlbumViewModel.getValueStatus().observe(getViewLifecycleOwner(), albumStatusWrapper -> {
-            var value = albumStatusWrapper.getValue();
-            var code = albumStatusWrapper.getCode();
-            mBinding.setAlbum(value);
-            mBinding.setLoading(code == StatusWrapper.STATUS_PRELOADED);
-            mBinding.setError(code == StatusWrapper.STATUS_ERROR ? getString(R.string.error_incomplete) : null);
-        });
-        mBinding.setColor(getColor());
-        if (mHideTitle) hideTitle();
-        return mBinding.getRoot();
+        var binding = FragmentInfoAlbumBinding.inflate(inflater, container, false);
+        mAlbumViewModel.getValue().observe(getViewLifecycleOwner(), binding::setAlbum);
+        binding.setColor(getColor());
+        return binding.getRoot();
     }
 
-    @NonNull
-    private Album getAlbum() {
+    private @NonNull Album getAlbum() {
         return mAlbumViewModel.getAlbumValue();
     }
 
@@ -68,39 +54,6 @@ public class AlbumInfoFragment extends InfoFragment {
     @Override
     protected int getBackground() {
         return Themes.pattern(getAlbum().getId());
-    }
-
-    @Override
-    protected String getTitle() {
-        return getAlbum().getName();
-    }
-
-    @Override
-    protected float getTitleBottom() {
-        return mBinding.title.getBottom();
-    }
-
-    @Override
-    public void hideTitle() {
-        mHideTitle = true;
-        if (mBinding != null) {
-            mBinding.titleLayout.setVisibility(View.GONE);
-        }
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        if (savedInstanceState != null) {
-            if (savedInstanceState.getBoolean(SAVED_TITLE_HIDDEN)) hideTitle();
-        }
-    }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putBoolean(SAVED_TITLE_HIDDEN, mHideTitle);
     }
 
     @BindingAdapter("album_categories")

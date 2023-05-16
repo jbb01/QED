@@ -8,9 +8,7 @@
         <import type="com.jonahbauer.qed.util.TimeUtils"/>
         <import type="com.jonahbauer.qed.util.TextUtils"/>
 
-        <variable name="loading" type="boolean" />
         <variable name="color" type="int" />
-        <variable name="error" type="String" />
         <variable name="registration" type="com.jonahbauer.qed.model.Registration" />
     </data>
 
@@ -20,47 +18,6 @@
         android:layout_height="wrap_content"
         android:background="?colorSurface"
         android:orientation="vertical">
-
-        <ProgressBar
-            android:id="@+id/progress_bar"
-            android:layout_width="match_parent"
-            android:layout_height="10dp"
-            android:indeterminate="true"
-            android:padding="0dp"
-            android:minHeight="0dp"
-            android:layout_marginTop="-4dp"
-            android:layout_marginBottom="-4dp"
-            android:visibility="@{loading ? View.VISIBLE : View.INVISIBLE}"
-            app:indeterminateTint="@{color}"
-            style="?android:progressBarStyleHorizontal"/>
-
-        <LinearLayout
-            android:id="@+id/title_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingVertical="@dimen/activity_vertical_margin"
-            android:paddingHorizontal="@dimen/activity_horizontal_margin">
-            <TextView
-                android:id="@+id/title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@{@string/registration_title(registration.personName)}"
-                android:textColor="?colorOnSurface"
-                android:textSize="30sp"
-                tools:text="Anmeldung von Max Mustermann"/>
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/error"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingVertical="@dimen/activity_vertical_margin"
-            android:paddingHorizontal="@dimen/activity_horizontal_margin"
-            android:textColor="?colorError"
-            android:text="@{error}"
-            android:visibility="@{error != null, default = gone}"
-            tools:text="@string/error_incomplete"
-            tools:visibility="visible"/>
 
         <LinearLayout
             android:layout_width="match_parent"

@@ -42,12 +42,10 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 public class PersonInfoFragment extends InfoFragment {
     private static final String SAVED_EXPANDED = "expanded";
-    private static final String SAVED_TITLE_HIDDEN = "titleHidden";
 
     private PersonViewModel mPersonViewModel;
     private FragmentInfoPersonBinding mBinding;
 
-    private boolean mHideTitle;
     private boolean mExpanded;
 
     private static final Object2IntMap<String> CONTACT_ICONS;
@@ -118,41 +116,9 @@ public class PersonInfoFragment extends InfoFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mBinding = FragmentInfoPersonBinding.inflate(inflater, container, false);
-        mPersonViewModel.getValueStatus().observe(getViewLifecycleOwner(), personStatusWrapper -> {
-            var value = personStatusWrapper.getValue();
-            var code = personStatusWrapper.getCode();
-            mBinding.setPerson(value);
-            mBinding.setLoading(code == StatusWrapper.STATUS_PRELOADED);
-            mBinding.setError(code == StatusWrapper.STATUS_ERROR ? getString(R.string.error_incomplete) : null);
-        });
+        mPersonViewModel.getValue().observe(getViewLifecycleOwner(), mBinding::setPerson);
         mBinding.setColor(getColor());
-        if (mHideTitle) hideTitle();
         return mBinding.getRoot();
-    }
-
-    @NonNull
-    private Person getPerson() {
-        return Objects.requireNonNull(mPersonViewModel.getValue().getValue());
-    }
-
-    @Override
-    public int getColor() {
-        return Themes.colorful(requireContext(), getPerson().getId());
-    }
-
-    @Override
-    protected int getBackground() {
-        return Themes.pattern(getPerson().getId());
-    }
-
-    @Override
-    protected String getTitle() {
-        return getPerson().getFullName();
-    }
-
-    @Override
-    protected float getTitleBottom() {
-        return mBinding.title.getBottom();
     }
 
     @Override
@@ -171,9 +137,22 @@ public class PersonInfoFragment extends InfoFragment {
 
         if (savedInstanceState != null) {
             mExpanded = savedInstanceState.getBoolean(SAVED_EXPANDED);
-            if (savedInstanceState.getBoolean(SAVED_TITLE_HIDDEN)) hideTitle();
         }
         setEventsExpanded(mExpanded);
+    }
+
+    private @NonNull Person getPerson() {
+        return Objects.requireNonNull(mPersonViewModel.getValue().getValue());
+    }
+
+    @Override
+    public int getColor() {
+        return Themes.colorful(requireContext(), getPerson().getId());
+    }
+
+    @Override
+    protected int getBackground() {
+        return Themes.pattern(getPerson().getId());
     }
 
 
@@ -195,15 +174,6 @@ public class PersonInfoFragment extends InfoFragment {
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putBoolean(SAVED_EXPANDED, mExpanded);
-        outState.putBoolean(SAVED_TITLE_HIDDEN, mHideTitle);
-    }
-
-    @Override
-    public void hideTitle() {
-        mHideTitle = true;
-        if (mBinding != null) {
-            mBinding.titleLayout.setVisibility(View.GONE);
-        }
     }
 
     @Override

@@ -6,7 +6,7 @@ import com.jonahbauer.qed.activities.sheets.InfoFragment;
 import com.jonahbauer.qed.activities.sheets.event.EventInfoFragment;
 import com.jonahbauer.qed.model.Event;
 import com.jonahbauer.qed.model.viewmodel.EventViewModel;
-import com.jonahbauer.qed.util.StatusWrapper;
+import com.jonahbauer.qed.model.viewmodel.InfoViewModel;
 import com.jonahbauer.qed.util.Themes;
 import com.jonahbauer.qed.util.ViewUtils;
 
@@ -27,22 +27,12 @@ public class EventFragment extends MainInfoFragment {
     }
 
     @Override
-    public void onObserveViewModel() {
-        mEventViewModel.getValueStatus().observe(getViewLifecycleOwner(), wrapper -> {
-            Event value = wrapper.getValue();
-            if (value != null) {
-                ViewUtils.setActionBarText(this, value.getTitle());
-            }
-
-            if (wrapper.getCode() != StatusWrapper.STATUS_PRELOADED) {
-                startPostponedEnterTransition();
-            }
-        });
+    public @NonNull InfoFragment createFragment() {
+        return EventInfoFragment.newInstance();
     }
 
-    @NonNull
     @Override
-    public InfoFragment createFragment() {
-        return EventInfoFragment.newInstance();
+    public @NonNull InfoViewModel<?> getInfoViewModel() {
+        return mEventViewModel;
     }
 }

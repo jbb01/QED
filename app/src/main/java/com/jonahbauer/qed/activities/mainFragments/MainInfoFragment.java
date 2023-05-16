@@ -11,8 +11,10 @@ import androidx.lifecycle.Lifecycle;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.sheets.InfoFragment;
 import com.jonahbauer.qed.databinding.SingleFragmentBinding;
+import com.jonahbauer.qed.model.viewmodel.InfoViewModel;
 import com.jonahbauer.qed.util.Actions;
 import com.jonahbauer.qed.util.TransitionUtils;
+import com.jonahbauer.qed.util.ViewUtils;
 import lombok.RequiredArgsConstructor;
 
 import java.util.concurrent.TimeUnit;
@@ -20,6 +22,7 @@ import java.util.function.Supplier;
 
 public abstract class MainInfoFragment extends Fragment {
     private @ColorInt int mColor;
+    private SingleFragmentBinding mBinding;
 
     @Override
     public final void onCreate(@Nullable Bundle savedInstanceState) {
@@ -33,24 +36,34 @@ public abstract class MainInfoFragment extends Fragment {
 
     @Override
     public final View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        SingleFragmentBinding binding = SingleFragmentBinding.inflate(inflater, container, false);
-        return binding.getRoot();
+        mBinding = SingleFragmentBinding.inflate(inflater, container, false);
+        return mBinding.getRoot();
     }
 
     @Override
     public final void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         postponeEnterTransition(200, TimeUnit.MILLISECONDS);
 
-        onObserveViewModel();
-
         var manager = getChildFragmentManager();
 
         var fragment = (InfoFragment) manager.findFragmentById(R.id.fragment);
         if (fragment == null) {
             fragment = createFragment();
-            fragment.hideTitle();
             manager.beginTransaction().replace(R.id.fragment, fragment).commit();
         }
+
+        var model = getInfoViewModel();
+        model.getError().observe(getViewLifecycleOwner(), error -> {
+            mBinding.setError(error ? getString(R.string.error_incomplete) : null);
+        });
+        model.getLoading().observe(getViewLifecycleOwner(), loading -> {
+            mBinding.setLoading(loading);
+            if (!loading) {
+                startPostponedEnterTransition();
+            }
+        });
+        model.getToolbarTitle().observe(getViewLifecycleOwner(), title -> ViewUtils.setActionBarText(this, title));
+        mBinding.setColor(mColor);
 
         if (fragment.isOpenInBrowserSupported()) {
             var menuProvider = new OpenInBrowserMenuProvider(fragment::getOpenInBrowserLink);
@@ -59,15 +72,17 @@ public abstract class MainInfoFragment extends Fragment {
     }
 
     protected void setColor(@ColorInt int color) {
-        this.mColor = color;
+        mColor = color;
+        if (mBinding != null) {
+            mBinding.setColor(color);
+        }
     }
 
     public abstract void onCreateViewModel();
 
-    public abstract void onObserveViewModel();
+    public abstract @NonNull InfoFragment createFragment();
 
-    @NonNull
-    public abstract InfoFragment createFragment();
+    public abstract @NonNull InfoViewModel<?> getInfoViewModel();
 
     @RequiredArgsConstructor
     private class OpenInBrowserMenuProvider implements MenuProvider {

@@ -10,6 +10,7 @@ import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.sheets.InfoBottomSheet;
 import com.jonahbauer.qed.activities.sheets.InfoFragment;
 import com.jonahbauer.qed.model.Registration;
+import com.jonahbauer.qed.model.viewmodel.InfoViewModel;
 import com.jonahbauer.qed.model.viewmodel.RegistrationViewModel;
 import com.jonahbauer.qed.util.Themes;
 
@@ -59,10 +60,14 @@ public class RegistrationInfoBottomSheet extends InfoBottomSheet {
         return Themes.pattern(getRegistration().getId());
     }
 
-    @NonNull
     @Override
-    public InfoFragment createFragment() {
+    public @NonNull InfoFragment createFragment() {
         return RegistrationInfoFragment.newInstance();
+    }
+
+    @Override
+    public @NonNull InfoViewModel<?> getInfoViewModel() {
+        return mRegistrationViewModel;
     }
 
     @NonNull

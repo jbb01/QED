@@ -9,6 +9,7 @@ import com.jonahbauer.qed.activities.sheets.InfoBottomSheet;
 import com.jonahbauer.qed.activities.sheets.InfoFragment;
 import com.jonahbauer.qed.model.Event;
 import com.jonahbauer.qed.model.viewmodel.EventViewModel;
+import com.jonahbauer.qed.model.viewmodel.InfoViewModel;
 import com.jonahbauer.qed.util.Themes;
 
 import java.util.Objects;
@@ -57,10 +58,14 @@ public class EventInfoBottomSheet extends InfoBottomSheet {
         return Themes.pattern(getEvent().getId());
     }
 
-    @NonNull
     @Override
-    public InfoFragment createFragment() {
+    public @NonNull InfoFragment createFragment() {
         return EventInfoFragment.newInstance();
+    }
+
+    @Override
+    public @NonNull InfoViewModel<?> getInfoViewModel() {
+        return mEventViewModel;
     }
 
     @NonNull

@@ -9,6 +9,7 @@ import com.jonahbauer.qed.activities.sheets.InfoBottomSheet;
 import com.jonahbauer.qed.activities.sheets.InfoFragment;
 import com.jonahbauer.qed.model.Album;
 import com.jonahbauer.qed.model.viewmodel.AlbumViewModel;
+import com.jonahbauer.qed.model.viewmodel.InfoViewModel;
 import com.jonahbauer.qed.util.Themes;
 
 public class AlbumInfoBottomSheet extends InfoBottomSheet {
@@ -55,10 +56,14 @@ public class AlbumInfoBottomSheet extends InfoBottomSheet {
         return Themes.pattern(getAlbum().getId());
     }
 
-    @NonNull
     @Override
-    public InfoFragment createFragment() {
+    public @NonNull InfoFragment createFragment() {
         return AlbumInfoFragment.newInstance();
+    }
+
+    @Override
+    public @NonNull InfoViewModel<?> getInfoViewModel() {
+        return mAlbumViewModel;
     }
 
     @NonNull

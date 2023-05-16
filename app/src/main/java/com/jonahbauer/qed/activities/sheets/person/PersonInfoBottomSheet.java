@@ -8,6 +8,7 @@ import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.sheets.InfoBottomSheet;
 import com.jonahbauer.qed.activities.sheets.InfoFragment;
 import com.jonahbauer.qed.model.Person;
+import com.jonahbauer.qed.model.viewmodel.InfoViewModel;
 import com.jonahbauer.qed.model.viewmodel.PersonViewModel;
 import com.jonahbauer.qed.util.Themes;
 
@@ -57,10 +58,14 @@ public class PersonInfoBottomSheet extends InfoBottomSheet {
         return Themes.pattern(getPerson().getId());
     }
 
-    @NonNull
     @Override
-    public InfoFragment createFragment() {
+    public @NonNull InfoFragment createFragment() {
         return PersonInfoFragment.newInstance();
+    }
+
+    @Override
+    public @NonNull InfoViewModel<?> getInfoViewModel() {
+        return mPersonViewModel;
     }
 
     @NonNull

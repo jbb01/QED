@@ -10,6 +10,7 @@ import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.activities.sheets.InfoBottomSheet;
 import com.jonahbauer.qed.activities.sheets.InfoFragment;
 import com.jonahbauer.qed.model.Message;
+import com.jonahbauer.qed.model.viewmodel.InfoViewModel;
 import com.jonahbauer.qed.model.viewmodel.MessageViewModel;
 import com.jonahbauer.qed.util.Themes;
 
@@ -59,10 +60,14 @@ public class MessageInfoBottomSheet extends InfoBottomSheet {
         return Themes.pattern(getMessage().getId());
     }
 
-    @NonNull
     @Override
-    public InfoFragment createFragment() {
+    public @NonNull InfoFragment createFragment() {
         return MessageInfoFragment.newInstance();
+    }
+
+    @Override
+    public @NonNull InfoViewModel<?> getInfoViewModel() {
+        return mMessageViewModel;
     }
 
     @NonNull

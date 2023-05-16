@@ -25,19 +25,14 @@ import com.jonahbauer.qed.model.Person;
 import com.jonahbauer.qed.model.Registration;
 import com.jonahbauer.qed.model.viewmodel.RegistrationViewModel;
 import com.jonahbauer.qed.networking.NetworkConstants;
-import com.jonahbauer.qed.util.StatusWrapper;
 import com.jonahbauer.qed.util.Themes;
 
 import java.util.Locale;
 import java.util.Objects;
 
 public class RegistrationInfoFragment extends InfoFragment {
-    private static final String SAVED_TITLE_HIDDEN = "titleHidden";
-
     private RegistrationViewModel mRegistrationViewModel;
     private FragmentInfoRegistrationBinding mBinding;
-
-    private boolean mHideTitle;
 
     public static RegistrationInfoFragment newInstance() {
         return new RegistrationInfoFragment();
@@ -55,49 +50,14 @@ public class RegistrationInfoFragment extends InfoFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mBinding = FragmentInfoRegistrationBinding.inflate(inflater, container, false);
-        mRegistrationViewModel.getValueStatus().observe(getViewLifecycleOwner(), registrationStatusWrapper -> {
-            var value = registrationStatusWrapper.getValue();
-            var code = registrationStatusWrapper.getCode();
-            mBinding.setRegistration(value);
-            mBinding.setLoading(code == StatusWrapper.STATUS_PRELOADED);
-            mBinding.setError(code == StatusWrapper.STATUS_ERROR ? getString(R.string.error_incomplete) : null);
-        });
+        mRegistrationViewModel.getValue().observe(getViewLifecycleOwner(), mBinding::setRegistration);
         mBinding.setColor(getColor());
-        if (mHideTitle) hideTitle();
         return mBinding.getRoot();
-    }
-
-    @NonNull
-    private Registration getRegistration() {
-        return Objects.requireNonNull(mRegistrationViewModel.getValue().getValue());
-    }
-
-    @Override
-    public int getColor() {
-        return Themes.colorful(requireContext(), getRegistration().getId());
-    }
-
-    @Override
-    protected int getBackground() {
-        return Themes.pattern(getRegistration().getId());
-    }
-
-    @Override
-    protected String getTitle() {
-        return getString(R.string.registration_title, getRegistration().getPersonName());
-    }
-
-    @Override
-    protected float getTitleBottom() {
-        return mBinding.title.getBottom();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if (savedInstanceState != null) {
-            if (savedInstanceState.getBoolean(SAVED_TITLE_HIDDEN)) hideTitle();
-        }
 
         mBinding.listItemPerson.setOnClickListener(v -> {
             var registration = mBinding.getRegistration();
@@ -123,18 +83,18 @@ public class RegistrationInfoFragment extends InfoFragment {
         });
     }
 
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putBoolean(SAVED_TITLE_HIDDEN, mHideTitle);
+    private @NonNull Registration getRegistration() {
+        return Objects.requireNonNull(mRegistrationViewModel.getValue().getValue());
     }
 
     @Override
-    public void hideTitle() {
-        mHideTitle = true;
-        if (mBinding != null) {
-            mBinding.titleLayout.setVisibility(View.GONE);
-        }
+    public int getColor() {
+        return Themes.colorful(requireContext(), getRegistration().getId());
+    }
+
+    @Override
+    protected int getBackground() {
+        return Themes.pattern(getRegistration().getId());
     }
 
     @Override

@@ -90,7 +90,7 @@ public class AlbumViewModel extends InfoViewModel<Album> {
     }
 
     @Override
-    protected @StringRes int getDefaultTitle() {
+    protected @StringRes Integer getDefaultTitle() {
         return R.string.title_fragment_album;
     }
 

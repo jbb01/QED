@@ -17,12 +17,6 @@ public abstract class InfoFragment extends Fragment {
     @DrawableRes
     protected abstract int getBackground();
 
-    protected abstract CharSequence getTitle();
-
-    protected abstract float getTitleBottom();
-
-    public abstract void hideTitle();
-
     public boolean isOpenInBrowserSupported() {
         return false;
     }

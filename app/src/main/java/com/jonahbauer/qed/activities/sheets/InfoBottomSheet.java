@@ -16,6 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.OneShotPreDrawListener;
 import androidx.core.view.ViewCompat;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -23,12 +24,15 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.jonahbauer.qed.R;
 import com.jonahbauer.qed.databinding.FragmentInfoBinding;
 import com.jonahbauer.qed.layoutStuff.ColorfulBottomSheetCallback;
+import com.jonahbauer.qed.model.viewmodel.InfoViewModel;
 import com.jonahbauer.qed.util.Colors;
 import com.jonahbauer.qed.util.ViewUtils;
 
 import java.util.Objects;
 
 public abstract class InfoBottomSheet extends BottomSheetDialogFragment {
+    private final MutableLiveData<Boolean> mToolbarVisible = new MutableLiveData<>(false);
+
     private Window mDialogWindow;
     private BottomSheetBehavior<?> mBottomSheetBehavior;
 
@@ -81,6 +85,8 @@ public abstract class InfoBottomSheet extends BottomSheetDialogFragment {
             mBinding.getRoot().setOnTouchListener(new TouchDelegator());
         });
 
+        observeViewModel();
+
         // setup toolbar + toolbar fading
         if (mBinding.toolbar != null) {
             mBinding.common.setOnScrollChangeListener(new CollapsingToolbarScrollListener());
@@ -103,6 +109,7 @@ public abstract class InfoBottomSheet extends BottomSheetDialogFragment {
         mBinding.backgroundPattern.setImageResource(getBackground());
         mBinding.backgroundPattern.setColorFilter(color, PorterDuff.Mode.MULTIPLY);
         mBinding.backgroundSolid.setBackgroundColor(darkColor);
+        mBinding.setColor(color);
 
         // make background 16:9
         int orientation = getResources().getConfiguration().orientation;
@@ -117,23 +124,56 @@ public abstract class InfoBottomSheet extends BottomSheetDialogFragment {
         ViewUtils.setSize(mBinding.background, width, height);
     }
 
+    private void observeViewModel() {
+        var model = getInfoViewModel();
+        model.getError().observe(getViewLifecycleOwner(), error -> {
+            mBinding.setError(error ? getString(R.string.error_incomplete) : null);
+        });
+        model.getLoading().observe(getViewLifecycleOwner(), loading -> {
+            mBinding.setLoading(loading);
+            if (!loading) {
+                startPostponedEnterTransition();
+            }
+        });
+        model.getTitle().observe(getViewLifecycleOwner(), title -> {
+            mBinding.setTitle(title);
+        });
+        mToolbarVisible.observe(getViewLifecycleOwner(), visible -> {
+            if (mBinding.toolbar != null) {
+                if (visible) {
+                    mBinding.toolbar.setTitle(model.getToolbarTitle().getValue());
+                } else {
+                    mBinding.toolbar.setTitle("");
+                }
+            }
+        });
+        model.getToolbarTitle().observe(getViewLifecycleOwner(), title -> {
+            if (mBinding.toolbar != null) {
+                if (Boolean.TRUE.equals(mToolbarVisible.getValue())) {
+                    mBinding.toolbar.setTitle(title);
+                } else {
+                    mBinding.toolbar.setTitle("");
+                }
+            }
+        });
+    }
+
     private ViewGroup getContentRoot() {
         return ((ViewGroup) mFragment.requireView());
     }
 
-    @ColorInt
-    public abstract int getColor();
 
-    @ColorInt
-    public int getDarkColor() {
+    public abstract @ColorInt int getColor();
+
+    public @ColorInt int getDarkColor() {
         return Colors.multiply(getColor(), 0xFFCCCCCC);
     }
 
-    @DrawableRes
-    public abstract int getBackground();
+    public abstract @DrawableRes int getBackground();
 
-    @NonNull
-    public abstract InfoFragment createFragment();
+    public abstract @NonNull InfoFragment createFragment();
+
+    public abstract @NonNull InfoViewModel<?> getInfoViewModel();
 
     protected ViewModelProvider getViewModelProvider() {
         return new ViewModelProvider(this);
@@ -188,18 +228,18 @@ public abstract class InfoBottomSheet extends BottomSheetDialogFragment {
             mBackgroundPattern.setAlpha(alpha);
             mBackground.setTranslationY(- scrollY / 2f);
 
-            boolean shouldShowTitle = mContent.getTop() - scrollY + mFragment.getTitleBottom() < mActionBarSize;
+            boolean shouldShowTitle = mContent.getTop() - scrollY + mBinding.title.getBottom() < mActionBarSize;
             boolean shouldShowActionBar = alpha == 0;
             if (shouldShowTitle || shouldShowActionBar) {
                 mToolbar.setBackgroundColor(mDarkColor);
 
                 float height, elevation;
                 if (shouldShowTitle) {
-                    mToolbar.setTitle(mFragment.getTitle());
+                    mToolbarVisible.setValue(true);
                     elevation = mActionBarElevation;
                     height = mActionBarSize;
                 } else {
-                    mToolbar.setTitle("");
+                    mToolbarVisible.setValue(false);
                     float toolbarTransition = (totalFadeOut * mActionBarSize - (mContent.getTop() - scrollY)) / ((totalFadeOut - 1) * mActionBarSize);
                     if (toolbarTransition < 0) toolbarTransition = 0;
                     else if (toolbarTransition > 1) toolbarTransition = 1;
@@ -213,8 +253,8 @@ public abstract class InfoBottomSheet extends BottomSheetDialogFragment {
                 ViewUtils.setHeight(mToolbar, (int) height);
                 ViewCompat.setElevation(mToolbar, elevation);
             } else {
+                mToolbarVisible.setValue(false);
                 mToolbar.setBackgroundColor(Color.TRANSPARENT);
-                mToolbar.setTitle("");
             }
         }
     }

@@ -32,7 +32,7 @@ public class EventViewModel extends DatabaseInfoViewModel<Event> {
     }
 
     @Override
-    protected @StringRes int getDefaultTitle() {
+    protected @StringRes Integer getDefaultTitle() {
         return R.string.title_fragment_event;
     }
 }

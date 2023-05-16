@@ -12,14 +12,12 @@ import com.jonahbauer.qed.activities.sheets.InfoFragment;
 import com.jonahbauer.qed.databinding.FragmentInfoMessageBinding;
 import com.jonahbauer.qed.model.Message;
 import com.jonahbauer.qed.model.viewmodel.MessageViewModel;
-import com.jonahbauer.qed.util.MessageUtils;
 import com.jonahbauer.qed.util.Themes;
 
 import java.util.Objects;
 
 public class MessageInfoFragment extends InfoFragment {
     private MessageViewModel mMessageViewModel;
-    private FragmentInfoMessageBinding mBinding;
 
     public static MessageInfoFragment newInstance() {
         return new MessageInfoFragment();
@@ -35,16 +33,16 @@ public class MessageInfoFragment extends InfoFragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mBinding = FragmentInfoMessageBinding.inflate(inflater, container, false);
-        mMessageViewModel.getValueStatus().observe(getViewLifecycleOwner(), messageStatusWrapper -> {
-            mBinding.setMessage(messageStatusWrapper.getValue());
-            mBinding.setColor(messageStatusWrapper.getValue().getColor(requireContext()));
+        var binding = FragmentInfoMessageBinding.inflate(inflater, container, false);
+        mMessageViewModel.getValue().observe(getViewLifecycleOwner(), message -> {
+            binding.setMessage(message);
+            binding.setColor(message.getColor(requireContext()));
         });
-        return mBinding.getRoot();
+        return binding.getRoot();
     }
 
-    @NonNull
-    private Message getMessage() {
+
+    private @NonNull Message getMessage() {
         return Objects.requireNonNull(mMessageViewModel.getValue().getValue());
     }
 
@@ -57,17 +55,4 @@ public class MessageInfoFragment extends InfoFragment {
     protected int getBackground() {
         return Themes.pattern(getMessage().getId());
     }
-
-    @Override
-    protected CharSequence getTitle() {
-        return MessageUtils.formatName(requireContext(), getMessage());
-    }
-
-    @Override
-    protected float getTitleBottom() {
-        return mBinding.getRoot().getTop();
-    }
-
-    @Override
-    public void hideTitle() {}
 }
