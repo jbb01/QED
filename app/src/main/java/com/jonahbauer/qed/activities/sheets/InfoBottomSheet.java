@@ -9,6 +9,7 @@ import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.*;
+import android.widget.ImageView;
 import androidx.annotation.ColorInt;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
@@ -28,11 +29,17 @@ import com.jonahbauer.qed.model.viewmodel.InfoViewModel;
 import com.jonahbauer.qed.util.Colors;
 import com.jonahbauer.qed.util.Themes;
 import com.jonahbauer.qed.util.ViewUtils;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Objects;
 
 public abstract class InfoBottomSheet extends BottomSheetDialogFragment {
-    private final MutableLiveData<Boolean> mToolbarVisible = new MutableLiveData<>(false);
+    private static final String SAVED_BACKGROUND_PATTERN_IMAGE_ALPHA = "backgroundPatternImageAlpha";
+    private static final String SAVED_TOOLBAR_TITLE_VISIBLE = "toolbarTitleVisible";
+    private static final String SAVED_TOOLBAR_BACKGROUND_COLOR = "toolbarBackgroundColor";
+
+    private final MutableLiveData<Boolean> mToolbarTitleVisible = new MutableLiveData<>(false);
+    private final MutableLiveData<Integer> mToolbarBackgroundColor = new MutableLiveData<>(Color.TRANSPARENT);
 
     private Window mDialogWindow;
     private BottomSheetBehavior<?> mBottomSheetBehavior;
@@ -62,6 +69,7 @@ public abstract class InfoBottomSheet extends BottomSheetDialogFragment {
     }
 
     @Override
+    @SuppressLint("ClickableViewAccessibility")
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         view.setOnClickListener(v -> dismiss());
 
@@ -84,20 +92,35 @@ public abstract class InfoBottomSheet extends BottomSheetDialogFragment {
 
             // forward touch event on header to content scroll view
             mBinding.getRoot().setOnTouchListener(new TouchDelegator());
+
+            // setup toolbar + toolbar fading
+            if (mBinding.toolbar != null) {
+                mBinding.toolbar.setOnTouchListener(new TouchDelegator(false));
+                mBinding.common.setOnScrollChangeListener(new CollapsingToolbarScrollListener());
+            }
         });
 
         observeViewModel();
+    }
 
-        // setup toolbar + toolbar fading
-        if (mBinding.toolbar != null) {
-            mBinding.common.setOnScrollChangeListener(new CollapsingToolbarScrollListener());
-        }
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(SAVED_BACKGROUND_PATTERN_IMAGE_ALPHA, mBinding.backgroundPattern.getImageAlpha());
+        outState.putBoolean(SAVED_TOOLBAR_TITLE_VISIBLE, Objects.requireNonNull(mToolbarTitleVisible.getValue()));
+        outState.putInt(SAVED_TOOLBAR_BACKGROUND_COLOR, Objects.requireNonNull(mToolbarBackgroundColor.getValue()));
     }
 
     @Override
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
         mBottomSheetCallback.onStateChanged(requireView(), mBottomSheetBehavior.getState());
+
+        if (savedInstanceState != null) {
+            mBinding.backgroundPattern.setImageAlpha(savedInstanceState.getInt(SAVED_BACKGROUND_PATTERN_IMAGE_ALPHA));
+            mToolbarTitleVisible.setValue(savedInstanceState.getBoolean(SAVED_TOOLBAR_TITLE_VISIBLE));
+            mToolbarBackgroundColor.setValue(savedInstanceState.getInt(SAVED_TOOLBAR_BACKGROUND_COLOR));
+        }
     }
 
     /**
@@ -139,24 +162,37 @@ public abstract class InfoBottomSheet extends BottomSheetDialogFragment {
         model.getTitle().observe(getViewLifecycleOwner(), title -> {
             mBinding.setTitle(title);
         });
-        mToolbarVisible.observe(getViewLifecycleOwner(), visible -> {
-            if (mBinding.toolbar != null) {
-                if (visible) {
-                    mBinding.toolbar.setTitle(model.getToolbarTitle().getValue());
-                } else {
-                    mBinding.toolbar.setTitle("");
-                }
-            }
-        });
-        model.getToolbarTitle().observe(getViewLifecycleOwner(), title -> {
-            if (mBinding.toolbar != null) {
-                if (Boolean.TRUE.equals(mToolbarVisible.getValue())) {
-                    mBinding.toolbar.setTitle(title);
-                } else {
-                    mBinding.toolbar.setTitle("");
-                }
-            }
-        });
+
+        // observer toolbar
+        mToolbarBackgroundColor.observe(getViewLifecycleOwner(), color -> mBinding.toolbar.setBackgroundColor(color));
+        mToolbarTitleVisible.observe(getViewLifecycleOwner(), visible -> updateToolbar(
+                model.getToolbarTitle().getValue(),
+                visible
+        ));
+        model.getToolbarTitle().observe(getViewLifecycleOwner(), title -> updateToolbar(
+                title,
+                Boolean.TRUE.equals(mToolbarTitleVisible.getValue())
+        ));
+    }
+
+    private CharSequence mPreviousTitle;
+    private Boolean mPreviousTitleVisible;
+    private void updateToolbar(CharSequence title, boolean titleVisible) {
+        if (mBinding.toolbar == null) return;
+
+        // debounce updates
+        if (Boolean.valueOf(titleVisible).equals(mPreviousTitleVisible) && title.equals(mPreviousTitle)) {
+            return;
+        }
+        mPreviousTitle = title;
+        mPreviousTitleVisible = titleVisible;
+
+        // update title
+        if (titleVisible) {
+            mBinding.toolbar.setTitle(title);
+        } else {
+            mBinding.toolbar.setTitle("");
+        }
     }
 
     private ViewGroup getContentRoot() {
@@ -191,7 +227,7 @@ public abstract class InfoBottomSheet extends BottomSheetDialogFragment {
     private class CollapsingToolbarScrollListener implements View.OnScrollChangeListener {
         private final Toolbar mToolbar;
         private final View mBackground;
-        private final View mBackgroundPattern;
+        private final ImageView mBackgroundPattern;
         private final View mContent;
 
         @ColorInt
@@ -200,7 +236,6 @@ public abstract class InfoBottomSheet extends BottomSheetDialogFragment {
         private final float mActionBarSize;
         private final float mActionBarElevation;
 
-        @SuppressLint("ClickableViewAccessibility")
         public CollapsingToolbarScrollListener() {
             mToolbar = Objects.requireNonNull(mBinding.toolbar);
             mBackground = mBinding.background;
@@ -213,11 +248,6 @@ public abstract class InfoBottomSheet extends BottomSheetDialogFragment {
             mContent.getContext().getTheme().resolveAttribute(R.attr.actionBarSize, typedValue, true);
             mActionBarSize = typedValue.getDimension(getResources().getDisplayMetrics());
             mActionBarElevation = mToolbar.getElevation();
-
-            TouchDelegator delegator = new TouchDelegator();
-            delegator.mClickAllowed = false;
-            mToolbar.setOnTouchListener(delegator);
-            mToolbar.setBackgroundColor(Color.TRANSPARENT);
         }
 
         @Override
@@ -231,21 +261,21 @@ public abstract class InfoBottomSheet extends BottomSheetDialogFragment {
             if (alpha < 0) alpha = 0;
             else if (alpha > 1) alpha = 1;
 
-            mBackgroundPattern.setAlpha(alpha);
+            mBackgroundPattern.setImageAlpha((int) (alpha * 255));
             mBackground.setTranslationY(- scrollY / 2f);
 
             boolean shouldShowTitle = mContent.getTop() - scrollY + mBinding.title.getBottom() < mActionBarSize;
             boolean shouldShowActionBar = alpha == 0;
             if (shouldShowTitle || shouldShowActionBar) {
-                mToolbar.setBackgroundColor(mDarkColor);
+                mToolbarBackgroundColor.setValue(mDarkColor);
 
                 float height, elevation;
                 if (shouldShowTitle) {
-                    mToolbarVisible.setValue(true);
+                    mToolbarTitleVisible.setValue(true);
                     elevation = mActionBarElevation;
                     height = mActionBarSize;
                 } else {
-                    mToolbarVisible.setValue(false);
+                    mToolbarTitleVisible.setValue(false);
                     float toolbarTransition = (totalFadeOut * mActionBarSize - (mContent.getTop() - scrollY)) / ((totalFadeOut - 1) * mActionBarSize);
                     if (toolbarTransition < 0) toolbarTransition = 0;
                     else if (toolbarTransition > 1) toolbarTransition = 1;
@@ -259,8 +289,8 @@ public abstract class InfoBottomSheet extends BottomSheetDialogFragment {
                 ViewUtils.setHeight(mToolbar, (int) height);
                 ViewCompat.setElevation(mToolbar, elevation);
             } else {
-                mToolbarVisible.setValue(false);
-                mToolbar.setBackgroundColor(Color.TRANSPARENT);
+                mToolbarTitleVisible.setValue(false);
+                mToolbarBackgroundColor.setValue(Color.TRANSPARENT);
             }
         }
     }
@@ -268,13 +298,18 @@ public abstract class InfoBottomSheet extends BottomSheetDialogFragment {
     /**
      * a touch listener that delegates touch events to the main NestedScrollView
      */
+    @RequiredArgsConstructor
     private class TouchDelegator implements View.OnTouchListener {
+        private final boolean mClickAllowed;
         private boolean mIntercepted;
-        private boolean mClickAllowed = true;
 
         private final int[] sourceLocation = new int[2];
         private final int[] targetLocation = new int[2];
         private final Matrix matrix = new Matrix();
+
+        public TouchDelegator() {
+            this(true);
+        }
 
         @Override
         @SuppressLint("ClickableViewAccessibility")
