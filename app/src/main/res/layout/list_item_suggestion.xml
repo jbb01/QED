@@ -14,7 +14,7 @@
         android:focusable="true"
         android:background="?selectableItemBackground">
 
-        <com.jonahbauer.qed.layoutStuff.views.MaterialListItem
+        <eu.jonahbauer.qed.layoutStuff.views.MaterialListItem
             android:id="@+id/item"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

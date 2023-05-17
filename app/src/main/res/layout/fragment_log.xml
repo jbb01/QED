@@ -6,7 +6,7 @@
 
     <data>
         <import type="android.view.View"/>
-        <import type="com.jonahbauer.qed.util.StatusWrapper"/>
+        <import type="eu.jonahbauer.qed.util.StatusWrapper"/>
 
         <variable name="status" type="int"/>
         <variable name="statusText" type="String"/>

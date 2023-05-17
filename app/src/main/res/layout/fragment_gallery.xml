@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-        <import type="com.jonahbauer.qed.util.StatusWrapper" />
+        <import type="eu.jonahbauer.qed.util.StatusWrapper" />
 
         <variable name="offline" type="boolean" />
         <variable name="forcedOfflineMode" type="boolean" />

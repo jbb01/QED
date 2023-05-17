@@ -4,12 +4,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <import type="android.view.View"/>
-        <import type="com.jonahbauer.qed.util.Actions"/>
-        <import type="com.jonahbauer.qed.util.TimeUtils"/>
-        <import type="com.jonahbauer.qed.util.TextUtils"/>
+        <import type="eu.jonahbauer.qed.util.Actions"/>
+        <import type="eu.jonahbauer.qed.util.TimeUtils"/>
+        <import type="eu.jonahbauer.qed.util.TextUtils"/>
 
         <variable name="color" type="int" />
-        <variable name="registration" type="com.jonahbauer.qed.model.Registration" />
+        <variable name="registration" type="eu.jonahbauer.qed.model.Registration" />
     </data>
 
     <!--suppress AndroidDomInspection -->
@@ -29,7 +29,7 @@
                 android:text="@string/registration_section_information"
                 style="@style/Widget.App.TextView.SectionHeading"/>
 
-            <com.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
                 android:id="@+id/list_item_event"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -38,7 +38,7 @@
                 app:subtitle="@string/registration_subtitle_event"
                 tools:title="@tools:sample/cities"/>
 
-            <com.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{registration.organizer == Boolean.TRUE, default = gone}"
@@ -46,7 +46,7 @@
                 app:title="@string/registration_subtitle_organizer"
                 tools:visibility="visible"/>
 
-            <com.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{registration.status != null}"
@@ -71,7 +71,7 @@
                 android:text="@string/registration_section_personal"
                 style="@style/Widget.App.TextView.SectionHeading"/>
 
-            <com.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
                 android:id="@+id/list_item_person"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -80,7 +80,7 @@
                 app:subtitle="@string/registration_subtitle_person"
                 tools:title="@tools:sample/full_names"/>
 
-            <com.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{registration.personBirthday != null}"
@@ -89,7 +89,7 @@
                 app:subtitle="@string/registration_subtitle_birthday"
                 tools:title="01.01.2000"/>
 
-            <com.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{registration.personGender != null}"
@@ -98,7 +98,7 @@
                 app:subtitle="@string/registration_subtitle_gender"
                 tools:icon="@drawable/ic_person_gender_male"/>
 
-            <com.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{!TextUtils.isNullOrBlank(registration.personMail)}"
@@ -109,7 +109,7 @@
                 app:subtitle="@string/registration_subtitle_mail"
                 tools:title="max.mustermann@mail.com"/>
 
-            <com.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{!TextUtils.isNullOrBlank(registration.personPhone)}"
@@ -120,7 +120,7 @@
                 app:subtitle="@string/registration_subtitle_phone"
                 tools:title="@tools:sample/us_phones"/>
 
-            <com.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{!TextUtils.isNullOrBlank(registration.personAddress)}"
@@ -147,7 +147,7 @@
                 android:text="@string/registration_section_transport"
                 style="@style/Widget.App.TextView.SectionHeading"/>
 
-            <com.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{registration.timeOfArrival != null}"
@@ -156,7 +156,7 @@
                 app:subtitle="@string/registration_subtitle_time_of_arrival"
                 tools:title="01.04.2022 00:00"/>
 
-            <com.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{registration.timeOfDeparture != null}"
@@ -165,7 +165,7 @@
                 app:subtitle="@string/registration_subtitle_time_of_departure"
                 tools:title="04.04.2022 00:00"/>
 
-            <com.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{registration.overnightStays != null}"
@@ -174,7 +174,7 @@
                 app:subtitle="@string/registration_subtitle_overnight_stays"
                 tools:title="5"/>
 
-            <com.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{!TextUtils.isNullOrBlank(registration.sourceStation)}"
@@ -183,7 +183,7 @@
                 app:subtitle="@string/registration_subtitle_source_station"
                 tools:title="München Hbf"/>
 
-            <com.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{!TextUtils.isNullOrBlank(registration.targetStation)}"
@@ -192,7 +192,7 @@
                 app:subtitle="@string/registration_subtitle_target_station"
                 tools:title="München Hbf"/>
 
-            <com.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{!TextUtils.isNullOrBlank(registration.railcard)}"
@@ -217,7 +217,7 @@
                 android:text="@string/registration_section_payment"
                 style="@style/Widget.App.TextView.SectionHeading"/>
 
-            <com.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{registration.paymentAmount != null}"
@@ -226,7 +226,7 @@
                 app:subtitle="@string/registration_subtitle_payment"
                 tools:title="100.00 €"/>
 
-            <com.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{registration.paymentDone != null}"
@@ -236,7 +236,7 @@
                 tools:icon="@drawable/ic_registration_payment_done"
                 tools:title="@string/registration_title_payment_done_true"/>
 
-            <com.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{registration.paymentTime != null}"
@@ -245,7 +245,7 @@
                 app:subtitle="@string/registration_subtitle_payment_time"
                 tools:title="01.01.2000"/>
 
-            <com.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{registration.memberAbatement != null}"
@@ -254,7 +254,7 @@
                 app:subtitle="@string/registration_subtitle_payment_membership_abatement"
                 tools:title="@string/yes"/>
 
-            <com.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{!TextUtils.isNullOrBlank(registration.otherAbatement)}"
@@ -278,7 +278,7 @@
                 android:text="@string/registration_section_additional"
                 style="@style/Widget.App.TextView.SectionHeading"/>
 
-            <com.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{!TextUtils.isNullOrBlank(registration.food)}"
@@ -287,7 +287,7 @@
                 app:subtitle="@string/registration_subtitle_food"
                 tools:title="vegetarisch"/>
 
-            <com.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{!TextUtils.isNullOrBlank(registration.talks)}"
@@ -295,7 +295,7 @@
                 app:title="@{registration.talks}"
                 app:subtitle="@string/registration_subtitle_talks" />
 
-            <com.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{!TextUtils.isNullOrBlank(registration.notes)}"

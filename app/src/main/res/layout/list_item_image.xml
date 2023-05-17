@@ -5,7 +5,7 @@
     <data>
         <import type="android.view.View"/>
 
-        <variable name="image" type="com.jonahbauer.qed.model.Image" />
+        <variable name="image" type="eu.jonahbauer.qed.model.Image" />
         <variable name="thumbnail" type="android.graphics.drawable.Drawable" />
         <variable name="disposable" type="io.reactivex.rxjava3.disposables.CompositeDisposable"/>
     </data>

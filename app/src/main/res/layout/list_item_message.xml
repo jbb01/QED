@@ -24,7 +24,7 @@
             tools:visibility="visible"
             tools:text="16.01.2020"/>
 
-        <com.jonahbauer.qed.layoutStuff.views.SimpleMessageView
+        <eu.jonahbauer.qed.layoutStuff.views.SimpleMessageView
             android:id="@+id/message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

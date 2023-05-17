@@ -7,19 +7,19 @@
 
     <fragment
         android:id="@+id/nav_login"
-        android:name="com.jonahbauer.qed.activities.mainFragments.LoginFragment"
+        android:name="eu.jonahbauer.qed.activities.mainFragments.LoginFragment"
         android:label="@string/title_fragment_login"
         tools:layout="@layout/fragment_login">
         <argument
             android:name="feature"
             android:defaultValue="CHAT"
-            app:argType="com.jonahbauer.qed.networking.Feature"
+            app:argType="eu.jonahbauer.qed.networking.Feature"
             app:nullable="false"/>
     </fragment>
 
     <fragment
         android:id="@+id/nav_chat"
-        android:name="com.jonahbauer.qed.activities.mainFragments.ChatFragment"
+        android:name="eu.jonahbauer.qed.activities.mainFragments.ChatFragment"
         android:label="@string/title_fragment_chat"
         tools:layout="@layout/fragment_chat">
         <deepLink
@@ -32,7 +32,7 @@
 
     <fragment
         android:id="@+id/nav_chat_db"
-        android:name="com.jonahbauer.qed.activities.mainFragments.ChatDatabaseFragment"
+        android:name="eu.jonahbauer.qed.activities.mainFragments.ChatDatabaseFragment"
         android:label="@string/title_fragment_chat_database"
         tools:layout="@layout/fragment_chat_database">
         <action
@@ -42,13 +42,13 @@
 
     <fragment
         android:id="@+id/nav_chat_log"
-        android:name="com.jonahbauer.qed.activities.mainFragments.LogFragment"
+        android:name="eu.jonahbauer.qed.activities.mainFragments.LogFragment"
         android:label="@string/title_fragment_log"
         tools:layout="@layout/fragment_log">
         <argument
             android:name="logRequest"
             android:defaultValue="@null"
-            app:argType="com.jonahbauer.qed.model.LogRequest"
+            app:argType="eu.jonahbauer.qed.model.LogRequest"
             app:nullable="true" />
         <action
             android:id="@+id/show_message"
@@ -60,7 +60,7 @@
 
     <fragment
         android:id="@+id/nav_database_persons"
-        android:name="com.jonahbauer.qed.activities.mainFragments.PersonDatabaseFragment"
+        android:name="eu.jonahbauer.qed.activities.mainFragments.PersonDatabaseFragment"
         android:label="@string/title_fragment_persons_database"
         tools:layout="@layout/fragment_persons_database">
         <deepLink
@@ -76,7 +76,7 @@
 
     <fragment
         android:id="@+id/nav_database_events"
-        android:name="com.jonahbauer.qed.activities.mainFragments.EventDatabaseFragment"
+        android:name="eu.jonahbauer.qed.activities.mainFragments.EventDatabaseFragment"
         android:label="@string/title_fragment_events_database"
         tools:layout="@layout/fragment_events_database">
         <deepLink
@@ -92,7 +92,7 @@
 
     <fragment
         android:id="@+id/nav_gallery"
-        android:name="com.jonahbauer.qed.activities.mainFragments.GalleryFragment"
+        android:name="eu.jonahbauer.qed.activities.mainFragments.GalleryFragment"
         android:label="@string/title_fragment_gallery"
         tools:layout="@layout/fragment_gallery">
         <deepLink
@@ -108,12 +108,12 @@
 
     <fragment
         android:id="@+id/nav_album"
-        android:name="com.jonahbauer.qed.activities.mainFragments.AlbumFragment"
+        android:name="eu.jonahbauer.qed.activities.mainFragments.AlbumFragment"
         tools:layout="@layout/fragment_album">
         <argument
             android:name="album"
             android:defaultValue="@null"
-            app:argType="com.jonahbauer.qed.model.Album"
+            app:argType="eu.jonahbauer.qed.model.Album"
             app:nullable="true"/>
         <argument
             android:name="id"
@@ -131,12 +131,12 @@
 
     <fragment
         android:id="@+id/nav_person"
-        android:name="com.jonahbauer.qed.activities.mainFragments.PersonFragment"
+        android:name="eu.jonahbauer.qed.activities.mainFragments.PersonFragment"
         tools:layout="@layout/fragment_info_person">
         <argument
             android:name="person"
             android:defaultValue="@null"
-            app:argType="com.jonahbauer.qed.model.Person"
+            app:argType="eu.jonahbauer.qed.model.Person"
             app:nullable="true" />
         <argument
             android:name="id"
@@ -148,12 +148,12 @@
 
     <fragment
         android:id="@+id/nav_event"
-        android:name="com.jonahbauer.qed.activities.mainFragments.EventFragment"
+        android:name="eu.jonahbauer.qed.activities.mainFragments.EventFragment"
         tools:layout="@layout/fragment_info_event">
         <argument
             android:name="event"
             android:defaultValue="@null"
-            app:argType="com.jonahbauer.qed.model.Event"
+            app:argType="eu.jonahbauer.qed.model.Event"
             app:nullable="true" />
         <argument
             android:name="id"
@@ -165,12 +165,12 @@
 
     <fragment
         android:id="@+id/nav_registration"
-        android:name="com.jonahbauer.qed.activities.mainFragments.RegistrationFragment"
+        android:name="eu.jonahbauer.qed.activities.mainFragments.RegistrationFragment"
         tools:layout="@layout/fragment_info_registration">
         <argument
             android:name="registration"
             android:defaultValue="@null"
-            app:argType="com.jonahbauer.qed.model.Registration"
+            app:argType="eu.jonahbauer.qed.model.Registration"
             app:nullable="true" />
         <argument
             android:name="id"
@@ -185,21 +185,21 @@
 
     <dialog
         android:id="@+id/nav_bottom_sheet_message"
-        android:name="com.jonahbauer.qed.activities.sheets.message.MessageInfoBottomSheet"
+        android:name="eu.jonahbauer.qed.activities.sheets.message.MessageInfoBottomSheet"
         tools:layout="@layout/fragment_info_message">
         <argument
             android:name="message"
-            app:argType="com.jonahbauer.qed.model.Message"
+            app:argType="eu.jonahbauer.qed.model.Message"
             app:nullable="false"/>
     </dialog>
 
     <dialog
         android:id="@+id/nav_bottom_sheet_album"
-        android:name="com.jonahbauer.qed.activities.sheets.album.AlbumInfoBottomSheet"
+        android:name="eu.jonahbauer.qed.activities.sheets.album.AlbumInfoBottomSheet"
         tools:layout="@layout/fragment_info_album">
         <argument
             android:name="album"
-            app:argType="com.jonahbauer.qed.model.Album"
+            app:argType="eu.jonahbauer.qed.model.Album"
             app:nullable="false"/>
     </dialog>
 

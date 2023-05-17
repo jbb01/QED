@@ -4,9 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <import type="com.jonahbauer.qed.util.Colors" />
+        <import type="eu.jonahbauer.qed.util.Colors" />
         <import type="android.view.View" />
-        <import type="com.jonahbauer.qed.activities.ColorPickerDialogFragment" />
+        <import type="eu.jonahbauer.qed.activities.ColorPickerDialogFragment" />
 
         <variable name="color" type="int" />
         <variable name="calculatedColor" type="int" />
@@ -30,7 +30,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintDimensionRatio="h,1:1">
 
-            <com.jonahbauer.qed.layoutStuff.views.ChatColorPicker
+            <eu.jonahbauer.qed.layoutStuff.views.ChatColorPicker
                 android:id="@+id/color_picker"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

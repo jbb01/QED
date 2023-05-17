@@ -16,7 +16,7 @@
             <flag name="luminosity" value="8"/>
         </attr>
     </declare-styleable>
-    <declare-styleable name="com.jonahbauer.qed.layoutStuff.SeekBarPreference">
+    <declare-styleable name="eu.jonahbauer.qed.layoutStuff.SeekBarPreference">
         <attr name="min" format="integer"/>
         <attr name="android:max" format="integer"/>
         <attr name="seekBarIncrement" format="integer"/>

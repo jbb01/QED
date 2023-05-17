@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <import type="com.jonahbauer.qed.util.StatusWrapper" />
+        <import type="eu.jonahbauer.qed.util.StatusWrapper" />
 
         <variable name="status" type="int" />
         <variable name="error" type="String" />
@@ -40,7 +40,7 @@
                 android:visibility="gone"
                 tools:visibility="visible">
 
-                <com.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
+                <eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
                     android:id="@+id/database_firstName_row"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
@@ -62,9 +62,9 @@
                         android:importantForAutofill="no"
                         android:inputType="text"
                         android:textSize="16sp" />
-                </com.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
+                </eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
 
-                <com.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
+                <eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
                     android:id="@+id/database_lastName_row"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
@@ -86,13 +86,13 @@
                         android:importantForAutofill="no"
                         android:inputType="text"
                         android:textSize="16sp" />
-                </com.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
+                </eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
 
                 <TableRow
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <com.jonahbauer.qed.layoutStuff.views.CheckBoxTriStates
+                    <eu.jonahbauer.qed.layoutStuff.views.CheckBoxTriStates
                         android:id="@+id/database_active_checkbox"
                         style="?triCheckboxStyle"
                         android:layout_width="wrap_content"
@@ -101,7 +101,7 @@
                         android:text="@string/persons_database_active_checkbox"
                         tools:ignore="RtlSymmetry" />
 
-                    <com.jonahbauer.qed.layoutStuff.views.CheckBoxTriStates
+                    <eu.jonahbauer.qed.layoutStuff.views.CheckBoxTriStates
                         android:id="@+id/database_member_checkbox"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"

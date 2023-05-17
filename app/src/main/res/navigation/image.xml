@@ -7,12 +7,12 @@
 
     <fragment
         android:id="@+id/nav_image"
-        android:name="com.jonahbauer.qed.activities.imageActivity.ImageFragment"
+        android:name="eu.jonahbauer.qed.activities.imageActivity.ImageFragment"
         tools:layout="@layout/fragment_image">
         <argument
             android:name="image"
             android:defaultValue="@null"
-            app:argType="com.jonahbauer.qed.model.Image"
+            app:argType="eu.jonahbauer.qed.model.Image"
             app:nullable="true"/>
         <argument
             android:name="id"
@@ -20,7 +20,7 @@
         <argument
             android:name="imageList"
             android:defaultValue="@null"
-            app:argType="com.jonahbauer.qed.model.Image[]"
+            app:argType="eu.jonahbauer.qed.model.Image[]"
             app:nullable="true"/>
         <action
             android:id="@+id/show_image_info"
@@ -35,11 +35,11 @@
 
     <fragment
         android:id="@+id/nav_image_info"
-        android:name="com.jonahbauer.qed.activities.imageActivity.ImageInfoFragment"
+        android:name="eu.jonahbauer.qed.activities.imageActivity.ImageInfoFragment"
         tools:layout="@layout/fragment_image_info">
         <argument
             android:name="image"
-            app:argType="com.jonahbauer.qed.model.Image"
+            app:argType="eu.jonahbauer.qed.model.Image"
             app:nullable="false"/>
     </fragment>
 </navigation>

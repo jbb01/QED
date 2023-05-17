@@ -89,7 +89,7 @@
                         android:textAppearance="@style/TextAppearance.AppCompat.Caption"
                         android:textColor="?colorAccent" />
 
-                    <com.jonahbauer.qed.layoutStuff.views.Histogram
+                    <eu.jonahbauer.qed.layoutStuff.views.Histogram
                         android:id="@+id/histogram"
                         android:layout_width="match_parent"
                         android:layout_height="150dp"

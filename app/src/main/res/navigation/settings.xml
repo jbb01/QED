@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/nav_preference_root"
-        android:name="com.jonahbauer.qed.activities.settings.RootPreferenceFragment"
+        android:name="eu.jonahbauer.qed.activities.settings.RootPreferenceFragment"
         android:label="@string/title_fragment_settings">
         <action
             android:id="@+id/general"
@@ -25,12 +25,12 @@
 
     <fragment
         android:id="@+id/nav_preference_general"
-        android:name="com.jonahbauer.qed.activities.settings.GeneralPreferenceFragment"
+        android:name="eu.jonahbauer.qed.activities.settings.GeneralPreferenceFragment"
         android:label="@string/preferences_header_general" />
 
     <fragment
         android:id="@+id/nav_preference_chat"
-        android:name="com.jonahbauer.qed.activities.settings.ChatPreferenceFragment"
+        android:name="eu.jonahbauer.qed.activities.settings.ChatPreferenceFragment"
         android:label="@string/preferences_header_chat" >
         <action
             android:id="@+id/name_suggestions"
@@ -42,23 +42,23 @@
 
     <fragment
         android:id="@+id/nav_preference_chat_name_suggestions"
-        android:name="com.jonahbauer.qed.activities.settings.suggestions.NameSuggestionsFragment"
+        android:name="eu.jonahbauer.qed.activities.settings.suggestions.NameSuggestionsFragment"
         android:label="@string/title_fragment_name_suggestions"
         tools:layout="@layout/fragment_preference_suggestions"/>
 
     <fragment
         android:id="@+id/nav_preference_chat_channel_suggestions"
-        android:name="com.jonahbauer.qed.activities.settings.suggestions.ChannelSuggestionsFragment"
+        android:name="eu.jonahbauer.qed.activities.settings.suggestions.ChannelSuggestionsFragment"
         android:label="@string/title_fragment_channel_suggestions"
         tools:layout="@layout/fragment_preference_suggestions"/>
 
     <fragment
         android:id="@+id/nav_preference_gallery"
-        android:name="com.jonahbauer.qed.activities.settings.GalleryPreferenceFragment"
+        android:name="eu.jonahbauer.qed.activities.settings.GalleryPreferenceFragment"
         android:label="@string/preferences_header_gallery" />
 
     <fragment
         android:id="@+id/nav_preference_debug"
-        android:name="com.jonahbauer.qed.activities.settings.DebugPreferenceFragment"
+        android:name="eu.jonahbauer.qed.activities.settings.DebugPreferenceFragment"
         android:label="@string/preferences_header_debug" />
 </navigation>

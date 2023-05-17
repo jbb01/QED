@@ -21,10 +21,10 @@ android {
     }
 
     compileSdk = 33
-    namespace = "com.jonahbauer.qed"
+    namespace = "eu.jonahbauer.qed"
 
     defaultConfig {
-        applicationId = "com.jonahbauer.qed"
+        applicationId = "eu.jonahbauer.qed"
         versionCode = 2
         versionName = "2.5.0-beta6"
 
@@ -41,8 +41,8 @@ android {
                     "java.time.Instant.ofEpochMilli(${System.currentTimeMillis()}L)"
             )
             buildConfigField(
-                    "com.jonahbauer.qed.model.Release", "RELEASE",
-                    "new com.jonahbauer.qed.model.Release(\"v" + defaultConfig.versionName + "\", BUILD_TIMESTAMP)"
+                    "eu.jonahbauer.qed.model.Release", "RELEASE",
+                    "new eu.jonahbauer.qed.model.Release(\"v" + defaultConfig.versionName + "\", BUILD_TIMESTAMP)"
             )
 
             val isPrerelease = defaultConfig.versionName!!.contains(Regex("^\\d+\\.\\d+\\.\\d+-"))

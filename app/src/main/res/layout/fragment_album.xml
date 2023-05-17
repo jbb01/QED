@@ -3,11 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
-        <import type="com.jonahbauer.qed.util.Actions"/>
+        <import type="eu.jonahbauer.qed.util.Actions"/>
         <import type="java.text.MessageFormat"/>
-        <import type="com.jonahbauer.qed.util.StatusWrapper"/>
+        <import type="eu.jonahbauer.qed.util.StatusWrapper"/>
 
-        <variable name="album" type="com.jonahbauer.qed.model.Album" />
+        <variable name="album" type="eu.jonahbauer.qed.model.Album" />
         <variable name="hits" type="String"/>
         <variable name="status" type="int" />
         <variable name="error" type="String" />
@@ -23,7 +23,7 @@
         android:background="?android:colorBackground"
         android:transitionGroup="true"
         android:transitionName="@string/transition_name_album_fragment"
-        tools:context="com.jonahbauer.qed.activities.mainFragments.AlbumFragment">
+        tools:context="eu.jonahbauer.qed.activities.mainFragments.AlbumFragment">
 
         <include
             layout="@layout/gallery_offline_label"
@@ -58,7 +58,7 @@
                 android:visibility="gone"
                 tools:visibility="visible">
 
-                <com.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
+                <eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
                     android:id="@+id/album_photographer_row"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
@@ -75,9 +75,9 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:spinnerMode="dialog"/>
-                </com.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
+                </eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
 
-                <com.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
+                <eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
                     android:id="@+id/album_date_row"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
@@ -94,9 +94,9 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:spinnerMode="dialog" />
-                </com.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
+                </eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
 
-                <com.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
+                <eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
                     android:id="@+id/album_upload_row"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
@@ -113,9 +113,9 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:spinnerMode="dialog" />
-                </com.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
+                </eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
 
-                <com.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
+                <eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
                     android:id="@+id/album_category_row"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
@@ -132,7 +132,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:spinnerMode="dialog"/>
-                </com.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
+                </eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
             </TableLayout>
 
             <View style="?dividerStyle"/>

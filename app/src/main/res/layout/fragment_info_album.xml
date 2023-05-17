@@ -3,12 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <import type="android.view.View"/>
-        <import type="com.jonahbauer.qed.util.Actions"/>
-        <import type="com.jonahbauer.qed.util.TimeUtils"/>
-        <import type="com.jonahbauer.qed.util.TextUtils"/>
+        <import type="eu.jonahbauer.qed.util.Actions"/>
+        <import type="eu.jonahbauer.qed.util.TimeUtils"/>
+        <import type="eu.jonahbauer.qed.util.TextUtils"/>
 
         <variable name="color" type="int" />
-        <variable name="album" type="com.jonahbauer.qed.model.Album" />
+        <variable name="album" type="eu.jonahbauer.qed.model.Album" />
     </data>
 
     <!--suppress AndroidDomInspection -->
@@ -28,7 +28,7 @@
                 android:text="@string/album_section_general"
                 style="@style/Widget.App.TextView.SectionHeading"/>
 
-            <com.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{!TextUtils.isNullOrBlank(album.owner)}"
@@ -36,7 +36,7 @@
                 app:title="@{album.owner}"
                 app:subtitle="@string/album_subtitle_owner"/>
 
-            <com.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{!TextUtils.isNullOrBlank(album.creationDate)}"
@@ -44,7 +44,7 @@
                 app:title="@{album.creationDate}"
                 app:subtitle="@string/album_subtitle_creation_date"/>
 
-            <com.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{album.dates.size() > 0}"
@@ -52,7 +52,7 @@
                 app:title="@{TextUtils.formatRange(context, TimeUtils.LOCAL_DATE_FORMATTER, album.dates)}"
                 app:subtitle="@string/album_subtitle_dates"/>
 
-            <com.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{album.uploadDates.size() > 0}"
@@ -60,14 +60,14 @@
                 app:title="@{TextUtils.formatRange(context, TimeUtils.LOCAL_DATE_FORMATTER, album.uploadDates)}"
                 app:subtitle="@string/album_subtitle_upload_dates"/>
 
-            <com.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:icon="@drawable/ic_album_image_count"
                 app:title="@{String.valueOf(album.images.size())}"
                 app:subtitle="@string/album_subtitle_image_count"/>
 
-            <com.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{album.private}"

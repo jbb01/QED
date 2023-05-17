@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <import type="com.jonahbauer.qed.model.LogRequest.Mode" />
+        <import type="eu.jonahbauer.qed.model.LogRequest.Mode" />
 
         <variable name="mode" type="Mode" />
         <variable name="error" type="java.lang.String"/>
