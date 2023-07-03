@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <declare-styleable name="MathView">
         <attr name="android:text" format="string"/>
         <attr name="android:textSize" format="dimension"/>
@@ -8,7 +8,7 @@
         <attr name="android:textColor" format="color"/>
     </declare-styleable>
     <declare-styleable name="Histogram">
-        <attr name="android:src"/>
+        <attr name="android:bitmap"/>
         <attr name="mode" format="flags">
             <flag name="red" value="1"/>
             <flag name="green" value="2"/>
@@ -16,7 +16,7 @@
             <flag name="luminosity" value="8"/>
         </attr>
     </declare-styleable>
-    <declare-styleable name="com.jonahbauer.qed.layoutStuff.SeekBarPreference">
+    <declare-styleable name="eu.jonahbauer.qed.layoutStuff.SeekBarPreference">
         <attr name="min" format="integer"/>
         <attr name="android:max" format="integer"/>
         <attr name="seekBarIncrement" format="integer"/>
@@ -27,53 +27,128 @@
         <attr name="externalValueStrings" format="reference"/>
     </declare-styleable>
 
-    <declare-styleable name="MessageView">
-        <attr name="name" format="string"/>
-        <attr name="message" format="string"/>
-        <attr name="date" format="string"/>
-        <attr name="dateBanner" format="string"/>
-        <attr name="channel" format="string"/>
-        <attr name="id" format="string"/>
 
-        <attr name="extended" format="boolean"/>
-        <attr name="linkify" format="boolean"/>
-        <attr name="katex" format="boolean"/>
-        <attr name="colorful" format="boolean"/>
+    <attr name="messageId" format="string"/>
+    <attr name="name" format="string"/>
+    <attr name="message" format="string"/>
+    <attr name="channel" format="string"/>
+    <attr name="timestamp" format="string"/>
 
-        <!-- Name Attributes -->
-        <attr name="nameTextColor" format="color"/>
-        <attr name="nameTextSize" format="dimension"/>
-        <attr name="nameTextAppearance" format="reference"/>
+    <attr name="extended" format="boolean"/>
+    <attr name="linkify" format="boolean"/>
+    <attr name="katex" format="boolean"/>
+    <attr name="colorful" format="boolean"/>
 
-        <!-- Message Attributes -->
-        <attr name="messageTextColor" format="color"/>
-        <attr name="messageTextSize" format="dimension"/>
-        <attr name="messageTextAppearance" format="reference"/>
+    <attr name="nameTextAppearance" format="reference"/>
+    <attr name="messageTextAppearance" format="reference"/>
+    <attr name="dataTextAppearance" format="reference"/>
 
-        <!-- Date Attributes -->
-        <attr name="dateTextColor" format="color"/>
-        <attr name="dateTextSize" format="dimension"/>
-        <attr name="dateTextAppearance" format="reference"/>
+    <attr name="dateBannerTextAppearance" format="reference"/>
+    <attr name="dateBannerBackgroundTint" format="color"/>
 
-        <!-- Date Banner Attributes -->
-        <attr name="dateBannerTextColor" format="color"/>
-        <attr name="dateBannerTextSize" format="dimension"/>
-        <attr name="dateBannerTextAppearance" format="reference"/>
-        <attr name="dateBannerBackgroundTint" format="color"/>
+    <declare-styleable name="SimpleMessageView">
+        <attr name="name" />
+        <attr name="message" />
+        <attr name="timestamp" />
 
-        <!-- Data Attributes (message id, channel, date; only when expanded) -->
-        <attr name="dataTextColor" format="color"/>
-        <attr name="dataTextSize" format="dimension"/>
-        <attr name="dataTextAppearance" format="reference"/>
+        <attr name="extended" />
+        <attr name="linkify" />
+        <attr name="katex" />
+        <attr name="colorful" />
 
-        <attr name="android:colorBackground" format="color"/>
-        <attr name="android:colorPressedHighlight" format="color"/>
+        <attr name="nameTextAppearance" />
+        <attr name="messageTextAppearance" />
+        <attr name="dataTextAppearance" />
     </declare-styleable>
 
-    <attr name="sideSheetDialogTheme" format="reference"/>
+    <declare-styleable name="ExtendedMessageView">
+        <attr name="messageId" />
+        <attr name="name" />
+        <attr name="message" />
+        <attr name="channel" />
+        <attr name="timestamp" />
+
+        <attr name="linkify" />
+        <attr name="colorful" />
+
+        <attr name="nameTextAppearance" />
+        <attr name="messageTextAppearance" />
+        <attr name="dataTextAppearance" />
+    </declare-styleable>
+
     <attr name="messageStyle" format="reference"/>
+    <attr name="extendedMessageStyle" format="reference"/>
+
+    <attr name="title" format="string"/>
+    <attr name="subtitle" format="string" />
+    <attr name="icon" format="reference"/>
+    <attr name="iconTint" format="color"/>
+
+    <declare-styleable name="MaterialListItem">
+        <attr name="title" />
+        <attr name="subtitle" />
+        <attr name="icon" />
+        <attr name="iconText" format="string" />
+
+        <attr name="titleTextAppearance" format="reference" />
+        <attr name="subtitleTextAppearance" format="reference" />
+        <attr name="iconTextAppearance" format="reference" />
+        <attr name="iconTint" />
+        <attr name="iconMode" format="enum">
+            <enum value="0" name="round"/>
+            <enum value="1" name="square"/>
+            <enum value="2" name="wide"/>
+        </attr>
+
+        <attr name="android:padding" />
+        <attr name="android:paddingTop" />
+        <attr name="android:paddingLeft" />
+        <attr name="android:paddingRight" />
+        <attr name="android:paddingBottom" />
+        <attr name="android:paddingStart" />
+        <attr name="android:paddingEnd" />
+        <attr name="android:paddingHorizontal" />
+        <attr name="android:paddingVertical" />
+    </declare-styleable>
+
+    <declare-styleable name="ListItem">
+        <attr name="title" />
+        <attr name="subtitle" />
+        <attr name="icon" />
+        <attr name="iconTint" />
+    </declare-styleable>
+
+    <attr name="chatColorPickerStyle" format="reference"/>
+    <declare-styleable name="ChatColorPicker">
+        <attr name="hue" format="float"/>
+        <attr name="saturation" format="float"/>
+        <attr name="value" format="float"/>
+
+        <attr name="hueCursor" format="reference"/>
+        <attr name="hueCursorTint" format="reference|color"/>
+
+        <attr name="satValCursor" format="reference"/>
+        <attr name="satValCursorTint" format="reference|color"/>
+
+        <attr name="ringWidth" format="dimension"/>
+    </declare-styleable>
+
+    <attr name="dividerStyle" format="reference"/>
+    <attr name="triCheckboxStyle" format="reference"/>
+
     <attr name="colorPrimaryLight" format="color"/>
-    <attr name="dividerColor" format="color"/>
-    <attr name="preferenceIconColor" format="color"/>
-    <attr name="listIconColor" format="color"/>
+    <attr name="colorOnSurfaceVariant" format="color" tools:override="true"/>
+    <attr name="colorOnBackgroundVariant" format="color"/>
+
+    <attr name="accentColor0" format="color"/>
+    <attr name="accentColor1" format="color"/>
+    <attr name="accentColor2" format="color"/>
+    <attr name="accentColor3" format="color"/>
+    <attr name="accentColor4" format="color"/>
+    <attr name="accentColor5" format="color"/>
+    <attr name="accentColor6" format="color"/>
+    <attr name="accentColor7" format="color"/>
+    <attr name="accentColor8" format="color"/>
+    <attr name="accentColor9" format="color"/>
+    <attr name="colorOnAccentColor" format="color"/>
 </resources>

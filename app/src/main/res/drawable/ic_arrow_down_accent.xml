@@ -9,7 +9,7 @@
         android:pivotX="12"
         android:pivotY="12">
         <path
-            android:fillColor="@color/colorAccent"
+            android:fillColor="?colorSecondary"
             android:pathData="M7.41,7.84L12,12.42l4.59,-4.58L18,9.25l-6,6 -6,-6z"/>
     </group>
 </vector>

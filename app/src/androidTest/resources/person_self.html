@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+
+<body>
+		<header>
+	<nav id="mainnav" class="horizontal">
+		<a href="/people/349">Eigene Daten</a>
+		<a href="/people">Personen</a>
+		<a href="/events">Veranstaltungen</a>
+		<a href="/hostels">Herbergen</a>
+		
+		
+		
+		
+		
+	</nav>
+
+	<div class="breadcrumb">
+		<a href="/">QED-Datenbank</a> » <a href="/people">Personen</a> » <a href="/people/349">Test User</a> » <a href="/people/349">Allgemeines</a>
+	</div>
+</header>
+
+
+<div class="mobilemenu">
+	<a class="button" href="javascript:toggleHeader()"><i class="material-icons md-24">menu</i></a>
+</div>
+
+<script>
+function toggleHeader() {
+	var menu = document.getElementsByTagName("header")[0];
+	if(menu.style.visibility === "visible")
+	{
+		menu.style.visibility = "hidden";
+		menu.style.opacity = "0%";
+	}
+	else
+	{
+		menu.style.visibility = "visible";
+		menu.style.opacity = "95%";
+	}
+}
+</script>
+
+
+	<div id="messages">
+	</div>
+
+	<div class="flexlayout">
+<article class="panel">
+<h2>Test User</h2>
+<div class="flexlayout">
+<section id="person_general_information">
+	<h3>Personendaten</h3>
+	<dl class="aligned">
+		<dt>Benutzername:</dt>
+		<dd>TestUser</dd>
+
+		<dt>Vorname:</dt>
+		<dd>Test</dd>
+
+		<dt>Nachname:</dt>
+		<dd>User</dd>
+
+		<dt>Emailadresse:</dt>
+		<dd><a href="mailto:test.user@example.org">test.user@example.org</a></dd>
+
+		<dt>Geburtstag:</dt>
+		<dd><time datetime="2001-02-03">03.02.2001</time></dd>
+
+		<dt>Geschlecht:</dt>
+		<dd>männlich</dd>
+
+		<dt>Eingetreten:</dt>
+		<dd><time datetime="2020-04-05">05.04.2020</time></dd>
+
+		<dt>Ausgetreten:</dt>
+		<dd><i>unb.</i></dd>
+
+		<dt>Mitglied bis:</dt>
+		<dd><time datetime="2024-12-31">31.12.2024</time></dd>
+
+		<dt>Bezahlt bis:</dt>
+		<dd><time datetime="2022-12-31">31.12.2022</time></dd>
+
+		<dt>Aktuell Mitglied:</dt>
+		<dd>Ja</dd>
+
+		<dt>Aktiviertes Profil:</dt>
+		<dd>Ja</dd>
+	</dl>
+</section>
+
+<section id="person_additional_information">
+	<h3>Weitere Informationen</h3>
+	<dl class="aligned">
+		<dt>Bahnhof:</dt>
+		<dd>Musterstadt</dd>
+
+		<dt>Bahnermäßigung:</dt>
+		<dd>Bahncard 100</dd>
+
+		<dt>Essenswünsche:</dt>
+		<dd><i>k.A.</i></dd>
+
+		<dt>Anmerkungen:</dt>
+		<dd><i>k.A.</i></dd>
+	</dl>
+</section>
+</div>
+
+<div class="actions">
+	<a class="button" href="/people/349/edit"><i class="material-icons md-24">edit</i>Mitgliedsdaten bearbeiten</a>
+</div>
+
+<hr>
+
+<div class="flexlayout">
+<section id="person_addresses">
+	<h3>Adressen</h3>
+		<dl class="aligned">
+				<dt>Hauptadresse:</dt>
+				<dd><span class="address">
+	Musterstraße 12<br>
+	98765 Musterstadt<br>
+</span>
+</dd>
+				<dt>Weitere Adresse:</dt>
+				<dd><span class="address">
+	Mustergasse 42<br>
+	12345 Musterdorf<br>
+</span>
+</dd>
+		</dl>
+</section>
+
+<section id="person_contacts">
+	<h3>Kontakte</h3>
+		<dl class="aligned">
+				<dt>daheim:</dt>
+				<dd>09876 54321</dd>
+				<dt>mobil:</dt>
+				<dd><a href="tel:0123456789">0123/456789</a></dd>
+		</dl>
+</section>
+</div>
+<div class="actions">
+	<a class="button" href="/people/349/edit_addresses"><i class="material-icons md-24">mail</i>Adressen &amp; Kontakte bearbeiten</a>
+</div>
+<hr>
+
+<div class="flexlayout">
+<section id="person_privacy">
+	<h3>Einstellungen</h3>
+	<p style="max-width: 30em">
+		Fotoeinwilligung vorhanden, Geburtstag einsehbar, Emailadresse einsehbar, Adressen und Kontakte einsehbar, Newsletter abonnieren, Profil veröffentlichen</span>
+	</p>
+</section>
+</div>
+<div class="actions">
+	<a class="button" href="/people/349/edit_privacy"><i class="material-icons md-24">security</i>Datenschutz einstellen</a>
+</div>
+<hr>
+
+<div class="flexlayout">
+<section id="person_payments">
+	<h3>Überweisungen</h3>
+		<dl class="aligned">
+					<dt style="font-weight: normal; width: 20em"><time datetime="2022-01-01">01.01.2022</time> - <time datetime="2022-12-31">31.12.2022</time></dt>
+				<dd><i>(Mitgliedsbeitrag)</i>
+</dd>
+					<dt style="font-weight: normal; width: 20em"><time datetime="2021-01-01">01.01.2021</time> - <time datetime="2021-12-31">31.12.2021</time></dt>
+				<dd><i>(Mitgliedsbeitrag)</i>
+</dd>
+					<dt style="font-weight: normal; width: 20em"><time datetime="2020-01-01">01.01.2020</time> - <time datetime="2020-12-31">31.12.2020</time></dt>
+				<dd><i>(Mitgliedsbeitrag)</i>
+</dd>
+		</dl>
+</section>
+</div>
+<div class="actions">
+	
+</div>
+<hr>
+
+<div class="flexlayout">
+<div>
+
+<!-- <section id="person_groups_explicit">
+	<h3>Zugehörigkeiten</h3>
+
+		<p><i>Diese Person wurde bislang in keine Gruppen eingetragen.</i></p>
+</section>-->
+
+<section id="person_groups_automatic">
+	<h3>Gruppen</h3>
+			<span style="margin: 0.5em">Mitglieder</span>
+			<span style="margin: 0.5em">Newsletter an</span>
+			<span style="margin: 0.5em">QED-Chat-Users</span>
+			<span style="margin: 0.5em">QED-Gallery-Editors</span>
+			<span style="margin: 0.5em">QED-Gallery-Viewers</span>
+			<span style="margin: 0.5em">QED-Kalender</span>
+</section>
+</div>
+</div>
+<hr>
+
+<div class="flexlayout">
+<section id="person_registrations">
+	<h3>Anmeldungen</h3>
+
+		Diese Person hat sich zu folgenden Veranstaltungen angemeldet:
+		<ul>
+				<li><a href="https://qeddb.qed-verein.de/registrations/117">Tastseminar</a> <i>(bestätigt)</i></li>
+		</ul>
+</section>
+</div>
+<hr>
+
+<div class="actions">
+	
+</div>
+</article>
+</div>
+
+
+	<footer>
+		<div style="float: right; text-align: right">
+			Du bist eingeloggt als: <b><a href="/people/349">Test User</a></b><br>
+			<em><a href="/logout">Ausloggen</a></em>
+		</div>
+
+		<div style="text-align: left">
+		<b>Bei Fragen und Problem bitte an die Administratoren unter <em><a href="mailto:webmaster@qed-verein.de">webmaster@qed-verein.de</a></em> wenden.</b>
+		</div>
+
+
+		<div style="text-align: left">
+		</div>
+	</footer>
+</body>
+</html>

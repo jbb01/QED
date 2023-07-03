@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".activities.sheets.InfoBottomSheet">
+
+    <data>
+        <import type="android.view.View"/>
+
+        <variable name="loading" type="boolean" />
+        <variable name="error" type="String" />
+        <variable name="color" type="int" />
+        <variable name="title" type="CharSequence" />
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipChildren="false">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?actionBarSize"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:clickable="false"
+            android:focusable="false"
+            style="@style/Widget.MaterialComponents.Toolbar.PrimarySurface"
+            app:titleTextColor="?colorOnAccentColor"
+            tools:background="@android:color/holo_green_light"/>
+
+        <RelativeLayout
+            android:id="@+id/background"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            tools:layout_height="115dp">
+            <View
+                android:id="@+id/background_solid"
+                android:layout_height="0dp"
+                android:layout_width="0dp"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentBottom="true" />
+
+            <ImageView
+                android:id="@+id/background_pattern"
+                android:layout_height="0dp"
+                android:layout_width="0dp"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentBottom="true"
+                android:scaleType="centerCrop"
+                android:tintMode="multiply"
+                android:importantForAccessibility="no"
+                tools:src="@drawable/background_4"
+                tools:tint="@android:color/holo_green_light"/>
+        </RelativeLayout>
+
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/common"
+            android:transitionName="common"
+            android:layout_below="@id/background"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?colorSurface"
+                android:orientation="vertical">
+
+                <ProgressBar
+                    android:id="@+id/progress_bar"
+                    android:layout_width="match_parent"
+                    android:layout_height="10dp"
+                    android:indeterminate="true"
+                    android:padding="0dp"
+                    android:minHeight="0dp"
+                    android:layout_marginTop="-4dp"
+                    android:layout_marginBottom="-4dp"
+                    android:visibility="@{loading ? View.VISIBLE : View.INVISIBLE}"
+                    app:indeterminateTint="@{color}"
+                    style="?android:progressBarStyleHorizontal"/>
+
+                <LinearLayout
+                    android:id="@+id/title_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="@dimen/activity_vertical_margin"
+                    android:paddingHorizontal="@dimen/activity_horizontal_margin"
+                    android:visibility="@{title != null ? View.VISIBLE : View.GONE}"
+                    android:orientation="horizontal"
+                    tools:visibility="visible">
+
+                    <TextView
+                        android:id="@+id/title"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@{title}"
+                        android:textColor="?colorOnSurface"
+                        android:textSize="30sp"/>
+
+                    <ImageButton
+                        android:id="@+id/open_in_browser"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:scaleType="centerInside"
+                        android:background="?attr/actionBarItemBackground"
+                        android:src="@drawable/ic_menu_launch"
+                        app:tint="?colorOnSurface" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/error"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="@dimen/activity_vertical_margin"
+                    android:paddingHorizontal="@dimen/activity_horizontal_margin"
+                    android:textColor="?colorError"
+                    android:text="@{error}"
+                    android:visibility="@{error != null, default = gone}"
+                    tools:text="@string/error_incomplete"
+                    tools:visibility="visible"/>
+
+                <androidx.fragment.app.FragmentContainerView
+                    android:id="@+id/fragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"/>
+            </LinearLayout>
+
+        </androidx.core.widget.NestedScrollView>
+    </RelativeLayout>
+</layout>

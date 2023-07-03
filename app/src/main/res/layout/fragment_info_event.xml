@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <import type="android.view.View"/>
+        <import type="eu.jonahbauer.qed.util.Actions"/>
+        <import type="eu.jonahbauer.qed.util.TimeUtils"/>
+        <import type="eu.jonahbauer.qed.util.TextUtils"/>
+
+        <variable name="color" type="int" />
+        <variable name="event" type="eu.jonahbauer.qed.model.Event" />
+    </data>
+
+    <!--suppress AndroidDomInspection -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?colorSurface"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/event_section_information"
+                style="@style/Widget.App.TextView.SectionHeading"/>
+
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="@{!TimeUtils.isNullOrBlank(event.start) &amp;&amp; !TimeUtils.isNullOrBlank(event.end)}"
+                android:onClick="@{(view) -> Actions.recordToCalendar(view.context, event)}"
+                app:icon="@drawable/ic_event_time"
+                app:title="@{TextUtils.formatRange(context, TimeUtils.PARSED_LOCAL_DATE_FORMATTER, event.start, event.end)}"
+                app:subtitle="@string/event_subtitle_time"/>
+
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="@{!TimeUtils.isNullOrBlank(event.deadline)}"
+                app:icon="@drawable/ic_event_deadline"
+                app:title="@{TimeUtils.format(event.deadline)}"
+                app:subtitle="@string/event_subtitle_deadline"/>
+
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="@{!TextUtils.isNullOrBlank(event.hotel)}"
+                app:icon="@drawable/ic_event_hotel"
+                app:title="@{event.hotel}"
+                app:subtitle="@string/event_subtitle_hotel"/>
+
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="@{!TextUtils.isNullOrBlank(event.hotelAddress)}"
+                android:onClick="@{v -> Actions.showOnMap(context, event.hotelAddress)}"
+                android:onLongClick="@{v -> Actions.copy(context, v, @string/event_clip_label_hotel_address(event.title), event.hotelAddress)}"
+                app:icon="@drawable/ic_event_hotel_address"
+                app:title="@{event.hotelAddress}"
+                app:subtitle="@string/event_subtitle_hotel_address" />
+
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="@{event.cost != null}"
+                app:icon="@drawable/ic_event_cost"
+                app:title="@{@string/event_title_cost(event.cost)}"
+                app:subtitle="@string/event_subtitle_cost"/>
+
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="@{!TextUtils.isNullOrBlank(event.paymentReference)}"
+                android:onLongClick="@{v -> Actions.copy(context, v, @string/event_clip_label_payment_reference(event.title), event.paymentReference)}"
+                app:icon="@drawable/ic_event_payment_reference"
+                app:title="@{event.paymentReference}"
+                app:subtitle="@string/event_subtitle_payment_reference"/>
+
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="@{event.maxParticipants != null}"
+                app:icon="@drawable/ic_event_max_member"
+                app:title="@{String.valueOf(event.maxParticipants)}"
+                app:subtitle="@string/event_subtitle_max_participants"/>
+
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="@{!TextUtils.isNullOrBlank(event.notes)}"
+                app:icon="@drawable/ic_event_notes"
+                app:title="@{event.notes}"
+                app:subtitle="@string/event_subtitle_notes"/>
+        </LinearLayout>
+
+        <View
+            android:visibility="@{event.hasOrganizerInformation()}"
+            style="?dividerStyle" />
+
+        <LinearLayout
+            android:id="@+id/orga_section"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="@{event.hasOrganizerInformation()}">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/event_section_organization"
+                style="@style/Widget.App.TextView.SectionHeading"/>
+
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="@{!TextUtils.isNullOrBlank(event.emailOrga)}"
+                android:onClick="@{v -> Actions.sendTo(context, event.emailOrga)}"
+                android:onLongClick="@{v -> Actions.copy(context, v, @string/event_clip_label_mail_organizers(event.title), event.emailOrga)}"
+                app:icon="@drawable/ic_event_mail"
+                app:title="@{event.emailOrga}"
+                app:subtitle="@string/event_subtitle_mail_organizers"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:event_organizers="@{event.organizers}"/>
+        </LinearLayout>
+
+        <View
+            android:visibility="@{event.hasParticipantInformation()}"
+            style="?dividerStyle"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="@{event.hasParticipantInformation()}">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/event_section_participants"
+                style="@style/Widget.App.TextView.SectionHeading"/>
+
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="@{!TextUtils.isNullOrBlank(event.emailAll)}"
+                android:onClick="@{v -> Actions.sendTo(context, event.emailAll)}"
+                android:onLongClick="@{v -> Actions.copy(context, v, @string/event_clip_label_mail_participants(event.title), event.emailAll)}"
+                app:icon="@drawable/ic_event_mail"
+                app:title="@{event.emailAll}"
+                app:subtitle="@string/event_subtitle_mail_participants"/>
+
+            <LinearLayout
+                android:visibility="gone"
+                android:id="@+id/participant_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:event_participants="@{event.participants}"/>
+        </LinearLayout>
+
+        <View
+            android:visibility="@{event.hasParticipants()}"
+            style="?dividerStyle"/>
+
+        <eu.jonahbauer.qed.layoutStuff.views.ListItem
+            android:id="@+id/toggle_participants_button"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="@{event.hasParticipants()}"
+            app:icon="@drawable/ic_arrow_down_accent"
+            app:title="@string/event_show_more" />
+
+        <View style="?dividerStyle"/>
+    </LinearLayout>
+</layout>

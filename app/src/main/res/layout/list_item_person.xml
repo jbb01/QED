@@ -1,93 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/person"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:paddingStart="@dimen/person_padding_horizontal"
-    android:paddingEnd="@dimen/person_padding_horizontal"
-    android:paddingTop="@dimen/person_padding_vertical"
-    android:paddingBottom="@dimen/person_padding_vertical"
-    android:clipToPadding="false"
-    android:layout_gravity="center"
-    android:descendantFocusability="blocksDescendants">
-    <RelativeLayout
-        android:id="@+id/person_layout"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <import type="eu.jonahbauer.qed.util.Themes" />
+
+        <variable name="person" type="eu.jonahbauer.qed.model.Person" />
+        <variable name="invertedInitials" type="boolean" />
+    </data>
+
+    <LinearLayout
+        android:id="@+id/person"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:elevation="1dp"
-        tools:ignore="UselessParent">
+        android:layout_height="72dp"
+        android:descendantFocusability="blocksDescendants"
+        android:orientation="horizontal"
+        android:transitionGroup="true"
+        android:transitionName="@{@string/transition_name_person(person.id)}" >
 
         <TextView
             android:id="@+id/header"
-            android:layout_width="30dp"
+            android:layout_width="12dp"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignTop="@id/person_name"
-            android:layout_alignBottom="@id/person_email"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="16dp"
             android:gravity="center"
-            android:textColor="#000"
-            tools:text="M"/>
+            android:textAppearance="?textAppearanceBody1"
+            android:textColor="?colorOnBackground"
+            tools:text="M" />
 
-        <ImageView
-            android:id="@+id/person_initials_circle"
-            android:layout_width="wrap_content"
+        <eu.jonahbauer.qed.layoutStuff.views.MaterialListItem
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_toEndOf="@id/header"
-            android:layout_alignTop="@id/person_name"
-            android:layout_alignBottom="@id/person_email"
-            android:maxHeight="50sp"
-            android:layout_marginEnd="5dp"
-            android:src="@drawable/person_initials_circle"
-            android:adjustViewBounds="true"
-            android:layout_gravity="center"
-            android:contentDescription="@string/content_description_icon"
-            tools:tint="@android:color/holo_green_dark"/>
-
-        <TextView
-            android:id="@+id/person_initials"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignStart="@id/person_initials_circle"
-            android:layout_alignEnd="@id/person_initials_circle"
-            android:layout_alignTop="@id/person_initials_circle"
-            android:layout_alignBottom="@id/person_initials_circle"
-            android:gravity="center"
-            android:textStyle="bold"
-            android:textColor="@color/person_database_initials"
-            tools:text="MM"/>
-
-        <TextView
-            android:id="@+id/person_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toEndOf="@id/person_initials_circle"
-            android:layout_alignParentTop="true"
-            style="?attr/textAppearanceListItemSecondary"
-            tools:text="Max Mustermann"/>
-
-        <TextView
-            android:id="@+id/person_active"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignTop="@id/person_name"
-            android:layout_alignBottom="@id/person_name"
-            android:layout_toEndOf="@id/person_name"
-            android:paddingStart="5dp"
-            android:paddingEnd="0dp"
-            style="?attr/textAppearanceListItemSmall"
-            tools:text="(inaktiv)"/>
-
-        <TextView
-            android:id="@+id/person_email"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toEndOf="@id/person_initials_circle"
-            android:layout_alignParentEnd="true"
-            android:layout_below="@id/person_name"
-            style="?attr/textAppearanceListItemSmall"
-            tools:text="max.mustermann@email.com"/>
-    </RelativeLayout>
-</RelativeLayout>
+            android:visibility="@{person != null}"
+            app:icon="@drawable/person_initials_circle"
+            app:iconTint="@{Themes.colorful(context, person.id)}"
+            app:iconText="@{person.getInitials(invertedInitials)}"
+            app:title="@{person.getFullName(invertedInitials) + ` ` + (!person.active ? @string/persons_database_inactive : !person.member ? @string/persons_database_non_member : ``)}"
+            app:subtitle="@{person.email ?? @string/persons_database_no_email, default = ``}"
+            tools:title="Max Mustermann (inaktiv)"
+            tools:subtitle="max.mustermann@email.com"
+            tools:iconText="MM"
+            tools:iconTint="@android:color/holo_green_dark"/>
+    </LinearLayout>
+</layout>

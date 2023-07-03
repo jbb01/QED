@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <import type="eu.jonahbauer.qed.util.Actions"/>
+        <import type="eu.jonahbauer.qed.util.TimeUtils"/>
+        <import type="eu.jonahbauer.qed.util.MessageUtils"/>
+        <import type="eu.jonahbauer.qed.model.Message"/>
+        <import type="eu.jonahbauer.qed.model.Person"/>
+
+        <variable name="color" type="int" />
+        <variable name="message" type="eu.jonahbauer.qed.model.Message" />
+    </data>
+
+    <!--suppress AndroidDomInspection -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?colorSurface"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/message_section_metadata"
+                style="@style/Widget.App.TextView.SectionHeading"/>
+
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onLongClick="@{v -> Actions.copy(context, v, @string/message_clip_label_id, String.valueOf(message.id))}"
+                app:icon="@drawable/ic_message_id"
+                app:title="@{String.valueOf(message.id)}"
+                app:subtitle="@string/message_subtitle_id"/>
+
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onLongClick="@{v -> Actions.copy(context, v, @string/message_clip_label_name, message.rawName)}"
+                app:icon="@drawable/ic_message_name"
+                app:title="@{MessageUtils.formatName(context, message)}"
+                app:subtitle="@string/message_subtitle_name"/>
+
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="@{message.userId != Person.NO_ID}"
+                android:onLongClick="@{v -> Actions.copy(context, v, @string/message_clip_label_username, message.userName)}"
+                app:icon="@drawable/ic_message_username"
+                app:title="@{@string/message_title_username(message.userName, message.userId)}"
+                app:subtitle="@string/message_subtitle_username"/>
+
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onLongClick="@{v -> Actions.copy(context, v, @string/message_clip_label_channel, message.channel)}"
+                app:icon="@drawable/ic_message_channel"
+                app:title="@{MessageUtils.formatChannel(context, message)}"
+                app:subtitle="@string/message_subtitle_channel"/>
+
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onLongClick="@{v -> Actions.copy(context, v, @string/message_clip_label_timestamp, TimeUtils.format(message.date))}"
+                app:icon="@drawable/ic_message_timestamp"
+                app:title="@{TimeUtils.format(message.date)}"
+                app:subtitle="@string/message_subtitle_timestamp"/>
+
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_message_bottag"
+                app:title="@{String.valueOf(message.bottag)}"
+                app:subtitle="@string/message_subtitle_bottag"/>
+        </LinearLayout>
+
+        <View style="?dividerStyle"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/message_section_message"
+                style="@style/Widget.App.TextView.SectionHeading"/>
+
+            <eu.jonahbauer.qed.layoutStuff.views.MathView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@{message.message}"
+                android:paddingHorizontal="16dp"
+                android:paddingBottom="8dp"
+                tools:text="@tools:sample/lorem"/>
+        </LinearLayout>
+
+        <View style="?dividerStyle"/>
+    </LinearLayout>
+</layout>

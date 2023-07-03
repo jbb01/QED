@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<animated-vector android:drawable="@drawable/ic_menu_chat_refresh"
-    xmlns:android="http://schemas.android.com/apk/res/android">
-    <target
-        android:animation="@animator/ic_refresh_rotate"
-        android:name="refresh"/>
-</animated-vector>

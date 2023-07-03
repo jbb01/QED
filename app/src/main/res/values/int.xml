@@ -1,12 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <integer name="expand_time">0</integer>
-
-    <integer name="checkbox_change_1">200</integer>
-    <integer name="checkbox_change_2">200</integer>
-
-    <integer name="reload_spin_time">500</integer>
-
     <integer-array name="chat_database_max_entries_values">
         <item>10000</item>
         <item>20000</item>

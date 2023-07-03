@@ -4,5 +4,5 @@
     android:drawable="@drawable/ic_arrow_down_accent">
     <target
         android:name="arrow"
-        android:animation="@animator/ic_arrow_rotate_from180_to0"/>
+        android:animation="@animator/ic_rotate_180_to_0"/>
 </animated-vector>

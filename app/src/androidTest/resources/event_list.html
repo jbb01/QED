@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Veranstaltungen</title>
+</head>
+
+<body>
+		<header>
+	<nav id="mainnav" class="horizontal">
+		<a href="/people/349">Eigene Daten</a>
+		<a href="/people">Personen</a>
+		<a href="/events">Veranstaltungen</a>
+		<a href="/hostels">Herbergen</a>
+		
+		
+		
+		
+		
+	</nav>
+
+	<div class="breadcrumb">
+		<a href="/">QED-Datenbank</a> » <a href="/events">Veranstaltungen</a>
+	</div>
+</header>
+
+
+<div class="mobilemenu">
+	<a class="button" href="javascript:toggleHeader()"><i class="material-icons md-24">menu</i></a>
+</div>
+
+<script>
+function toggleHeader() {
+	var menu = document.getElementsByTagName("header")[0];
+	if(menu.style.visibility === "visible")
+	{
+		menu.style.visibility = "hidden";
+		menu.style.opacity = "0%";
+	}
+	else
+	{
+		menu.style.visibility = "visible";
+		menu.style.opacity = "95%";
+	}
+}
+</script>
+
+
+	<div id="messages">
+	</div>
+
+	<h1>Veranstaltungen</h1>
+
+
+<div class="actions">
+	<button class="button" onclick="downloadTable(&#39;#events_table&#39;)"><i class="material-icons md-24">save_alt</i>Herunterladen</button>
+</div>
+
+<table class="indexed_table" id="events_table">
+	<thead>
+		<tr>
+			<th>#</th>
+				<th data-sort="string">Titel</th>
+				<th data-sort="string">Beginn</th>
+				<th data-sort="string">Ende</th>
+				<th data-sort="string">Hostel</th>
+				<th data-sort="string">Anmeldeschluss</th>
+				<th data-sort="int">Kosten</th>
+				<th data-sort="int">Teilnehmerlimit</th>
+		</tr>
+	</thead>
+
+	<tbody>
+			<tr>
+				<td></td>
+				<td><a href="/events/5">Erlangen 2011</a></td>
+				<td data-sort-value="2011-07-07"><time datetime="2011-07-07">07.07.2011</time></td>
+				<td data-sort-value="2011-07-10"><time datetime="2011-07-10">10.07.2011</time></td>
+				<td style="word-wrap: break-word; max-width: 20em">
+					<a href="/hostels/5">JH Erlangen</a>
+				</td>
+				<td data-sort-value="2011-05-10"><time datetime="2011-05-10">10.05.2011</time></td>
+				<td>55,00 €</td>
+				<td>40</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><a href="/events/3">Passau 2011</a></td>
+				<td data-sort-value="2011-04-18"><time datetime="2011-04-18">18.04.2011</time></td>
+				<td data-sort-value="2011-04-21"><time datetime="2011-04-21">21.04.2011</time></td>
+				<td style="word-wrap: break-word; max-width: 20em">
+					<a href="/hostels/3">Haus St. Maximilian</a>
+				</td>
+				<td data-sort-value="2011-04-20"><time datetime="2011-04-20">20.04.2011</time></td>
+				<td>110,00 €</td>
+				<td>30</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><a href="/events/1">Ulm 2010</a></td>
+				<td data-sort-value="2010-09-17"><time datetime="2010-09-17">17.09.2010</time></td>
+				<td data-sort-value="2010-09-20"><time datetime="2010-09-20">20.09.2010</time></td>
+				<td style="word-wrap: break-word; max-width: 20em">
+					<i>unb.</i>
+				</td>
+				<td data-sort-value=""><i>unb.</i></td>
+				<td>0,00 €</td>
+				<td>2</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><a href="/events/2">Tastseminar</a></td>
+				<td data-sort-value="2000-09-03"><time datetime="2000-09-03">03.09.2000</time></td>
+				<td data-sort-value="2000-09-10"><time datetime="2000-09-10">10.09.2000</time></td>
+				<td style="word-wrap: break-word; max-width: 20em">
+					<i>unb.</i>
+				</td>
+				<td data-sort-value="2100-10-01"><time datetime="2100-10-01">01.10.2100</time></td>
+				<td>50,00 €</td>
+				<td>80</td>
+			</tr>
+	</tbody>
+</table>
+<script>
+	$("#events_table").stupidtable();
+</script>
+
+
+	<footer>
+		<div style="float: right; text-align: right">
+			Du bist eingeloggt als: <b><a href="/people/349">Test User</a></b><br>
+			<em><a href="/logout">Ausloggen</a></em>
+		</div>
+
+		<div style="text-align: left">
+		<b>Bei Fragen und Problem bitte an die Administratoren unter <em><a href="mailto:webmaster@qed-verein.de">webmaster@qed-verein.de</a></em> wenden.</b>
+		</div>
+
+
+		<div style="text-align: left">
+		</div>
+	</footer>
+</body>
+</html>

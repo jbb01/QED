@@ -53,11 +53,13 @@
             android:id="@+id/nav_settings"
             android:icon="@drawable/ic_drawer_settings"
             android:checkable="false"
+            android:menuCategory="secondary"
             android:title="@string/drawer_settings"/>
         <item
             android:id="@+id/nav_logout"
             android:icon="@drawable/ic_drawer_logout"
             android:checkable="false"
+            android:menuCategory="secondary"
             android:title="@string/drawer_logout"/>
     </group>
 </menu>

@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <import type="android.view.View"/>
+        <import type="eu.jonahbauer.qed.util.Actions"/>
+        <import type="eu.jonahbauer.qed.util.TimeUtils"/>
+        <import type="eu.jonahbauer.qed.util.TextUtils"/>
+
+        <variable name="color" type="int" />
+        <variable name="person" type="eu.jonahbauer.qed.model.Person" />
+    </data>
+
+    <!--suppress AndroidDomInspection -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?colorSurface"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/person_section_personal"
+                style="@style/Widget.App.TextView.SectionHeading"/>
+
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="@{!TextUtils.isNullOrBlank(person.email)}"
+                android:onClick="@{v -> Actions.sendTo(context, person.email)}"
+                android:onLongClick="@{v -> Actions.copy(context, v, @string/person_clip_label_mail(person.fullName), person.email)}"
+                app:icon="@drawable/ic_person_mail"
+                app:title="@{person.email}"
+                app:subtitle="@string/person_subtitle_mail"/>
+
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="@{!TimeUtils.isNullOrBlank(person.birthday)}"
+                app:icon="@drawable/ic_person_birthday"
+                app:title="@{TimeUtils.format(person.birthday)}"
+                app:subtitle="@string/person_subtitle_birthday"/>
+
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="@{person.gender != null}"
+                app:icon="@{person.gender.drawableRes}"
+                app:title="@{person.gender.stringRes}"
+                app:subtitle="@string/person_subtitle_gender"
+                tools:icon="@drawable/ic_person_gender_male"/>
+
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="@{!TimeUtils.isNullOrBlank(person.dateOfJoining)}"
+                app:icon="@drawable/ic_person_date_of_joining"
+                app:title="@{TimeUtils.format(person.dateOfJoining)}"
+                app:subtitle="@string/person_subtitle_date_of_joining"/>
+
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="@{!TimeUtils.isNullOrBlank(person.dateOfQuitting)}"
+                app:icon="@drawable/ic_person_date_of_quitting"
+                app:title="@{TimeUtils.format(person.dateOfQuitting)}"
+                app:subtitle="@string/person_subtitle_date_of_quitting"/>
+
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="@{!TimeUtils.isNullOrBlank(person.memberUntil)}"
+                app:icon="@drawable/ic_person_member_until"
+                app:title="@{TimeUtils.format(person.memberUntil)}"
+                app:subtitle="@string/person_subtitle_member_until"/>
+
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="@{!TimeUtils.isNullOrBlank(person.paidUntil)}"
+                app:icon="@drawable/ic_person_paid_until"
+                app:title="@{TimeUtils.format(person.paidUntil)}"
+                app:subtitle="@string/person_subtitle_paid_until"/>
+
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="@{person.member != null}"
+                app:icon="@drawable/ic_person_member"
+                app:title="@{person.member ? @string/person_title_member_true : @string/person_title_member_false}"
+                app:subtitle="@string/person_subtitle_member"/>
+
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="@{person.active != null}"
+                app:icon="@drawable/ic_person_active"
+                app:title="@{person.active ? @string/person_title_active_true : @string/person_title_active_false}"
+                app:subtitle="@string/person_subtitle_active"/>
+        </LinearLayout>
+
+        <View
+            android:visibility="@{person.hasAdditionalInformation()}"
+            style="?dividerStyle"/>
+
+        <LinearLayout
+            android:visibility="@{person.hasAdditionalInformation()}"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/person_section_additional"
+                style="@style/Widget.App.TextView.SectionHeading"/>
+
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="@{!TextUtils.isNullOrBlank(person.homeStation)}"
+                app:icon="@drawable/ic_person_train"
+                app:title="@{person.homeStation}"
+                app:subtitle="@string/person_subtitle_station" />
+
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="@{!TextUtils.isNullOrBlank(person.railcard)}"
+                app:icon="@drawable/ic_person_railcard"
+                app:title="@{person.railcard}"
+                app:subtitle="@string/person_subtitle_railcard" />
+
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="@{!TextUtils.isNullOrBlank(person.food)}"
+                app:icon="@drawable/ic_person_food"
+                app:title="@{person.food}"
+                app:subtitle="@string/person_subtitle_food" />
+
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="@{!person.groups.empty}"
+                app:icon="@drawable/ic_person_groups"
+                app:title="@{String.join(`, `, person.groups)}"
+                app:subtitle="@string/person_subtitle_groups" />
+
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="@{person.privacy != null}"
+                app:icon="@drawable/ic_person_privacy"
+                app:person_privacy="@{person.privacy}"
+                app:subtitle="@string/person_subtitle_privacy" />
+
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="@{!TextUtils.isNullOrBlank(person.notes)}"
+                app:icon="@drawable/ic_person_notes"
+                app:title="@{person.notes}"
+                app:subtitle="@string/person_subtitle_notes" />
+        </LinearLayout>
+
+        <View
+            android:visibility="@{!person.addresses.empty}"
+            style="?dividerStyle"/>
+
+        <LinearLayout
+            android:visibility="@{!person.addresses.empty}"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/person_section_addresses"
+                style="@style/Widget.App.TextView.SectionHeading"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:person_addresses="@{person}"/>
+        </LinearLayout>
+
+        <View
+            android:visibility="@{!person.contacts.empty}"
+            style="?dividerStyle"/>
+
+        <LinearLayout
+            android:visibility="@{!person.contacts.empty}"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/person_section_contacts"
+                style="@style/Widget.App.TextView.SectionHeading"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:person_contacts="@{person}"/>
+        </LinearLayout>
+
+        <View
+            android:visibility="@{!person.payments.empty}"
+            style="?dividerStyle"/>
+
+        <LinearLayout
+            android:visibility="@{!person.payments.empty}"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/person_section_payments"
+                style="@style/Widget.App.TextView.SectionHeading"/>
+
+            <LinearLayout
+                android:id="@+id/payment_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:person_payments="@{person.payments}"/>
+        </LinearLayout>
+
+        <View
+            android:visibility="@{!person.events.empty}"
+            style="?dividerStyle"/>
+
+        <LinearLayout
+            android:visibility="@{!person.events.empty}"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/person_section_registrations"
+                style="@style/Widget.App.TextView.SectionHeading"/>
+
+            <LinearLayout
+                android:visibility="gone"
+                android:id="@+id/registration_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:person_registrations="@{person.events}"/>
+        </LinearLayout>
+
+        <View
+            android:visibility="@{!person.events.empty}"
+            style="?dividerStyle"/>
+
+        <eu.jonahbauer.qed.layoutStuff.views.ListItem
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="@{!person.events.empty}"
+            android:id="@+id/toggle_events_button"
+            app:icon="@drawable/ic_arrow_down_accent"
+            app:title="@string/event_show_more"/>
+
+        <View style="?dividerStyle"/>
+    </LinearLayout>
+</layout>

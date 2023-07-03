@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+    <data>
+        <variable name="offline" type="boolean" />
+        <variable name="forcedOfflineMode" type="boolean" />
+        <variable name="onClick" type="android.view.View.OnClickListener"/>
+    </data>
+
+    <LinearLayout
+        android:id="@+id/label_offline"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:elevation="0dp"
+        android:background="?colorSurface"
+        android:visibility="@{offline}"
+        android:gravity="center_vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:layout_margin="16dp">
+            <ImageView
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_settings_offline_mode"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginHorizontal="16dp"
+                android:textAppearance="?textAppearanceBody2"
+                android:gravity="center_vertical"
+                android:text="@{forcedOfflineMode ? @string/gallery_forced_offline_mode : @string/gallery_offline_mode}"/>
+
+            <Button
+                android:id="@+id/offline_action_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="@{onClick}"
+                android:text="@{forcedOfflineMode ? @string/gallery_disable_offline_mode : @string/retry}"
+                style="@style/Widget.App.Button.Small"/>
+        </LinearLayout>
+
+        <View style="?dividerStyle" />
+    </LinearLayout>
+</layout>

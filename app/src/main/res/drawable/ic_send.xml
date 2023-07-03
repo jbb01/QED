@@ -7,7 +7,7 @@
         android:translateX="-1.5"
         android:translateY="1.5">
         <path
-            android:fillColor="@color/colorAccent"
+            android:fillColor="?colorSecondary"
             android:pathData="M 22,2 L15,22 L9.5,16.5 L17,7 L7.5,14.5 L2,9"/>
     </group>
 </vector>

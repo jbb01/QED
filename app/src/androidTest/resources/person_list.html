@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Personen</title>
+</head>
+
+<body>
+		<header>
+	<nav id="mainnav" class="horizontal">
+		<a href="/people/349">Eigene Daten</a>
+		<a href="/people">Personen</a>
+		<a href="/events">Veranstaltungen</a>
+		<a href="/hostels">Herbergen</a>
+		
+		
+		
+		
+		
+	</nav>
+
+	<div class="breadcrumb">
+		<a href="/">QED-Datenbank</a> » <a href="/people">Personen</a>
+	</div>
+</header>
+
+
+<div class="mobilemenu">
+	<a class="button" href="javascript:toggleHeader()"><i class="material-icons md-24">menu</i></a>
+</div>
+
+<script>
+function toggleHeader() {
+	var menu = document.getElementsByTagName("header")[0];
+	if(menu.style.visibility === "visible")
+	{
+		menu.style.visibility = "hidden";
+		menu.style.opacity = "0%";
+	}
+	else
+	{
+		menu.style.visibility = "visible";
+		menu.style.opacity = "95%";
+	}
+}
+</script>
+
+
+	<div id="messages">
+	</div>
+
+	<h1>Personen</h1>
+
+
+<section id="people_data">
+
+<div class="flexlayout">
+<fieldset>
+	<legend>Ansicht konfigurieren</legend>
+	<div class="flexlayout">
+	<fieldset>
+		<label>Personen auswählen</label>
+		<label><input autocomplete="off" type="checkbox" id="show_member_row" checked="checked">Mitglieder anzeigen</input></label>
+		<label><input autocomplete="off" type="checkbox" id="show_non_member_row" checked="checked">Nichtmitglieder anzeigen</input></label>
+	</fieldset>
+	<fieldset>
+		<label>Informationen auswählen</label>
+		<label><input autocomplete="off" type="checkbox" id="show_person_field" checked="checked">Geschlecht und Geburtstag</input></label>
+		<label><input autocomplete="off" type="checkbox" id="show_phone_field" checked="checked">Handynummer</input></label>
+		<label><input autocomplete="off" type="checkbox" id="show_email_field" checked="checked">Emailadresse</input></label>
+		<label><input autocomplete="off" type="checkbox" id="show_address_field" checked="checked">Addressdaten</input></label>
+		<label><input autocomplete="off" type="checkbox" id="show_account_field">Benutzerkonto</input></label>
+		<label><input autocomplete="off" type="checkbox" id="show_status_field">Mitgliedsstatus</input></label>
+	</fieldset>
+	</div>
+	<div class="actions">
+		<button class="button" onclick="downloadTable(&#39;#people_table&#39;)"><i class="material-icons md-24">save_alt</i>Herunterladen</button>
+	</div>
+</fieldset>
+</div>
+
+<table class="indexed_table" id="people_table">
+	<thead>
+		<tr>
+			<th>#</th>
+			<th data-sort="string">Vorname</th>
+			<th data-sort="string">Nachname</th>
+			<th data-sort="string" class="person_field">Geschlecht</th>
+			<th data-sort="string" class="person_field">Geburtstag</th>
+			<th data-sort="string" class="email_field">Emailadresse</th>
+			<th data-sort="string" class="address_field">Hauptadresse</th>
+			<th data-sort="string" class="phone_field">Handynummer</th>
+			<th data-sort="int"    class="account_field">Id</th>
+			<th data-sort="string" class="account_field">Benutzername</th>
+			<th data-sort="string" class="account_field">Aktiviertes Profil</th>
+			<th data-sort="string" class="status_field">Aktuell Mitglied</th>
+			<th data-sort="string" class="status_field">Eingetreten</th>
+			<th data-sort="string" class="status_field">Ausgetreten</th>
+		</tr>
+	</thead>
+
+	<tbody>
+			<tr class="non_member_row">
+				<td></td>
+				<td><a href="/people/0">Stefani</a></td>
+				<td><a href="/people/0">Rivas</a></td>
+
+				<td class="person_field">männlich</td>
+
+					<td class="person_field" data-sort-value="1983-06-29">
+						<time datetime="1983-06-29">29.06.1983</time>
+					</td>
+
+
+				<td class="email_field">
+						<a href="mailto:stefani.rivas@example.org">stefani.rivas@example.org</a>
+				</td>
+
+				<td class="address_field">
+						Zeil 47, 40764 Frankfurt am Main
+				</td>
+
+				<td class="phone_field">
+						<i>unb.</i>
+				</td>
+
+				<td class="account_field">
+					0
+				</td>
+
+				<td class="account_field">
+					StefaniRivas
+				</td>
+
+				<td class="account_field">
+					Ja
+				</td>
+
+				<td class="status_field">
+					Nein
+				</td>
+
+				<td class="status_field" data-sort-value="2000-01-01">
+					<time datetime="2000-01-01">01.01.2000</time>
+				</td>
+
+				<td class="status_field" data-sort-value="">
+					<i>unb.</i>
+				</td>
+
+			</tr>
+			<tr class="non_member_row">
+				<td></td>
+				<td><a href="/people/1">Assol</a></td>
+				<td><a href="/people/1">Vespa</a></td>
+
+				<td class="person_field">männlich</td>
+
+					<td class="person_field" data-sort-value="2002-10-07">
+						<time datetime="2002-10-07">07.10.2002</time>
+					</td>
+
+
+				<td class="email_field">
+						<a href="mailto:assol.vespa@example.org">assol.vespa@example.org</a>
+				</td>
+
+				<td class="address_field">
+						Fahltskamp 74, 25421 Pinneberg
+				</td>
+
+				<td class="phone_field">
+						<a href="tel:0751 43692">0751 43692</a>
+				</td>
+
+				<td class="account_field">
+					1
+				</td>
+
+				<td class="account_field">
+					AssolVespa
+				</td>
+
+				<td class="account_field">
+					Ja
+				</td>
+
+				<td class="status_field">
+					Nein
+				</td>
+
+				<td class="status_field" data-sort-value="2017-06-14">
+					<time datetime="2017-06-14">14.06.2017</time>
+				</td>
+
+				<td class="status_field" data-sort-value="">
+					<i>unb.</i>
+				</td>
+
+			</tr>
+			<tr class="member_row">
+				<td></td>
+				<td><a href="/people/2">Natasha</a></td>
+				<td><a href="/people/2">Susskind</a></td>
+
+				<td class="person_field">männlich</td>
+
+					<td class="person_field" data-sort-value="2001-12-02">
+						<time datetime="2001-12-02">02.12.2001</time>
+					</td>
+
+
+				<td class="email_field">
+						<a href="mailto:natasha.susskind@example.org">natasha.susskind@example.org</a>
+				</td>
+
+				<td class="address_field">
+					Dreieckstrasse 17, 58097 Hagen
+				</td>
+
+				<td class="phone_field">
+						<a href="tel:02331 8051">02331 8051</a>
+				</td>
+
+				<td class="account_field">
+					2
+				</td>
+
+				<td class="account_field">
+					NatashaSusskind
+				</td>
+
+				<td class="account_field">
+					Ja
+				</td>
+
+				<td class="status_field">
+					Ja
+				</td>
+
+				<td class="status_field" data-sort-value="2017-06-24">
+					<time datetime="2017-06-24">24.06.2017</time>
+				</td>
+
+				<td class="status_field" data-sort-value="">
+					<i>unb.</i>
+				</td>
+
+			</tr>
+			<tr class="member_row">
+				<td></td>
+				<td><a href="/people/3">Rayna</a></td>
+				<td><a href="/people/3">Oláh</a></td>
+
+				<td class="person_field">weiblich</td>
+
+					<td class="person_field"><i>privat</i></td>
+
+
+				<td class="email_field">
+						<i>privat</i>
+				</td>
+
+				<td class="address_field">
+						<i>privat</i>
+				</td>
+
+				<td class="phone_field">
+						<i>privat</i>
+				</td>
+
+				<td class="account_field">
+					3
+				</td>
+
+				<td class="account_field">
+					RaynaOlah
+				</td>
+
+				<td class="account_field">
+					Ja
+				</td>
+
+				<td class="status_field">
+					Ja
+				</td>
+
+				<td class="status_field" data-sort-value="2015-02-28">
+					<time datetime="2015-02-28">28.02.2015</time>
+				</td>
+
+				<td class="status_field" data-sort-value="">
+					<i>unb.</i>
+				</td>
+
+			</tr>
+	</tbody>
+</table>
+</section>
+
+<script>
+$(function(){
+	$("#people_table").stupidtable();
+	$('#people_data input[type=checkbox]').each(function(index, item) {updateVisibility(item)})})
+$('#people_data input[type=checkbox]').click(function() {updateVisibility(this)});
+</script>
+
+
+
+	<footer>
+		<div style="float: right; text-align: right">
+			Du bist eingeloggt als: <b><a href="/people/349">Test User</a></b><br>
+			<em><a href="/logout">Ausloggen</a></em>
+		</div>
+
+		<div style="text-align: left">
+		<b>Bei Fragen und Problem bitte an die Administratoren unter <em><a href="mailto:webmaster@qed-verein.de">webmaster@qed-verein.de</a></em> wenden.</b>
+		</div>
+
+
+		<div style="text-align: left">
+		</div>
+	</footer>
+</body>
+</html>

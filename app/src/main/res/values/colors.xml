@@ -3,77 +3,68 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorPrimaryLight">#4D61C6</color>
-    <color name="colorAccent">#FF4081</color>
-    <color name="colorAccentDark">#C60055</color>
-    <color name="colorAccentLight">#FF79B0</color>
 
-    <color name="colorPrimary2">#F5F5F5</color>
-    <color name="colorPrimaryDark2">#757575</color>
-    <color name="colorPrimaryLight2">#FFFFFF</color>
-    <color name="colorAccent2">#009688</color>
-    <color name="colorAccentDark2">#00675B</color>
-    <color name="colorAccentLight2">#52C7B8</color>
+    <color name="colorSecondary">#FF4081</color>
+    <color name="colorSecondaryDark">#C60055</color>
+    <color name="colorSecondaryLight">#FF79B0</color>
 
-    <color name="divider">#F0F0F0</color>
+    <color name="dateBannerBackground">#E0E0FF</color>
 
-    <!--<color name="colorBackground">#F0EDE8</color>-->
     <color name="colorBackground">#FAFAFA</color>
-    <color name="colorBackgroundAccent">#DCDBD6</color>
+    <color name="colorSurface">@android:color/white</color>
 
-    <!-- Icons -->
-    <color name="menu_items">@android:color/white</color>
-    <color name="setting_items">@color/colorAccent</color>
+    <color name="accentColor0">#33b5e5</color>
+    <color name="accentColor1">#99cc00</color>
+    <color name="accentColor2">#ff4444</color>
+    <color name="accentColor3">#0099cc</color>
+    <color name="accentColor4">#669900</color>
+    <color name="accentColor5">#cc0000</color>
+    <color name="accentColor6">#aa66cc</color>
+    <color name="accentColor7">#ffbb33</color>
+    <color name="accentColor8">#ff8800</color>
+    <color name="accentColor9">#00ddff</color>
 
-    <!-- Progressbar -->
-    <color name="progressbar_background_start">@color/colorBackground</color>
-    <color name="progressbar_background_center">@color/colorBackground</color>
-    <color name="progressbar_background_end">@color/colorBackground</color>
-    <color name="progressbar_progress_start">#CC3366</color>
-    <color name="progressbar_progress_center">#FF4080</color>
-    <color name="progressbar_progress_end">#99264D</color>
+    <color name="accent_charm_purple_dark">#ff9798d8</color>
+    <color name="accent_charm_purple_light">#ff9066af</color>
+    <color name="accent_default_dark">#ff7ca1cc</color>
+    <color name="accent_default_light">#ff55759b</color>
+    <color name="accent_fashion_pink_dark">#ffce81ab</color>
+    <color name="accent_fashion_pink_light">#ffae5083</color>
+    <color name="accent_golden_dark">#ffcc9c6b</color>
+    <color name="accent_golden_light">#ffc2864e</color>
+    <color name="accent_grass_green_dark">#ff5de55c</color>
+    <color name="accent_grass_green_light">#ff789d3e</color>
+    <color name="accent_lemon_yellow_dark">#ffd2be72</color>
+    <color name="accent_lemon_yellow_light">#ffbb9658</color>
+    <color name="accent_material_dark">@color/material_deep_teal_200</color>
+    <color name="accent_material_light">@color/material_deep_teal_500</color>
+    <color name="accent_sky_blue_dark">#ff66bfd4</color>
+    <color name="accent_sky_blue_light">#ff3794ac</color>
+    <color name="accent_star_wars">#ffff2837</color>
+    <color name="accent_vigour_red_dark">#ffd88e89</color>
+    <color name="accent_vigour_red_light">#ffa04a43</color>
 
-    <!-- Chat Activity -->
-    <color name="chat_message_background">@android:color/white</color>
-    <color name="chat_message_text">@android:color/black</color>
-    <color name="chat_message_date">#E04D4D4D</color>
-    <color name="chat_date">#D4EAF5</color>
-    <color name="chat_date_text">#545F63</color>
+    <color name="statusBarScrim">#40000000</color>
 
-    <!-- Log Activity -->
-    <color name="log_subtitle_background">@color/colorBackground</color>
-    <color name="log_subtitle_font">#383838</color>
+    <!-- Night Mode -->
+    <color name="colorPrimaryNight">#202225</color>
+    <color name="colorPrimaryDarkNight">#000000</color>
+    <color name="colorPrimaryLightNight">#47494d</color>
 
-    <!-- Chat Database Activity -->
-    <color name="chat_database_search_background">@android:color/white</color>
-    <color name="chat_database_search_headers">@android:color/black</color>
+    <color name="colorSecondaryNight">#52c7b8</color>
+    <color name="colorSecondaryDarkNight">#019688</color>
+    <color name="colorSecondaryLightNight">#88faea</color>
 
-    <!-- Person Database Activity -->
-    <color name="person_database_search_background">@android:color/white</color>
-    <color name="person_database_search_headers">@android:color/black</color>
-    <color name="person_database_text">@android:color/black</color>
-    <color name="person_database_email">#383838</color>
-    <color name="person_database_active">#383838</color>
-    <color name="person_database_initials">@android:color/white</color>
+    <color name="dateBannerBackgroundNight">@color/colorSurfaceNight</color>
 
-    <!-- Event Database Activity -->
-    <color name="event_database_search_background">@android:color/white</color>
-    <color name="event_database_search_headers">@android:color/black</color>
-    <color name="event_database_text">@android:color/black</color>
-    <color name="event_database_time">#383838</color>
+    <color name="colorBackgroundNight">#2F3136</color>
+    <color name="colorSurfaceNight">#36393f</color>
 
-    <!-- Person Bottom Sheet -->
-    <color name="person_big_name">@android:color/black</color>
-    <color name="person_icons">#868686</color>
+    <!-- Dark/Black Theme (Image Activity) -->
+    <color name="colorSecondaryBlack">#009688</color>
+    <color name="colorSecondaryDarkBlack">#00675B</color>
+    <color name="colorSecondaryLightBlack">#52C7B8</color>
 
-    <!-- Event Bottom Sheet -->
-    <color name="event_big_name">@android:color/black</color>
-    <color name="event_icons">#868686</color>
-
-    <!-- Album -->
-    <color name="album_list_text">@android:color/black</color>
-    <color name="album_search_headers">@android:color/black</color>
-    <color name="album_info_headers">@android:color/black</color>
-    <color name="image_info_headers">@android:color/black</color>
-    <color name="offline_label_font">#383838</color>
-
+    <color name="colorBackgroundBlack">#000000</color>
+    <color name="colorSurfaceBlack">#202225</color>
 </resources>

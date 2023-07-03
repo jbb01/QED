@@ -11,6 +11,14 @@
             android:title="@string/image_open_with"
             app:showAsAction="never"/>
         <item
+            android:id="@+id/image_share"
+            android:title="@string/image_share"
+            app:showAsAction="never"/>
+        <item
+            android:id="@+id/image_copy_link"
+            android:title="@string/image_copy_link"
+            app:showAsAction="never"/>
+        <item
             android:id="@+id/image_info"
             android:title="@string/image_info"
             app:showAsAction="never"/>

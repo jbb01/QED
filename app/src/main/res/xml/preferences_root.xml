@@ -1,0 +1,21 @@
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <Preference
+        android:selectable="true"
+        android:key="settings_header_general"
+        android:icon="@drawable/ic_settings_general"
+        android:title="@string/preferences_header_general" />
+
+    <Preference
+        android:selectable="true"
+        android:key="settings_header_chat"
+        android:icon="@drawable/ic_settings_chat"
+        android:title="@string/preferences_header_chat" />
+
+    <Preference
+        android:selectable="true"
+        android:key="settings_header_gallery"
+        android:icon="@drawable/ic_settings_gallery"
+        android:title="@string/preferences_header_gallery" />
+
+</androidx.preference.PreferenceScreen>

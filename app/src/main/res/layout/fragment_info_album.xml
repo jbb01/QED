@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <import type="android.view.View"/>
+        <import type="eu.jonahbauer.qed.util.Actions"/>
+        <import type="eu.jonahbauer.qed.util.TimeUtils"/>
+        <import type="eu.jonahbauer.qed.util.TextUtils"/>
+
+        <variable name="color" type="int" />
+        <variable name="album" type="eu.jonahbauer.qed.model.Album" />
+    </data>
+
+    <!--suppress AndroidDomInspection -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?colorSurface"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/album_section_general"
+                style="@style/Widget.App.TextView.SectionHeading"/>
+
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="@{!TextUtils.isNullOrBlank(album.owner)}"
+                app:icon="@drawable/ic_album_owner"
+                app:title="@{album.owner}"
+                app:subtitle="@string/album_subtitle_owner"/>
+
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="@{!TextUtils.isNullOrBlank(album.creationDate)}"
+                app:icon="@drawable/ic_album_creation_date"
+                app:title="@{album.creationDate}"
+                app:subtitle="@string/album_subtitle_creation_date"/>
+
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="@{album.dates.size() > 0}"
+                app:icon="@drawable/ic_album_dates"
+                app:title="@{TextUtils.formatRange(context, TimeUtils.LOCAL_DATE_FORMATTER, album.dates)}"
+                app:subtitle="@string/album_subtitle_dates"/>
+
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="@{album.uploadDates.size() > 0}"
+                app:icon="@drawable/ic_album_dates"
+                app:title="@{TextUtils.formatRange(context, TimeUtils.LOCAL_DATE_FORMATTER, album.uploadDates)}"
+                app:subtitle="@string/album_subtitle_upload_dates"/>
+
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_album_image_count"
+                app:title="@{String.valueOf(album.images.size())}"
+                app:subtitle="@string/album_subtitle_image_count"/>
+
+            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="@{album.private}"
+                app:icon="@drawable/ic_album_private"
+                app:title="@string/album_title_private"/>
+        </LinearLayout>
+
+        <View style="?dividerStyle"
+            android:visibility="@{!album.categories.empty}"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="@{!album.categories.empty}">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/album_section_categories"
+                style="@style/Widget.App.TextView.SectionHeading"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:album_categories="@{album.categories}"/>
+        </LinearLayout>
+
+        <View style="?dividerStyle"
+            android:visibility="@{!album.persons.empty}"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="@{!album.persons.empty}">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/album_section_persons"
+                style="@style/Widget.App.TextView.SectionHeading"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:album_persons="@{album.persons}"/>
+        </LinearLayout>
+
+        <View style="?dividerStyle"/>
+    </LinearLayout>
+</layout>

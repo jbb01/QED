@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    app:startDestination="@+id/nav_chat">
+
+    <fragment
+        android:id="@+id/nav_login"
+        android:name="eu.jonahbauer.qed.activities.mainFragments.LoginFragment"
+        android:label="@string/title_fragment_login"
+        tools:layout="@layout/fragment_login">
+        <argument
+            android:name="feature"
+            android:defaultValue="CHAT"
+            app:argType="eu.jonahbauer.qed.networking.Feature"
+            app:nullable="false"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_chat"
+        android:name="eu.jonahbauer.qed.activities.mainFragments.ChatFragment"
+        android:label="@string/title_fragment_chat"
+        tools:layout="@layout/fragment_chat">
+        <deepLink
+            android:id="@+id/deep_link_chat"
+            app:uri="chat.qed-verein.de" />
+        <action
+            android:id="@+id/show_message"
+            app:destination="@id/nav_bottom_sheet_message" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_chat_db"
+        android:name="eu.jonahbauer.qed.activities.mainFragments.ChatDatabaseFragment"
+        android:label="@string/title_fragment_chat_database"
+        tools:layout="@layout/fragment_chat_database">
+        <action
+            android:id="@+id/show_message"
+            app:destination="@id/nav_bottom_sheet_message" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_chat_log"
+        android:name="eu.jonahbauer.qed.activities.mainFragments.LogFragment"
+        android:label="@string/title_fragment_log"
+        tools:layout="@layout/fragment_log">
+        <argument
+            android:name="logRequest"
+            android:defaultValue="@null"
+            app:argType="eu.jonahbauer.qed.model.LogRequest"
+            app:nullable="true" />
+        <action
+            android:id="@+id/show_message"
+            app:destination="@id/nav_bottom_sheet_message" />
+        <deepLink
+            android:id="@+id/deep_link_chat_log"
+            app:uri="chat.qed-verein.de/history.html" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_database_persons"
+        android:name="eu.jonahbauer.qed.activities.mainFragments.PersonDatabaseFragment"
+        android:label="@string/title_fragment_persons_database"
+        tools:layout="@layout/fragment_persons_database">
+        <deepLink
+            android:id="@+id/deep_link_people_list0"
+            app:uri="qeddb.qed-verein.de/people" />
+        <deepLink
+            android:id="@+id/deep_link_people_list1"
+            app:uri="qeddb.qed-verein.de/people/" />
+        <action
+            android:id="@+id/show_person"
+            app:destination="@id/nav_person" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_database_events"
+        android:name="eu.jonahbauer.qed.activities.mainFragments.EventDatabaseFragment"
+        android:label="@string/title_fragment_events_database"
+        tools:layout="@layout/fragment_events_database">
+        <deepLink
+            android:id="@+id/deep_link_events_list0"
+            app:uri="qeddb.qed-verein.de/events" />
+        <deepLink
+            android:id="@+id/deep_link_events_list1"
+            app:uri="qeddb.qed-verein.de/events/" />
+        <action
+            android:id="@+id/show_event"
+            app:destination="@id/nav_event" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_gallery"
+        android:name="eu.jonahbauer.qed.activities.mainFragments.GalleryFragment"
+        android:label="@string/title_fragment_gallery"
+        tools:layout="@layout/fragment_gallery">
+        <deepLink
+            android:id="@+id/deep_link_album_list0"
+            app:uri="qedgallery.qed-verein.de/album_list.php" />
+        <deepLink
+            android:id="@+id/deep_link_album_list1"
+            app:uri="qedgallery.qed-verein.de/" />
+        <action
+            android:id="@+id/show_album"
+            app:destination="@id/nav_album" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_album"
+        android:name="eu.jonahbauer.qed.activities.mainFragments.AlbumFragment"
+        tools:layout="@layout/fragment_album">
+        <argument
+            android:name="album"
+            android:defaultValue="@null"
+            app:argType="eu.jonahbauer.qed.model.Album"
+            app:nullable="true"/>
+        <argument
+            android:name="id"
+            app:argType="long"/>
+        <deepLink
+            android:id="@+id/deep_link_album"
+            app:uri="qedgallery.qed-verein.de/album_view.php?albumid={id}" />
+        <action
+            android:id="@+id/show_image"
+            app:destination="@id/nav_image"/>
+        <action
+            android:id="@+id/show_album_info"
+            app:destination="@id/nav_bottom_sheet_album" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_person"
+        android:name="eu.jonahbauer.qed.activities.mainFragments.PersonFragment"
+        tools:layout="@layout/fragment_info_person">
+        <argument
+            android:name="person"
+            android:defaultValue="@null"
+            app:argType="eu.jonahbauer.qed.model.Person"
+            app:nullable="true" />
+        <argument
+            android:name="id"
+            app:argType="long"/>
+        <action
+            android:id="@+id/show_registration"
+            app:destination="@id/nav_registration"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_event"
+        android:name="eu.jonahbauer.qed.activities.mainFragments.EventFragment"
+        tools:layout="@layout/fragment_info_event">
+        <argument
+            android:name="event"
+            android:defaultValue="@null"
+            app:argType="eu.jonahbauer.qed.model.Event"
+            app:nullable="true" />
+        <argument
+            android:name="id"
+            app:argType="long"/>
+        <action
+            android:id="@+id/show_registration"
+            app:destination="@id/nav_registration"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_registration"
+        android:name="eu.jonahbauer.qed.activities.mainFragments.RegistrationFragment"
+        tools:layout="@layout/fragment_info_registration">
+        <argument
+            android:name="registration"
+            android:defaultValue="@null"
+            app:argType="eu.jonahbauer.qed.model.Registration"
+            app:nullable="true" />
+        <argument
+            android:name="id"
+            app:argType="long"/>
+        <action
+            android:id="@+id/show_person"
+            app:destination="@id/nav_person"/>
+        <action
+            android:id="@+id/show_event"
+            app:destination="@id/nav_event"/>
+    </fragment>
+
+    <dialog
+        android:id="@+id/nav_bottom_sheet_message"
+        android:name="eu.jonahbauer.qed.activities.sheets.message.MessageInfoBottomSheet"
+        tools:layout="@layout/fragment_info_message">
+        <argument
+            android:name="message"
+            app:argType="eu.jonahbauer.qed.model.Message"
+            app:nullable="false"/>
+    </dialog>
+
+    <dialog
+        android:id="@+id/nav_bottom_sheet_album"
+        android:name="eu.jonahbauer.qed.activities.sheets.album.AlbumInfoBottomSheet"
+        tools:layout="@layout/fragment_info_album">
+        <argument
+            android:name="album"
+            app:argType="eu.jonahbauer.qed.model.Album"
+            app:nullable="false"/>
+    </dialog>
+
+    <action
+        android:id="@+id/login"
+        app:launchSingleTop="true"
+        app:destination="@id/nav_login"/>
+
+    <include app:graph="@navigation/settings" />
+
+
+</navigation>
