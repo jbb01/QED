@@ -15,6 +15,8 @@ import androidx.security.crypto.EncryptedSharedPreferences;
 import androidx.security.crypto.MasterKeys;
 
 import eu.jonahbauer.qed.crypt.PasswordStorage;
+import eu.jonahbauer.qed.layoutStuff.themes.Theme;
+import eu.jonahbauer.qed.layoutStuff.themes.ThemeListener;
 import eu.jonahbauer.qed.networking.cookies.QEDCookieHandler;
 import eu.jonahbauer.qed.util.Preferences;
 
@@ -94,22 +96,19 @@ public class Application extends android.app.Application implements android.app.
             PasswordStorage.init(passwordSharedPreferences);
         }).subscribeOn(Schedulers.computation()).subscribe();
 
-        // Setup preferences
+        // setup preferences
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         Preferences.init(preferences, this.getResources());
 
-        // Activate Night Mode
-        if (Preferences.getGeneral().isNightMode()) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-        } else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-        }
+        // apply theme
+        Theme.getCurrentTheme().apply(this);
+        preferences.registerOnSharedPreferenceChangeListener(ThemeListener.INSTANCE);
 
-        // Set language
+        // apply language
         var language = Preferences.getGeneral().getLanguage();
         AppCompatDelegate.setApplicationLocales(language.getLocales());
 
-        // Track changes to name and channel
+        // track changes to name and channel
         preferences.registerOnSharedPreferenceChangeListener(RecentsSharedPreferenceListener.INSTANCE);
     }
 

@@ -3,6 +3,7 @@ package eu.jonahbauer.qed.util;
 import eu.jonahbauer.qed.BuildConfig;
 import eu.jonahbauer.qed.R;
 
+import eu.jonahbauer.qed.layoutStuff.themes.Theme;
 import eu.jonahbauer.qed.model.Language;
 import eu.jonahbauer.qed.model.Release;
 import eu.jonahbauer.android.preference.annotations.Preference;
@@ -20,7 +21,7 @@ import java.util.stream.Collectors;
                 @Preference(name = "bug_report", type = void.class),
                 @Preference(name = "language", type = Language.class, defaultValue = "SYSTEM"),
                 @Preference(name = "github", type = void.class),
-                @Preference(name = "night_mode", type = boolean.class),
+                @Preference(name = "theme", type = Theme.class, defaultValue = "LIGHT"),
                 @Preference(name = "update_check_enabled", type = boolean.class, defaultValue = "true"),
                 @Preference(name = "update_check_includes_prereleases", type = boolean.class, defaultValue = "" + BuildConfig.PRERELEASE),
                 @Preference(name = "update_check_dont_suggest", type = Set.class, serializer = Preferences$Config.VersionSerializer.class),

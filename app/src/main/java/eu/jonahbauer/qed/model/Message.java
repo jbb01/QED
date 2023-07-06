@@ -1,28 +1,25 @@
 package eu.jonahbauer.qed.model;
 
 import android.content.Context;
-import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
-
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.room.ColumnInfo;
-import androidx.room.Entity;
-import androidx.room.Ignore;
-import androidx.room.PrimaryKey;
-import androidx.room.TypeConverters;
-
+import androidx.room.*;
+import eu.jonahbauer.qed.layoutStuff.themes.Theme;
+import eu.jonahbauer.qed.model.parcel.LambdaCreator;
 import eu.jonahbauer.qed.model.parcel.ParcelExtensions;
 import eu.jonahbauer.qed.model.room.Converters;
-import eu.jonahbauer.qed.model.parcel.LambdaCreator;
 import eu.jonahbauer.qed.networking.NetworkConstants;
 import eu.jonahbauer.qed.util.Colors;
-
 import eu.jonahbauer.qed.util.MessageUtils;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -36,11 +33,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Locale;
 import java.util.Objects;
-
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
 
 /**
  * An object representing a message in the qed chat
@@ -208,12 +200,8 @@ public class Message implements Parcelable, Comparable<Message>, Serializable {
     }
 
     public @ColorInt int getColor(@NonNull Context context) {
-        var config = context.getResources().getConfiguration();
-        if ((config.uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES) {
-            return colorInt;
-        } else {
-            return transformedColorInt;
-        }
+        var theme = Theme.getCurrentTheme();
+        return theme.getMessageNameColor(context, this);
     }
 
     public int compareTo(Message other) {

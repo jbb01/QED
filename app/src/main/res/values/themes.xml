@@ -46,8 +46,8 @@
         <item name="android:verticalDivider">?dividerVertical</item>
         <item name="android:dividerHeight">1dp</item>
 
-        <item name="windowNoTitle">false</item>
-        <item name="windowActionBar">true</item>
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
         <item name="windowActionModeOverlay">true</item>
 
         <item name="android:statusBarColor">@color/statusBarScrim</item>
@@ -122,17 +122,7 @@
         <item name="alertDialogTheme">@style/ThemeOverlay.App.Dialog.Alert.Dark</item>
     </style>
 
-    <style name="Theme.App.NoActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-    </style>
-
-    <style name="Theme.App.Black.NoActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-    </style>
-
-    <style name="Theme.App.Black.NoActionBar.Fullscreen"/>
+    <style name="Theme.App.Black.Fullscreen"/>
 
     <style name="Theme.App.SplashScreen">
         <item name="android:windowBackground">@drawable/splash_screen</item>

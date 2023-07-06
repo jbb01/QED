@@ -17,7 +17,6 @@ import eu.jonahbauer.qed.util.Preferences;
 public class GeneralPreferenceFragment extends AbstractPreferenceFragment implements PreferenceFragment, Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
     private Preference bugReport;
     private Preference github;
-    private SwitchPreference nightMode;
     private ListPreference language;
 
     private SwitchPreference updateCheckEnabled;
@@ -46,10 +45,6 @@ public class GeneralPreferenceFragment extends AbstractPreferenceFragment implem
         assert language != null;
         language.setOnPreferenceChangeListener(this);
 
-        nightMode = findPreference(Preferences.getGeneral().getKeys().getNightMode());
-        assert nightMode != null;
-        nightMode.setOnPreferenceChangeListener(this);
-
         updateCheckEnabled = findPreference(Preferences.getGeneral().getKeys().getUpdateCheckEnabled());
         assert updateCheckEnabled != null;
         updateCheckEnabled.setOnPreferenceChangeListener(this);
@@ -74,16 +69,7 @@ public class GeneralPreferenceFragment extends AbstractPreferenceFragment implem
 
     @Override
     public boolean onPreferenceChange(@NonNull Preference preference, Object newValue) {
-        if (preference == nightMode) {
-            if (!(newValue instanceof Boolean)) return false;
-            boolean value = (Boolean) newValue;
-
-            if (value) {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-            } else {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-            }
-        } else if (preference == updateCheckEnabled) {
+        if (preference == updateCheckEnabled) {
             if (!(newValue instanceof Boolean)) return false;
             boolean value = (Boolean) newValue;
             updateCheckIncludesPrereleases.setEnabled(value);

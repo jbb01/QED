@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Widget.App.NavigationView" parent="Widget.MaterialComponents.NavigationView">
+    <style name="Widget.App.NavigationView.Dark" parent="Widget.MaterialComponents.NavigationView">
         <item name="itemIconTint">@android:color/white</item>
         <item name="itemTextColor">@android:color/white</item>
         <item name="itemShapeFillColor">@color/navigation_item_background_night</item>
     </style>
 
-    <style name="Widget.App.Chip" parent="Widget.MaterialComponents.Chip.Action">
+    <style name="Widget.App.Chip.Dark">
         <item name="chipBackgroundColor">#3a3c3f</item>
     </style>
 </resources>

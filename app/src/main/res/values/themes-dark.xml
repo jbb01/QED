@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Themes -->
-    <style name="Theme.App" parent="Base.Theme.App">
-        <item name="navigationViewStyle">@style/Widget.App.NavigationView</item>
+    <style name="Theme.App.Dark" parent="Base.Theme.App">
+        <item name="navigationViewStyle">@style/Widget.App.NavigationView.Dark</item>
+        <item name="chipStyle">@style/Widget.App.Chip.Dark</item>
 
         <!-- Color Palette -->
         <item name="colorPrimary">@color/colorPrimaryNight</item>
