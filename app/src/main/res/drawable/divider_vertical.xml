@@ -4,7 +4,7 @@
         android:width="?android:dividerHeight">
         <shape
             android:shape="rectangle"
-            android:tint="#F0F0F0">
+            android:tint="?dividerColor">
             <solid android:color="@android:color/white"/>
         </shape>
     </item>

@@ -95,6 +95,8 @@
         <item name="accentColor8">@color/accentColor8</item>
         <item name="accentColor9">@color/accentColor9</item>
         <item name="colorOnAccentColor">@android:color/white</item>
+
+        <item name="dividerColor">#F0F0F0</item>
     </style>
 
     <style name="Theme.App.Black">

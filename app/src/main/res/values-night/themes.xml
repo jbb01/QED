@@ -38,6 +38,8 @@
         <item name="accentColor9">@color/accentColor9</item>
         <item name="colorOnAccentColor">@android:color/white</item>
 
+        <item name="dividerColor">#42454A</item>
+
         <item name="elevationOverlayEnabled">false</item>
 
         <item name="dateBannerBackgroundTint">@color/dateBannerBackgroundNight</item>
