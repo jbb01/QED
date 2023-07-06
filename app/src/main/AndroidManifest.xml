@@ -77,7 +77,7 @@
             android:name=".activities.imageActivity.ImageActivity"
             android:hardwareAccelerated="true"
             android:launchMode="standard"
-            android:theme="@style/Theme.App.Dark.NoActionBar.Fullscreen"
+            android:theme="@style/Theme.App.Black.NoActionBar.Fullscreen"
             android:exported="true">
 
             <nav-graph android:value="@navigation/image"/>

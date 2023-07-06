@@ -97,7 +97,7 @@
         <item name="colorOnAccentColor">@android:color/white</item>
     </style>
 
-    <style name="Theme.App.Dark">
+    <style name="Theme.App.Black">
         <item name="android:colorBackground">@color/colorBackgroundBlack</item>
         <item name="colorOnBackground">@android:color/white</item>
         <item name="colorOnBackgroundVariant">@android:color/darker_gray</item>
@@ -125,12 +125,12 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="Theme.App.Dark.NoActionBar">
+    <style name="Theme.App.Black.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="Theme.App.Dark.NoActionBar.Fullscreen"/>
+    <style name="Theme.App.Black.NoActionBar.Fullscreen"/>
 
     <style name="Theme.App.SplashScreen">
         <item name="android:windowBackground">@drawable/splash_screen</item>
