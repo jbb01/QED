@@ -43,6 +43,7 @@
     <string name="error_out_of_memory">Speicher reicht nicht aus.</string>
     <string name="error_unknown">Ein unbekannter Fehler trat auf.</string>
     <string name="error_user">Fehler in Layer 8</string>
+    <string name="error_bad_link">Fehlerhafter Link!</string>
 
     <!-- Update Dialog -->
     <string name="update_dialog_title">Update verfügbar</string>
