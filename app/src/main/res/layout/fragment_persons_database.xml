@@ -137,24 +137,23 @@
                             android:orientation="horizontal"
                             android:textSize="16sp">
 
-                            <RadioButton
-                                android:id="@+id/database_sort_first_name_radio_button"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:checked="true"
-                                android:text="@string/persons_database_sort_first_name"
-                                android:paddingEnd="8dp"
-                                android:textColor="?colorOnSurface"
+                        <RadioButton
+                            android:id="@+id/database_sort_first_name_radio_button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="true"
+                            android:text="@string/persons_database_sort_first_name"
+                            android:paddingEnd="8dp"
                             tools:ignore="RtlSymmetry" />
 
-                            <RadioButton
-                                android:id="@+id/database_sort_last_name_radio_button"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/persons_database_sort_last_name"
-                        android:textColor="?colorOnSurface" /></RadioGroup>
-                    </TableRow>
-                </TableLayout>
+                        <RadioButton
+                            android:id="@+id/database_sort_last_name_radio_button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/persons_database_sort_last_name" />
+                    </RadioGroup>
+                </TableRow>
+            </TableLayout>
 
                 <View style="?dividerStyle"/>
             </LinearLayout>

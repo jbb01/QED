@@ -1,15 +1,17 @@
 package eu.jonahbauer.qed.layoutStuff.themes;
 
 import android.content.Context;
-import androidx.annotation.ColorInt;
-import androidx.annotation.NonNull;
-import androidx.annotation.StyleRes;
+import android.graphics.Color;
+import androidx.annotation.*;
 import androidx.appcompat.app.AppCompatDelegate;
+import eu.jonahbauer.qed.Application;
 import eu.jonahbauer.qed.R;
 import eu.jonahbauer.qed.model.Message;
+import eu.jonahbauer.qed.util.Colors;
 import eu.jonahbauer.qed.util.Preferences;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
 @Getter
 @RequiredArgsConstructor
@@ -19,11 +21,42 @@ public enum Theme {
         public @ColorInt int getMessageNameColor(@NonNull Context context, @NonNull Message message) {
             return message.getTransformedColorInt();
         }
+
+        @Override
+        public @ColorInt int getMessageColorForName(@NonNull String name) {
+            return Colors.transformColor(Colors.getColorForName(name));
+        }
     },
     DARK(R.style.Theme_App_Dark, true) {
         @Override
         public @ColorInt int getMessageNameColor(@NonNull Context context, @NonNull Message message) {
             return message.getColorInt();
+        }
+
+        @Override
+        public @ColorInt int getMessageColorForName(@NonNull @NotNull String name) {
+            return Colors.getColorForName(name);
+        }
+    },
+    WORKERS_RED(R.style.Theme_App_WorkersRed, false) {
+        @Override
+        public @ColorInt int getMessageNameColor(@NonNull Context context, @NonNull Message message) {
+            return context.getColor(R.color.workers_yellow);
+        }
+
+        @Override
+        public @ColorInt int getMessageColorForName(@NonNull String name) {
+            return Color.YELLOW;
+        }
+
+        @Override
+        public @ColorInt int getSheetBackgroundColor(@NonNull Context context, long seed) {
+            return context.getColor(R.color.workers_red);
+        }
+
+        @Override
+        public @ColorInt int getSheetBackgroundColor(@NonNull Context context, @NonNull Message message) {
+            return context.getColor(R.color.workers_red);
         }
     },
     ;
@@ -57,36 +90,71 @@ public enum Theme {
         currentTheme = theme;
     }
 
-    public void apply(@NonNull Context context) {
-        AppCompatDelegate.setDefaultNightMode(this.isDark()
+    public void apply(@NonNull Application context) {
+        var oldNightMode = AppCompatDelegate.getDefaultNightMode();
+        var newNightMode = this.isDark()
                 ? AppCompatDelegate.MODE_NIGHT_YES
-                : AppCompatDelegate.MODE_NIGHT_NO
-        );
+                : AppCompatDelegate.MODE_NIGHT_NO;
+
+        if (oldNightMode != newNightMode) {
+            AppCompatDelegate.setDefaultNightMode(newNightMode);
+        } else {
+            context.getActivity().recreate();
+        }
+
         context.setTheme(getTheme());
     }
 
+    /**
+     * {@return the color for a given message}
+     */
     public abstract @ColorInt int getMessageNameColor(@NonNull Context context, @NonNull Message message);
 
+    /**
+     * {@return the color for a given name}
+     */
+    public abstract @ColorInt int getMessageColorForName(@NonNull String name);
+
+    /**
+     * {@return the icon color for colored icons in list views}
+     */
     public @ColorInt int getIconColor(@NonNull Context context, long seed) {
         return Colors.getColor(context, getAccentColorResource(seed));
     }
 
+    /**
+     * {@return the color for the pattern in the info bottom sheet header}
+     */
     public @ColorInt int getSheetBackgroundColor(@NonNull Context context, long seed) {
         return getIconColor(context, seed);
     }
 
+    /**
+     * {@return the color for the dark parts of the pattern in the info bottom sheet header}
+     */
     public @ColorInt int getSheetBackgroundColorDark(@NonNull Context context, long seed) {
         return Colors.multiply(getSheetBackgroundColor(context, seed), 0xFFCCCCCC);
     }
 
+    /**
+     * {@return the color for the pattern in the info bottom sheet header}
+     * @see #getSheetBackgroundColor(Context, long)
+     */
     public @ColorInt int getSheetBackgroundColor(@NonNull Context context, @NonNull Message message) {
         return getMessageNameColor(context, message);
     }
 
+    /**
+     * {@return the color for the dark parts of the pattern in the info bottom sheet header}
+     * @see #getSheetBackgroundColorDark(Context, long)
+     */
     public @ColorInt int getSheetBackgroundColorDark(@NonNull Context context, @NonNull Message message) {
         return Colors.multiply(getSheetBackgroundColor(context, message), 0xFFCCCCCC);
     }
 
+    /**
+     * {@return the pattern for the info bottom sheet header}
+     */
     public @DrawableRes int getSheetBackgroundPattern(@NonNull Context context, long seed) {
         final int max = patterns.length;
         return patterns[(int) ((seed % max + max) % max)];

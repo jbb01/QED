@@ -80,13 +80,16 @@
     <string-array name="theme_names" translatable="false">
         <item>@string/theme_light</item>
         <item>@string/theme_dark</item>
+        <item>@string/theme_workers_red</item>
     </string-array>
     <string-array name="theme_codes" translatable="false">
         <item>LIGHT</item>
         <item>DARK</item>
+        <item>WORKERS_RED</item>
     </string-array>
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
+    <string name="theme_workers_red">Worker\'s Red</string>
 
     <!-- Error messages -->
     <string name="error">Error!</string>

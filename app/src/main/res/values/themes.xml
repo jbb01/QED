@@ -26,7 +26,6 @@
         <item name="textInputStyle">@style/Widget.Design.TextInputLayout</item>
         <item name="actionModeStyle">@style/Widget.App.ActionMode</item>
         <item name="android:dropDownListViewStyle">@style/Widget.App.ListView.DropDown</item>
-        <item name="chipStyle">@style/Widget.App.Chip</item>
         <item name="qedLogoStyle">@style/Widget.App.Logo</item>
 
         <!-- Text Appearances -->
@@ -97,6 +96,7 @@
         <item name="colorOnAccentColor">@android:color/white</item>
 
         <item name="dividerColor">#F0F0F0</item>
+        <item name="chipBackgroundColor">#f4f4f4</item>
 
         <item name="dateBannerBackgroundTint">@color/dateBannerBackground</item>
         <item name="dateBannerTextAppearance">@style/TextAppearance.App.Message.DateBanner</item>

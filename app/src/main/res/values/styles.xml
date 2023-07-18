@@ -53,11 +53,6 @@
         <item name="android:maxWidth">@null</item>
     </style>
 
-    <style name="Widget.App.Chip" parent="Widget.MaterialComponents.Chip.Action">
-        <item name="chipBackgroundColor">#f4f4f4</item>
-    </style>
-
-
     <style name="Widget.App.MaterialListItem" parent="">
         <item name="titleTextAppearance">?textAppearanceSubtitle1</item>
         <item name="subtitleTextAppearance">?textAppearanceCaption</item>

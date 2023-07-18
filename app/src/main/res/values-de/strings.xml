@@ -36,6 +36,7 @@
     <!-- Themes -->
     <string name="theme_light">Hell</string>
     <string name="theme_dark">Dunkel</string>
+    <string name="theme_workers_red">Arbeiterrot</string>
 
     <!-- Error messages -->
     <string name="error">Fehler!</string>
