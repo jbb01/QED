@@ -73,6 +73,7 @@ public class Person implements Parcelable {
     private Instant loaded;
 
     // Pair of type and number/name
+    @NonNull
     private final Set<Pair<String, String>> contacts = new LinkedHashSet<>();
     private final Set<String> addresses = new LinkedHashSet<>();
     private final Set<Registration> events = new ObjectLinkedOpenCustomHashSet<>(Registration.STRATEGY_ID);

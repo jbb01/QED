@@ -6,10 +6,12 @@ import android.content.*;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.provider.CalendarContract;
+import android.provider.ContactsContract;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.util.Pair;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
@@ -27,6 +29,8 @@ import eu.jonahbauer.qed.networking.NetworkConstants;
 
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 
 import lombok.experimental.UtilityClass;
 
@@ -90,6 +94,67 @@ public class Actions {
                 .putExtra(CalendarContract.EXTRA_EVENT_ALL_DAY, true)
                 .putExtra(CalendarContract.Events.EVENT_LOCATION, event.getHotelAddress())
                 .putExtra(Intent.EXTRA_EMAIL, event.getEmailOrga());
+
+        return tryStartActivity(context, intent);
+    }
+
+    /**
+     * Launches an {@link Intent} to {@linkplain Intent#ACTION_INSERT insert} the given person into the contact book.
+     * The following attributes are included:
+     * <ul>
+     *     <li>the {@linkplain Person::getFullName full name},</li>
+     *     <li>the {@linkplain Person::getPhone phone number},</li>
+     *     <li>the {@linkplain Person::getEmail mail address}.</li>
+     * </ul>
+     */
+    public static boolean exportToAddressBook(@NonNull Context context, @NonNull Person person) {
+        Intent intent = new Intent(Intent.ACTION_INSERT)
+                .setType(ContactsContract.Contacts.CONTENT_TYPE)
+                .putExtra(ContactsContract.Intents.Insert.NAME, person.getFullName())
+                .putExtra(ContactsContract.Intents.Insert.NOTES, "QED");
+        if(person.getEmail() != null)
+                intent.putExtra(ContactsContract.Intents.Insert.EMAIL, person.getEmail());
+        var contacts = person.getContacts();
+        var data = new ArrayList<ContentValues>();
+        var numPhones = 0;
+        for (var contact : contacts) {
+            switch (contact.first.toLowerCase()) {
+                case "daheim":
+                case "mobil":
+                case "phone":
+                case "telefon":
+                case "festnetz":
+                    if(numPhones > 2) break;
+                    String phoneType, phone;
+                    switch(numPhones){
+                        case 0:
+                            phone = ContactsContract.Intents.Insert.PHONE;
+                            phoneType = ContactsContract.Intents.Insert.PHONE_TYPE;
+                            break;
+                        case 1:
+                            phone = ContactsContract.Intents.Insert.SECONDARY_PHONE;
+                            phoneType = ContactsContract.Intents.Insert.SECONDARY_PHONE_TYPE;
+                            break;
+                        default:
+                            phone = ContactsContract.Intents.Insert.TERTIARY_PHONE;
+                            phoneType = ContactsContract.Intents.Insert.TERTIARY_PHONE;
+                            break;
+                    };
+                    intent.putExtra(phoneType, contact.first);
+                    intent.putExtra(phone, contact.second);
+                    numPhones++;
+                    break;
+                default:
+                    var row = new ContentValues();
+                    row.put(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Im.CONTENT_ITEM_TYPE);
+                    row.put(ContactsContract.CommonDataKinds.Im.DATA, contact.second);
+                    row.put(ContactsContract.CommonDataKinds.Im.PROTOCOL, ContactsContract.CommonDataKinds.Im.PROTOCOL_CUSTOM);
+                    row.put(ContactsContract.CommonDataKinds.Im.CUSTOM_PROTOCOL, contact.first);
+                    data.add(row);
+                    break;
+            }
+        }
+        intent.putParcelableArrayListExtra(ContactsContract.Intents.Insert.DATA, data);
 
         return tryStartActivity(context, intent);
     }
