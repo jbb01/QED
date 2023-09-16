@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 public final class EventParser extends DatabaseParser<Event> {
     private static final String LOG_TAG = EventParser.class.getName();
 
-    private static final Pattern COST_PATTERN = Pattern.compile("(\\d+(?:,\\d+)?)\\s*€");
+    private static final Pattern COST_PATTERN = Pattern.compile("((?:\\d+\\.)*\\d+(?:,\\d+)?)\\s*€");
     private static final Pattern NUMBER_PATTERN = Pattern.compile("\\d+");
 
     private static final String GENERAL_KEY_START = "Beginn:";
@@ -174,6 +174,7 @@ public final class EventParser extends DatabaseParser<Event> {
             String match = matcher.group(1);
             assert match != null;
 
+            match = match.replaceAll("\\.","");
             match = match.replace(',', '.');
             return HtmlParser.parseDouble(match);
         }
