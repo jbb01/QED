@@ -174,7 +174,7 @@ public final class EventParser extends DatabaseParser<Event> {
             String match = matcher.group(1);
             assert match != null;
 
-            match = match.replaceAll("\\.","");
+            match = match.replace(".","");
             match = match.replace(',', '.');
             return HtmlParser.parseDouble(match);
         }
