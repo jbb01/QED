@@ -41,7 +41,7 @@ public abstract class MainInfoFragment extends Fragment {
     }
 
     @Override
-    public final void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         postponeEnterTransition(200, TimeUnit.MILLISECONDS);
 
         var manager = getChildFragmentManager();
