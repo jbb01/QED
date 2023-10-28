@@ -27,173 +27,179 @@
             android:orientation="vertical"
             android:elevation="4dp">
 
-            <TableLayout
+            <LinearLayout
                 android:id="@+id/expandable"
-                android:visibility="gone"
-                android:paddingHorizontal="8dp"
-                android:paddingTop="8dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
                 tools:visibility="visible">
 
-                <eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
-                    android:id="@+id/database_channel_row"
+                <TableLayout
+                    android:paddingHorizontal="8dp"
+                    android:paddingTop="8dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
-                    <CheckBox
-                        android:id="@+id/database_channel_checkbox"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingEnd="8dp"
-                        android:text="@string/chat_database_channel_checkbox"
-                        tools:ignore="RtlSymmetry" />
-                    <EditText
-                        android:id="@+id/database_channel_editText"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:textSize="16sp"
-                        android:hint="@string/chat_database_channel_hint"
-                        android:inputType="text"
-                        android:importantForAutofill="no" />
-                </eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
 
-                <eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
-                    android:id="@+id/database_message_row"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <CheckBox
-                        android:id="@+id/database_message_checkbox"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingEnd="8dp"
-                        android:text="@string/chat_database_message_checkbox"
-                        tools:ignore="RtlSymmetry" />
-                    <EditText
-                        android:id="@+id/database_message_editText"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:textSize="16sp"
-                        android:hint="@string/chat_database_message_hint"
-                        android:inputType="text"
-                        android:importantForAutofill="no" />
-                </eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
+                    <eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
+                        android:id="@+id/database_channel_row"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <CheckBox
+                            android:id="@+id/database_channel_checkbox"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingEnd="8dp"
+                            android:text="@string/chat_database_channel_checkbox"
+                            tools:ignore="RtlSymmetry" />
+                        <EditText
+                            android:id="@+id/database_channel_editText"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textSize="16sp"
+                            android:hint="@string/chat_database_channel_hint"
+                            android:inputType="text"
+                            android:importantForAutofill="no" />
+                    </eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
 
-                <eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
-                    android:id="@+id/database_name_row"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <CheckBox
-                        android:id="@+id/database_name_checkbox"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingEnd="8dp"
-                        android:text="@string/chat_database_name_checkbox"
-                        tools:ignore="RtlSymmetry" />
-                    <EditText
-                        android:id="@+id/database_name_editText"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:textSize="16sp"
-                        android:hint="@string/chat_database_name_hint"
-                        android:inputType="text"
-                        android:importantForAutofill="no" />
-                </eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
+                    <eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
+                        android:id="@+id/database_message_row"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <CheckBox
+                            android:id="@+id/database_message_checkbox"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingEnd="8dp"
+                            android:text="@string/chat_database_message_checkbox"
+                            tools:ignore="RtlSymmetry" />
+                        <EditText
+                            android:id="@+id/database_message_editText"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textSize="16sp"
+                            android:hint="@string/chat_database_message_hint"
+                            android:inputType="text"
+                            android:importantForAutofill="no" />
+                    </eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
 
-                <eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
-                    android:id="@+id/database_dateFrom_row"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <CheckBox
-                        android:id="@+id/database_dateFrom_checkbox"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingEnd="8dp"
-                        android:text="@string/chat_database_dateFrom_checkbox"
-                        tools:ignore="RtlSymmetry" />
-                    <EditText
-                        android:id="@+id/database_dateFrom_editText"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:textSize="16sp"
-                        android:focusable="false"
-                        android:hint="@string/chat_database_dateFrom_hint"
-                        android:inputType="date"
-                        android:importantForAutofill="no" />
-                    <EditText
-                        android:id="@+id/database_timeFrom_editText"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:textSize="16sp"
-                        android:focusable="false"
-                        android:hint="@string/chat_database_timeFrom_hint"
-                        android:inputType="time"
-                        android:importantForAutofill="no" />
-                </eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
+                    <eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
+                        android:id="@+id/database_name_row"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <CheckBox
+                            android:id="@+id/database_name_checkbox"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingEnd="8dp"
+                            android:text="@string/chat_database_name_checkbox"
+                            tools:ignore="RtlSymmetry" />
+                        <EditText
+                            android:id="@+id/database_name_editText"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textSize="16sp"
+                            android:hint="@string/chat_database_name_hint"
+                            android:inputType="text"
+                            android:importantForAutofill="no" />
+                    </eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
 
-                <eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
-                    android:id="@+id/database_dateTo_row"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <CheckBox
-                        android:id="@+id/database_dateTo_checkbox"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingEnd="8dp"
-                        android:text="@string/chat_database_dateTo_checkbox"
-                        tools:ignore="RtlSymmetry" />
-                    <EditText
-                        android:id="@+id/database_dateTo_editText"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:textSize="16sp"
-                        android:focusable="false"
-                        android:hint="@string/chat_database_dateTo_hint"
-                        android:inputType="datetime"
-                        android:importantForAutofill="no" />
-                    <EditText
-                        android:id="@+id/database_timeTo_editText"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:textSize="16sp"
-                        android:focusable="false"
-                        android:hint="@string/chat_database_timeTo_hint"
-                        android:inputType="time"
-                        android:importantForAutofill="no" />
-                </eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
+                    <eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
+                        android:id="@+id/database_dateFrom_row"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <CheckBox
+                            android:id="@+id/database_dateFrom_checkbox"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingEnd="8dp"
+                            android:text="@string/chat_database_dateFrom_checkbox"
+                            tools:ignore="RtlSymmetry" />
+                        <EditText
+                            android:id="@+id/database_dateFrom_editText"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textSize="16sp"
+                            android:focusable="false"
+                            android:hint="@string/chat_database_dateFrom_hint"
+                            android:inputType="date"
+                            android:importantForAutofill="no" />
+                        <EditText
+                            android:id="@+id/database_timeFrom_editText"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textSize="16sp"
+                            android:focusable="false"
+                            android:hint="@string/chat_database_timeFrom_hint"
+                            android:inputType="time"
+                            android:importantForAutofill="no" />
+                    </eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
 
-                <eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
-                    android:id="@+id/database_id_row"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <CheckBox
-                        android:id="@+id/database_id_checkbox"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingEnd="8dp"
-                        android:text="@string/chat_database_id_checkbox"
-                        tools:ignore="RtlSymmetry" />
-                    <EditText
-                        android:id="@+id/database_id_editText"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:textSize="16sp"
-                        android:hint="@string/chat_database_id_hint"
-                        android:inputType="number"
-                        android:digits="0123456789-"
-                        android:imeActionId="6"
-                        android:importantForAutofill="no" />
-                </eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
-            </TableLayout>
+                    <eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
+                        android:id="@+id/database_dateTo_row"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <CheckBox
+                            android:id="@+id/database_dateTo_checkbox"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingEnd="8dp"
+                            android:text="@string/chat_database_dateTo_checkbox"
+                            tools:ignore="RtlSymmetry" />
+                        <EditText
+                            android:id="@+id/database_dateTo_editText"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textSize="16sp"
+                            android:focusable="false"
+                            android:hint="@string/chat_database_dateTo_hint"
+                            android:inputType="datetime"
+                            android:importantForAutofill="no" />
+                        <EditText
+                            android:id="@+id/database_timeTo_editText"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textSize="16sp"
+                            android:focusable="false"
+                            android:hint="@string/chat_database_timeTo_hint"
+                            android:inputType="time"
+                            android:importantForAutofill="no" />
+                    </eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
 
-            <View style="?dividerStyle"/>
+                    <eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
+                        android:id="@+id/database_id_row"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <CheckBox
+                            android:id="@+id/database_id_checkbox"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingEnd="8dp"
+                            android:text="@string/chat_database_id_checkbox"
+                            tools:ignore="RtlSymmetry" />
+                        <EditText
+                            android:id="@+id/database_id_editText"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textSize="16sp"
+                            android:hint="@string/chat_database_id_hint"
+                            android:inputType="number"
+                            android:digits="0123456789-"
+                            android:imeActionId="6"
+                            android:importantForAutofill="no" />
+                    </eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
+                </TableLayout>
+
+                <View style="?dividerStyle"/>
+            </LinearLayout>
 
             <LinearLayout
                 android:padding="8dp"

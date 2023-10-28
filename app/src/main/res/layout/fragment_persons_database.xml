@@ -31,128 +31,133 @@
             android:orientation="vertical"
             tools:ignore="UselessParent">
 
-            <TableLayout
+            <LinearLayout
                 android:id="@+id/expandable"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingHorizontal="8dp"
-                android:paddingTop="8dp"
+                android:orientation="vertical"
                 android:visibility="gone"
                 tools:visibility="visible">
 
-                <eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
-                    android:id="@+id/database_firstName_row"
+                <TableLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="8dp"
+                    android:paddingTop="8dp">
 
-                    <CheckBox
-                        android:id="@+id/database_firstName_checkbox"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingEnd="8dp"
-                        android:text="@string/persons_database_firstName_checkbox"
-                        tools:ignore="RtlSymmetry" />
+                    <eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
+                        android:id="@+id/database_firstName_row"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
 
-                    <EditText
-                        android:id="@+id/database_firstName_editText"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:hint="@string/persons_database_firstName_hint"
-                        android:importantForAutofill="no"
-                        android:inputType="text"
-                        android:textSize="16sp" />
-                </eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
-
-                <eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
-                    android:id="@+id/database_lastName_row"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <CheckBox
-                        android:id="@+id/database_lastName_checkbox"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingEnd="8dp"
-                        android:text="@string/persons_database_lastName_checkbox"
-                        tools:ignore="RtlSymmetry" />
-
-                    <EditText
-                        android:id="@+id/database_lastName_editText"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:hint="@string/persons_database_lastName_hint"
-                        android:importantForAutofill="no"
-                        android:inputType="text"
-                        android:textSize="16sp" />
-                </eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
-
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <eu.jonahbauer.qed.layoutStuff.views.CheckBoxTriStates
-                        android:id="@+id/database_active_checkbox"
-                        style="?triCheckboxStyle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingEnd="8dp"
-                        android:text="@string/persons_database_active_checkbox"
-                        tools:ignore="RtlSymmetry" />
-
-                    <eu.jonahbauer.qed.layoutStuff.views.CheckBoxTriStates
-                        android:id="@+id/database_member_checkbox"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/persons_database_member_checkbox" />
-                </TableRow>
-
-                <View style="?dividerStyle"/>
-
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:id="@+id/database_sort"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:paddingHorizontal="8dp"
-                        android:gravity="center_vertical"
-                        android:textAppearance="?textAppearanceBody2"
-                        android:text="@string/persons_database_sort" />
-
-                    <RadioGroup
-                        android:id="@+id/database_sort_radio_group"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="horizontal"
-                        android:textSize="16sp">
-
-                        <RadioButton
-                            android:id="@+id/database_sort_first_name_radio_button"
+                        <CheckBox
+                            android:id="@+id/database_firstName_checkbox"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:checked="true"
-                            android:text="@string/persons_database_sort_first_name"
                             android:paddingEnd="8dp"
-                            android:textColor="?colorOnSurface"
+                            android:text="@string/persons_database_firstName_checkbox"
                             tools:ignore="RtlSymmetry" />
 
-                        <RadioButton
-                            android:id="@+id/database_sort_last_name_radio_button"
+                        <EditText
+                            android:id="@+id/database_firstName_editText"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:hint="@string/persons_database_firstName_hint"
+                            android:importantForAutofill="no"
+                            android:inputType="text"
+                            android:textSize="16sp" />
+                    </eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
+
+                    <eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
+                        android:id="@+id/database_lastName_row"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <CheckBox
+                            android:id="@+id/database_lastName_checkbox"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/persons_database_sort_last_name"
-                            android:textColor="?colorOnSurface" />
-                    </RadioGroup>
-                </TableRow>
-            </TableLayout>
+                            android:paddingEnd="8dp"
+                            android:text="@string/persons_database_lastName_checkbox"
+                            tools:ignore="RtlSymmetry" />
 
-            <View style="?dividerStyle"/>
+                        <EditText
+                            android:id="@+id/database_lastName_editText"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:hint="@string/persons_database_lastName_hint"
+                            android:importantForAutofill="no"
+                            android:inputType="text"
+                            android:textSize="16sp" />
+                    </eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <eu.jonahbauer.qed.layoutStuff.views.CheckBoxTriStates
+                            android:id="@+id/database_active_checkbox"
+                            style="?triCheckboxStyle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingEnd="8dp"
+                            android:text="@string/persons_database_active_checkbox"
+                            tools:ignore="RtlSymmetry" />
+
+                        <eu.jonahbauer.qed.layoutStuff.views.CheckBoxTriStates
+                            android:id="@+id/database_member_checkbox"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/persons_database_member_checkbox" />
+                    </TableRow>
+
+                    <View style="?dividerStyle"/>
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/database_sort"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:paddingHorizontal="8dp"
+                            android:gravity="center_vertical"
+                            android:textAppearance="?textAppearanceBody2"
+                            android:text="@string/persons_database_sort" />
+
+                        <RadioGroup
+                            android:id="@+id/database_sort_radio_group"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="horizontal"
+                            android:textSize="16sp">
+
+                            <RadioButton
+                                android:id="@+id/database_sort_first_name_radio_button"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:checked="true"
+                                android:text="@string/persons_database_sort_first_name"
+                                android:paddingEnd="8dp"
+                                android:textColor="?colorOnSurface"
+                            tools:ignore="RtlSymmetry" />
+
+                            <RadioButton
+                                android:id="@+id/database_sort_last_name_radio_button"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/persons_database_sort_last_name"
+                        android:textColor="?colorOnSurface" /></RadioGroup>
+                    </TableRow>
+                </TableLayout>
+
+                <View style="?dividerStyle"/>
+            </LinearLayout>
 
             <LinearLayout
                 android:padding="8dp"

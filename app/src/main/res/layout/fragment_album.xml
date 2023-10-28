@@ -49,93 +49,99 @@
             android:elevation="4dp"
             android:orientation="vertical">
 
-            <TableLayout
+            <LinearLayout
                 android:id="@+id/expandable"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingHorizontal="8dp"
-                android:paddingTop="8dp"
+                android:orientation="vertical"
                 android:visibility="gone"
                 tools:visibility="visible">
 
-                <eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
-                    android:id="@+id/album_photographer_row"
+                <TableLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <CheckBox
-                        android:id="@+id/album_photographer_check_box"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingEnd="8dp"
-                        android:text="@string/album_photographer_radio_button"
-                        tools:ignore="RtlSymmetry" />
-                    <Spinner
-                        android:id="@+id/album_photographer_spinner"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:spinnerMode="dialog"/>
-                </eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="8dp"
+                    android:paddingTop="8dp">
 
-                <eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
-                    android:id="@+id/album_date_row"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <CheckBox
-                        android:id="@+id/album_date_check_box"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingEnd="8dp"
-                        android:text="@string/album_date_radio_button"
-                        tools:ignore="RtlSymmetry" />
-                    <Spinner
-                        android:id="@+id/album_date_spinner"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:spinnerMode="dialog" />
-                </eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
+                    <eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
+                        android:id="@+id/album_photographer_row"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <CheckBox
+                            android:id="@+id/album_photographer_check_box"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingEnd="8dp"
+                            android:text="@string/album_photographer_radio_button"
+                            tools:ignore="RtlSymmetry" />
+                        <Spinner
+                            android:id="@+id/album_photographer_spinner"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:spinnerMode="dialog"/>
+                    </eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
 
-                <eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
-                    android:id="@+id/album_upload_row"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <CheckBox
-                        android:id="@+id/album_upload_check_box"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingEnd="8dp"
-                        android:text="@string/album_upload_radio_button"
-                        tools:ignore="RtlSymmetry" />
-                    <Spinner
-                        android:id="@+id/album_upload_spinner"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:spinnerMode="dialog" />
-                </eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
+                    <eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
+                        android:id="@+id/album_date_row"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <CheckBox
+                            android:id="@+id/album_date_check_box"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingEnd="8dp"
+                            android:text="@string/album_date_radio_button"
+                            tools:ignore="RtlSymmetry" />
+                        <Spinner
+                            android:id="@+id/album_date_spinner"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:spinnerMode="dialog" />
+                    </eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
 
-                <eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
-                    android:id="@+id/album_category_row"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <CheckBox
-                        android:id="@+id/album_category_check_box"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingEnd="8dp"
-                        android:text="@string/album_category_radio_button"
-                        tools:ignore="RtlSymmetry" />
-                    <Spinner
-                        android:id="@+id/album_category_spinner"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:spinnerMode="dialog"/>
-                </eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
-            </TableLayout>
+                    <eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
+                        android:id="@+id/album_upload_row"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <CheckBox
+                            android:id="@+id/album_upload_check_box"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingEnd="8dp"
+                            android:text="@string/album_upload_radio_button"
+                            tools:ignore="RtlSymmetry" />
+                        <Spinner
+                            android:id="@+id/album_upload_spinner"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:spinnerMode="dialog" />
+                    </eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
 
-            <View style="?dividerStyle"/>
+                    <eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
+                        android:id="@+id/album_category_row"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <CheckBox
+                            android:id="@+id/album_category_check_box"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingEnd="8dp"
+                            android:text="@string/album_category_radio_button"
+                            tools:ignore="RtlSymmetry" />
+                        <Spinner
+                            android:id="@+id/album_category_spinner"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:spinnerMode="dialog"/>
+                    </eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
+                </TableLayout>
+
+                <View style="?dividerStyle"/>
+            </LinearLayout>
 
             <LinearLayout
                 android:padding="8dp"
