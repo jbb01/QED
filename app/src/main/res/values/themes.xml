@@ -27,6 +27,7 @@
         <item name="actionModeStyle">@style/Widget.App.ActionMode</item>
         <item name="android:dropDownListViewStyle">@style/Widget.App.ListView.DropDown</item>
         <item name="chipStyle">@style/Widget.App.Chip</item>
+        <item name="qedLogoStyle">@style/Widget.App.Logo</item>
 
         <!-- Text Appearances -->
         <item name="textAppearanceButton">@style/TextAppearance.App.Button</item>

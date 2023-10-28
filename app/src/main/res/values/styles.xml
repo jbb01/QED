@@ -33,6 +33,10 @@
         <item name="android:elevation">1dp</item>
     </style>
 
+    <style name="Widget.App.Logo" parent="">
+        <item name="android:colorForeground">@android:color/white</item>
+        <item name="android:colorBackground">@android:color/black</item>
+    </style>
     <style name="Widget.App.Divider" parent="">
         <item name="android:background">?divider</item>
         <item name="android:layout_height">?android:dividerHeight</item>

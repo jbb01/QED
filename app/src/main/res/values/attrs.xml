@@ -133,6 +133,7 @@
         <attr name="ringWidth" format="dimension"/>
     </declare-styleable>
 
+    <attr name="qedLogoStyle" format="reference"/>
     <attr name="dividerStyle" format="reference"/>
     <attr name="triCheckboxStyle" format="reference"/>
 
