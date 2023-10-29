@@ -4,6 +4,7 @@
     <style name="Theme.App.Dark" parent="Base.Theme.App">
         <item name="navigationViewStyle">@style/Widget.App.NavigationView.Dark</item>
         <item name="chipStyle">@style/Widget.App.Chip.Dark</item>
+        <item name="messageTheme">@style/ThemeOverlay.App.Message.Dark</item>
 
         <!-- Color Palette -->
         <item name="colorPrimary">@color/colorPrimaryNight</item>
@@ -42,7 +43,11 @@
         <item name="dividerColor">#42454A</item>
 
         <item name="elevationOverlayEnabled">false</item>
+        <item name="dateBannerBackgroundTint">?colorSurface</item>
+    </style>
 
-        <item name="dateBannerBackgroundTint">@color/dateBannerBackgroundNight</item>
+    <style name="ThemeOverlay.App.Message.Dark">
+        <item name="backgroundTintPressed">#5E6165</item>
+        <item name="backgroundTintActivated">#4B4D70</item>
     </style>
 </resources>

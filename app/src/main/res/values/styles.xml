@@ -19,6 +19,7 @@
     </style>
 
     <style name="Widget.App.Message" parent="">
+        <item name="materialThemeOverlay">?messageTheme</item>
         <item name="android:backgroundTint">@color/message_background</item>
 
         <item name="nameTextAppearance">@style/TextAppearance.App.Message.Name</item>

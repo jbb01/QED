@@ -21,6 +21,7 @@ import androidx.core.text.util.LinkifyCompat;
 import com.google.android.material.shape.MaterialShapeDrawable;
 import com.google.android.material.shape.RoundedCornerTreatment;
 import com.google.android.material.shape.ShapeAppearanceModel;
+import com.google.android.material.theme.overlay.MaterialThemeOverlay;
 import eu.jonahbauer.qed.R;
 import eu.jonahbauer.qed.model.Message;
 import eu.jonahbauer.qed.util.ViewUtils;
@@ -59,7 +60,11 @@ public class ExtendedMessageView extends LinearLayout implements MessageView {
     }
 
     public ExtendedMessageView(@NonNull Context context, @Nullable AttributeSet attrs, @AttrRes int defStyleAttr, @StyleRes int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
+        super(
+                MaterialThemeOverlay.wrap(context, attrs, defStyleAttr, defStyleRes),
+                attrs, defStyleAttr, defStyleRes
+        );
+        context = getContext();
 
         var array = context.obtainStyledAttributes(attrs, R.styleable.ExtendedMessageView, defStyleAttr, defStyleRes);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {

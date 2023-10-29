@@ -55,8 +55,6 @@
     <color name="colorSecondaryDarkNight">#019688</color>
     <color name="colorSecondaryLightNight">#88faea</color>
 
-    <color name="dateBannerBackgroundNight">@color/colorSurfaceNight</color>
-
     <color name="colorBackgroundNight">#2F3136</color>
     <color name="colorSurfaceNight">#36393f</color>
 

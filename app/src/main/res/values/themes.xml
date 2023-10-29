@@ -55,10 +55,9 @@
         <item name="android:navigationBarColor">@android:color/black</item>
 
         <!-- Messages -->
+        <item name="messageTheme">@style/ThemeOverlay.App.Message</item>
         <item name="messageStyle">@style/Widget.App.Message</item>
         <item name="extendedMessageStyle">@style/Widget.App.Message.Extended</item>
-        <item name="dateBannerTextAppearance">@style/TextAppearance.App.Message.DateBanner</item>
-        <item name="dateBannerBackgroundTint">@color/dateBannerBackground</item>
     </style>
 
     <style name="Theme.App" parent="Base.Theme.App">
@@ -98,6 +97,9 @@
         <item name="colorOnAccentColor">@android:color/white</item>
 
         <item name="dividerColor">#F0F0F0</item>
+
+        <item name="dateBannerBackgroundTint">@color/dateBannerBackground</item>
+        <item name="dateBannerTextAppearance">@style/TextAppearance.App.Message.DateBanner</item>
     </style>
 
     <style name="Theme.App.Black">
@@ -156,5 +158,10 @@
     <style name="ThemeOverlay.App.BottomSheetDialog" parent="ThemeOverlay.MaterialComponents.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/Widget.App.BottomSheet.Modal</item>
         <item name="snackbarStyle">@style/Widget.App.Snackbar.BottomSheet</item>
+    </style>
+    <style name="ThemeOverlay.App.Message" parent="">
+        <item name="backgroundTint">?colorSurface</item>
+        <item name="backgroundTintActivated">#E0E0FF</item>
+        <item name="backgroundTintPressed">#EEEEEE</item>
     </style>
 </resources>
