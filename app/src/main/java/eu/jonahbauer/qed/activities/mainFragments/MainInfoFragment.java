@@ -11,6 +11,7 @@ import androidx.lifecycle.Lifecycle;
 import eu.jonahbauer.qed.R;
 import eu.jonahbauer.qed.activities.sheets.InfoFragment;
 import eu.jonahbauer.qed.databinding.SingleFragmentBinding;
+import eu.jonahbauer.qed.layoutStuff.themes.Theme;
 import eu.jonahbauer.qed.model.viewmodel.InfoViewModel;
 import eu.jonahbauer.qed.util.Actions;
 import eu.jonahbauer.qed.util.TransitionUtils;
@@ -22,6 +23,7 @@ import java.util.function.Supplier;
 
 public abstract class MainInfoFragment extends Fragment {
     private @ColorInt int mColor;
+    private @ColorInt int mBackgroundColor;
     private SingleFragmentBinding mBinding;
 
     @Override
@@ -30,8 +32,8 @@ public abstract class MainInfoFragment extends Fragment {
 
         onCreateViewModel();
 
-        TransitionUtils.setupDefaultTransitions(this, mColor);
-        TransitionUtils.setupEnterContainerTransform(this, mColor);
+        TransitionUtils.setupDefaultTransitions(this, mBackgroundColor);
+        TransitionUtils.setupEnterContainerTransform(this, mBackgroundColor);
     }
 
     @Override
@@ -71,8 +73,15 @@ public abstract class MainInfoFragment extends Fragment {
         }
     }
 
-    protected void setColor(@ColorInt int color) {
+    protected void setDesignSeed(long seed) {
+        var theme = Theme.getCurrentTheme();
+        var context = requireContext();
+        setColor(theme.getIconColor(context, seed), theme.getSheetBackgroundColorDark(context, seed));
+    }
+
+    protected void setColor(@ColorInt int color, @ColorInt int backgroundColor) {
         mColor = color;
+        mBackgroundColor = backgroundColor;
         if (mBinding != null) {
             mBinding.setColor(color);
         }

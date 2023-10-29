@@ -117,7 +117,6 @@ public class PersonInfoFragment extends InfoFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mBinding = FragmentInfoPersonBinding.inflate(inflater, container, false);
         mPersonViewModel.getValue().observe(getViewLifecycleOwner(), mBinding::setPerson);
-        mBinding.setColor(getColor());
         return mBinding.getRoot();
     }
 
@@ -125,15 +124,17 @@ public class PersonInfoFragment extends InfoFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        var color = getColor();
+
         mBinding.toggleEventsButton.setOnClickListener(this::toggleEventsExpanded);
-        mBinding.toggleEventsButton.setIconTint(getColor());
+        mBinding.toggleEventsButton.setIconTint(color);
 
         TypedValue typedValue = new TypedValue();
         requireContext().getTheme().resolveAttribute(R.attr.textAppearanceButton, typedValue, true);
         @StyleRes int textAppearanceButton = typedValue.data;
 
         mBinding.toggleEventsButton.setTitleTextAppearance(textAppearanceButton);
-        mBinding.toggleEventsButton.setTitleTextColor(getColor());
+        mBinding.toggleEventsButton.setTitleTextColor(color);
 
         if (savedInstanceState != null) {
             mExpanded = savedInstanceState.getBoolean(SAVED_EXPANDED);
@@ -145,16 +146,11 @@ public class PersonInfoFragment extends InfoFragment {
         return Objects.requireNonNull(mPersonViewModel.getValue().getValue());
     }
 
-    @Override
-    public int getColor() {
-        return Themes.colorful(requireContext(), getPerson().getId());
-    }
 
     @Override
-    protected int getBackground() {
-        return Themes.pattern(getPerson().getId());
+    protected long getDesignSeed() {
+        return getPerson().getId();
     }
-
 
     public void toggleEventsExpanded(@Nullable View view) {
         setEventsExpanded(!mExpanded);

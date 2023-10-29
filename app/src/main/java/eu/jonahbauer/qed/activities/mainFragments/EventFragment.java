@@ -7,7 +7,6 @@ import eu.jonahbauer.qed.activities.sheets.event.EventInfoFragment;
 import eu.jonahbauer.qed.model.Event;
 import eu.jonahbauer.qed.model.viewmodel.EventViewModel;
 import eu.jonahbauer.qed.model.viewmodel.InfoViewModel;
-import eu.jonahbauer.qed.util.Themes;
 import eu.jonahbauer.qed.util.ViewUtils;
 
 public class EventFragment extends MainInfoFragment {
@@ -23,7 +22,7 @@ public class EventFragment extends MainInfoFragment {
         mEventViewModel = ViewUtils.getViewModelProvider(this, R.id.nav_event).get(EventViewModel.class);
         mEventViewModel.load(event);
 
-        setColor(Themes.colorful(requireContext(), event.getId()));
+        setDesignSeed(event.getId());
     }
 
     @Override

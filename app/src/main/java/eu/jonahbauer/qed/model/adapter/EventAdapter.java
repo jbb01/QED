@@ -8,10 +8,10 @@ import android.widget.SectionIndexer;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import eu.jonahbauer.qed.R;
+import eu.jonahbauer.qed.layoutStuff.themes.Theme;
 import eu.jonahbauer.qed.layoutStuff.views.MaterialListItem;
 import eu.jonahbauer.qed.model.Event;
 import eu.jonahbauer.qed.util.TextUtils;
-import eu.jonahbauer.qed.util.Themes;
 import eu.jonahbauer.qed.util.TimeUtils;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
@@ -45,7 +45,7 @@ public class EventAdapter extends ArrayAdapter<Event> implements SectionIndexer 
 
         item.setTitle(event.getTitle());
         item.setSubtitle(subtitle);
-        item.setIconTint(Themes.colorful(context, event.getId()));
+        item.setIconTint(Theme.getCurrentTheme().getIconColor(context, event.getId()));
         item.setTransitionName(context.getString(R.string.transition_name_event, event.getId()));
 
         return item;

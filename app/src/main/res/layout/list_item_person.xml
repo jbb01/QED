@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <import type="eu.jonahbauer.qed.util.Themes" />
+        <import type="eu.jonahbauer.qed.layoutStuff.themes.Theme" />
 
         <variable name="person" type="eu.jonahbauer.qed.model.Person" />
         <variable name="invertedInitials" type="boolean" />
@@ -35,7 +35,7 @@
             android:layout_height="wrap_content"
             android:visibility="@{person != null}"
             app:icon="@drawable/person_initials_circle"
-            app:iconTint="@{Themes.colorful(context, person.id)}"
+            app:iconTint="@{Theme.getCurrentTheme().getIconColor(context, person.id)}"
             app:iconText="@{person.getInitials(invertedInitials)}"
             app:title="@{person.getFullName(invertedInitials) + ` ` + (!person.active ? @string/persons_database_inactive : !person.member ? @string/persons_database_non_member : ``)}"
             app:subtitle="@{person.email ?? @string/persons_database_no_email, default = ``}"

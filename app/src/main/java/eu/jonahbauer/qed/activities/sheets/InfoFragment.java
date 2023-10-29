@@ -4,6 +4,7 @@ import android.view.ViewGroup;
 import androidx.annotation.*;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import eu.jonahbauer.qed.layoutStuff.themes.Theme;
 import eu.jonahbauer.qed.layoutStuff.views.ListItem;
 import eu.jonahbauer.qed.util.ViewUtils;
 
@@ -11,11 +12,12 @@ import java.util.Collection;
 import java.util.function.BiConsumer;
 
 public abstract class InfoFragment extends Fragment {
-    @ColorInt
-    public abstract int getColor();
 
-    @DrawableRes
-    protected abstract int getBackground();
+    public @ColorInt int getColor() {
+        return Theme.getCurrentTheme().getIconColor(requireContext(), getDesignSeed());
+    }
+
+    protected abstract long getDesignSeed();
 
     public boolean isOpenInBrowserSupported() {
         return false;

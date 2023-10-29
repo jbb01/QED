@@ -29,6 +29,19 @@ public enum Theme {
     ;
 
     private static Theme currentTheme;
+    private static final @AttrRes int[] accentColors = {
+            R.attr.accentColor0, R.attr.accentColor1,
+            R.attr.accentColor2, R.attr.accentColor3,
+            R.attr.accentColor4, R.attr.accentColor5,
+            R.attr.accentColor6, R.attr.accentColor7,
+            R.attr.accentColor8, R.attr.accentColor9,
+    };
+    private static final @DrawableRes int[] patterns = {
+            R.drawable.background_0, R.drawable.background_1,
+            R.drawable.background_2, R.drawable.background_3,
+            R.drawable.background_4, R.drawable.background_5,
+            R.drawable.background_6, R.drawable.background_7
+    };
 
     private final @StyleRes int theme;
     private final boolean dark;
@@ -53,4 +66,35 @@ public enum Theme {
     }
 
     public abstract @ColorInt int getMessageNameColor(@NonNull Context context, @NonNull Message message);
+
+    public @ColorInt int getIconColor(@NonNull Context context, long seed) {
+        return Colors.getColor(context, getAccentColorResource(seed));
+    }
+
+    public @ColorInt int getSheetBackgroundColor(@NonNull Context context, long seed) {
+        return getIconColor(context, seed);
+    }
+
+    public @ColorInt int getSheetBackgroundColorDark(@NonNull Context context, long seed) {
+        return Colors.multiply(getSheetBackgroundColor(context, seed), 0xFFCCCCCC);
+    }
+
+    public @ColorInt int getSheetBackgroundColor(@NonNull Context context, @NonNull Message message) {
+        return getMessageNameColor(context, message);
+    }
+
+    public @ColorInt int getSheetBackgroundColorDark(@NonNull Context context, @NonNull Message message) {
+        return Colors.multiply(getSheetBackgroundColor(context, message), 0xFFCCCCCC);
+    }
+
+    public @DrawableRes int getSheetBackgroundPattern(@NonNull Context context, long seed) {
+        final int max = patterns.length;
+        return patterns[(int) ((seed % max + max) % max)];
+    }
+
+    @AttrRes
+    private static int getAccentColorResource(long seed) {
+        final int max = accentColors.length;
+        return accentColors[(int) ((seed % max + max) % max)];
+    }
 }

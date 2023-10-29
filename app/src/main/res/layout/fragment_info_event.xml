@@ -7,7 +7,6 @@
         <import type="eu.jonahbauer.qed.util.TimeUtils"/>
         <import type="eu.jonahbauer.qed.util.TextUtils"/>
 
-        <variable name="color" type="int" />
         <variable name="event" type="eu.jonahbauer.qed.model.Event" />
     </data>
 

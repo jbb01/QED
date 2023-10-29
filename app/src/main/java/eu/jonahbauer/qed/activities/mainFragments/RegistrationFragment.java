@@ -7,7 +7,6 @@ import eu.jonahbauer.qed.activities.sheets.registration.RegistrationInfoFragment
 import eu.jonahbauer.qed.model.Registration;
 import eu.jonahbauer.qed.model.viewmodel.InfoViewModel;
 import eu.jonahbauer.qed.model.viewmodel.RegistrationViewModel;
-import eu.jonahbauer.qed.util.Themes;
 import eu.jonahbauer.qed.util.ViewUtils;
 
 public class RegistrationFragment extends MainInfoFragment {
@@ -23,7 +22,7 @@ public class RegistrationFragment extends MainInfoFragment {
         mRegistrationViewModel = ViewUtils.getViewModelProvider(this, R.id.nav_registration).get(RegistrationViewModel.class);
         mRegistrationViewModel.load(registration);
 
-        setColor(Themes.colorful(requireContext(), registration.getId()));
+        setDesignSeed(registration.getId());
     }
 
     @Override

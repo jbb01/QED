@@ -12,7 +12,6 @@ import eu.jonahbauer.qed.activities.sheets.InfoFragment;
 import eu.jonahbauer.qed.databinding.FragmentInfoMessageBinding;
 import eu.jonahbauer.qed.model.Message;
 import eu.jonahbauer.qed.model.viewmodel.MessageViewModel;
-import eu.jonahbauer.qed.util.Themes;
 
 import java.util.Objects;
 
@@ -47,12 +46,7 @@ public class MessageInfoFragment extends InfoFragment {
     }
 
     @Override
-    public int getColor() {
-        return getMessage().getColor(requireContext());
-    }
-
-    @Override
-    protected int getBackground() {
-        return Themes.pattern(getMessage().getId());
+    protected long getDesignSeed() {
+        return getMessage().getId();
     }
 }

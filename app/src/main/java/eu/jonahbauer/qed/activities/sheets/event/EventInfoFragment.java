@@ -19,7 +19,6 @@ import eu.jonahbauer.qed.model.Event;
 import eu.jonahbauer.qed.model.Registration;
 import eu.jonahbauer.qed.model.viewmodel.EventViewModel;
 import eu.jonahbauer.qed.networking.NetworkConstants;
-import eu.jonahbauer.qed.util.Themes;
 
 import java.util.Collection;
 import java.util.Locale;
@@ -56,7 +55,6 @@ public class EventInfoFragment extends InfoFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mBinding = FragmentInfoEventBinding.inflate(inflater, container, false);
         mEventViewModel.getValue().observe(getViewLifecycleOwner(), mBinding::setEvent);
-        mBinding.setColor(getColor());
         return mBinding.getRoot();
     }
 
@@ -64,15 +62,17 @@ public class EventInfoFragment extends InfoFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        var color = getColor();
+
         mBinding.toggleParticipantsButton.setOnClickListener(this::toggleParticipantsExpanded);
-        mBinding.toggleParticipantsButton.setIconTint(getColor());
+        mBinding.toggleParticipantsButton.setIconTint(color);
 
         TypedValue typedValue = new TypedValue();
         requireContext().getTheme().resolveAttribute(R.attr.textAppearanceButton, typedValue, true);
         @StyleRes int textAppearanceButton = typedValue.data;
 
         mBinding.toggleParticipantsButton.setTitleTextAppearance(textAppearanceButton);
-        mBinding.toggleParticipantsButton.setTitleTextColor(getColor());
+        mBinding.toggleParticipantsButton.setTitleTextColor(color);
 
         if (savedInstanceState != null) {
             mExpanded = savedInstanceState.getBoolean(SAVED_EXPANDED);
@@ -86,13 +86,8 @@ public class EventInfoFragment extends InfoFragment {
     }
 
     @Override
-    public int getColor() {
-        return Themes.colorful(requireContext(), getEvent().getId());
-    }
-
-    @Override
-    protected int getBackground() {
-        return Themes.pattern(getEvent().getId());
+    protected long getDesignSeed() {
+        return getEvent().getId();
     }
 
     @Override

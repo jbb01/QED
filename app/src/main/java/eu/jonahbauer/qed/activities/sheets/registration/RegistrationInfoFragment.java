@@ -21,7 +21,6 @@ import eu.jonahbauer.qed.model.Person;
 import eu.jonahbauer.qed.model.Registration;
 import eu.jonahbauer.qed.model.viewmodel.RegistrationViewModel;
 import eu.jonahbauer.qed.networking.NetworkConstants;
-import eu.jonahbauer.qed.util.Themes;
 import eu.jonahbauer.qed.activities.mainFragments.EventFragmentArgs;
 import eu.jonahbauer.qed.activities.mainFragments.PersonFragmentArgs;
 import eu.jonahbauer.qed.activities.mainFragments.RegistrationFragmentArgs;
@@ -51,7 +50,6 @@ public class RegistrationInfoFragment extends InfoFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mBinding = FragmentInfoRegistrationBinding.inflate(inflater, container, false);
         mRegistrationViewModel.getValue().observe(getViewLifecycleOwner(), mBinding::setRegistration);
-        mBinding.setColor(getColor());
         return mBinding.getRoot();
     }
 
@@ -88,13 +86,8 @@ public class RegistrationInfoFragment extends InfoFragment {
     }
 
     @Override
-    public int getColor() {
-        return Themes.colorful(requireContext(), getRegistration().getId());
-    }
-
-    @Override
-    protected int getBackground() {
-        return Themes.pattern(getRegistration().getId());
+    protected long getDesignSeed() {
+        return getRegistration().getId();
     }
 
     @Override

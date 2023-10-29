@@ -7,9 +7,9 @@ import android.widget.ArrayAdapter;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import eu.jonahbauer.qed.R;
+import eu.jonahbauer.qed.layoutStuff.themes.Theme;
 import eu.jonahbauer.qed.layoutStuff.views.MaterialListItem;
 import eu.jonahbauer.qed.model.Album;
-import eu.jonahbauer.qed.util.Themes;
 
 import java.util.List;
 
@@ -36,7 +36,7 @@ public class AlbumAdapter extends ArrayAdapter<Album> {
         }
 
         item.setTitle(album.getName());
-        item.setIconTint(Themes.colorful(context, album.getId()));
+        item.setIconTint(Theme.getCurrentTheme().getIconColor(context, album.getId()));
         item.setTransitionName(context.getString(R.string.transition_name_album, album.getId()));
 
         return item;
