@@ -101,6 +101,7 @@
     <string name="error_out_of_memory">Out of memory.</string>
     <string name="error_unknown">An unknown error occurred.</string>
     <string name="error_user">Error in Layer 8</string>
+    <string name="error_bad_link">Broken Link!</string>
 
     <!-- Update Dialog -->
     <string name="update_dialog_title">Update Available</string>

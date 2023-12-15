@@ -1,5 +1,6 @@
 package eu.jonahbauer.qed.activities.imageActivity;
 
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.*;
@@ -28,6 +29,9 @@ import eu.jonahbauer.qed.util.*;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectList;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.experimental.Accessors;
 
 import java.io.File;
 import java.lang.ref.SoftReference;
@@ -54,6 +58,10 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
 
     private boolean mExtended = false;
 
+    @Getter(lazy = true, value = AccessLevel.PRIVATE)
+    @Accessors(prefix = "m")
+    private final Image mDeepLinkErrorImage = loadDeeplinkErrorImage();
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,14 +69,19 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
 
         mImageAdapter = new ImageAdapter();
 
-        ImageFragmentArgs args = ImageFragmentArgs.fromBundle(getArguments());
-        mImage = args.getImage();
-        if (mImage == null) mImage = new Image(args.getId());
+        try {
+            ImageFragmentArgs args = ImageFragmentArgs.fromBundle(getArguments());
+            mImage = args.getImage();
+            if (mImage == null) mImage = new Image(args.getId());
 
-        var imageList = args.getImageList();
-        if (imageList != null && imageList.length > 0) {
-            mImageAdapter.submitList(ObjectList.of(imageList));
-        } else {
+            var imageList = args.getImageList();
+            if (imageList != null && imageList.length > 0) {
+                mImageAdapter.submitList(ObjectList.of(imageList));
+            } else {
+                mImageAdapter.submitList(Collections.singletonList(mImage));
+            }
+        } catch (IllegalArgumentException ex) {
+            mImage = getDeepLinkErrorImage();
             mImageAdapter.submitList(Collections.singletonList(mImage));
         }
 
@@ -231,12 +244,14 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
             mBinding.setError(null);
         }
 
+        var imageAvailable = image != null && image.getId() != Image.NO_ID;
+
         // update buttons
-        mOpenWithButton.setEnabled(image != null && image.getPath() != null);
-        mShareButton.setEnabled(image != null && image.getPath() != null && image.getFormat() != null);
-        mDownloadButton.setEnabled(image != null);
-        mInfoButton.setEnabled(image != null);
-        mCopyLinkButton.setEnabled(image != null);
+        mOpenWithButton.setEnabled(imageAvailable && image.getPath() != null);
+        mShareButton.setEnabled(imageAvailable && image.getPath() != null && image.getFormat() != null);
+        mDownloadButton.setEnabled(imageAvailable);
+        mInfoButton.setEnabled(imageAvailable);
+        mCopyLinkButton.setEnabled(imageAvailable);
     }
 
     private void onPageSelected(int position) {
@@ -287,6 +302,13 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
     private void downloadOriginal(int position) {
         ImageViewHolder viewHolder = mImageAdapter.getViewHolderByPosition(position);
         viewHolder.downloadOriginal();
+    }
+
+    private @NonNull Image loadDeeplinkErrorImage() {
+        var image = new Image(Image.NO_ID);
+        image.setName("");
+        image.setThumbnail(BitmapFactory.decodeResource(getResources(), R.drawable.error_image_meme));
+        return image;
     }
 
     private class ImageAdapter extends ListAdapter<Image, ImageViewHolder> {

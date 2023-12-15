@@ -185,14 +185,18 @@ public class ImageViewHolder extends RecyclerView.ViewHolder implements QEDPageR
         var type = image.getType();
         if (reason == null && type == Image.Type.IMAGE) {
             setImageFromFile(image);
-        } else if (image.getThumbnail() != null) {
-            mBinding.setDrawable(new BitmapDrawable(mContext.getResources(), image.getThumbnail()));
-        } else if (reason == null) {
-            mBinding.setDrawable(AppCompatResources.getDrawable(mContext, Image.getThumbnail(type, true)));
-            mStatus.setValue(StatusWrapper.loaded(image));
         } else {
-            mBinding.setDrawable(AppCompatResources.getDrawable(mContext, Image.getThumbnail(type, false)));
-            mStatus.setValue(StatusWrapper.error(image, reason));
+            if (image.getThumbnail() != null) {
+                mBinding.setDrawable(new BitmapDrawable(mContext.getResources(), image.getThumbnail()));
+            } else {
+                mBinding.setDrawable(AppCompatResources.getDrawable(mContext, Image.getThumbnail(type, reason == null)));
+            }
+
+            if (reason == null) {
+                mStatus.setValue(StatusWrapper.loaded(image));
+            } else {
+                mStatus.setValue(StatusWrapper.error(image, reason));
+            }
         }
     }
 

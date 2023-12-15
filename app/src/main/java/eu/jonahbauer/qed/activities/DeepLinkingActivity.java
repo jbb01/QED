@@ -63,7 +63,7 @@ public class DeepLinkingActivity extends AppCompatActivity {
         super.onStart();
 
         if (mBottomSheet == null) {
-            Toast.makeText(this, R.string.error, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.error_bad_link, Toast.LENGTH_SHORT).show();
             finish();
         } else {
             mBottomSheet.requireDialog().setOnDismissListener(dialog -> {

@@ -186,7 +186,11 @@ public abstract class InfoBottomSheet extends BottomSheetDialogFragment {
         });
 
         // observer toolbar
-        mToolbarBackgroundColor.observe(getViewLifecycleOwner(), color -> mBinding.toolbar.setBackgroundColor(color));
+        mToolbarBackgroundColor.observe(getViewLifecycleOwner(), color -> {
+            if (mBinding.toolbar != null) {
+                mBinding.toolbar.setBackgroundColor(color);
+            }
+        });
         mToolbarTitleVisible.observe(getViewLifecycleOwner(), visible -> updateToolbar(
                 model.getToolbarTitle().getValue(),
                 visible
@@ -197,13 +201,13 @@ public abstract class InfoBottomSheet extends BottomSheetDialogFragment {
         ));
     }
 
-    private CharSequence mPreviousTitle;
-    private Boolean mPreviousTitleVisible;
-    private void updateToolbar(CharSequence title, boolean titleVisible) {
+    private @Nullable CharSequence mPreviousTitle;
+    private @Nullable Boolean mPreviousTitleVisible;
+    private void updateToolbar(@Nullable CharSequence title, boolean titleVisible) {
         if (mBinding.toolbar == null) return;
 
         // debounce updates
-        if (Boolean.valueOf(titleVisible).equals(mPreviousTitleVisible) && title.equals(mPreviousTitle)) {
+        if (Boolean.valueOf(titleVisible).equals(mPreviousTitleVisible) && Objects.equals(title, mPreviousTitle)) {
             return;
         }
         mPreviousTitle = title;
