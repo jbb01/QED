@@ -10,6 +10,7 @@ import eu.jonahbauer.qed.R;
 import eu.jonahbauer.qed.activities.ColorPickerDialogFragment;
 import eu.jonahbauer.qed.layoutStuff.preferences.AdvancedEditTextPreference;
 import eu.jonahbauer.qed.layoutStuff.preferences.SeekBarPreference;
+import eu.jonahbauer.qed.layoutStuff.themes.Theme;
 import eu.jonahbauer.qed.model.room.Database;
 import eu.jonahbauer.qed.util.MessageUtils;
 import eu.jonahbauer.qed.util.Preferences;
@@ -109,9 +110,17 @@ public class ChatPreferenceFragment extends AbstractPreferenceFragment implement
             alertDialog.show();
             return true;
         } else if (preference == color) {
-            var dialog = new ColorPickerDialogFragment();
-            dialog.show(getChildFragmentManager(), null);
-            dialog.setOnDismissListener(() -> name.setText(Preferences.getChat().getName()));
+            if (Theme.getCurrentTheme() == Theme.WORKERS_RED) {
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
+                alertDialog.setMessage(R.string.preferences_chat_color_workers_red);
+                alertDialog.setPositiveButton(R.string.ok, (dialog, which) -> dialog.dismiss());
+                alertDialog.show();
+            } else {
+                var dialog = new ColorPickerDialogFragment();
+                dialog.show(getChildFragmentManager(), null);
+                dialog.setOnDismissListener(() -> name.setText(Preferences.getChat().getName()));
+            }
+            return true;
         }
         return false;
     }

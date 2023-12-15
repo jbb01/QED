@@ -437,6 +437,7 @@
     <string name="preferences_chat_name_title">Name</string>
     <string name="preferences_chat_channel_title">Channel</string>
     <string name="preferences_chat_color_title">Farbe</string>
+    <string name="preferences_chat_color_workers_red">Du brauchst keine Farben außer dem glorreichen Arbeiterrot und Proletariergelb!</string>
     <string name="preferences_chat_public_id_title">Öffentliche ID</string>
 
     <string name="preferences_chat_group_appearance">Darstellung</string>

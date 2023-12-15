@@ -503,6 +503,7 @@
     <string name="preferences_chat_name_title">Name</string>
     <string name="preferences_chat_channel_title">Channel</string>
     <string name="preferences_chat_color_title">Color</string>
+    <string name="preferences_chat_color_workers_red">You don\'t need colors beside the glorious workers\' red and proletarian yellow!</string>
     <string name="preferences_chat_public_id_title">Public ID</string>
 
     <string name="preferences_chat_group_appearance">Appearance</string>
