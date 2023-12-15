@@ -7,7 +7,6 @@ import eu.jonahbauer.qed.activities.sheets.person.PersonInfoFragment;
 import eu.jonahbauer.qed.model.Person;
 import eu.jonahbauer.qed.model.viewmodel.InfoViewModel;
 import eu.jonahbauer.qed.model.viewmodel.PersonViewModel;
-import eu.jonahbauer.qed.util.Themes;
 import eu.jonahbauer.qed.util.ViewUtils;
 
 public class PersonFragment extends MainInfoFragment {
@@ -23,7 +22,7 @@ public class PersonFragment extends MainInfoFragment {
         mPersonViewModel = ViewUtils.getViewModelProvider(this, R.id.nav_person).get(PersonViewModel.class);
         mPersonViewModel.load(person);
 
-        setColor(Themes.colorful(requireContext(), person.getId()));
+        setDesignSeed(person.getId());
     }
 
     @Override

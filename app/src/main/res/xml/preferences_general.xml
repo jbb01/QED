@@ -28,12 +28,14 @@
 
     <PreferenceCategory
         app:title="@string/preferences_general_group_appearance">
-        <SwitchPreference
-            android:defaultValue="false"
-            android:key="@string/preferences_general_night_mode_key"
-            android:title="@string/preferences_general_night_mode_title"
-            android:icon="@drawable/ic_settings_night_mode"
-            android:summary="@string/preferences_general_night_mode_summary"/>
+        <ListPreference
+            android:key="@string/preferences_general_theme_key"
+            android:title="@string/preferences_general_theme_title"
+            android:summary="@string/preferences_general_theme_summary"
+            android:icon="@drawable/ic_settings_theme"
+            android:entries="@array/theme_names"
+            android:entryValues="@array/theme_codes"
+            android:defaultValue="LIGHT"/>
     </PreferenceCategory>
 
     <PreferenceCategory

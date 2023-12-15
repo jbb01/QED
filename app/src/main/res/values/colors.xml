@@ -55,10 +55,16 @@
     <color name="colorSecondaryDarkNight">#019688</color>
     <color name="colorSecondaryLightNight">#88faea</color>
 
-    <color name="dateBannerBackgroundNight">@color/colorSurfaceNight</color>
-
     <color name="colorBackgroundNight">#2F3136</color>
     <color name="colorSurfaceNight">#36393f</color>
+
+    <!-- Worker's Red -->
+    <color name="workers_yellow">#ffff00</color>
+    <color name="workers_yellow_darker">#e8e800</color>
+    <color name="workers_yellow_dark">#bbbb00</color>
+    <color name="workers_red">#ff1108</color>
+    <color name="workers_red_darker">#e81008</color>
+    <color name="workers_red_dark">#bb0808</color>
 
     <!-- Dark/Black Theme (Image Activity) -->
     <color name="colorSecondaryBlack">#009688</color>

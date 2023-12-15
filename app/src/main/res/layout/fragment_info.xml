@@ -28,7 +28,6 @@
             android:clickable="false"
             android:focusable="false"
             style="@style/Widget.MaterialComponents.Toolbar.PrimarySurface"
-            app:titleTextColor="?colorOnAccentColor"
             tools:background="@android:color/holo_green_light"/>
 
         <RelativeLayout

@@ -49,7 +49,7 @@
     <string name="preferences_general_language_key" translatable="false">general.language</string>
     <string name="preferences_general_github_key" translatable="false">general.github</string>
     <string name="preferences_general_remember_me_key" translatable="false">general.remember_me</string>
-    <string name="preferences_general_night_mode_key" translatable="false">general.night_mode</string>
+    <string name="preferences_general_theme_key" translatable="false">general.theme</string>
     <string name="preferences_general_update_check_enabled_key" translatable="false">general.update_check.enabled</string>
     <string name="preferences_general_update_check_includes_prereleases_key" translatable="false">general.update_check.includes_prereleases</string>
     <string name="preferences_general_update_check_dont_suggest_key" translatable="false">general.update_check.dont_suggest</string>
@@ -75,6 +75,21 @@
     <string name="language_system">System</string>
     <string name="language_german" translatable="false">Deutsch</string>
     <string name="language_english" translatable="false">English</string>
+
+    <!-- Themes -->
+    <string-array name="theme_names" translatable="false">
+        <item>@string/theme_light</item>
+        <item>@string/theme_dark</item>
+        <item>@string/theme_workers_red</item>
+    </string-array>
+    <string-array name="theme_codes" translatable="false">
+        <item>LIGHT</item>
+        <item>DARK</item>
+        <item>WORKERS_RED</item>
+    </string-array>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="theme_workers_red">Worker\'s Red</string>
 
     <!-- Error messages -->
     <string name="error">Error!</string>
@@ -471,8 +486,8 @@
     <string name="preferences_general_language_title">Language</string>
 
     <string name="preferences_general_group_appearance">Appearance</string>
-    <string name="preferences_general_night_mode_title">Night Mode</string>
-    <string name="preferences_general_night_mode_summary">A theme as black as your soul.</string>
+    <string name="preferences_general_theme_title">Theme</string>
+    <string name="preferences_general_theme_summary">Foo Bar</string>
 
     <string name="preferences_general_group_update_check">Update Check</string>
     <string name="preferences_general_update_check_enabled_title">Check for Updates</string>

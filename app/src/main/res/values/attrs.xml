@@ -28,23 +28,28 @@
     </declare-styleable>
 
 
-    <attr name="messageId" format="string"/>
-    <attr name="name" format="string"/>
-    <attr name="message" format="string"/>
-    <attr name="channel" format="string"/>
-    <attr name="timestamp" format="string"/>
+    <declare-styleable name="Message">
+        <attr name="messageId" format="string"/>
+        <attr name="name" format="string"/>
+        <attr name="message" format="string"/>
+        <attr name="channel" format="string"/>
+        <attr name="timestamp" format="string"/>
 
-    <attr name="extended" format="boolean"/>
-    <attr name="linkify" format="boolean"/>
-    <attr name="katex" format="boolean"/>
-    <attr name="colorful" format="boolean"/>
+        <attr name="extended" format="boolean"/>
+        <attr name="linkify" format="boolean"/>
+        <attr name="katex" format="boolean"/>
+        <attr name="colorful" format="boolean"/>
 
-    <attr name="nameTextAppearance" format="reference"/>
-    <attr name="messageTextAppearance" format="reference"/>
-    <attr name="dataTextAppearance" format="reference"/>
+        <attr name="backgroundTint" format="color"/>
+        <attr name="backgroundTintActivated" format="color"/>
+        <attr name="backgroundTintPressed" format="color"/>
+        <attr name="dateBannerBackgroundTint" format="color"/>
 
-    <attr name="dateBannerTextAppearance" format="reference"/>
-    <attr name="dateBannerBackgroundTint" format="color"/>
+        <attr name="nameTextAppearance" format="reference"/>
+        <attr name="messageTextAppearance" format="reference"/>
+        <attr name="dataTextAppearance" format="reference"/>
+        <attr name="dateBannerTextAppearance" format="reference"/>
+    </declare-styleable>
 
     <declare-styleable name="SimpleMessageView">
         <attr name="name" />
@@ -78,6 +83,7 @@
 
     <attr name="messageStyle" format="reference"/>
     <attr name="extendedMessageStyle" format="reference"/>
+    <attr name="messageTheme" format="reference"/>
 
     <attr name="title" format="string"/>
     <attr name="subtitle" format="string" />
@@ -133,6 +139,7 @@
         <attr name="ringWidth" format="dimension"/>
     </declare-styleable>
 
+    <attr name="qedLogoStyle" format="reference"/>
     <attr name="dividerStyle" format="reference"/>
     <attr name="triCheckboxStyle" format="reference"/>
 

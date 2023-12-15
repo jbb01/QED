@@ -26,14 +26,12 @@
             android:layout_height="wrap_content"
             android:clickable="false"
             android:focusable="false"
-            tools:text="Max Mustermann"
-            android:textAppearance="@style/TextAppearance.App.Message.Name" />
+            tools:text="Max Mustermann" />
 
         <TextView
             android:id="@+id/message_message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.App.Message.Message"
             android:clickable="false"
             android:focusable="false"
             tools:text="Musternachricht             " />
@@ -53,7 +51,6 @@
         android:layout_height="wrap_content"
         android:clickable="false"
         android:focusable="false"
-        android:textAppearance="@style/TextAppearance.App.Message.Date"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         tools:text="13:37" />

@@ -1,7 +1,6 @@
 package eu.jonahbauer.qed.util;
 
 import android.content.Context;
-import android.content.res.Configuration;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
@@ -21,6 +20,7 @@ import androidx.lifecycle.LifecycleOwner;
 
 import eu.jonahbauer.qed.R;
 import eu.jonahbauer.qed.activities.MainActivity;
+import eu.jonahbauer.qed.layoutStuff.themes.Theme;
 import eu.jonahbauer.qed.model.Message;
 import eu.jonahbauer.qed.model.adapter.MessageAdapter;
 import eu.jonahbauer.qed.networking.NetworkConstants;
@@ -190,14 +190,7 @@ public class MessageUtils {
         var text = isAnonymous(name) ? context.getText(R.string.message_name_anonymous) : name.trim();
         if (!colored) return text;
 
-        var color = Colors.getColorForName(name);
-
-        // transform color when in light mode
-        var config = context.getResources().getConfiguration();
-        if ((config.uiMode & Configuration.UI_MODE_NIGHT_MASK) != Configuration.UI_MODE_NIGHT_YES) {
-            color = Colors.transformColor(color);
-        }
-
+        var color = Theme.getCurrentTheme().getMessageColorForName(name);
         var out = new SpannableString(text);
         out.setSpan(new ForegroundColorSpan(color), 0, out.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         return out;

@@ -26,7 +26,7 @@
         <item name="textInputStyle">@style/Widget.Design.TextInputLayout</item>
         <item name="actionModeStyle">@style/Widget.App.ActionMode</item>
         <item name="android:dropDownListViewStyle">@style/Widget.App.ListView.DropDown</item>
-        <item name="chipStyle">@style/Widget.App.Chip</item>
+        <item name="qedLogoStyle">@style/Widget.App.Logo</item>
 
         <!-- Text Appearances -->
         <item name="textAppearanceButton">@style/TextAppearance.App.Button</item>
@@ -46,18 +46,17 @@
         <item name="android:verticalDivider">?dividerVertical</item>
         <item name="android:dividerHeight">1dp</item>
 
-        <item name="windowNoTitle">false</item>
-        <item name="windowActionBar">true</item>
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
         <item name="windowActionModeOverlay">true</item>
 
         <item name="android:statusBarColor">@color/statusBarScrim</item>
         <item name="android:navigationBarColor">@android:color/black</item>
 
         <!-- Messages -->
+        <item name="messageTheme">@style/ThemeOverlay.App.Message</item>
         <item name="messageStyle">@style/Widget.App.Message</item>
         <item name="extendedMessageStyle">@style/Widget.App.Message.Extended</item>
-        <item name="dateBannerTextAppearance">@style/TextAppearance.App.Message.DateBanner</item>
-        <item name="dateBannerBackgroundTint">@color/dateBannerBackground</item>
     </style>
 
     <style name="Theme.App" parent="Base.Theme.App">
@@ -95,9 +94,15 @@
         <item name="accentColor8">@color/accentColor8</item>
         <item name="accentColor9">@color/accentColor9</item>
         <item name="colorOnAccentColor">@android:color/white</item>
+
+        <item name="dividerColor">#F0F0F0</item>
+        <item name="chipBackgroundColor">#f4f4f4</item>
+
+        <item name="dateBannerBackgroundTint">@color/dateBannerBackground</item>
+        <item name="dateBannerTextAppearance">@style/TextAppearance.App.Message.DateBanner</item>
     </style>
 
-    <style name="Theme.App.Dark">
+    <style name="Theme.App.Black">
         <item name="android:colorBackground">@color/colorBackgroundBlack</item>
         <item name="colorOnBackground">@android:color/white</item>
         <item name="colorOnBackgroundVariant">@android:color/darker_gray</item>
@@ -120,17 +125,7 @@
         <item name="alertDialogTheme">@style/ThemeOverlay.App.Dialog.Alert.Dark</item>
     </style>
 
-    <style name="Theme.App.NoActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-    </style>
-
-    <style name="Theme.App.Dark.NoActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-    </style>
-
-    <style name="Theme.App.Dark.NoActionBar.Fullscreen"/>
+    <style name="Theme.App.Black.Fullscreen"/>
 
     <style name="Theme.App.SplashScreen">
         <item name="android:windowBackground">@drawable/splash_screen</item>
@@ -146,6 +141,15 @@
     </style>
 
     <!-- ThemeOverlays -->
+    <style name="ThemeOverlay.App.Translucent" parent="">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
+
     <style name="ThemeOverlay.App.Dialog" parent="ThemeOverlay.MaterialComponents.Dialog">
         <item name="buttonStyle">@style/Widget.App.Button</item>
         <item name="buttonBarButtonStyle">@style/Widget.App.Button</item>
@@ -163,5 +167,10 @@
     <style name="ThemeOverlay.App.BottomSheetDialog" parent="ThemeOverlay.MaterialComponents.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/Widget.App.BottomSheet.Modal</item>
         <item name="snackbarStyle">@style/Widget.App.Snackbar.BottomSheet</item>
+    </style>
+    <style name="ThemeOverlay.App.Message" parent="">
+        <item name="backgroundTint">?colorSurface</item>
+        <item name="backgroundTintActivated">#E0E0FF</item>
+        <item name="backgroundTintPressed">#EEEEEE</item>
     </style>
 </resources>

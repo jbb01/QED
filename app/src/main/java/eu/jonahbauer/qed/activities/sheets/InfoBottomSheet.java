@@ -26,10 +26,9 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import eu.jonahbauer.qed.R;
 import eu.jonahbauer.qed.databinding.FragmentInfoBinding;
 import eu.jonahbauer.qed.layoutStuff.ColorfulBottomSheetCallback;
+import eu.jonahbauer.qed.layoutStuff.themes.Theme;
 import eu.jonahbauer.qed.model.viewmodel.InfoViewModel;
 import eu.jonahbauer.qed.util.Actions;
-import eu.jonahbauer.qed.util.Colors;
-import eu.jonahbauer.qed.util.Themes;
 import eu.jonahbauer.qed.util.ViewUtils;
 import lombok.RequiredArgsConstructor;
 
@@ -81,7 +80,7 @@ public abstract class InfoBottomSheet extends BottomSheetDialogFragment {
         var touchOutside = view.getRootView().findViewById(R.id.touch_outside);
 
         // register callback
-        mBottomSheetCallback = new ColorfulBottomSheetCallback(mDialogWindow, touchOutside, getColor());
+        mBottomSheetCallback = new ColorfulBottomSheetCallback(mDialogWindow, touchOutside, getSheetBackgroundColor());
         mBottomSheetBehavior.addBottomSheetCallback(mBottomSheetCallback);
 
         // instantiate fragment
@@ -150,9 +149,10 @@ public abstract class InfoBottomSheet extends BottomSheetDialogFragment {
      */
     private void initBackground() {
         // set background colors
-        var color = getColor();
-        var darkColor = getDarkColor();
-        mBinding.backgroundPattern.setImageResource(getBackground());
+        var color = getSheetBackgroundColor();
+        var darkColor = getSheetBackgroundColorDark();
+        var pattern = getSheetBackgroundPattern();
+        mBinding.backgroundPattern.setImageResource(pattern);
         mBinding.backgroundPattern.setColorFilter(color, PorterDuff.Mode.MULTIPLY);
         mBinding.backgroundSolid.setBackgroundColor(darkColor);
         mBinding.setColor(color);
@@ -236,17 +236,18 @@ public abstract class InfoBottomSheet extends BottomSheetDialogFragment {
 
     public abstract long getDesignSeed();
 
-    public @ColorInt int getColor() {
-        return Themes.colorful(requireContext(), getDesignSeed());
+    public @ColorInt int getSheetBackgroundColor() {
+        return Theme.getCurrentTheme().getSheetBackgroundColor(requireContext(), getDesignSeed());
     }
 
-    public @ColorInt int getDarkColor() {
-        return Colors.multiply(getColor(), 0xFFCCCCCC);
+    public @ColorInt int getSheetBackgroundColorDark() {
+        return Theme.getCurrentTheme().getSheetBackgroundColorDark(requireContext(), getDesignSeed());
     }
 
-    public @DrawableRes int getBackground() {
-        return Themes.pattern(getDesignSeed());
+    public @DrawableRes int getSheetBackgroundPattern() {
+        return Theme.getCurrentTheme().getSheetBackgroundPattern(requireContext(), getDesignSeed());
     }
+
 
     public abstract @NonNull InfoFragment createFragment();
 
@@ -277,7 +278,7 @@ public abstract class InfoBottomSheet extends BottomSheetDialogFragment {
             mBackgroundPattern = mBinding.backgroundPattern;
             mContent = mBinding.common;
 
-            mDarkColor = getDarkColor();
+            mDarkColor = getSheetBackgroundColorDark();
 
             TypedValue typedValue = new TypedValue();
             mContent.getContext().getTheme().resolveAttribute(R.attr.actionBarSize, typedValue, true);

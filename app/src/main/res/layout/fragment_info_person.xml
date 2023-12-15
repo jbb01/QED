@@ -8,7 +8,6 @@
         <import type="eu.jonahbauer.qed.util.TimeUtils"/>
         <import type="eu.jonahbauer.qed.util.TextUtils"/>
 
-        <variable name="color" type="int" />
         <variable name="person" type="eu.jonahbauer.qed.model.Person" />
     </data>
 

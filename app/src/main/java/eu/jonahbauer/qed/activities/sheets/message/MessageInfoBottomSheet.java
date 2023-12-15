@@ -9,6 +9,7 @@ import androidx.annotation.Nullable;
 import eu.jonahbauer.qed.R;
 import eu.jonahbauer.qed.activities.sheets.InfoBottomSheet;
 import eu.jonahbauer.qed.activities.sheets.InfoFragment;
+import eu.jonahbauer.qed.layoutStuff.themes.Theme;
 import eu.jonahbauer.qed.model.Message;
 import eu.jonahbauer.qed.model.viewmodel.InfoViewModel;
 import eu.jonahbauer.qed.model.viewmodel.MessageViewModel;
@@ -55,8 +56,13 @@ public class MessageInfoBottomSheet extends InfoBottomSheet {
     }
 
     @Override
-    public int getColor() {
-        return getMessage().getColor(requireContext());
+    public int getSheetBackgroundColor() {
+        return Theme.getCurrentTheme().getSheetBackgroundColor(requireContext(), getMessage());
+    }
+
+    @Override
+    public int getSheetBackgroundColorDark() {
+        return Theme.getCurrentTheme().getSheetBackgroundColorDark(requireContext(), getMessage());
     }
 
     @Override

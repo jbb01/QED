@@ -11,7 +11,6 @@ import eu.jonahbauer.qed.databinding.FragmentInfoAlbumBinding;
 import eu.jonahbauer.qed.model.Album;
 import eu.jonahbauer.qed.model.Person;
 import eu.jonahbauer.qed.model.viewmodel.AlbumViewModel;
-import eu.jonahbauer.qed.util.Themes;
 
 import java.util.Collection;
 
@@ -38,7 +37,6 @@ public class AlbumInfoFragment extends InfoFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         var binding = FragmentInfoAlbumBinding.inflate(inflater, container, false);
         mAlbumViewModel.getValue().observe(getViewLifecycleOwner(), binding::setAlbum);
-        binding.setColor(getColor());
         return binding.getRoot();
     }
 
@@ -47,13 +45,8 @@ public class AlbumInfoFragment extends InfoFragment {
     }
 
     @Override
-    public int getColor() {
-        return Themes.colorful(requireContext(), getAlbum().getId());
-    }
-
-    @Override
-    protected int getBackground() {
-        return Themes.pattern(getAlbum().getId());
+    protected long getDesignSeed() {
+        return getAlbum().getId();
     }
 
     @BindingAdapter("album_categories")

@@ -33,6 +33,11 @@
     <!-- Language -->
     <string name="language_system">System</string>
 
+    <!-- Themes -->
+    <string name="theme_light">Hell</string>
+    <string name="theme_dark">Dunkel</string>
+    <string name="theme_workers_red">Arbeiterrot</string>
+
     <!-- Error messages -->
     <string name="error">Fehler!</string>
     <string name="error_404">Die angeforderte Ressource wurde nicht gefunden.</string>
@@ -415,8 +420,8 @@
     <string name="preferences_general_language_title">Sprache</string>
 
     <string name="preferences_general_group_appearance">Darstellung</string>
-    <string name="preferences_general_night_mode_title">Nachtmodus</string>
-    <string name="preferences_general_night_mode_summary">Ein Theme so schwarz wie deine Seele</string>
+    <string name="preferences_general_theme_title">Farbschema</string>
+    <string name="preferences_general_theme_summary">Foo Bar</string>
 
     <string name="preferences_general_group_update_check">Updates</string>
     <string name="preferences_general_update_check_enabled_title">Auf Updates prüfen</string>

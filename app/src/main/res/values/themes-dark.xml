@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Themes -->
-    <style name="Theme.App" parent="Base.Theme.App">
-        <item name="navigationViewStyle">@style/Widget.App.NavigationView</item>
+    <style name="Theme.App.Dark" parent="Base.Theme.App">
+        <item name="navigationViewStyle">@style/Widget.App.NavigationView.Dark</item>
+        <item name="messageTheme">@style/ThemeOverlay.App.Message.Dark</item>
 
         <!-- Color Palette -->
         <item name="colorPrimary">@color/colorPrimaryNight</item>
@@ -38,8 +39,21 @@
         <item name="accentColor9">@color/accentColor9</item>
         <item name="colorOnAccentColor">@android:color/white</item>
 
-        <item name="elevationOverlayEnabled">false</item>
+        <item name="dividerColor">#42454A</item>
+        <item name="chipBackgroundColor">#3a3c3f</item>
 
-        <item name="dateBannerBackgroundTint">@color/dateBannerBackgroundNight</item>
+        <item name="elevationOverlayEnabled">false</item>
+        <item name="dateBannerBackgroundTint">?colorSurface</item>
+    </style>
+
+    <style name="ThemeOverlay.App.Message.Dark">
+        <item name="backgroundTintPressed">#5E6165</item>
+        <item name="backgroundTintActivated">#4B4D70</item>
+    </style>
+
+    <style name="Widget.App.NavigationView.Dark" parent="Widget.MaterialComponents.NavigationView">
+        <item name="itemIconTint">@android:color/white</item>
+        <item name="itemTextColor">@android:color/white</item>
+        <item name="itemShapeFillColor">@color/navigation_item_background_dark</item>
     </style>
 </resources>

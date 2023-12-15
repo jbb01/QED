@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Themes -->
+    <style name="Theme.App.WorkersRed" parent="Base.Theme.App">
+        <item name="android:timePickerDialogTheme">@style/ThemeOverlay.App.TimePickerDialog.WorkersRed</item>
+        <item name="android:datePickerDialogTheme">@style/ThemeOverlay.App.DatePickerDialog.WorkersRed</item>
+        <item name="messageTheme">@style/ThemeOverlay.App.Message.WorkersRed</item>
+
+        <item name="navigationViewStyle">@style/Widget.App.NavigationView.WorkersRed</item>
+        <item name="qedLogoStyle">@style/Widget.App.Logo.WorkersRed</item>
+
+        <item name="android:textColorPrimary">@color/workers_yellow</item>
+        <item name="android:textColorSecondary">@color/workers_yellow_darker</item>
+        <item name="android:textColorTertiary">@color/workers_yellow_dark</item>
+        <item name="android:textColorPrimaryDisableOnly">@color/workers_yellow</item>
+        <item name="android:textColorHint">@color/workers_yellow</item>
+        <item name="android:textColorHighlight">@color/workers_yellow</item>
+        <item name="android:textColorLink">@color/workers_yellow</item>
+
+        <item name="android:textColorPrimaryInverse">@color/workers_red</item>
+        <item name="android:textColorSecondaryInverse">@color/workers_red_darker</item>
+        <item name="android:textColorTertiaryInverse">@color/workers_red_darker</item>
+        <item name="android:textColorPrimaryInverseDisableOnly">@color/workers_red</item>
+        <item name="android:textColorHintInverse">@color/workers_red</item>
+        <item name="android:textColorHighlightInverse">@color/workers_red</item>
+        <item name="android:textColorLinkInverse">@color/workers_red</item>
+
+        <item name="android:textColorAlertDialogListItem">@color/workers_yellow</item>
+        <item name="textColorAlertDialogListItem">@color/workers_yellow</item>
+        <item name="colorSwitchThumbNormal">@color/workers_yellow</item>
+        <item name="android:fastScrollTextColor">@color/workers_red</item>
+
+        <item name="colorControlActivated">@color/workers_yellow</item>
+        <item name="colorControlNormal">@color/workers_yellow</item>
+        <item name="colorControlHighlight">@color/workers_yellow</item>
+        <item name="android:colorControlActivated">@color/workers_yellow</item>
+        <item name="android:colorControlNormal">@color/workers_yellow</item>
+        <item name="android:colorControlHighlight">@color/workers_yellow</item>
+
+        <!-- Color Palette -->
+        <item name="colorPrimary">@color/workers_red_dark</item>
+        <item name="colorPrimaryLight">@color/workers_red_dark</item>
+        <item name="colorPrimaryDark">@color/workers_red_dark</item>
+
+        <item name="colorOnPrimary">@color/workers_yellow</item>
+
+        <item name="colorSecondary">@color/workers_yellow</item>
+        <item name="colorOnSecondary">@color/workers_red</item>
+
+        <item name="android:colorForeground">@color/workers_yellow</item>
+        <item name="android:colorBackground">@color/workers_red_darker</item>
+        <item name="colorBackgroundFloating">@color/workers_red_darker</item>
+        <item name="colorOnBackground">@color/workers_yellow</item>
+        <item name="colorOnBackgroundVariant">@color/workers_yellow</item>
+
+        <item name="colorSurface">@color/workers_red</item>
+        <item name="colorOnSurface">@color/workers_yellow</item>
+        <item name="colorOnSurfaceVariant">@color/workers_yellow</item>
+
+        <item name="colorError">@color/workers_yellow</item>
+        <item name="colorOnError">@color/workers_red</item>
+
+        <item name="accentColor0">@color/workers_yellow</item>
+        <item name="accentColor1">@color/workers_yellow</item>
+        <item name="accentColor2">@color/workers_yellow</item>
+        <item name="accentColor3">@color/workers_yellow</item>
+        <item name="accentColor4">@color/workers_yellow</item>
+        <item name="accentColor5">@color/workers_yellow</item>
+        <item name="accentColor6">@color/workers_yellow</item>
+        <item name="accentColor7">@color/workers_yellow</item>
+        <item name="accentColor8">@color/workers_yellow</item>
+        <item name="accentColor9">@color/workers_yellow</item>
+        <item name="colorOnAccentColor">@color/workers_red</item>
+
+        <item name="dividerColor">@color/workers_red_darker</item>
+        <item name="chipBackgroundColor">@color/workers_red_dark</item>
+
+        <item name="elevationOverlayEnabled">false</item>
+        <item name="dateBannerBackgroundTint">@color/workers_red</item>
+    </style>
+
+    <style name="ThemeOverlay.App.Message.WorkersRed">
+        <item name="backgroundTintPressed">@color/workers_red_darker</item>
+        <item name="backgroundTintActivated">@color/workers_red_dark</item>
+    </style>
+    <style name="ThemeOverlay.App.TimePickerDialog.WorkersRed" parent="ThemeOverlay.App.Dialog">
+        <item name="android:windowBackground">@color/workers_red</item>
+        <item name="android:timePickerStyle">@style/Widget.App.TimePicker.WorkersRed</item>
+    </style>
+    <style name="ThemeOverlay.App.DatePickerDialog.WorkersRed" parent="ThemeOverlay.App.Dialog">
+        <item name="android:windowBackground">@color/workers_red</item>
+        <item name="android:datePickerStyle">@style/Widget.App.DatePicker.WorkersRed</item>
+    </style>
+
+    <style name="Widget.App.Logo.WorkersRed">
+        <item name="android:colorForeground">@color/workers_yellow</item>
+        <item name="android:colorBackground">@color/workers_red</item>
+    </style>
+    <style name="Widget.App.NavigationView.WorkersRed" parent="Widget.MaterialComponents.NavigationView">
+        <item name="itemIconTint">@color/workers_yellow</item>
+        <item name="itemTextColor">@color/workers_yellow</item>
+        <item name="itemShapeFillColor">@color/navigation_item_background_workers_red</item>
+    </style>
+    <style name="Widget.App.TimePicker.WorkersRed" parent="@android:style/Widget.Material.Light.TimePicker">
+        <item name="android:headerTimeTextAppearance">@style/TextAppearance.App.TimePicker.TimeLabel.WorkersRed</item>
+        <item name="android:headerAmPmTextAppearance">@style/TextAppearance.App.TimePicker.TimeLabel.WorkersRed</item>
+        <item name="android:numbersBackgroundColor">@color/workers_red_darker</item>
+        <item name="android:headerBackground">@color/workers_red_dark</item>
+    </style>
+    <style name="Widget.App.DatePicker.WorkersRed" parent="@android:style/Widget.Material.Light.DatePicker">
+        <item name="android:headerMonthTextAppearance">@style/TextAppearance.App.DatePicker.DateLabel.WorkersRed</item>
+        <item name="android:headerDayOfMonthTextAppearance">@style/TextAppearance.App.DatePicker.DateLabel.WorkersRed</item>
+        <item name="android:headerYearTextAppearance">@style/TextAppearance.App.DatePicker.DateLabel.WorkersRed</item>
+        <item name="android:headerBackground">@color/workers_red_dark</item>
+    </style>
+
+    <style name="TextAppearance.App.TimePicker.TimeLabel.WorkersRed" parent="@style/TextAppearance.MaterialComponents.Headline1"/>
+    <style name="TextAppearance.App.DatePicker.DateLabel.WorkersRed" parent="@style/TextAppearance.MaterialComponents.Headline1"/>
+</resources>

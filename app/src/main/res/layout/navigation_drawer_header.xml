@@ -20,5 +20,6 @@
         android:layout_gravity="start|bottom"
         android:src="@drawable/ic_qed_logo"
         android:padding="16dp"
-        android:importantForAccessibility="no" />
+        android:importantForAccessibility="no"
+        android:theme="?qedLogoStyle"/>
 </FrameLayout>

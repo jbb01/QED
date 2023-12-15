@@ -19,6 +19,7 @@
     </style>
 
     <style name="Widget.App.Message" parent="">
+        <item name="materialThemeOverlay">?messageTheme</item>
         <item name="android:backgroundTint">@color/message_background</item>
 
         <item name="nameTextAppearance">@style/TextAppearance.App.Message.Name</item>
@@ -33,6 +34,10 @@
         <item name="android:elevation">1dp</item>
     </style>
 
+    <style name="Widget.App.Logo" parent="">
+        <item name="android:colorForeground">@android:color/white</item>
+        <item name="android:colorBackground">@android:color/black</item>
+    </style>
     <style name="Widget.App.Divider" parent="">
         <item name="android:background">?divider</item>
         <item name="android:layout_height">?android:dividerHeight</item>
@@ -47,8 +52,6 @@
     <style name="Widget.App.BottomSheet.Modal" parent="Widget.MaterialComponents.BottomSheet.Modal">
         <item name="android:maxWidth">@null</item>
     </style>
-
-    <style name="Widget.App.Chip" parent="Widget.MaterialComponents.Chip.Action"/>
 
     <style name="Widget.App.MaterialListItem" parent="">
         <item name="titleTextAppearance">?textAppearanceSubtitle1</item>
