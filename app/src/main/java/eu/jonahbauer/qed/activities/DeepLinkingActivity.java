@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import eu.jonahbauer.qed.R;
+import eu.jonahbauer.qed.layoutStuff.themes.Theme;
 import eu.jonahbauer.qed.model.Event;
 import eu.jonahbauer.qed.model.Person;
 import eu.jonahbauer.qed.model.Registration;
@@ -22,6 +23,8 @@ public class DeepLinkingActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        setTheme(Theme.getCurrentTheme().getTheme());
+        getTheme().applyStyle(R.style.ThemeOverlay_App_Translucent, true);
         super.onCreate(savedInstanceState);
 
         Intent intent = getIntent();

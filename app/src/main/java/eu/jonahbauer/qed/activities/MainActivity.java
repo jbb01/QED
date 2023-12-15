@@ -34,6 +34,7 @@ import eu.jonahbauer.qed.R;
 import eu.jonahbauer.qed.activities.mainFragments.OnActivityReenterListener;
 import eu.jonahbauer.qed.databinding.ActivityMainBinding;
 import eu.jonahbauer.qed.layoutStuff.CustomActionMode;
+import eu.jonahbauer.qed.layoutStuff.themes.Theme;
 import eu.jonahbauer.qed.networking.login.QEDLogout;
 import eu.jonahbauer.qed.util.Colors;
 import eu.jonahbauer.qed.util.Preferences;
@@ -66,9 +67,7 @@ public class MainActivity extends AppCompatActivity implements NavController.OnD
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        var theme = Preferences.getGeneral().getTheme();
-        setTheme(theme.getTheme());
-
+        setTheme(Theme.getCurrentTheme().getTheme());
         super.onCreate(savedInstanceState);
 
         mBinding = ActivityMainBinding.inflate(getLayoutInflater());

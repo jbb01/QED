@@ -141,6 +141,15 @@
     </style>
 
     <!-- ThemeOverlays -->
+    <style name="ThemeOverlay.App.Translucent" parent="">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
+
     <style name="ThemeOverlay.App.Dialog" parent="ThemeOverlay.MaterialComponents.Dialog">
         <item name="buttonStyle">@style/Widget.App.Button</item>
         <item name="buttonBarButtonStyle">@style/Widget.App.Button</item>
