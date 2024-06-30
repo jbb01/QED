@@ -422,7 +422,6 @@
 
     <string name="preferences_general_group_appearance">Darstellung</string>
     <string name="preferences_general_theme_title">Farbschema</string>
-    <string name="preferences_general_theme_summary">Foo Bar</string>
 
     <string name="preferences_general_group_update_check">Updates</string>
     <string name="preferences_general_update_check_enabled_title">Auf Updates prüfen</string>

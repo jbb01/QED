@@ -488,7 +488,6 @@
 
     <string name="preferences_general_group_appearance">Appearance</string>
     <string name="preferences_general_theme_title">Theme</string>
-    <string name="preferences_general_theme_summary">Foo Bar</string>
 
     <string name="preferences_general_group_update_check">Update Check</string>
     <string name="preferences_general_update_check_enabled_title">Check for Updates</string>
