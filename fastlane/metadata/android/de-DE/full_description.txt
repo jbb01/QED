@@ -1,0 +1,5 @@
+Diese App bündelt den <a href="https://chat.qed-verein.de/">Chat</a>, die <a href="https://gallery.qed-verein.de/">Galerie</a> und die <a href="https://qeddb.qed-verein.de/">Datenbank</a> des <a href="https://qed-verein.de">QED e.V.</a> in eine sehr, sehr gute App.
+
+Disclaimer: Diese App steht in keinem offiziellen Zusammenhang mit dem Quod Erat Demonstrandum e.V.
+
+
