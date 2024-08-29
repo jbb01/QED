@@ -8,13 +8,13 @@ import android.os.Parcelable;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
-import androidx.core.util.Pair;
 
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import eu.jonahbauer.qed.R;
+import eu.jonahbauer.qed.model.contact.ContactDetail;
 import eu.jonahbauer.qed.model.parcel.ParcelExtensions;
 import eu.jonahbauer.qed.model.parcel.LambdaCreator;
 import eu.jonahbauer.qed.model.parcel.ParcelableEnum;
@@ -73,7 +73,7 @@ public class Person implements Parcelable {
     private Instant loaded;
 
     // Pair of type and number/name
-    private final Set<Pair<String, String>> contacts = new LinkedHashSet<>();
+    private final Set<ContactDetail> contacts = new LinkedHashSet<>();
     private final Set<String> addresses = new LinkedHashSet<>();
     private final Set<Registration> events = new ObjectLinkedOpenCustomHashSet<>(Registration.STRATEGY_ID);
     private final Set<String> groups = new LinkedHashSet<>();
@@ -105,11 +105,11 @@ public class Person implements Parcelable {
         String first = inverted ? lastName : firstName;
         String last = inverted ? firstName : lastName;
 
-        if (first != null && first.length() > 0) {
+        if (first != null && !first.isEmpty()) {
             out += first.charAt(0);
         }
 
-        if (last != null && last.length() > 0) {
+        if (last != null && !last.isEmpty()) {
             out += last.charAt(0);
         }
 
@@ -144,7 +144,7 @@ public class Person implements Parcelable {
         if (dateOfQuitting != null) joiner.add( "\"quit_at\":\"" + dateOfQuitting + "\"");
         if (memberUntil != null) joiner.add( "\"member_until\":\"" + memberUntil + "\"");
         if (paidUntil != null) joiner.add( "\"paid_until\":\"" + paidUntil + "\"");
-        if (!contacts.isEmpty()) joiner.add( "\"contacts\":" + contacts.stream().map(number -> "{\"note\":\"" + number.first + "\", \"number\":\"" + number.second + "\"}").collect(Collectors.joining(", ", "[", "]")));
+        if (!contacts.isEmpty()) joiner.add( "\"contacts\":" + contacts.stream().map(contact -> "{\"label\":\"" + contact.getLabel() + "\", \"value\":\"" + contact.getValue() + "\"}").collect(Collectors.joining(", ", "[", "]")));
         if (!addresses.isEmpty()) joiner.add( "\"addresses\":" + addresses);
         if (!events.isEmpty()) joiner.add( "\"events\":" + events.stream().map(String::valueOf).collect(Collectors.joining(", ", "[", "]")));
         if (!groups.isEmpty()) joiner.add("\"groups\":" + groups);
@@ -184,11 +184,7 @@ public class Person implements Parcelable {
 
         ParcelExtensions.writeInstant(dest, loaded);
 
-        dest.writeInt(contacts.size());
-        for (Pair<String, String> number : contacts) {
-            dest.writeString(number.first);
-            dest.writeString(number.second);
-        }
+        ParcelExtensions.writeTypedCollection(dest, contacts);
 
         ParcelExtensions.writeStringCollection(dest, addresses);
         ParcelExtensions.writeTypedCollection(dest, events);
@@ -223,13 +219,7 @@ public class Person implements Parcelable {
 
         person.loaded = ParcelExtensions.readInstant(source);
 
-        int contactCount = source.readInt();
-        for (int i = 0; i < contactCount; i++) {
-            person.contacts.add(new Pair<>(
-                    source.readString(),
-                    source.readString()
-            ));
-        }
+        ParcelExtensions.readTypedCollection(source, person.contacts, ContactDetail.CREATOR);
 
         ParcelExtensions.readStringCollection(source, person.addresses);
         ParcelExtensions.readTypedCollection(source, person.events, Registration.CREATOR);

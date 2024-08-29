@@ -1,7 +1,5 @@
 package eu.jonahbauer.qed.util;
 
-import androidx.core.util.Pair;
-
 import eu.jonahbauer.qed.model.Album;
 import eu.jonahbauer.qed.model.Event;
 import eu.jonahbauer.qed.model.Image;
@@ -12,6 +10,7 @@ import eu.jonahbauer.qed.model.Registration;
 import java.time.*;
 
 import eu.jonahbauer.qed.model.Registration.Status;
+import eu.jonahbauer.qed.model.contact.ContactDetail;
 import eu.jonahbauer.qed.model.util.ParsedInstant;
 import eu.jonahbauer.qed.model.util.ParsedLocalDate;
 import lombok.experimental.UtilityClass;
@@ -33,9 +32,9 @@ public class Debug {
         person.setActive(true);
         person.setDateOfJoining(new ParsedLocalDate("03/14/2020", LocalDate.of(2020, 3, 2)));
         person.setDateOfQuitting(new ParsedLocalDate("31-12-2050", LocalDate.of(2050, 12, 31)));
-        person.getContacts().add(Pair.create("mobil", "0123456789"));
-        person.getContacts().add(Pair.create("daheim", "987654321"));
-        person.getContacts().add(Pair.create("skype", "max.mustermann"));
+        person.getContacts().add(new ContactDetail("mobil", "0123456789"));
+        person.getContacts().add(new ContactDetail("daheim", "987654321"));
+        person.getContacts().add(new ContactDetail("skype", "max.mustermann"));
         person.getAddresses().add("Musterstraße 10\n12345 Musterstadt");
         person.getAddresses().add("Mustergasse 5\n54321 Musterdorf");
 
