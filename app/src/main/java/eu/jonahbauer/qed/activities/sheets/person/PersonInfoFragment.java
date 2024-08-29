@@ -1,7 +1,6 @@
 package eu.jonahbauer.qed.activities.sheets.person;
 
 import android.app.PendingIntent;
-import android.content.Context;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -25,20 +24,12 @@ import eu.jonahbauer.qed.networking.NetworkConstants;
 import eu.jonahbauer.qed.util.*;
 
 import java.util.*;
-import java.util.function.BiConsumer;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StyleRes;
 import androidx.databinding.BindingAdapter;
 import androidx.navigation.Navigation;
-
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.Object2IntMaps;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectMaps;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 public class PersonInfoFragment extends InfoFragment {
     private static final String SAVED_EXPANDED = "expanded";
@@ -48,57 +39,6 @@ public class PersonInfoFragment extends InfoFragment {
 
     private boolean mExpanded;
 
-    private static final Object2IntMap<String> CONTACT_ICONS;
-    private static final Object2ObjectMap<String, BiConsumer<Context, String>> CONTACT_ACTIONS;
-
-    static {
-        Object2IntOpenHashMap<String> icons = new Object2IntOpenHashMap<>();
-        icons.put("daheim", R.drawable.ic_person_contact_phone);
-        icons.put("discord", R.drawable.ic_person_contact_discord);
-        icons.put("email", R.drawable.ic_person_contact_mail);
-        icons.put("facebook", R.drawable.ic_person_contact_facebook);
-        icons.put("github", R.drawable.ic_person_contact_github);
-        icons.put("gpg", R.drawable.ic_person_contact_gpg);
-        icons.put("icq", R.drawable.ic_person_contact_icq);
-        icons.put("instagram", R.drawable.ic_person_contact_instagram);
-        icons.put("irc", R.drawable.ic_person_contact_irc);
-        icons.put("jabber", R.drawable.ic_person_contact_jabber);
-        icons.put("matrix", R.drawable.ic_person_contact_matrix);
-        icons.put("mobil", R.drawable.ic_person_contact_phone);
-        icons.put("mumble", R.drawable.ic_person_contact_mumble);
-        icons.put("phön", R.drawable.ic_person_contact_phoen);
-        icons.put("signal", R.drawable.ic_person_contact_signal);
-        icons.put("skype", R.drawable.ic_person_contact_skype);
-        icons.put("teamspeak", R.drawable.ic_person_contact_teamspeak);
-        icons.put("telegram", R.drawable.ic_person_contact_telegram);
-        icons.put("threema", R.drawable.ic_person_contact_threema);
-        icons.put("telefon", R.drawable.ic_person_contact_phone);
-        icons.put("twitter", R.drawable.ic_person_contact_twitter);
-        icons.put("whatsapp", R.drawable.ic_person_contact_whatsapp);
-        icons.put("youtube", R.drawable.ic_person_contact_youtube);
-        icons.put("xmpp", R.drawable.ic_person_contact_xmpp);
-        icons.defaultReturnValue(R.drawable.ic_person_contact);
-        CONTACT_ICONS = Object2IntMaps.unmodifiable(icons);
-
-        Object2ObjectOpenHashMap<String, BiConsumer<Context, String>> actions = new Object2ObjectOpenHashMap<>();
-        actions.put("daheim", Actions::dial);
-        actions.put("email", Actions::sendTo);
-        actions.put("facebook", Actions::openFacebook);
-        actions.put("github", Actions::openGithub);
-        actions.put("instagram", Actions::openInstagram);
-        actions.put("jabber", Actions::openXmpp);
-        actions.put("matrix", Actions::openMatrix);
-        actions.put("mobil", Actions::dial);
-        actions.put("phön", Actions::dial);
-        actions.put("skype", Actions::openSkype);
-        actions.put("telegram", Actions::openTelegram);
-        actions.put("telefon", Actions::dial);
-        actions.put("threema", Actions::openThreema);
-        actions.put("twitter", Actions::openTwitter);
-        actions.put("whatsapp", Actions::openWhatsapp);
-        actions.put("xmpp", Actions::openXmpp);
-        CONTACT_ACTIONS = Object2ObjectMaps.unmodifiable(actions);
-    }
 
     public static PersonInfoFragment newInstance() {
         return new PersonInfoFragment();
@@ -202,21 +142,22 @@ public class PersonInfoFragment extends InfoFragment {
     public static void bindContacts(ViewGroup parent, Person person) {
         var contacts = person.getContacts();
         bindList(parent, contacts, (contact, item) -> {
+            var type = contact.getType();
             var context = item.getContext();
-            item.setIcon(CONTACT_ICONS.getInt(contact.first.toLowerCase()));
-            item.setTitle(contact.second);
-            item.setSubtitle(contact.first);
+            item.setIcon(type.getIcon());
+            item.setTitle(contact.getValue());
+            item.setSubtitle(contact.getLabel());
 
-            BiConsumer<Context, String> action = CONTACT_ACTIONS.get(contact.first.toLowerCase());
+            var action = type.getAction();
             if (action != null) {
-                item.setOnClickListener(v -> action.accept(context, contact.second));
+                item.setOnClickListener(v -> action.accept(context, contact.getValue()));
             } else {
                 item.setOnClickListener(null);
             }
 
             item.setOnLongClickListener(v -> {
                 var name = person.getFullName();
-                Actions.copy(context, parent, context.getString(R.string.person_clip_label_contact, contact.first, name), contact.second);
+                Actions.copy(context, parent, context.getString(R.string.person_clip_label_contact, contact.getLabel(), name), contact.getValue());
                 return true;
             });
         });

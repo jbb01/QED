@@ -8,6 +8,7 @@ import androidx.core.util.Pair;
 import eu.jonahbauer.qed.model.Person;
 import eu.jonahbauer.qed.model.Registration;
 
+import eu.jonahbauer.qed.model.contact.ContactDetail;
 import eu.jonahbauer.qed.util.TextUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -207,7 +208,7 @@ public final class PersonParser extends DatabaseParser<Person> {
                        var contact = value.text();
                        if (TextUtils.isNullOrBlank(contact)) return;
 
-                       person.getContacts().add(Pair.create(
+                       person.getContacts().add(new ContactDetail(
                                key.substring(0, key.length() - 1),
                                contact
                        ));

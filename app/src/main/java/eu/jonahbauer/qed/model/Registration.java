@@ -12,6 +12,7 @@ import eu.jonahbauer.qed.R;
 
 import java.time.Instant;
 
+import eu.jonahbauer.qed.model.contact.ContactDetailType;
 import eu.jonahbauer.qed.model.parcel.ParcelExtensions;
 import eu.jonahbauer.qed.model.parcel.LambdaCreator;
 import eu.jonahbauer.qed.model.parcel.ParcelableEnum;
@@ -86,9 +87,9 @@ public class Registration implements Parcelable {
             personAddress = null;
         }
 
-        for (Pair<String, String> contact : person.getContacts()) {
-            if (contact.first.equalsIgnoreCase("mobil")) {
-                personPhone = contact.second;
+        for (var contact : person.getContacts()) {
+            if (contact.getLabel().equalsIgnoreCase(ContactDetailType.MOBILE_PHONE_LABEL)) {
+                personPhone = contact.getValue();
                 break;
             }
         }

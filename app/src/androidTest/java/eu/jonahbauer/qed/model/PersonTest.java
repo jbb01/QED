@@ -2,6 +2,8 @@ package eu.jonahbauer.qed.model;
 
 import android.os.Parcel;
 import androidx.core.util.Pair;
+
+import eu.jonahbauer.qed.model.contact.ContactDetail;
 import eu.jonahbauer.qed.model.util.ParsedLocalDate;
 import org.junit.Test;
 
@@ -66,8 +68,8 @@ public class PersonTest {
         person.setPaidUntil(new ParsedLocalDate("31.12.2022", LocalDate.of(2022, 12, 31)));
         person.setMemberUntil(new ParsedLocalDate("31.12.2024", LocalDate.of(2024, 12, 31)));
         person.setLoaded(Instant.now());
-        person.getContacts().add(Pair.create("mobil", "0123456789"));
-        person.getContacts().add(Pair.create("daheim", "987654321"));
+        person.getContacts().add(new ContactDetail("mobil", "0123456789"));
+        person.getContacts().add(new ContactDetail("daheim", "987654321"));
         person.getAddresses().add("Musterstraße 1\n12345 Musterstadt");
         person.getGroups().add("QED-Gallery-Viewers");
         person.getGroups().add("QED-Gallery-Editors");
