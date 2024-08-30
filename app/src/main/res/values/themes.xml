@@ -173,4 +173,7 @@
         <item name="backgroundTintActivated">#E0E0FF</item>
         <item name="backgroundTintPressed">#EEEEEE</item>
     </style>
+    <style name="ThemeOverlay.App.BottomSheet.TitleBar" parent="">
+        <item name="colorControlNormal">?colorOnSurface</item>
+    </style>
 </resources>

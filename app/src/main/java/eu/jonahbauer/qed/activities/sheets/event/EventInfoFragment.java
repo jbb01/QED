@@ -91,12 +91,12 @@ public class EventInfoFragment extends InfoFragment {
     }
 
     @Override
-    public boolean isOpenInBrowserSupported() {
+    protected boolean isOpenInBrowserSupported() {
         return true;
     }
 
     @Override
-    public @NonNull String getOpenInBrowserLink() {
+    protected @NonNull String getOpenInBrowserLink() {
         return String.format(Locale.ROOT, NetworkConstants.DATABASE_SERVER_EVENT, getEvent().getId());
     }
 

@@ -5,7 +5,6 @@ import android.view.*;
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
 import eu.jonahbauer.qed.R;
@@ -13,13 +12,10 @@ import eu.jonahbauer.qed.activities.sheets.InfoFragment;
 import eu.jonahbauer.qed.databinding.SingleFragmentBinding;
 import eu.jonahbauer.qed.layoutStuff.themes.Theme;
 import eu.jonahbauer.qed.model.viewmodel.InfoViewModel;
-import eu.jonahbauer.qed.util.Actions;
 import eu.jonahbauer.qed.util.TransitionUtils;
 import eu.jonahbauer.qed.util.ViewUtils;
-import lombok.RequiredArgsConstructor;
 
 import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
 
 public abstract class MainInfoFragment extends Fragment {
     private @ColorInt int mColor;
@@ -67,9 +63,8 @@ public abstract class MainInfoFragment extends Fragment {
         model.getToolbarTitle().observe(getViewLifecycleOwner(), title -> ViewUtils.setActionBarText(this, title));
         mBinding.setColor(mColor);
 
-        if (fragment.isOpenInBrowserSupported()) {
-            var menuProvider = new OpenInBrowserMenuProvider(fragment::getOpenInBrowserLink);
-            requireActivity().addMenuProvider(menuProvider, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
+        if (fragment.hasMenu()) {
+            requireActivity().addMenuProvider(fragment, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
         }
     }
 
@@ -87,28 +82,9 @@ public abstract class MainInfoFragment extends Fragment {
         }
     }
 
-    public abstract void onCreateViewModel();
+    protected abstract void onCreateViewModel();
 
-    public abstract @NonNull InfoFragment createFragment();
+    protected abstract @NonNull InfoFragment createFragment();
 
-    public abstract @NonNull InfoViewModel<?> getInfoViewModel();
-
-    @RequiredArgsConstructor
-    private class OpenInBrowserMenuProvider implements MenuProvider {
-        private final Supplier<String> mUrl;
-
-        @Override
-        public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
-            menuInflater.inflate(R.menu.menu_open_in_browser, menu);
-        }
-
-        @Override
-        public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-            if (menuItem.getItemId() == R.id.open_in_browser) {
-                Actions.openInBrowser(requireContext(), mUrl.get());
-                return true;
-            }
-            return false;
-        }
-    }
+    protected abstract @NonNull InfoViewModel<?> getInfoViewModel();
 }

@@ -97,6 +97,20 @@
         <item name="elevation">22dp</item>
     </style>
 
+    <style name="Widget.App.BottomSheet.TitleBar" parent="">
+        <item name="android:theme">@style/ThemeOverlay.App.BottomSheet.TitleBar</item>
+        <item name="android:paddingTop">@dimen/activity_vertical_margin</item>
+        <item name="android:paddingBottom">@dimen/activity_vertical_margin</item>
+        <item name="android:paddingStart">@dimen/activity_horizontal_margin</item>
+        <item name="android:paddingEnd">@dimen/activity_horizontal_margin</item>
+        <item name="titleMarginTop">0dp</item>
+        <item name="titleMarginBottom">0dp</item>
+        <item name="titleTextAppearance">@style/TextAppearance.App.BottomSheet.Title</item>
+        <item name="titleTextColor">?colorOnSurface</item>
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:elevation">0dp</item>
+    </style>
+
     <!-- TextAppearance -->
     <style name="TextAppearance.App.Button" parent="android:TextAppearance.Material.Button">
         <item name="android:textColor">?colorSecondary</item>
@@ -104,6 +118,10 @@
     <style name="TextAppearance.App.MaterialListItem.Icon" parent="android:TextAppearance.Material.Body1">
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">?colorOnAccentColor</item>
+    </style>
+
+    <style name="TextAppearance.App.BottomSheet.Title" parent="">
+        <item name="android:textSize">@dimen/bottom_sheet_title_size</item>
     </style>
 
     <style name="TextAppearance.App.Message" parent="android:TextAppearance.Material.Body1"/>

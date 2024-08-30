@@ -14,7 +14,7 @@ public class PersonFragment extends MainInfoFragment {
     private PersonViewModel mPersonViewModel;
 
     @Override
-    public void onCreateViewModel() {
+    protected void onCreateViewModel() {
         PersonFragmentArgs args = PersonFragmentArgs.fromBundle(getArguments());
         Person person = args.getPerson();
         if (person == null) person = new Person(args.getId());
@@ -26,12 +26,12 @@ public class PersonFragment extends MainInfoFragment {
     }
 
     @Override
-    public @NonNull InfoFragment createFragment() {
+    protected @NonNull InfoFragment createFragment() {
         return PersonInfoFragment.newInstance();
     }
 
     @Override
-    public @NonNull InfoViewModel<?> getInfoViewModel() {
+    protected @NonNull InfoViewModel<?> getInfoViewModel() {
         return mPersonViewModel;
     }
 }

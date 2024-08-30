@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <item type="id" name="tag_position"/>
+
+    <item type="id" name="open_in_browser"/>
+    <item type="id" name="person_favorite"/>
 </resources>

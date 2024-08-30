@@ -15,9 +15,9 @@ import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
-import androidx.appcompat.widget.TooltipCompat;
 import androidx.core.view.OneShotPreDrawListener;
 import androidx.core.view.ViewCompat;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
@@ -28,7 +28,6 @@ import eu.jonahbauer.qed.databinding.FragmentInfoBinding;
 import eu.jonahbauer.qed.layoutStuff.ColorfulBottomSheetCallback;
 import eu.jonahbauer.qed.layoutStuff.themes.Theme;
 import eu.jonahbauer.qed.model.viewmodel.InfoViewModel;
-import eu.jonahbauer.qed.util.Actions;
 import eu.jonahbauer.qed.util.ViewUtils;
 import lombok.RequiredArgsConstructor;
 
@@ -105,22 +104,11 @@ public abstract class InfoBottomSheet extends BottomSheetDialogFragment {
 
         observeViewModel();
 
-        // setup open in browser button
-        if (mFragment.isOpenInBrowserSupported()) {
-            mBinding.openInBrowser.setVisibility(View.VISIBLE);
-            mBinding.openInBrowser.setOnClickListener(v -> openInBrowser());
-            TooltipCompat.setTooltipText(mBinding.openInBrowser, getString(R.string.open_in_browser));
-            if (mBinding.toolbar != null) {
-                mBinding.toolbar.setOnMenuItemClickListener(item -> {
-                    if (item.getItemId() == R.id.open_in_browser) {
-                        openInBrowser();
-                        return true;
-                    }
-                    return false;
-                });
-            }
-        } else {
-            mBinding.openInBrowser.setVisibility(View.GONE);
+        mBinding.titleToolbar.addMenuProvider(mFragment, mFragment, Lifecycle.State.RESUMED);
+
+        // delegate toolbar events to fragment
+        if (mBinding.toolbar != null) {
+            mBinding.toolbar.setOnMenuItemClickListener(mFragment::onMenuItemSelected);
         }
     }
 
@@ -221,17 +209,13 @@ public abstract class InfoBottomSheet extends BottomSheetDialogFragment {
         }
 
         // update menu
-        if (mFragment.isOpenInBrowserSupported()) {
-            mBinding.toolbar.getMenu().clear();
+        if (mFragment.hasMenu()) {
+            var menu = mBinding.toolbar.getMenu();
+            menu.clear();
             if (titleVisible) {
-                mMenuInflater.inflate(R.menu.menu_open_in_browser, mBinding.toolbar.getMenu());
+                mFragment.onCreateMenu(menu, mMenuInflater);
             }
         }
-    }
-
-    private void openInBrowser() {
-        if (!mFragment.isOpenInBrowserSupported()) return;
-        Actions.openInBrowser(requireContext(), mFragment.getOpenInBrowserLink());
     }
 
     private ViewGroup getContentRoot() {
@@ -273,6 +257,7 @@ public abstract class InfoBottomSheet extends BottomSheetDialogFragment {
         @ColorInt
         private final int mDarkColor;
 
+        private final float mTitleTextHeight;
         private final float mActionBarSize;
         private final float mActionBarElevation;
 
@@ -288,6 +273,9 @@ public abstract class InfoBottomSheet extends BottomSheetDialogFragment {
             mContent.getContext().getTheme().resolveAttribute(R.attr.actionBarSize, typedValue, true);
             mActionBarSize = typedValue.getDimension(getResources().getDisplayMetrics());
             mActionBarElevation = mToolbar.getElevation();
+
+            var titleHeightFactor = 1.3f; // factor to account for difference between text view height and font size, determined experimentally
+            mTitleTextHeight = getResources().getDimensionPixelSize(R.dimen.bottom_sheet_title_size) * titleHeightFactor;
         }
 
         @Override
@@ -304,7 +292,8 @@ public abstract class InfoBottomSheet extends BottomSheetDialogFragment {
             mBackgroundPattern.setImageAlpha((int) (alpha * 255));
             mBackground.setTranslationY(- scrollY / 2f);
 
-            boolean shouldShowTitle = mContent.getTop() - scrollY + mBinding.title.getBottom() < mActionBarSize;
+            var titleBottom = mBinding.titleToolbar.getBottom() - (mBinding.titleToolbar.getHeight() - mTitleTextHeight + 1) / 2;
+            boolean shouldShowTitle = mContent.getTop() - scrollY + titleBottom < mActionBarSize;
             boolean shouldShowActionBar = alpha == 0;
             if (shouldShowTitle || shouldShowActionBar) {
                 mToolbarBackgroundColor.setValue(mDarkColor);

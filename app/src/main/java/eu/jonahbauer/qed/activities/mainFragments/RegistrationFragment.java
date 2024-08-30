@@ -14,7 +14,7 @@ public class RegistrationFragment extends MainInfoFragment {
     private RegistrationViewModel mRegistrationViewModel;
 
     @Override
-    public void onCreateViewModel() {
+    protected void onCreateViewModel() {
         RegistrationFragmentArgs args = RegistrationFragmentArgs.fromBundle(getArguments());
         Registration registration = args.getRegistration();
         if (registration == null) registration = new Registration(args.getId());
@@ -26,12 +26,12 @@ public class RegistrationFragment extends MainInfoFragment {
     }
 
     @Override
-    public @NonNull InfoFragment createFragment() {
+    protected @NonNull InfoFragment createFragment() {
         return RegistrationInfoFragment.newInstance();
     }
 
     @Override
-    public @NonNull InfoViewModel<?> getInfoViewModel() {
+    protected @NonNull InfoViewModel<?> getInfoViewModel() {
         return mRegistrationViewModel;
     }
 }

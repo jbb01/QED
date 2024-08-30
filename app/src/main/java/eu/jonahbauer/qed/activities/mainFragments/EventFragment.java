@@ -14,7 +14,7 @@ public class EventFragment extends MainInfoFragment {
     private EventViewModel mEventViewModel;
 
     @Override
-    public void onCreateViewModel() {
+    protected void onCreateViewModel() {
         EventFragmentArgs args = EventFragmentArgs.fromBundle(getArguments());
         Event event = args.getEvent();
         if (event == null) event = new Event(args.getId());
@@ -26,12 +26,12 @@ public class EventFragment extends MainInfoFragment {
     }
 
     @Override
-    public @NonNull InfoFragment createFragment() {
+    protected @NonNull InfoFragment createFragment() {
         return EventInfoFragment.newInstance();
     }
 
     @Override
-    public @NonNull InfoViewModel<?> getInfoViewModel() {
+    protected @NonNull InfoViewModel<?> getInfoViewModel() {
         return mEventViewModel;
     }
 }
