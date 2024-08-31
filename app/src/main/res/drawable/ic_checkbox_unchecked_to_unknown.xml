@@ -12,7 +12,7 @@
 -->
 
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:name="ic_checkbox_unchecked"
+    android:name="ic_checkbox_unknown"
     android:width="32dp"
     android:viewportWidth="48"
     android:height="32dp"
@@ -24,11 +24,11 @@
         android:scaleX="0.2"
         android:scaleY="0.2">
         <group
-            android:name="icon_new_group"
+            android:name="icon_old_group"
             android:scaleX="7.5"
             android:scaleY="7.5">
             <path
-                android:name="icon_new"
+                android:name="icon_old"
                 android:fillColor="@android:color/white"
                 android:pathData="M -7.5 -7.5 h15 v15 h -15 l 2.5 -2.5 l 0.75 0.75 l 4.25 -4.25 l 4.25 4.25 l 1.5 -1.5 l -4.25 -4.25 l 4.25 -4.25 l -1.5 -1.5 l -4.25 4.25 l -4.25 -4.25 l -1.5 1.5 l 4.25 4.25 l -4.25 4.25 l 0.75 0.75 l -2 2"/>
         </group>

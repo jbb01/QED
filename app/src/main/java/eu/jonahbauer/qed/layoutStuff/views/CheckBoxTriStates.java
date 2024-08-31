@@ -55,12 +55,12 @@ public class CheckBoxTriStates extends MaterialCheckBox {
         if (mChangingState) return;
         switch (mState) {
             case UNKNOWN:
-                setState(State.UNCHECKED);
-                break;
-            case UNCHECKED:
                 setState(State.CHECKED);
                 break;
             case CHECKED:
+                setState(State.UNCHECKED);
+                break;
+            case UNCHECKED:
                 setState(State.UNKNOWN);
                 break;
         }
@@ -72,19 +72,19 @@ public class CheckBoxTriStates extends MaterialCheckBox {
     }
 
     private void updateDrawable(boolean isInit) {
-        int btnDrawable = R.drawable.ic_checkbox_checked_to_unknown;
+        int btnDrawable = R.drawable.ic_checkbox_unchecked_to_unknown;
         switch (mState) {
             case UNKNOWN:
                 if (isInit) btnDrawable = R.drawable.ic_checkbox_unknown;
-                else btnDrawable = R.drawable.ic_checkbox_checked_to_unknown_animated;
+                else btnDrawable = R.drawable.ic_checkbox_unchecked_to_unknown_animated;
                 break;
             case UNCHECKED:
                 if (isInit) btnDrawable = R.drawable.ic_checkbox_unchecked;
-                else btnDrawable = R.drawable.ic_checkbox_unknown_to_unchecked_animated;
+                else btnDrawable = R.drawable.ic_checkbox_checked_to_unchecked_animated;
                 break;
             case CHECKED:
                 if (isInit) btnDrawable = R.drawable.ic_checkbox_checked;
-                else btnDrawable = R.drawable.ic_checkbox_unchecked_to_checked_animated;
+                else btnDrawable = R.drawable.ic_checkbox_unknown_to_checked_animated;
                 break;
         }
         setButtonDrawable(AppCompatResources.getDrawable(getContext(), btnDrawable));
@@ -152,8 +152,9 @@ public class CheckBoxTriStates extends MaterialCheckBox {
     @RequiredArgsConstructor
     public enum State implements ParcelableEnum {
         UNKNOWN(null),
+        CHECKED(true),
         UNCHECKED(false),
-        CHECKED(true);
+        ;
         public static final Creator<State> CREATOR = new Creator<>(State.values(), State[]::new);
 
         private final Boolean value;

@@ -12,7 +12,7 @@
 -->
 
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:name="ic_checkbox_unknown"
+    android:name="ic_checkbox_unchecked"
     android:width="32dp"
     android:viewportWidth="48"
     android:height="32dp"
@@ -24,11 +24,11 @@
         android:scaleX="0.2"
         android:scaleY="0.2">
         <group
-            android:name="icon_old_group"
+            android:name="icon_new_group"
             android:scaleX="7.5"
             android:scaleY="7.5">
             <path
-                android:name="icon_old"
+                android:name="icon_new"
                 android:pathData="M 7.0,-9.0 c 0.0,0.0 -14.0,0.0 -14.0,0.0 c -1.1044921875,0.0 -2.0,0.8955078125 -2.0,2.0 c 0.0,0.0 0.0,14.0 0.0,14.0 c 0.0,1.1044921875 0.8955078125,2.0 2.0,2.0 c 0.0,0.0 14.0,0.0 14.0,0.0 c 1.1044921875,0.0 2.0,-0.8955078125 2.0,-2.0 c 0.0,0.0 0.0,-14.0 0.0,-14.0 c 0.0,-1.1044921875 -0.8955078125,-2.0 -2.0,-2.0 c 0.0,0.0 0.0,0.0 0.0,0.0 Z M -2.0,5.00001525879 c 0.0,0.0 -5.0,-5.00001525879 -5.0,-5.00001525879 c 0.0,0.0 1.41409301758,-1.41409301758 1.41409301758,-1.41409301758 c 0.0,0.0 3.58590698242,3.58601379395 3.58590698242,3.58601379395 c 0.0,0.0 7.58590698242,-7.58601379395 7.58590698242,-7.58601379395 c 0.0,0.0 1.41409301758,1.41409301758 1.41409301758,1.41409301758 c 0.0,0.0 -9.0,9.00001525879 -9.0,9.00001525879 Z"
                 android:fillColor="@android:color/white" />
         </group>

@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:drawable="@drawable/ic_checkbox_unchecked_to_checked">
-    <target
-        android:animation="@animator/ic_tri_checkbox_old"
-        android:name="icon_old_group"/>
+    android:drawable="@drawable/ic_checkbox_unknown_to_checked">
     <target
         android:animation="@animator/ic_tri_checkbox_new"
         android:name="icon_new_group"/>
