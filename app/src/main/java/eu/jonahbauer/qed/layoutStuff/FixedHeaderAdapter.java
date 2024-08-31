@@ -13,13 +13,7 @@ import androidx.annotation.Nullable;
 
 import eu.jonahbauer.qed.R;
 
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 
 import it.unimi.dsi.fastutil.ints.IntArrayList;
@@ -39,22 +33,23 @@ import it.unimi.dsi.fastutil.ints.IntSet;
  */
 @SuppressWarnings({"unused", "WeakerAccess"})
 public abstract class FixedHeaderAdapter<C, H> extends ArrayAdapter<C> implements SectionIndexer, AbsListView.OnScrollListener {
-    protected final List<C> mItemList;
-    private Function<C, H> mHeaderMap;
-    private Comparator<? super C> mComparator;
+    protected final @NonNull List<C> mItemList;
+
+    private @NonNull Function<C, H> mHeaderMap;
+    private @NonNull Comparator<? super C> mComparator;
 
     // cache
     private H[] mSections;
     private int[] mSectionForPosition;
     private int[] mPositionForSection;
 
-    private final IntSet mHeaderPositions;
+    private final @NonNull IntSet mHeaderPositions;
 
     private boolean mNotifyOnChange;
 
-    private final View mFixedHeader;
-    private final Set<View> mInvisibleViews;
-    private final LayoutInflater mLayoutInflater;
+    private final @NonNull View mFixedHeader;
+    private final @NonNull Set<View> mInvisibleViews;
+    private final @NonNull LayoutInflater mLayoutInflater;
 
     /**
      * Creates a new fixed header adapter.
@@ -82,18 +77,26 @@ public abstract class FixedHeaderAdapter<C, H> extends ArrayAdapter<C> implement
      * @param comparator a sorting function
      * @param fixedHeader a view used for the fixed header
      */
-    public FixedHeaderAdapter(Context context, @NonNull List<C> itemList, @NonNull Function<C, H> headerMap, Comparator<? super C> comparator, View fixedHeader) {
+    public FixedHeaderAdapter(
+            @NonNull Context context,
+            @NonNull List<C> itemList,
+            @NonNull Function<C, H> headerMap,
+            @NonNull Comparator<? super C> comparator,
+            @NonNull View fixedHeader
+    ) {
         super(context, 0, itemList);
-        this.mItemList = itemList;
-        setComparator(comparator);
-        this.mHeaderMap = headerMap;
+
+        this.mItemList = Objects.requireNonNull(itemList);
+        this.mHeaderMap = Objects.requireNonNull(headerMap);
+        this.mComparator = Objects.requireNonNull(comparator);
+        this.mFixedHeader = Objects.requireNonNull(fixedHeader);
+
         this.mHeaderPositions = new IntOpenHashSet();
         this.mInvisibleViews = new HashSet<>();
         this.mLayoutInflater = LayoutInflater.from(context);
-        this.mFixedHeader = fixedHeader;
         this.mNotifyOnChange = true;
 
-        if (itemList.size() > 0) prepareHeaders();
+        if (!itemList.isEmpty()) prepareHeaders();
     }
 
     @NonNull
@@ -137,6 +140,7 @@ public abstract class FixedHeaderAdapter<C, H> extends ArrayAdapter<C> implement
     /**
      * {@inheritDoc}
      */
+    @Override
     public void add(@Nullable C object) {
         if (object != null) {
             mItemList.add(object);
@@ -148,6 +152,7 @@ public abstract class FixedHeaderAdapter<C, H> extends ArrayAdapter<C> implement
     /**
      * {@inheritDoc}
      */
+    @Override
     public void addAll(@NonNull Collection<? extends C> collection) {
         mItemList.addAll(collection);
         prepareHeaders();
@@ -166,6 +171,7 @@ public abstract class FixedHeaderAdapter<C, H> extends ArrayAdapter<C> implement
     /**
      * {@inheritDoc}
      */
+    @Override
     public void clear() {
         mItemList.clear();
         prepareHeaders();
@@ -266,8 +272,8 @@ public abstract class FixedHeaderAdapter<C, H> extends ArrayAdapter<C> implement
         this.mNotifyOnChange = notifyOnChange;
     }
 
-    public void setComparator(Comparator<? super C> comparator) {
-        this.mComparator = comparator;
+    public void setComparator(@NonNull Comparator<? super C> comparator) {
+        this.mComparator = Objects.requireNonNull(comparator);
     }
 
     /**
@@ -286,11 +292,11 @@ public abstract class FixedHeaderAdapter<C, H> extends ArrayAdapter<C> implement
      *     </ul>
      * </p>
      */
-    public void setHeaderMap(Function<C, H> headerMap) {
-        this.mHeaderMap = headerMap;
+    public void setHeaderMap(@NonNull Function<C, H> headerMap) {
+        this.mHeaderMap = Objects.requireNonNull(headerMap);
     }
 
-    public List<C> getItemList() {
+    public @NonNull List<C> getItemList() {
         return mItemList;
     }
 

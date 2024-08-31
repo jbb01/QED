@@ -16,61 +16,25 @@ import eu.jonahbauer.qed.layoutStuff.FixedHeaderAdapter;
 import eu.jonahbauer.qed.model.Person;
 import eu.jonahbauer.qed.model.parcel.ParcelableEnum;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 
 import static eu.jonahbauer.qed.model.Person.COMPARATOR_FIRST_NAME;
 import static eu.jonahbauer.qed.model.Person.COMPARATOR_LAST_NAME;
 
 public class PersonAdapter extends FixedHeaderAdapter<Person, Character> {
-    private static final Function<Person, Character> headerMapFirstName = person -> {
-        if (person.getFirstName() == null) return '?';
-        else {
-            char chr = person.getFirstName().charAt(0);
+    private @NonNull SortMode mSort;
 
-            switch (chr) {
-                case 'Ä':
-                case 'ä':
-                    return 'A';
-                case 'Ö':
-                case 'ö':
-                    return 'O';
-                case 'Ü':
-                case 'ü':
-                    return 'U';
-                default:
-                    if ('a' <= chr && chr <= 'z') chr -= 0x32;
-                    return chr;
-            }
-        }
-    };
-    private static final Function<Person, Character> headerMapLastName = person -> {
-        if (person.getLastName() == null) return '?';
-        else {
-            char chr = person.getLastName().charAt(0);
-
-            switch (chr) {
-                case 'Ä':
-                case 'ä':
-                    return 'A';
-                case 'Ö':
-                case 'ö':
-                    return 'O';
-                case 'Ü':
-                case 'ü':
-                    return 'U';
-                default:
-                    if ('a' <= chr && chr <= 'z') chr -= 0x32;
-                    return chr;
-            }
-        }
-    };
-
-    private SortMode mSort;
-
-    public PersonAdapter(Context context, @NonNull List<Person> itemList, SortMode sort, View fixedHeader) {
-        super(context, itemList, headerMapFirstName, COMPARATOR_FIRST_NAME, fixedHeader);
-        setSortMode(sort);
+    public PersonAdapter(
+            @NonNull Context context,
+            @NonNull List<Person> itemList,
+            @NonNull SortMode sort,
+            @NonNull View fixedHeader
+    ) {
+        super(context, itemList, sort, sort, fixedHeader);
+        this.mSort = sort;
     }
 
     @NonNull
@@ -98,18 +62,9 @@ public class PersonAdapter extends FixedHeaderAdapter<Person, Character> {
     }
 
     public void setSortMode(@NonNull SortMode sort) {
-        switch (sort) {
-            case FIRST_NAME:
-                setHeaderMap(headerMapFirstName);
-                setComparator(COMPARATOR_FIRST_NAME);
-                break;
-            case LAST_NAME:
-                setHeaderMap(headerMapLastName);
-                setComparator(COMPARATOR_LAST_NAME);
-                break;
-        }
-
-        this.mSort = sort;
+        this.mSort = Objects.requireNonNull(sort);
+        setHeaderMap(sort);
+        setComparator(sort);
     }
 
     @Nullable
@@ -132,8 +87,48 @@ public class PersonAdapter extends FixedHeaderAdapter<Person, Character> {
         return true;
     }
 
-    public enum SortMode implements ParcelableEnum {
-        FIRST_NAME, LAST_NAME;
+    public enum SortMode implements ParcelableEnum, Function<Person, Character>, Comparator<Person> {
+        FIRST_NAME(Person::getFirstName, COMPARATOR_FIRST_NAME),
+        LAST_NAME(Person::getLastName, COMPARATOR_LAST_NAME),
+        ;
+
         public static final Parcelable.Creator<SortMode> CREATOR = new Creator<>(SortMode.values(), SortMode[]::new);
+
+        private final @NonNull Function<Person, String> name;
+        private final @NonNull Comparator<Person> comparator;
+
+        SortMode(@NonNull Function<Person, String> name, @NonNull Comparator<Person> comparator) {
+            this.name = Objects.requireNonNull(name);
+            this.comparator = Objects.requireNonNull(comparator);
+        }
+
+        @Override
+        public @NonNull Character apply(@NonNull Person person) {
+            return getHeader(name.apply(person));
+        }
+
+        @Override
+        public int compare(@NonNull Person first, @NonNull Person second) {
+            return comparator.compare(first, second);
+        }
+
+        private static Character getHeader(String name) {
+            if (name == null || name.isEmpty()) return '?';
+            char chr = name.charAt(0);
+            switch (chr) {
+                case 'Ä':
+                case 'ä':
+                    return 'A';
+                case 'Ö':
+                case 'ö':
+                    return 'O';
+                case 'Ü':
+                case 'ü':
+                    return 'U';
+                default:
+                    if ('a' <= chr && chr <= 'z') chr -= 0x32;
+                    return chr;
+            }
+        }
     }
 }
