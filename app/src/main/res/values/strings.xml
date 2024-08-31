@@ -55,6 +55,8 @@
     <string name="preferences_general_update_check_dont_suggest_key" translatable="false">general.update_check.dont_suggest</string>
     <string name="preferences_general_username_key" translatable="false">general.username</string>
 
+    <string name="preferences_database_favorites_key" translatable="false">database.people.favorites</string>
+
     <string name="preferences_gallery_delete_thumbnails_key" translatable="false">gallery.delete_thumbnails</string>
     <string name="preferences_gallery_delete_images_key" translatable="false">gallery.delete_images</string>
     <string name="preferences_gallery_offline_mode_key" translatable="false">gallery.offline_mode</string>
@@ -262,6 +264,7 @@
     <string name="persons_database_lastName_hint">Last Name</string>
     <string name="persons_database_active_checkbox">Active</string>
     <string name="persons_database_member_checkbox">Member</string>
+    <string name="persons_database_favorite_checkbox">Favorite</string>
     <string name="persons_database_sort">Order By</string>
     <string name="persons_database_sort_first_name">First Name</string>
     <string name="persons_database_sort_last_name">Last Name</string>
@@ -319,6 +322,9 @@
     <string name="person_privacy_public_email">Public Mail</string>
     <string name="person_privacy_public_address">Public Address and Contact Information</string>
     <string name="person_privacy_public_profile">Public Profile</string>
+
+    <string name="person_favorite_add">Add to favorites</string>
+    <string name="person_favorite_remove">Remove from favorites</string>
 
     <!-- Events Database Fragment -->
     <string name="title_fragment_events_database">Events</string>

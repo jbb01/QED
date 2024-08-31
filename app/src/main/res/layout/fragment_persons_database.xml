@@ -97,20 +97,32 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
-                        <eu.jonahbauer.qed.layoutStuff.views.CheckBoxTriStates
-                            android:id="@+id/database_active_checkbox"
-                            style="?triCheckboxStyle"
-                            android:layout_width="wrap_content"
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:paddingEnd="8dp"
-                            android:text="@string/persons_database_active_checkbox"
-                            tools:ignore="RtlSymmetry" />
+                            android:layout_weight="1"
+                            android:orientation="horizontal">
 
-                        <eu.jonahbauer.qed.layoutStuff.views.CheckBoxTriStates
-                            android:id="@+id/database_member_checkbox"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/persons_database_member_checkbox" />
+                            <eu.jonahbauer.qed.layoutStuff.views.CheckBoxTriStates
+                                android:id="@+id/database_active_checkbox"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="8dp"
+                                android:text="@string/persons_database_active_checkbox" />
+
+                            <eu.jonahbauer.qed.layoutStuff.views.CheckBoxTriStates
+                                android:id="@+id/database_member_checkbox"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="8dp"
+                                android:text="@string/persons_database_member_checkbox" />
+
+                            <eu.jonahbauer.qed.layoutStuff.views.CheckBoxTriStates
+                                android:id="@+id/database_favorite_checkbox"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/persons_database_favorite_checkbox" />
+                        </LinearLayout>
                     </TableRow>
 
                     <View style="?dividerStyle"/>

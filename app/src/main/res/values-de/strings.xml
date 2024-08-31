@@ -198,6 +198,7 @@
     <string name="persons_database_lastName_hint">Nachname</string>
     <string name="persons_database_active_checkbox">Aktiv</string>
     <string name="persons_database_member_checkbox">Mitglied</string>
+    <string name="persons_database_favorite_checkbox">Favouriten</string>
     <string name="persons_database_sort">Sortieren nach</string>
     <string name="persons_database_sort_first_name">Vornamen</string>
     <string name="persons_database_sort_last_name">Nachnamen</string>
@@ -255,6 +256,9 @@
     <string name="person_privacy_public_email">Email einsehbar</string>
     <string name="person_privacy_public_address">Adressen und Kontakte einsehbar</string>
     <string name="person_privacy_public_profile">Profil einsehbar</string>
+
+    <string name="person_favorite_add">Zu Favoriten hinzufügen</string>
+    <string name="person_favorite_remove">Von Favoriten entfernen</string>
 
     <!-- Events Database Fragment -->
     <string name="title_fragment_events_database">Veranstaltungen</string>

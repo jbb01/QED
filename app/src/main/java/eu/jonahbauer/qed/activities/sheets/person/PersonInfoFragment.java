@@ -3,12 +3,14 @@ package eu.jonahbauer.qed.activities.sheets.person;
 import android.app.PendingIntent;
 import android.os.Bundle;
 import android.util.TypedValue;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 import android.widget.LinearLayout;
-
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StyleRes;
+import androidx.databinding.BindingAdapter;
 import androidx.navigation.NavDeepLinkBuilder;
+import androidx.navigation.Navigation;
 import eu.jonahbauer.qed.R;
 import eu.jonahbauer.qed.activities.MainActivity;
 import eu.jonahbauer.qed.activities.mainFragments.PersonFragmentArgs;
@@ -21,15 +23,14 @@ import eu.jonahbauer.qed.model.Person;
 import eu.jonahbauer.qed.model.Registration;
 import eu.jonahbauer.qed.model.viewmodel.PersonViewModel;
 import eu.jonahbauer.qed.networking.NetworkConstants;
-import eu.jonahbauer.qed.util.*;
+import eu.jonahbauer.qed.util.Actions;
+import eu.jonahbauer.qed.util.Preferences;
+import eu.jonahbauer.qed.util.TextUtils;
+import eu.jonahbauer.qed.util.TimeUtils;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 
+import java.lang.ref.WeakReference;
 import java.util.*;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.StyleRes;
-import androidx.databinding.BindingAdapter;
-import androidx.navigation.Navigation;
 
 public class PersonInfoFragment extends InfoFragment {
     private static final String SAVED_EXPANDED = "expanded";
@@ -38,7 +39,7 @@ public class PersonInfoFragment extends InfoFragment {
     private FragmentInfoPersonBinding mBinding;
 
     private boolean mExpanded;
-
+    private final List<WeakReference<MenuItem>> items = new ArrayList<>();
 
     public static PersonInfoFragment newInstance() {
         return new PersonInfoFragment();
@@ -57,6 +58,21 @@ public class PersonInfoFragment extends InfoFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mBinding = FragmentInfoPersonBinding.inflate(inflater, container, false);
         mPersonViewModel.getValue().observe(getViewLifecycleOwner(), mBinding::setPerson);
+        mPersonViewModel.getFavorite().observe(getViewLifecycleOwner(), favorite -> {
+            var title = favorite ? R.string.person_favorite_remove : R.string.person_favorite_add;
+            var icon = favorite ? R.drawable.ic_menu_favorite_yes : R.drawable.ic_menu_favorite_no;
+
+            var it = items.iterator();
+            while (it.hasNext()) {
+                var item = it.next().get();
+                if (item == null) {
+                    it.remove();
+                } else {
+                    item.setTitle(title);
+                    item.setIcon(icon);
+                }
+            }
+        });
         return mBinding.getRoot();
     }
 
@@ -110,6 +126,46 @@ public class PersonInfoFragment extends InfoFragment {
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putBoolean(SAVED_EXPANDED, mExpanded);
+    }
+
+    @Override
+    public boolean hasMenu() {
+        return true;
+    }
+
+    @Override
+    public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        var favorites = Preferences.getDatabase().getFavorites();
+        var isFavorite = favorites.contains(getPerson().getId());
+        var item = menu.add(
+                Menu.NONE, R.id.person_favorite, Menu.NONE,
+                isFavorite ? R.string.person_favorite_remove : R.string.person_favorite_add
+        );
+        item.setIcon(isFavorite ? R.drawable.ic_menu_favorite_yes : R.drawable.ic_menu_favorite_no);
+        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        items.add(new WeakReference<>(item));
+        super.onCreateMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onMenuItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.person_favorite) {
+            var id = getPerson().getId();
+            var favorites = new LongOpenHashSet(Preferences.getDatabase().getFavorites());
+
+            // update shared prefs
+            var isFavorite = favorites.contains(id);
+            if (isFavorite) {
+                favorites.remove(id);
+            } else {
+                favorites.add(id);
+            }
+            Preferences.getDatabase().setFavorites(favorites);
+
+            return true;
+        } else {
+            return super.onMenuItemSelected(item);
+        }
     }
 
     @Override

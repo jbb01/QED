@@ -11,6 +11,7 @@ import eu.jonahbauer.android.preference.annotations.PreferenceGroup;
 import eu.jonahbauer.android.preference.annotations.Preferences;
 import eu.jonahbauer.android.preference.annotations.serializer.PreferenceSerializationException;
 import eu.jonahbauer.android.preference.annotations.serializer.PreferenceSerializer;
+import it.unimi.dsi.fastutil.longs.LongSet;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -41,6 +42,9 @@ import java.util.stream.Collectors;
                 @Preference(name = "db_max_result", type = int.class, defaultValue = "50_000"),
                 @Preference(name = "delete_db", type = void.class)
         }),
+        @PreferenceGroup(name = "database", prefix = "preferences_database_", suffix = "_key", value = {
+                @Preference(name = "favorites", type = String.class, serializer = Preferences$Config.LongSetSerializer.class)
+        }),
         @PreferenceGroup(name = "gallery", prefix = "preferences_gallery_", suffix = "_key", value = {
                 @Preference(name = "offline_mode", type = boolean.class),
                 @Preference(name = "delete_thumbnails", type = void.class),
@@ -49,7 +53,26 @@ import java.util.stream.Collectors;
                 @Preference(name = "show_dir", type = void.class)
         })
 })
-class Preferences$Config {
+public final class Preferences$Config {
+
+    private Preferences$Config() {
+        throw new UnsupportedOperationException();
+    }
+
+    public static class LongSetSerializer implements PreferenceSerializer<LongSet, String> {
+
+        @Override
+        public String serialize(LongSet longs) throws PreferenceSerializationException {
+            if (longs == null || longs.isEmpty()) return null;
+            return longs.longStream().mapToObj(String::valueOf).collect(Collectors.joining(","));
+        }
+
+        @Override
+        public LongSet deserialize(String s) throws PreferenceSerializationException {
+            if (s == null || s.isEmpty()) return LongSet.of();
+            return LongSet.of(Arrays.stream(s.split(",")).mapToLong(Long::parseLong).toArray());
+        }
+    }
 
     public static class LinkedSetSerializer implements PreferenceSerializer<Set<String>, String> {
         @Override

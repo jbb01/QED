@@ -107,6 +107,7 @@ public class PersonDatabaseFragment extends Fragment implements AdapterView.OnIt
         String lastName = null;
         Boolean member;
         Boolean active;
+        Boolean favorite;
 
         if (mBinding.databaseFirstNameCheckbox.isChecked()) {
             firstName = mBinding.databaseFirstNameEditText.getText().toString();
@@ -118,9 +119,10 @@ public class PersonDatabaseFragment extends Fragment implements AdapterView.OnIt
 
         member = mBinding.databaseMemberCheckbox.getState().asBoolean();
         active = mBinding.databaseActiveCheckbox.getState().asBoolean();
+        favorite = mBinding.databaseFavoriteCheckbox.getState().asBoolean();
 
         mPersonListViewModel.setSortMode(getSortMode());
-        mPersonListViewModel.filter(new PersonFilter(firstName, lastName, member, active));
+        mPersonListViewModel.filter(new PersonFilter(firstName, lastName, member, active, favorite));
     }
 
     @Override
