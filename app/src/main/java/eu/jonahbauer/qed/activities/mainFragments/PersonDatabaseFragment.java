@@ -56,7 +56,7 @@ public class PersonDatabaseFragment extends Fragment implements AdapterView.OnIt
         TransitionUtils.postponeEnterAnimationToPreDraw(this, view);
         requireActivity().addMenuProvider(this, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
 
-        mPersonAdapter = new PersonAdapter(getContext(), new ArrayList<>(), PersonAdapter.SortMode.FIRST_NAME, mBinding.fixedHeader.getRoot());
+        mPersonAdapter = new PersonAdapter(requireContext(), new ArrayList<>(), PersonAdapter.SortMode.FIRST_NAME, mBinding.fixedHeader.getRoot());
         mBinding.list.setOnItemClickListener(this);
         mBinding.list.setOnScrollListener(mPersonAdapter);
         mBinding.list.setAdapter(mPersonAdapter);
@@ -69,16 +69,17 @@ public class PersonDatabaseFragment extends Fragment implements AdapterView.OnIt
             }
 
             mPersonAdapter.clear();
+            int hits = 0;
             if (persons.getCode() == StatusWrapper.STATUS_LOADED) {
                 mPersonAdapter.setSortMode(mPersonListViewModel.getSortMode());
-                mPersonAdapter.addAll(persons.getValue());
+                mPersonAdapter.setPersons(persons.getValue());
+                hits = persons.getValue().size();
             } else if (persons.getCode() == StatusWrapper.STATUS_ERROR) {
                 Reason reason = persons.getReason();
                 mBinding.setError(getString(reason == Reason.EMPTY ? R.string.database_empty : reason.getStringRes()));
             }
             mPersonAdapter.notifyDataSetChanged();
 
-            int hits = mPersonAdapter.getItemList().size();
             if (hits > 0) {
                 mBinding.setHits(getString(R.string.hits, hits));
             } else {
@@ -124,7 +125,7 @@ public class PersonDatabaseFragment extends Fragment implements AdapterView.OnIt
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Person person = mPersonAdapter.getItem(position);
+        Person person = mPersonAdapter.getPerson(position);
         if (person != null) {
             var extras = new FragmentNavigator.Extras.Builder()
                     .addSharedElement(view, getString(R.string.transition_name_single_fragment))

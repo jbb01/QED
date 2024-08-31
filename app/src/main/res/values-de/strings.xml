@@ -204,6 +204,7 @@
     <string name="persons_database_inactive">(inaktiv)</string>
     <string name="persons_database_non_member">(kein Mitglied)</string>
     <string name="persons_database_no_email"><i>privat</i></string>
+    <string name="persons_database_header_self">ICH</string>
 
     <!-- Person Fragment -->
     <string name="title_fragment_person">Person</string>
