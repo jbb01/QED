@@ -1,5 +1,6 @@
 package eu.jonahbauer.qed;
 
+import android.accounts.*;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.SharedPreferences;
@@ -82,6 +83,9 @@ public class Application extends android.app.Application implements android.app.
 
         mConnectionStateMonitor = new ConnectionStateMonitor(this);
         mConnectionStateMonitor.enable();
+
+        // create account if necessary
+        initAccount();
     }
 
     private void initSharedPreferences() {
@@ -110,6 +114,20 @@ public class Application extends android.app.Application implements android.app.
 
         // track changes to name and channel
         preferences.registerOnSharedPreferenceChangeListener(RecentsSharedPreferenceListener.INSTANCE);
+    }
+
+    private void initAccount() {
+        AccountManager accountManager = AccountManager.get(this);
+
+        String accountType = getString(R.string.account_type);
+        String accountName = getString(R.string.app_name);
+        Account account = new Account(accountName, accountType);
+
+        if (accountManager.addAccountExplicitly(account, null, null)) {
+            Log.d(LOG_TAG, "Successfully added account");
+        } else {
+            Log.w(LOG_TAG, "Failed to add account.");
+        }
     }
 
     @Override

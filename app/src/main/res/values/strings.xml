@@ -30,6 +30,7 @@
     <string name="logout_success">Logout successful</string>
     <string name="not_official">This app is not related to the Quod Erat Demonstrandum e.V. in any official way.</string>
     <string name="master_key_error">Password could not be saved.</string>
+    <string name="account_type" translatable="false">eu.jonahbauer.qed.account_type</string>
 
     <!-- Preference Keys -->
     <string name="preferences_chat_name_key" translatable="false">chat.name</string>
