@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -57,9 +58,7 @@ public final class QEDLogin {
      */
     private static void loginChat() throws InvalidCredentialsException, NetworkException {
         Pair<String, char[]> credentials = loadUsernameAndPassword();
-
         loginChat(credentials.first, credentials.second);
-
         PasswordUtils.wipe(credentials.second);
     }
 
@@ -69,9 +68,7 @@ public final class QEDLogin {
      */
     private static void loginDatabase() throws InvalidCredentialsException, NetworkException {
         Pair<String, char[]> credentials = loadUsernameAndPassword();
-
         loginDatabase(credentials.first, credentials.second);
-
         PasswordUtils.wipe(credentials.second);
     }
 
@@ -81,9 +78,7 @@ public final class QEDLogin {
      */
     private static void loginGallery() throws NetworkException, InvalidCredentialsException {
         Pair<String, char[]> credentials = loadUsernameAndPassword();
-
         loginGallery(credentials.first, credentials.second);
-
         PasswordUtils.wipe(credentials.second);
     }
 
@@ -94,12 +89,11 @@ public final class QEDLogin {
     private static void loginChat(String username, char[] password) throws InvalidCredentialsException, NetworkException {
         String version = NetworkConstants.CHAT_VERSION;
 
-        byte[] passwordBytes = PasswordUtils.toBytes(password);
-        byte[] data = PasswordUtils.combine(
-                String.format("username=%s&version=%s&password=", username, version).getBytes(StandardCharsets.UTF_8),
-                passwordBytes
-        );
-        PasswordUtils.wipe(passwordBytes);
+        byte[] data = PasswordUtils.encode(Map.of(
+                "username", username,
+                "version", version,
+                "password", password
+        ));
 
         try {
             HttpsURLConnection httpsURLConnection = (HttpsURLConnection) new URL(NetworkConstants.CHAT_SERVER_LOGIN).openConnection();
@@ -168,12 +162,11 @@ public final class QEDLogin {
             httpsURLConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
             httpsURLConnection.setRequestProperty("charset", "utf-8");
 
-            byte[] passwordBytes = PasswordUtils.toBytes(password);
-            data = PasswordUtils.combine(
-                    String.format("account_name=%s&authenticity_token=%s&password=", username, authenticityToken).getBytes(StandardCharsets.UTF_8),
-                    passwordBytes
-            );
-            PasswordUtils.wipe(passwordBytes);
+            data = PasswordUtils.encode(Map.of(
+                    "account_name", username,
+                    "authenticity_token", authenticityToken,
+                    "password", password
+            ));
 
             DataOutputStream dataOutputStream = new DataOutputStream(httpsURLConnection.getOutputStream());
             dataOutputStream.write(data);
@@ -200,13 +193,11 @@ public final class QEDLogin {
      * The authentication cookie will be handled by the {@link QEDCookieHandler}.
      */
     private static void loginGallery(String username, char[] password) throws InvalidCredentialsException, NetworkException {
-        byte[] passwordBytes = PasswordUtils.toBytes(password);
-        byte[] data = PasswordUtils.combine(
-                String.format("username=%s&login=Einloggen&password=", username).getBytes(StandardCharsets.UTF_8),
-                passwordBytes
-        );
-        PasswordUtils.wipe(passwordBytes);
-
+        byte[] data = PasswordUtils.encode(Map.of(
+                "username", username,
+                "login", "Einloggen",
+                "password", password
+        ));
         try {
             HttpsURLConnection httpsURLConnection = (HttpsURLConnection) new URL(NetworkConstants.GALLERY_SERVER_LOGIN).openConnection();
             httpsURLConnection.setRequestMethod("POST");
