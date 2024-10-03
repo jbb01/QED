@@ -3,7 +3,6 @@ package eu.jonahbauer.qed.model.parser;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.core.util.Pair;
 
 import eu.jonahbauer.qed.model.Person;
 import eu.jonahbauer.qed.model.Registration;
@@ -320,7 +319,7 @@ public final class PersonParser extends DatabaseParser<Person> {
                 var statusElement = li.selectFirst("i");
                 var statusString = statusElement != null ? statusElement.text() : "";
                 var orga = statusString.contains(REGISTRATIONS_KEY_ORGA);
-                var status = RegistrationStatusParser.INSTANCE.parseLenient(statusString, Registration.Status.CONFIRMED);
+                var status = RegistrationStatusParser.INSTANCE.parse(statusString);
 
                 Registration registration = new Registration(id);
                 registration.setStatus(status);

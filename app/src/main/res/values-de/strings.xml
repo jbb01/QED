@@ -331,7 +331,7 @@
     <!-- Registration -->
     <string name="registration_orga">Orga</string>
     <string name="registration_status_confirmed">bestätigt</string>
-    <string name="registration_status_pending">offen</string>
+    <string name="registration_status_pending">angemeldet</string>
     <string name="registration_status_rejected">abgelehnt</string>
     <string name="registration_status_cancelled">abgemeldet</string>
 

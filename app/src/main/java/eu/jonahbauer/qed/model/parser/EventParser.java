@@ -146,7 +146,7 @@ public final class EventParser extends DatabaseParser<Event> {
                                    var statusElement = div.selectFirst("i");
                                    var statusString = statusElement != null ? statusElement.text() : "";
                                    var orga = statusString.contains(REGISTRATIONS_KEY_ORGA);
-                                   var status = RegistrationStatusParser.INSTANCE.parseLenient(statusString, Registration.Status.CONFIRMED);
+                                   var status = RegistrationStatusParser.INSTANCE.parse(statusString);
 
                                    Registration registration = new Registration(id);
                                    registration.setStatus(status);

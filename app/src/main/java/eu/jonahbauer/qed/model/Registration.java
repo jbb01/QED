@@ -5,8 +5,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import androidx.annotation.DrawableRes;
+import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
-import androidx.core.util.Pair;
 
 import eu.jonahbauer.qed.R;
 
@@ -28,8 +28,8 @@ public class Registration implements Parcelable {
     public static final long NO_ID = Long.MIN_VALUE;
     private final long id;
 
-    private Status status;
-    private Boolean organizer;
+    private @Nullable Status status;
+    private @Nullable Boolean organizer;
 
     // cached values to be used when navigating
     @ToString.Exclude
@@ -232,10 +232,11 @@ public class Registration implements Parcelable {
         PENDING(R.string.registration_status_pending, R.drawable.ic_event_registration_pending, R.drawable.ic_registration_status_pending),
         CONFIRMED(R.string.registration_status_confirmed, R.drawable.ic_event_registration_confirmed, R.drawable.ic_registration_status_confirmed),
         REJECTED(R.string.registration_status_rejected, R.drawable.ic_event_registration_rejected, R.drawable.ic_registration_status_rejected),
-        CANCELLED(R.string.registration_status_cancelled, R.drawable.ic_event_registration_cancelled, R.drawable.ic_registration_status_cancelled);
+        CANCELLED(R.string.registration_status_cancelled, R.drawable.ic_event_registration_cancelled, R.drawable.ic_registration_status_cancelled)
+        ;
         public static final Parcelable.Creator<Status> CREATOR = new ParcelableEnum.Creator<>(Status.values(), Status[]::new);
 
-        private final @StringRes int stringRes;
+        private final @StringRes   int stringRes;
         private final @DrawableRes int drawableRes;
         private final @DrawableRes int drawableResVariant;
     }

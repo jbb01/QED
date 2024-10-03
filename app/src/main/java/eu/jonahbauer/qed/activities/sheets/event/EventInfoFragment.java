@@ -134,7 +134,7 @@ public class EventInfoFragment extends InfoFragment {
     public static void bindParticipants(ViewGroup parent, Collection<Registration> participants) {
         var nonOrganizers = participants.stream().filter(r -> !r.isOrganizer()).collect(Collectors.toList());
         bindList(parent, nonOrganizers, (registration, item) -> {
-            var status = Objects.requireNonNull(registration.getStatus());
+            var status = Objects.requireNonNullElse(registration.getStatus(), Registration.Status.PENDING);
             item.setIcon(status.getDrawableRes());
             item.setTitle(registration.getPersonName());
             item.setSubtitle(status.getStringRes());
