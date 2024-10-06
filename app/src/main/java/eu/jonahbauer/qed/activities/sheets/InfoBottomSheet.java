@@ -104,7 +104,7 @@ public abstract class InfoBottomSheet extends BottomSheetDialogFragment {
 
         observeViewModel();
 
-        mBinding.titleToolbar.addMenuProvider(mFragment, mFragment.getViewLifecycleOwner(), Lifecycle.State.RESUMED);
+        mBinding.titleToolbar.addMenuProvider(mFragment, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
 
         // delegate toolbar events to fragment
         if (mBinding.toolbar != null) {
