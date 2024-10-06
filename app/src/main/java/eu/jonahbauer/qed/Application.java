@@ -3,8 +3,10 @@ package eu.jonahbauer.qed;
 import android.accounts.*;
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.content.ContentResolver;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.security.keystore.KeyGenParameterSpec;
 import android.util.Log;
 import android.widget.Toast;
@@ -15,6 +17,7 @@ import androidx.preference.PreferenceManager;
 import androidx.security.crypto.EncryptedSharedPreferences;
 import androidx.security.crypto.MasterKeys;
 
+import eu.jonahbauer.qed.util.preferences.FavoritesSharedPreferenceListener;
 import eu.jonahbauer.qed.crypt.PasswordStorage;
 import eu.jonahbauer.qed.layoutStuff.themes.Theme;
 import eu.jonahbauer.qed.layoutStuff.themes.ThemeListener;
@@ -114,6 +117,9 @@ public class Application extends android.app.Application implements android.app.
 
         // track changes to name and channel
         preferences.registerOnSharedPreferenceChangeListener(RecentsSharedPreferenceListener.INSTANCE);
+
+        // track favorites and run sync adapter
+        preferences.registerOnSharedPreferenceChangeListener(FavoritesSharedPreferenceListener.INSTANCE);
     }
 
     private void initAccount() {
@@ -124,6 +130,7 @@ public class Application extends android.app.Application implements android.app.
         Account account = new Account(accountName, accountType);
 
         if (accountManager.addAccountExplicitly(account, null, null)) {
+            ContentResolver.setSyncAutomatically(account, ContactsContract.AUTHORITY, true);
             Log.d(LOG_TAG, "Successfully added account");
         } else {
             Log.w(LOG_TAG, "Failed to add account.");
