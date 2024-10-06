@@ -2,6 +2,7 @@ package eu.jonahbauer.qed.util.preferences;
 
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
@@ -36,6 +37,7 @@ public final class SharedPreferenceLiveData<T> extends LiveData<T> {
         return new SharedPreferenceLiveData<>(preferences, SharedPreferences::getString, serializer, key, defaultValue);
     }
 
+    private final @NonNull String mKey;
     private final @NonNull SharedPreferences mPreferences;
     private final @NonNull OnSharedPreferenceChangeListener mListener;
 
@@ -43,9 +45,10 @@ public final class SharedPreferenceLiveData<T> extends LiveData<T> {
             @NonNull SharedPreferences preferences, @NonNull PreferenceAccessor<S> getter, @NonNull PreferenceSerializer<T, S> serializer,
             @NonNull String key, @Nullable S defaultValue
     ) {
+        this.mKey = key;
         this.mPreferences = preferences;
         this.mListener = (sharedPreferences, k) -> {
-            if (!key.equals(k)) return;
+            if (!mKey.equals(k)) return;
             var stored = getter.get(sharedPreferences, k, defaultValue);
             var value = serializer.deserialize(stored);
             setValue(value);
@@ -53,12 +56,15 @@ public final class SharedPreferenceLiveData<T> extends LiveData<T> {
     }
 
     @Override
+    @MainThread
     protected void onActive() {
         super.onActive();
         mPreferences.registerOnSharedPreferenceChangeListener(mListener);
+        mListener.onSharedPreferenceChanged(mPreferences, mKey);
     }
 
     @Override
+    @MainThread
     protected void onInactive() {
         mPreferences.unregisterOnSharedPreferenceChangeListener(mListener);
         super.onInactive();
