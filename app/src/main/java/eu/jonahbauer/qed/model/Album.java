@@ -30,7 +30,7 @@ import lombok.experimental.Accessors;
 @Entity
 @EqualsAndHashCode(of = "id")
 @TypeConverters(Converters.class)
-public class Album implements Parcelable {
+public class Album implements Parcelable, HasId {
     public static final long NO_ID = Long.MIN_VALUE;
     public static final String CATEGORY_ETC = "Sonstige";
 

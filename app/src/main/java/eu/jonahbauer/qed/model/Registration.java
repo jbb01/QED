@@ -24,7 +24,7 @@ import lombok.*;
 
 @Data
 @EqualsAndHashCode(of = "id")
-public class Registration implements Parcelable {
+public class Registration implements Parcelable, HasId {
     public static final long NO_ID = Long.MIN_VALUE;
     private final long id;
 

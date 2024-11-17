@@ -41,7 +41,7 @@ import java.util.Objects;
 @Entity
 @EqualsAndHashCode(of = "id")
 @TypeConverters(Converters.class)
-public class Message implements Parcelable, Comparable<Message>, Serializable {
+public class Message implements Parcelable, Comparable<Message>, Serializable, HasId {
     private static final String LOG_TAG = Message.class.getName();
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter
             .ofPattern("yyyy-MM-dd HH:mm:ss")

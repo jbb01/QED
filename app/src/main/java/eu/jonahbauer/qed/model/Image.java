@@ -29,7 +29,7 @@ import lombok.EqualsAndHashCode;
 @Entity
 @EqualsAndHashCode(of = "id")
 @TypeConverters(Converters.class)
-public class Image implements Parcelable {
+public class Image implements Parcelable, HasId {
     public static final long NO_ID = Long.MIN_VALUE;
 
     public static final String DATA_KEY_ALBUM = "album";

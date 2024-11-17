@@ -28,7 +28,7 @@ import lombok.RequiredArgsConstructor;
 
 @Data
 @EqualsAndHashCode(of = "id")
-public class Person implements Parcelable {
+public class Person implements Parcelable, HasId {
     public static final long NO_ID = Long.MIN_VALUE;
 
     private static final Collator COLLATOR = Collator.getInstance(Locale.ROOT);

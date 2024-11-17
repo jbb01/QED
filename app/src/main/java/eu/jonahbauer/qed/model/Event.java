@@ -19,7 +19,7 @@ import lombok.*;
 
 @Data
 @EqualsAndHashCode(of = "id")
-public class Event implements Comparable<Event>, Parcelable {
+public class Event implements Comparable<Event>, Parcelable, HasId {
     public static final long NO_ID = Long.MIN_VALUE;
 
     private final long id;
