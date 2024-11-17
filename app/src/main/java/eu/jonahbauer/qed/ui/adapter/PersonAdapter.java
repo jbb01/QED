@@ -22,9 +22,6 @@ import lombok.Value;
 import java.util.*;
 import java.util.function.Function;
 
-import static eu.jonahbauer.qed.model.Person.COMPARATOR_FIRST_NAME;
-import static eu.jonahbauer.qed.model.Person.COMPARATOR_LAST_NAME;
-
 public class PersonAdapter extends FixedHeaderAdapter<PersonAdapter.PersonWrapper, String> {
     @SuppressWarnings("NotNullFieldNotInitialized")
     private @NonNull SortMode mSort;
@@ -116,8 +113,8 @@ public class PersonAdapter extends FixedHeaderAdapter<PersonAdapter.PersonWrappe
     }
 
     public enum SortMode implements ParcelableEnum {
-        FIRST_NAME(Person::getFirstName, COMPARATOR_FIRST_NAME),
-        LAST_NAME(Person::getLastName, COMPARATOR_LAST_NAME),
+        FIRST_NAME(Person::getFirstName, Person.Comparators.FIRST_NAME),
+        LAST_NAME(Person::getLastName, Person.Comparators.LAST_NAME),
         ;
 
         public static final Parcelable.Creator<SortMode> CREATOR = new Creator<>(SortMode.values(), SortMode[]::new);

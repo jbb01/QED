@@ -21,32 +21,12 @@ import eu.jonahbauer.qed.model.parcel.ParcelableEnum;
 import eu.jonahbauer.qed.model.util.ParsedLocalDate;
 import eu.jonahbauer.qed.util.TextUtils;
 import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenCustomHashSet;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 @Data
 @EqualsAndHashCode(of = "id")
 public class Person implements Parcelable, HasId {
     public static final long NO_ID = Long.MIN_VALUE;
-
-    private static final Collator COLLATOR = Collator.getInstance(Locale.ROOT);
-    static {
-        COLLATOR.setStrength(Collator.PRIMARY);
-        COLLATOR.freeze();
-    }
-    private static final Comparator<String> COMPARATOR = Comparator.nullsLast(COLLATOR::compare);
-    public static final Comparator<Person> COMPARATOR_FIRST_NAME = Comparator.nullsLast((p1, p2) -> {
-        var out = COMPARATOR.compare(p1.getFirstName(), p2.getFirstName());
-        if (out == 0) out = COMPARATOR.compare(p1.getLastName(), p2.getLastName());
-        return out;
-    });
-    public static final Comparator<Person> COMPARATOR_LAST_NAME = Comparator.nullsLast((p1, p2) -> {
-        var out = COMPARATOR.compare(p1.getLastName(), p2.getLastName());
-        if (out == 0) out = COMPARATOR.compare(p1.getFirstName(), p2.getFirstName());
-        return out;
-    });
 
     private final long id;
     private String username;
@@ -303,5 +283,27 @@ public class Person implements Parcelable, HasId {
         public static final ParcelableEnum.Creator<Privacy> CREATOR = new ParcelableEnum.Creator<>(Privacy.values(), Privacy[]::new);
 
         private final @StringRes int stringRes;
+    }
+
+    public static final class Comparators {
+        private static final Collator COLLATOR = getCollator();
+        private static final Comparator<String> COMPARATOR = Comparator.nullsLast(COLLATOR::compare);
+        public static final Comparator<Person> FIRST_NAME = Comparator.nullsLast((p1, p2) -> {
+            var out = COMPARATOR.compare(p1.getFirstName(), p2.getFirstName());
+            if (out == 0) out = COMPARATOR.compare(p1.getLastName(), p2.getLastName());
+            return out;
+        });
+        public static final Comparator<Person> LAST_NAME = Comparator.nullsLast((p1, p2) -> {
+            var out = COMPARATOR.compare(p1.getLastName(), p2.getLastName());
+            if (out == 0) out = COMPARATOR.compare(p1.getFirstName(), p2.getFirstName());
+            return out;
+        });
+
+        private static Collator getCollator() {
+            var collator = Collator.getInstance(Locale.ROOT);
+            collator.setStrength(Collator.PRIMARY);
+            collator.freeze();
+            return collator;
+        }
     }
 }
