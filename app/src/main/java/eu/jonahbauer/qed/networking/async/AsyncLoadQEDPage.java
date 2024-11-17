@@ -3,7 +3,7 @@ package eu.jonahbauer.qed.networking.async;
 import androidx.annotation.NonNull;
 
 import eu.jonahbauer.qed.networking.Feature;
-import eu.jonahbauer.qed.networking.NetworkUtils;
+import eu.jonahbauer.qed.network.util.NetworkUtil;
 import eu.jonahbauer.qed.networking.exceptions.InvalidCredentialsException;
 
 import java.io.IOException;
@@ -30,7 +30,7 @@ public final class AsyncLoadQEDPage extends BaseAsyncLoadQEDPage implements Call
             throw new IOException("Status Code is not 200.");
         }
 
-        String out = NetworkUtils.readPage(httpsURLConnection);
+        String out = NetworkUtil.readPage(httpsURLConnection);
         httpsURLConnection.disconnect();
 
         return out;

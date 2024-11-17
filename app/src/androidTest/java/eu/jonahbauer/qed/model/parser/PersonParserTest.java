@@ -2,7 +2,7 @@ package eu.jonahbauer.qed.model.parser;
 
 import androidx.core.util.Pair;
 import eu.jonahbauer.qed.model.Person;
-import eu.jonahbauer.qed.networking.NetworkUtils;
+import eu.jonahbauer.qed.network.util.NetworkUtil;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -19,7 +19,7 @@ public class PersonParserTest {
     public void parseOther() throws IOException {
         String html;
         try (var in = getClass().getResourceAsStream("/person.html")) {
-            html = new String(NetworkUtils.readAllBytes(Objects.requireNonNull(in)), StandardCharsets.UTF_8);
+            html = new String(NetworkUtil.readAllBytes(Objects.requireNonNull(in)), StandardCharsets.UTF_8);
         }
 
         var person = new Person(349);
@@ -34,7 +34,7 @@ public class PersonParserTest {
     public void parseSelf() throws IOException {
         String html;
         try (var in = getClass().getResourceAsStream("/person_self.html")) {
-            html = new String(NetworkUtils.readAllBytes(Objects.requireNonNull(in)), StandardCharsets.UTF_8);
+            html = new String(NetworkUtil.readAllBytes(Objects.requireNonNull(in)), StandardCharsets.UTF_8);
         }
 
         var person = new Person(349);

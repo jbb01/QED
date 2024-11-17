@@ -1,4 +1,4 @@
-package eu.jonahbauer.qed.networking;
+package eu.jonahbauer.qed.network.util;
 
 import androidx.annotation.NonNull;
 
@@ -11,11 +11,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import eu.jonahbauer.qed.networking.Feature;
 import lombok.experimental.UtilityClass;
 
 
 @UtilityClass
-public class NetworkUtils {
+public class NetworkUtil {
     private static final int DEFAULT_BUFFER_SIZE = 8192;
     private static final int MAX_BUFFER_SIZE = Integer.MAX_VALUE - 8;
 

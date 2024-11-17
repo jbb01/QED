@@ -21,8 +21,8 @@ import eu.jonahbauer.qed.activities.mainFragments.LoginFragmentArgs;
 import eu.jonahbauer.qed.crypt.PasswordStorage;
 import eu.jonahbauer.qed.crypt.PasswordUtils;
 import eu.jonahbauer.qed.networking.Feature;
-import eu.jonahbauer.qed.networking.NetworkConstants;
-import eu.jonahbauer.qed.networking.NetworkUtils;
+import eu.jonahbauer.qed.network.util.NetworkConstants;
+import eu.jonahbauer.qed.network.util.NetworkUtil;
 import eu.jonahbauer.qed.networking.async.QEDPageReceiver;
 import eu.jonahbauer.qed.networking.cookies.QEDCookieHandler;
 import eu.jonahbauer.qed.networking.exceptions.InvalidCredentialsException;
@@ -151,7 +151,7 @@ public final class QEDLogin {
             httpsURLConnection.setInstanceFollowRedirects(false);
             httpsURLConnection.connect();
 
-            String response = new String(NetworkUtils.readAllBytes(httpsURLConnection.getInputStream()), StandardCharsets.UTF_8);
+            String response = new String(NetworkUtil.readAllBytes(httpsURLConnection.getInputStream()), StandardCharsets.UTF_8);
             Document responseDoc = Jsoup.parse(response);
             String authenticityToken = responseDoc.select("input[name=authenticity_token]").val();
 

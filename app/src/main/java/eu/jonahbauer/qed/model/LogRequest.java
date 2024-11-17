@@ -18,7 +18,7 @@ import eu.jonahbauer.qed.R;
 import eu.jonahbauer.qed.model.parcel.ParcelExtensions;
 import eu.jonahbauer.qed.model.parcel.LambdaCreator;
 import eu.jonahbauer.qed.model.parcel.ParcelableEnum;
-import eu.jonahbauer.qed.networking.NetworkConstants;
+import eu.jonahbauer.qed.network.util.NetworkConstants;
 import eu.jonahbauer.qed.util.TimeUtils;
 
 import lombok.RequiredArgsConstructor;

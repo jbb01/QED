@@ -23,7 +23,7 @@ import eu.jonahbauer.qed.activities.MainActivity;
 import eu.jonahbauer.qed.ui.themes.Theme;
 import eu.jonahbauer.qed.model.Message;
 import eu.jonahbauer.qed.ui.adapter.MessageAdapter;
-import eu.jonahbauer.qed.networking.NetworkConstants;
+import eu.jonahbauer.qed.network.util.NetworkConstants;
 
 import java.time.DayOfWeek;
 import java.time.Month;

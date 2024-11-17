@@ -20,7 +20,7 @@ import eu.jonahbauer.qed.model.Event;
 import eu.jonahbauer.qed.model.Person;
 import eu.jonahbauer.qed.model.Registration;
 import eu.jonahbauer.qed.model.viewmodel.RegistrationViewModel;
-import eu.jonahbauer.qed.networking.NetworkConstants;
+import eu.jonahbauer.qed.network.util.NetworkConstants;
 import eu.jonahbauer.qed.activities.mainFragments.EventFragmentArgs;
 import eu.jonahbauer.qed.activities.mainFragments.PersonFragmentArgs;
 import eu.jonahbauer.qed.activities.mainFragments.RegistrationFragmentArgs;

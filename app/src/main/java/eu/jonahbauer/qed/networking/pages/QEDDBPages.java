@@ -11,7 +11,7 @@ import eu.jonahbauer.qed.model.parser.PersonListParser;
 import eu.jonahbauer.qed.model.parser.PersonParser;
 import eu.jonahbauer.qed.model.parser.RegistrationParser;
 import eu.jonahbauer.qed.networking.Feature;
-import eu.jonahbauer.qed.networking.NetworkConstants;
+import eu.jonahbauer.qed.network.util.NetworkConstants;
 import eu.jonahbauer.qed.networking.Reason;
 import eu.jonahbauer.qed.networking.async.AsyncLoadQEDPage;
 import eu.jonahbauer.qed.networking.async.QEDPageReceiver;

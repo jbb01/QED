@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 
 import eu.jonahbauer.qed.BuildConfig;
 import eu.jonahbauer.qed.model.Message;
+import eu.jonahbauer.qed.network.util.NetworkConstants;
 import eu.jonahbauer.qed.networking.cookies.QEDCookieHandler;
 import eu.jonahbauer.qed.networking.exceptions.InvalidCredentialsException;
 

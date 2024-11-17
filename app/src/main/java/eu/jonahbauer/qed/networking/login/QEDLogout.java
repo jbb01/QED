@@ -4,7 +4,7 @@ import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 
 import eu.jonahbauer.qed.crypt.PasswordStorage;
-import eu.jonahbauer.qed.networking.NetworkConstants;
+import eu.jonahbauer.qed.network.util.NetworkConstants;
 import eu.jonahbauer.qed.networking.cookies.QEDCookieHandler;
 
 import java.io.IOException;

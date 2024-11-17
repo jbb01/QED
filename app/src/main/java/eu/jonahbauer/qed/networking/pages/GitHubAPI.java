@@ -3,8 +3,8 @@ package eu.jonahbauer.qed.networking.pages;
 import androidx.annotation.NonNull;
 import androidx.annotation.WorkerThread;
 import eu.jonahbauer.qed.model.Release;
-import eu.jonahbauer.qed.networking.NetworkConstants;
-import eu.jonahbauer.qed.networking.NetworkUtils;
+import eu.jonahbauer.qed.network.util.NetworkConstants;
+import eu.jonahbauer.qed.network.util.NetworkUtil;
 import lombok.experimental.UtilityClass;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -77,7 +77,7 @@ public class GitHubAPI {
             throw new HttpStatusException("Unexpected response code", connection.getResponseCode(), url);
         }
 
-        var content = NetworkUtils.readPage(connection);
+        var content = NetworkUtil.readPage(connection);
         return new JSONTokener(content).nextValue();
     }
 }

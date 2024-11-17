@@ -12,7 +12,7 @@ import eu.jonahbauer.qed.model.parser.AlbumListParser;
 import eu.jonahbauer.qed.model.parser.AlbumParser;
 import eu.jonahbauer.qed.model.parser.ImageParser;
 import eu.jonahbauer.qed.networking.Feature;
-import eu.jonahbauer.qed.networking.NetworkConstants;
+import eu.jonahbauer.qed.network.util.NetworkConstants;
 import eu.jonahbauer.qed.networking.Reason;
 import eu.jonahbauer.qed.networking.async.AsyncLoadQEDPage;
 import eu.jonahbauer.qed.networking.async.AsyncLoadQEDPageToImage;

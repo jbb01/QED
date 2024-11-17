@@ -6,7 +6,7 @@ import android.graphics.BitmapFactory;
 import androidx.annotation.NonNull;
 
 import eu.jonahbauer.qed.networking.Feature;
-import eu.jonahbauer.qed.networking.NetworkUtils;
+import eu.jonahbauer.qed.network.util.NetworkUtil;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -34,7 +34,7 @@ public final class AsyncLoadQEDPageToImage extends BaseAsyncLoadQEDPage implemen
             return Optional.empty();
         }
 
-        byte[] data = NetworkUtils.readAllBytes(httpsURLConnection.getInputStream());
+        byte[] data = NetworkUtil.readAllBytes(httpsURLConnection.getInputStream());
 
         httpsURLConnection.disconnect();
 

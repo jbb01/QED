@@ -18,7 +18,7 @@ import eu.jonahbauer.qed.ui.views.ListItem;
 import eu.jonahbauer.qed.model.Event;
 import eu.jonahbauer.qed.model.Registration;
 import eu.jonahbauer.qed.model.viewmodel.EventViewModel;
-import eu.jonahbauer.qed.networking.NetworkConstants;
+import eu.jonahbauer.qed.network.util.NetworkConstants;
 
 import java.util.Collection;
 import java.util.Locale;

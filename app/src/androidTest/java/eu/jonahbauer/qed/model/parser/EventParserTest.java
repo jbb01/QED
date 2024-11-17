@@ -1,7 +1,7 @@
 package eu.jonahbauer.qed.model.parser;
 
 import eu.jonahbauer.qed.model.Event;
-import eu.jonahbauer.qed.networking.NetworkUtils;
+import eu.jonahbauer.qed.network.util.NetworkUtil;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -17,7 +17,7 @@ public class EventParserTest {
     public void parse() throws IOException {
         String html;
         try (var in = getClass().getResourceAsStream("/event.html")) {
-            html = new String(NetworkUtils.readAllBytes(Objects.requireNonNull(in)), StandardCharsets.UTF_8);
+            html = new String(NetworkUtil.readAllBytes(Objects.requireNonNull(in)), StandardCharsets.UTF_8);
         }
 
         var event = new Event(2);

@@ -10,7 +10,7 @@ import eu.jonahbauer.qed.model.LogRequest.FileLogRequest;
 import eu.jonahbauer.qed.model.Message;
 import eu.jonahbauer.qed.model.parser.ChatLogParser;
 import eu.jonahbauer.qed.networking.Feature;
-import eu.jonahbauer.qed.networking.NetworkConstants;
+import eu.jonahbauer.qed.network.util.NetworkConstants;
 import eu.jonahbauer.qed.networking.Reason;
 import eu.jonahbauer.qed.networking.async.AsyncLoadQEDPageToStream;
 import eu.jonahbauer.qed.networking.async.QEDPageStreamReceiver;

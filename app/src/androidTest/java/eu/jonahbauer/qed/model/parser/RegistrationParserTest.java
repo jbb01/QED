@@ -2,7 +2,7 @@ package eu.jonahbauer.qed.model.parser;
 
 import eu.jonahbauer.qed.model.Person;
 import eu.jonahbauer.qed.model.Registration;
-import eu.jonahbauer.qed.networking.NetworkUtils;
+import eu.jonahbauer.qed.network.util.NetworkUtil;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -20,7 +20,7 @@ public class RegistrationParserTest {
     public void parseOther() throws IOException {
         String html;
         try (var in = getClass().getResourceAsStream("/registration.html")) {
-            html = new String(NetworkUtils.readAllBytes(Objects.requireNonNull(in)), StandardCharsets.UTF_8);
+            html = new String(NetworkUtil.readAllBytes(Objects.requireNonNull(in)), StandardCharsets.UTF_8);
         }
 
         var registration = new Registration(117);
@@ -35,7 +35,7 @@ public class RegistrationParserTest {
     public void parseSelf() throws IOException {
         String html;
         try (var in = getClass().getResourceAsStream("/registration_self.html")) {
-            html = new String(NetworkUtils.readAllBytes(Objects.requireNonNull(in)), StandardCharsets.UTF_8);
+            html = new String(NetworkUtil.readAllBytes(Objects.requireNonNull(in)), StandardCharsets.UTF_8);
         }
 
         var registration = new Registration(117);

@@ -1,4 +1,4 @@
-package eu.jonahbauer.qed.networking;
+package eu.jonahbauer.qed.network.util;
 
 import java.time.ZoneId;
 
@@ -12,6 +12,7 @@ public class NetworkConstants {
     public static final String CHAT_WEBSOCKET = "wss://chat.qed-verein.de/websocket";
     public static final String CHAT_VERSION = "20171030131648";
 
+    public static final String DATABASE_SERVER_MAIN = "https://qeddb.qed-verein.de/";
     public static final String DATABASE_SERVER_LOGIN = "https://qeddb.qed-verein.de/login";
     public static final String DATABASE_SERVER_LOGOUT = "https://qeddb.qed-verein.de/logout";
     public static final String DATABASE_SERVER_PERSONS = "https://qeddb.qed-verein.de/people_as_table";
@@ -34,4 +35,5 @@ public class NetworkConstants {
     public static final String GIT_HUB_API = "https://api.github.com/repos/jbb01/QED";
 
     public static final ZoneId SERVER_TIME_ZONE = ZoneId.of("Europe/Berlin");
+    public static final String HOST = ".qed-verein.de";
 }

@@ -13,7 +13,7 @@ import eu.jonahbauer.qed.ui.themes.Theme;
 import eu.jonahbauer.qed.model.parcel.LambdaCreator;
 import eu.jonahbauer.qed.model.parcel.ParcelExtensions;
 import eu.jonahbauer.qed.model.room.Converters;
-import eu.jonahbauer.qed.networking.NetworkConstants;
+import eu.jonahbauer.qed.network.util.NetworkConstants;
 import eu.jonahbauer.qed.util.Colors;
 import eu.jonahbauer.qed.util.MessageUtils;
 import lombok.AccessLevel;

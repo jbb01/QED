@@ -4,7 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import eu.jonahbauer.qed.model.util.ParsedInstant;
 import eu.jonahbauer.qed.model.util.ParsedLocalDate;
-import eu.jonahbauer.qed.networking.NetworkConstants;
+import eu.jonahbauer.qed.network.util.NetworkConstants;
 
 import java.time.Instant;
 import java.time.LocalDate;

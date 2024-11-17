@@ -9,7 +9,7 @@ import androidx.preference.SwitchPreference;
 import eu.jonahbauer.qed.R;
 import eu.jonahbauer.qed.activities.MainActivity;
 import eu.jonahbauer.qed.model.Language;
-import eu.jonahbauer.qed.networking.NetworkConstants;
+import eu.jonahbauer.qed.network.util.NetworkConstants;
 import eu.jonahbauer.qed.util.Actions;
 import eu.jonahbauer.qed.util.Colors;
 import eu.jonahbauer.qed.util.Preferences;

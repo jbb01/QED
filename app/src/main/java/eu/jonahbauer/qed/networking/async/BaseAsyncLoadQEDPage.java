@@ -3,7 +3,7 @@ package eu.jonahbauer.qed.networking.async;
 import androidx.annotation.NonNull;
 
 import eu.jonahbauer.qed.networking.Feature;
-import eu.jonahbauer.qed.networking.NetworkUtils;
+import eu.jonahbauer.qed.network.util.NetworkUtil;
 import eu.jonahbauer.qed.networking.cookies.QEDCookieHandler;
 import eu.jonahbauer.qed.networking.exceptions.InvalidCredentialsException;
 import eu.jonahbauer.qed.networking.login.QEDLogin;
@@ -21,7 +21,7 @@ abstract class BaseAsyncLoadQEDPage {
         httpsURLConnection.connect();
 
         // check for login error
-        if (NetworkUtils.isLoginError(feature, httpsURLConnection)) {
+        if (NetworkUtil.isLoginError(feature, httpsURLConnection)) {
             httpsURLConnection.disconnect();
 
             // login
@@ -33,7 +33,7 @@ abstract class BaseAsyncLoadQEDPage {
 
             // check for login error once more
             // if authentication failed after successful login -> throw exception
-            if (NetworkUtils.isLoginError(feature, httpsURLConnection)) {
+            if (NetworkUtil.isLoginError(feature, httpsURLConnection)) {
                 throw new InvalidCredentialsException(new AssertionError("request not authenticated after login"));
             }
         }

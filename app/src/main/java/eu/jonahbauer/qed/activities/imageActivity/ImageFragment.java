@@ -24,7 +24,7 @@ import androidx.viewpager2.widget.ViewPager2;
 import eu.jonahbauer.qed.R;
 import eu.jonahbauer.qed.databinding.FragmentImageBinding;
 import eu.jonahbauer.qed.model.Image;
-import eu.jonahbauer.qed.networking.NetworkConstants;
+import eu.jonahbauer.qed.network.util.NetworkConstants;
 import eu.jonahbauer.qed.util.*;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;

@@ -23,7 +23,7 @@ import eu.jonahbauer.qed.model.Event;
 import eu.jonahbauer.qed.model.Message;
 import eu.jonahbauer.qed.model.Person;
 import eu.jonahbauer.qed.model.Registration;
-import eu.jonahbauer.qed.networking.NetworkConstants;
+import eu.jonahbauer.qed.network.util.NetworkConstants;
 
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
