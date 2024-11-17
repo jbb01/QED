@@ -74,7 +74,7 @@
         </activity>
 
         <activity
-            android:name=".activities.imageActivity.ImageActivity"
+            android:name=".activities.image.ImageActivity"
             android:hardwareAccelerated="true"
             android:launchMode="standard"
             android:theme="@style/Theme.App.Black.Fullscreen"

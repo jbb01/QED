@@ -1,4 +1,4 @@
-package eu.jonahbauer.qed.activities.imageActivity;
+package eu.jonahbauer.qed.activities.image;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;

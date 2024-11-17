@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/nav_image"
-        android:name="eu.jonahbauer.qed.activities.imageActivity.ImageFragment"
+        android:name="eu.jonahbauer.qed.activities.image.ImageFragment"
         tools:layout="@layout/fragment_image">
         <argument
             android:name="image"
@@ -35,7 +35,7 @@
 
     <fragment
         android:id="@+id/nav_image_info"
-        android:name="eu.jonahbauer.qed.activities.imageActivity.ImageInfoFragment"
+        android:name="eu.jonahbauer.qed.activities.image.ImageInfoFragment"
         tools:layout="@layout/fragment_image_info">
         <argument
             android:name="image"
