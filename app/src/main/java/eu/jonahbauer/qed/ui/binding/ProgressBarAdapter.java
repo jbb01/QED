@@ -1,4 +1,4 @@
-package eu.jonahbauer.qed.ui.adapters;
+package eu.jonahbauer.qed.ui.binding;
 
 import android.content.res.ColorStateList;
 import android.widget.ProgressBar;
