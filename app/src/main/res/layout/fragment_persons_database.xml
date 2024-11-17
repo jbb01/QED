@@ -45,7 +45,7 @@
                     android:paddingHorizontal="8dp"
                     android:paddingTop="8dp">
 
-                    <eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
+                    <eu.jonahbauer.qed.ui.views.InterceptingTableRow
                         android:id="@+id/database_firstName_row"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
@@ -67,9 +67,9 @@
                             android:importantForAutofill="no"
                             android:inputType="text"
                             android:textSize="16sp" />
-                    </eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
+                    </eu.jonahbauer.qed.ui.views.InterceptingTableRow>
 
-                    <eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
+                    <eu.jonahbauer.qed.ui.views.InterceptingTableRow
                         android:id="@+id/database_lastName_row"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
@@ -91,7 +91,7 @@
                             android:importantForAutofill="no"
                             android:inputType="text"
                             android:textSize="16sp" />
-                    </eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
+                    </eu.jonahbauer.qed.ui.views.InterceptingTableRow>
 
                     <TableRow
                         android:layout_width="match_parent"
@@ -103,21 +103,21 @@
                             android:layout_weight="1"
                             android:orientation="horizontal">
 
-                            <eu.jonahbauer.qed.layoutStuff.views.CheckBoxTriStates
+                            <eu.jonahbauer.qed.ui.views.CheckBoxTriStates
                                 android:id="@+id/database_active_checkbox"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginEnd="8dp"
                                 android:text="@string/persons_database_active_checkbox" />
 
-                            <eu.jonahbauer.qed.layoutStuff.views.CheckBoxTriStates
+                            <eu.jonahbauer.qed.ui.views.CheckBoxTriStates
                                 android:id="@+id/database_member_checkbox"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginEnd="8dp"
                                 android:text="@string/persons_database_member_checkbox" />
 
-                            <eu.jonahbauer.qed.layoutStuff.views.CheckBoxTriStates
+                            <eu.jonahbauer.qed.ui.views.CheckBoxTriStates
                                 android:id="@+id/database_favorite_checkbox"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"

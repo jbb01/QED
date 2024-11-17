@@ -41,7 +41,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
+                    <eu.jonahbauer.qed.ui.views.InterceptingTableRow
                         android:id="@+id/database_channel_row"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
@@ -61,9 +61,9 @@
                             android:hint="@string/chat_database_channel_hint"
                             android:inputType="text"
                             android:importantForAutofill="no" />
-                    </eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
+                    </eu.jonahbauer.qed.ui.views.InterceptingTableRow>
 
-                    <eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
+                    <eu.jonahbauer.qed.ui.views.InterceptingTableRow
                         android:id="@+id/database_message_row"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
@@ -83,9 +83,9 @@
                             android:hint="@string/chat_database_message_hint"
                             android:inputType="text"
                             android:importantForAutofill="no" />
-                    </eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
+                    </eu.jonahbauer.qed.ui.views.InterceptingTableRow>
 
-                    <eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
+                    <eu.jonahbauer.qed.ui.views.InterceptingTableRow
                         android:id="@+id/database_name_row"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
@@ -105,9 +105,9 @@
                             android:hint="@string/chat_database_name_hint"
                             android:inputType="text"
                             android:importantForAutofill="no" />
-                    </eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
+                    </eu.jonahbauer.qed.ui.views.InterceptingTableRow>
 
-                    <eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
+                    <eu.jonahbauer.qed.ui.views.InterceptingTableRow
                         android:id="@+id/database_dateFrom_row"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
@@ -138,9 +138,9 @@
                             android:hint="@string/chat_database_timeFrom_hint"
                             android:inputType="time"
                             android:importantForAutofill="no" />
-                    </eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
+                    </eu.jonahbauer.qed.ui.views.InterceptingTableRow>
 
-                    <eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
+                    <eu.jonahbauer.qed.ui.views.InterceptingTableRow
                         android:id="@+id/database_dateTo_row"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
@@ -171,9 +171,9 @@
                             android:hint="@string/chat_database_timeTo_hint"
                             android:inputType="time"
                             android:importantForAutofill="no" />
-                    </eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
+                    </eu.jonahbauer.qed.ui.views.InterceptingTableRow>
 
-                    <eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow
+                    <eu.jonahbauer.qed.ui.views.InterceptingTableRow
                         android:id="@+id/database_id_row"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
@@ -195,7 +195,7 @@
                             android:digits="0123456789-"
                             android:imeActionId="6"
                             android:importantForAutofill="no" />
-                    </eu.jonahbauer.qed.layoutStuff.views.InterceptingTableRow>
+                    </eu.jonahbauer.qed.ui.views.InterceptingTableRow>
                 </TableLayout>
 
                 <View style="?dividerStyle"/>

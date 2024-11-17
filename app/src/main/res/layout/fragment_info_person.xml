@@ -28,7 +28,7 @@
                 android:text="@string/person_section_personal"
                 style="@style/Widget.App.TextView.SectionHeading"/>
 
-            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.ui.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{!TextUtils.isNullOrBlank(person.email)}"
@@ -38,7 +38,7 @@
                 app:title="@{person.email}"
                 app:subtitle="@string/person_subtitle_mail"/>
 
-            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.ui.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{!TimeUtils.isNullOrBlank(person.birthday)}"
@@ -46,7 +46,7 @@
                 app:title="@{TimeUtils.format(person.birthday)}"
                 app:subtitle="@string/person_subtitle_birthday"/>
 
-            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.ui.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{person.gender != null}"
@@ -55,7 +55,7 @@
                 app:subtitle="@string/person_subtitle_gender"
                 tools:icon="@drawable/ic_person_gender_male"/>
 
-            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.ui.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{!TimeUtils.isNullOrBlank(person.dateOfJoining)}"
@@ -63,7 +63,7 @@
                 app:title="@{TimeUtils.format(person.dateOfJoining)}"
                 app:subtitle="@string/person_subtitle_date_of_joining"/>
 
-            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.ui.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{!TimeUtils.isNullOrBlank(person.dateOfQuitting)}"
@@ -71,7 +71,7 @@
                 app:title="@{TimeUtils.format(person.dateOfQuitting)}"
                 app:subtitle="@string/person_subtitle_date_of_quitting"/>
 
-            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.ui.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{!TimeUtils.isNullOrBlank(person.memberUntil)}"
@@ -79,7 +79,7 @@
                 app:title="@{TimeUtils.format(person.memberUntil)}"
                 app:subtitle="@string/person_subtitle_member_until"/>
 
-            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.ui.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{!TimeUtils.isNullOrBlank(person.paidUntil)}"
@@ -87,7 +87,7 @@
                 app:title="@{TimeUtils.format(person.paidUntil)}"
                 app:subtitle="@string/person_subtitle_paid_until"/>
 
-            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.ui.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{person.member != null}"
@@ -95,7 +95,7 @@
                 app:title="@{person.member ? @string/person_title_member_true : @string/person_title_member_false}"
                 app:subtitle="@string/person_subtitle_member"/>
 
-            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.ui.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{person.active != null}"
@@ -120,7 +120,7 @@
                 android:text="@string/person_section_additional"
                 style="@style/Widget.App.TextView.SectionHeading"/>
 
-            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.ui.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{!TextUtils.isNullOrBlank(person.homeStation)}"
@@ -128,7 +128,7 @@
                 app:title="@{person.homeStation}"
                 app:subtitle="@string/person_subtitle_station" />
 
-            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.ui.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{!TextUtils.isNullOrBlank(person.railcard)}"
@@ -136,7 +136,7 @@
                 app:title="@{person.railcard}"
                 app:subtitle="@string/person_subtitle_railcard" />
 
-            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.ui.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{!TextUtils.isNullOrBlank(person.food)}"
@@ -144,7 +144,7 @@
                 app:title="@{person.food}"
                 app:subtitle="@string/person_subtitle_food" />
 
-            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.ui.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{!person.groups.empty}"
@@ -152,7 +152,7 @@
                 app:title="@{String.join(`, `, person.groups)}"
                 app:subtitle="@string/person_subtitle_groups" />
 
-            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.ui.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{person.privacy != null}"
@@ -160,7 +160,7 @@
                 app:person_privacy="@{person.privacy}"
                 app:subtitle="@string/person_subtitle_privacy" />
 
-            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.ui.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{!TextUtils.isNullOrBlank(person.notes)}"
@@ -264,7 +264,7 @@
             android:visibility="@{!person.events.empty}"
             style="?dividerStyle"/>
 
-        <eu.jonahbauer.qed.layoutStuff.views.ListItem
+        <eu.jonahbauer.qed.ui.views.ListItem
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:visibility="@{!person.events.empty}"

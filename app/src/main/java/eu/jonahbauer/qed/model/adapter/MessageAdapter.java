@@ -17,9 +17,9 @@ import androidx.annotation.Px;
 
 import eu.jonahbauer.qed.R;
 import eu.jonahbauer.qed.databinding.ListItemMessageBinding;
-import eu.jonahbauer.qed.layoutStuff.views.ExtendedMessageView;
-import eu.jonahbauer.qed.layoutStuff.views.MathView;
-import eu.jonahbauer.qed.layoutStuff.views.SimpleMessageView;
+import eu.jonahbauer.qed.ui.views.ExtendedMessageView;
+import eu.jonahbauer.qed.ui.views.MathView;
+import eu.jonahbauer.qed.ui.views.SimpleMessageView;
 import eu.jonahbauer.qed.model.Message;
 import eu.jonahbauer.qed.util.Preferences;
 import eu.jonahbauer.qed.util.ViewUtils;

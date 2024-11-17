@@ -23,7 +23,7 @@ import eu.jonahbauer.qed.R;
 import eu.jonahbauer.qed.activities.imageActivity.ImageActivity;
 import eu.jonahbauer.qed.activities.imageActivity.ImageFragmentArgs;
 import eu.jonahbauer.qed.databinding.FragmentAlbumBinding;
-import eu.jonahbauer.qed.layoutStuff.CustomArrayAdapter;
+import eu.jonahbauer.qed.ui.CustomArrayAdapter;
 import eu.jonahbauer.qed.model.Album;
 import eu.jonahbauer.qed.model.AlbumFilter;
 import eu.jonahbauer.qed.model.Image;

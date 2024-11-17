@@ -20,7 +20,7 @@ import androidx.lifecycle.LifecycleOwner;
 
 import eu.jonahbauer.qed.R;
 import eu.jonahbauer.qed.activities.MainActivity;
-import eu.jonahbauer.qed.layoutStuff.themes.Theme;
+import eu.jonahbauer.qed.ui.themes.Theme;
 import eu.jonahbauer.qed.model.Message;
 import eu.jonahbauer.qed.model.adapter.MessageAdapter;
 import eu.jonahbauer.qed.networking.NetworkConstants;

@@ -13,7 +13,7 @@ import android.widget.SeekBar;
 import androidx.lifecycle.ViewModelProvider;
 import eu.jonahbauer.qed.R;
 import eu.jonahbauer.qed.databinding.AlertDialogColorBinding;
-import eu.jonahbauer.qed.layoutStuff.views.ChatColorPicker;
+import eu.jonahbauer.qed.ui.views.ChatColorPicker;
 import eu.jonahbauer.qed.model.viewmodel.ColorPickerViewModel;
 import eu.jonahbauer.qed.util.MessageUtils;
 import eu.jonahbauer.qed.util.Preferences;

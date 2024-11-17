@@ -27,7 +27,7 @@
                 android:text="@string/event_section_information"
                 style="@style/Widget.App.TextView.SectionHeading"/>
 
-            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.ui.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{!TimeUtils.isNullOrBlank(event.start) &amp;&amp; !TimeUtils.isNullOrBlank(event.end)}"
@@ -36,7 +36,7 @@
                 app:title="@{TextUtils.formatRange(context, TimeUtils.PARSED_LOCAL_DATE_FORMATTER, event.start, event.end)}"
                 app:subtitle="@string/event_subtitle_time"/>
 
-            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.ui.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{!TimeUtils.isNullOrBlank(event.deadline)}"
@@ -44,7 +44,7 @@
                 app:title="@{TimeUtils.format(event.deadline)}"
                 app:subtitle="@string/event_subtitle_deadline"/>
 
-            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.ui.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{!TextUtils.isNullOrBlank(event.hotel)}"
@@ -52,7 +52,7 @@
                 app:title="@{event.hotel}"
                 app:subtitle="@string/event_subtitle_hotel"/>
 
-            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.ui.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{!TextUtils.isNullOrBlank(event.hotelAddress)}"
@@ -62,7 +62,7 @@
                 app:title="@{event.hotelAddress}"
                 app:subtitle="@string/event_subtitle_hotel_address" />
 
-            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.ui.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{event.cost != null}"
@@ -70,7 +70,7 @@
                 app:title="@{@string/event_title_cost(event.cost)}"
                 app:subtitle="@string/event_subtitle_cost"/>
 
-            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.ui.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{!TextUtils.isNullOrBlank(event.paymentReference)}"
@@ -79,7 +79,7 @@
                 app:title="@{event.paymentReference}"
                 app:subtitle="@string/event_subtitle_payment_reference"/>
 
-            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.ui.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{event.maxParticipants != null}"
@@ -87,7 +87,7 @@
                 app:title="@{String.valueOf(event.maxParticipants)}"
                 app:subtitle="@string/event_subtitle_max_participants"/>
 
-            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.ui.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{!TextUtils.isNullOrBlank(event.notes)}"
@@ -113,7 +113,7 @@
                 android:text="@string/event_section_organization"
                 style="@style/Widget.App.TextView.SectionHeading"/>
 
-            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.ui.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{!TextUtils.isNullOrBlank(event.emailOrga)}"
@@ -145,7 +145,7 @@
                 android:text="@string/event_section_participants"
                 style="@style/Widget.App.TextView.SectionHeading"/>
 
-            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.ui.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{!TextUtils.isNullOrBlank(event.emailAll)}"
@@ -168,7 +168,7 @@
             android:visibility="@{event.hasParticipants()}"
             style="?dividerStyle"/>
 
-        <eu.jonahbauer.qed.layoutStuff.views.ListItem
+        <eu.jonahbauer.qed.ui.views.ListItem
             android:id="@+id/toggle_participants_button"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

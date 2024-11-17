@@ -30,7 +30,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintDimensionRatio="h,1:1">
 
-            <eu.jonahbauer.qed.layoutStuff.views.ChatColorPicker
+            <eu.jonahbauer.qed.ui.views.ChatColorPicker
                 android:id="@+id/color_picker"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

@@ -20,7 +20,7 @@ import com.google.android.material.transition.MaterialElevationScale;
 import com.google.android.material.transition.MaterialFadeThrough;
 import eu.jonahbauer.qed.R;
 import eu.jonahbauer.qed.activities.MainActivity;
-import eu.jonahbauer.qed.layoutStuff.transition.ActionBarAnimation;
+import eu.jonahbauer.qed.ui.transition.ActionBarAnimation;
 
 import java.util.List;
 import java.util.Map;

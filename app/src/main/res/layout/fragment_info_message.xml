@@ -30,7 +30,7 @@
                 android:text="@string/message_section_metadata"
                 style="@style/Widget.App.TextView.SectionHeading"/>
 
-            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.ui.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:onLongClick="@{v -> Actions.copy(context, v, @string/message_clip_label_id, String.valueOf(message.id))}"
@@ -38,7 +38,7 @@
                 app:title="@{String.valueOf(message.id)}"
                 app:subtitle="@string/message_subtitle_id"/>
 
-            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.ui.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:onLongClick="@{v -> Actions.copy(context, v, @string/message_clip_label_name, message.rawName)}"
@@ -46,7 +46,7 @@
                 app:title="@{MessageUtils.formatName(context, message)}"
                 app:subtitle="@string/message_subtitle_name"/>
 
-            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.ui.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{message.userId != Person.NO_ID}"
@@ -55,7 +55,7 @@
                 app:title="@{@string/message_title_username(message.userName, message.userId)}"
                 app:subtitle="@string/message_subtitle_username"/>
 
-            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.ui.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:onLongClick="@{v -> Actions.copy(context, v, @string/message_clip_label_channel, message.channel)}"
@@ -63,7 +63,7 @@
                 app:title="@{MessageUtils.formatChannel(context, message)}"
                 app:subtitle="@string/message_subtitle_channel"/>
 
-            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.ui.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:onLongClick="@{v -> Actions.copy(context, v, @string/message_clip_label_timestamp, TimeUtils.format(message.date))}"
@@ -71,7 +71,7 @@
                 app:title="@{TimeUtils.format(message.date)}"
                 app:subtitle="@string/message_subtitle_timestamp"/>
 
-            <eu.jonahbauer.qed.layoutStuff.views.ListItem
+            <eu.jonahbauer.qed.ui.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:icon="@drawable/ic_message_bottag"
@@ -91,7 +91,7 @@
                 android:text="@string/message_section_message"
                 style="@style/Widget.App.TextView.SectionHeading"/>
 
-            <eu.jonahbauer.qed.layoutStuff.views.MathView
+            <eu.jonahbauer.qed.ui.views.MathView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@{message.message}"

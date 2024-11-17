@@ -14,7 +14,7 @@ import eu.jonahbauer.qed.activities.mainFragments.EventFragmentDirections;
 import eu.jonahbauer.qed.activities.mainFragments.RegistrationFragmentArgs;
 import eu.jonahbauer.qed.activities.sheets.InfoFragment;
 import eu.jonahbauer.qed.databinding.FragmentInfoEventBinding;
-import eu.jonahbauer.qed.layoutStuff.views.ListItem;
+import eu.jonahbauer.qed.ui.views.ListItem;
 import eu.jonahbauer.qed.model.Event;
 import eu.jonahbauer.qed.model.Registration;
 import eu.jonahbauer.qed.model.viewmodel.EventViewModel;

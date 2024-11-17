@@ -9,7 +9,7 @@ import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.room.*;
-import eu.jonahbauer.qed.layoutStuff.themes.Theme;
+import eu.jonahbauer.qed.ui.themes.Theme;
 import eu.jonahbauer.qed.model.parcel.LambdaCreator;
 import eu.jonahbauer.qed.model.parcel.ParcelExtensions;
 import eu.jonahbauer.qed.model.room.Converters;

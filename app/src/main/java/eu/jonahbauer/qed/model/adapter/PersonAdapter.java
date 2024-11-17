@@ -13,7 +13,7 @@ import androidx.annotation.Nullable;
 
 import eu.jonahbauer.qed.R;
 import eu.jonahbauer.qed.databinding.ListItemPersonBinding;
-import eu.jonahbauer.qed.layoutStuff.FixedHeaderAdapter;
+import eu.jonahbauer.qed.ui.FixedHeaderAdapter;
 import eu.jonahbauer.qed.model.Person;
 import eu.jonahbauer.qed.model.parcel.ParcelableEnum;
 import eu.jonahbauer.qed.util.Preferences;

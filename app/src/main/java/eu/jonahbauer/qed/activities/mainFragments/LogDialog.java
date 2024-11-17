@@ -22,7 +22,7 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import eu.jonahbauer.qed.R;
 import eu.jonahbauer.qed.databinding.AlertDialogLogModeBinding;
-import eu.jonahbauer.qed.layoutStuff.CustomArrayAdapter;
+import eu.jonahbauer.qed.ui.CustomArrayAdapter;
 import eu.jonahbauer.qed.model.LogRequest;
 import eu.jonahbauer.qed.model.LogRequest.DateIntervalLogRequest;
 import eu.jonahbauer.qed.model.LogRequest.DateRecentLogRequest;

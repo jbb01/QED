@@ -28,7 +28,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.disposables.Disposable;
 
-import static eu.jonahbauer.qed.layoutStuff.views.MessageView.formatName;
+import static eu.jonahbauer.qed.ui.views.MessageView.formatName;
 import static eu.jonahbauer.qed.util.MessageUtils.isMainChannel;
 
 public class ChatFragment extends Fragment implements AbsListView.OnScrollListener, MenuProvider {

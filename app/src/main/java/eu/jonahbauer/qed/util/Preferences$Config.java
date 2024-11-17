@@ -3,7 +3,7 @@ package eu.jonahbauer.qed.util;
 import eu.jonahbauer.qed.BuildConfig;
 import eu.jonahbauer.qed.R;
 
-import eu.jonahbauer.qed.layoutStuff.themes.Theme;
+import eu.jonahbauer.qed.ui.themes.Theme;
 import eu.jonahbauer.qed.model.Language;
 import eu.jonahbauer.qed.model.Release;
 import eu.jonahbauer.android.preference.annotations.Preference;

@@ -12,8 +12,8 @@ import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import eu.jonahbauer.qed.R;
-import eu.jonahbauer.qed.layoutStuff.themes.Theme;
-import eu.jonahbauer.qed.layoutStuff.views.ListItem;
+import eu.jonahbauer.qed.ui.themes.Theme;
+import eu.jonahbauer.qed.ui.views.ListItem;
 import eu.jonahbauer.qed.util.Actions;
 import eu.jonahbauer.qed.util.ViewUtils;
 

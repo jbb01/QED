@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import eu.jonahbauer.qed.R;
-import eu.jonahbauer.qed.layoutStuff.themes.Theme;
+import eu.jonahbauer.qed.ui.themes.Theme;
 import eu.jonahbauer.qed.model.Event;
 import eu.jonahbauer.qed.model.Person;
 import eu.jonahbauer.qed.model.Registration;

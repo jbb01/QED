@@ -16,8 +16,8 @@ import androidx.security.crypto.EncryptedSharedPreferences;
 import androidx.security.crypto.MasterKeys;
 
 import eu.jonahbauer.qed.crypt.PasswordStorage;
-import eu.jonahbauer.qed.layoutStuff.themes.Theme;
-import eu.jonahbauer.qed.layoutStuff.themes.ThemeListener;
+import eu.jonahbauer.qed.ui.themes.Theme;
+import eu.jonahbauer.qed.ui.themes.ThemeListener;
 import eu.jonahbauer.qed.networking.cookies.QEDCookieHandler;
 import eu.jonahbauer.qed.util.Preferences;
 

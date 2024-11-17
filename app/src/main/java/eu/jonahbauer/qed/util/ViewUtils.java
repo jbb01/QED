@@ -32,7 +32,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.google.android.material.chip.Chip;
 import eu.jonahbauer.qed.R;
 import eu.jonahbauer.qed.databinding.AlertDialogEditTextBinding;
-import eu.jonahbauer.qed.layoutStuff.views.InterceptingView;
+import eu.jonahbauer.qed.ui.views.InterceptingView;
 import it.unimi.dsi.fastutil.Pair;
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import lombok.EqualsAndHashCode;

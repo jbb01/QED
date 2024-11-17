@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <eu.jonahbauer.qed.layoutStuff.views.AdvancedImageView
+        <eu.jonahbauer.qed.ui.views.AdvancedImageView
             android:id="@+id/gallery_image"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

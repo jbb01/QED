@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <import type="eu.jonahbauer.qed.layoutStuff.themes.Theme" />
+        <import type="eu.jonahbauer.qed.ui.themes.Theme" />
 
         <variable name="person" type="eu.jonahbauer.qed.model.Person" />
         <variable name="invertedInitials" type="boolean" />
@@ -30,7 +30,7 @@
             android:textColor="?colorOnBackground"
             tools:text="M" />
 
-        <eu.jonahbauer.qed.layoutStuff.views.MaterialListItem
+        <eu.jonahbauer.qed.ui.views.MaterialListItem
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:visibility="@{person != null}"

@@ -7,8 +7,8 @@ import android.widget.ArrayAdapter;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import eu.jonahbauer.qed.R;
-import eu.jonahbauer.qed.layoutStuff.themes.Theme;
-import eu.jonahbauer.qed.layoutStuff.views.MaterialListItem;
+import eu.jonahbauer.qed.ui.themes.Theme;
+import eu.jonahbauer.qed.ui.views.MaterialListItem;
 import eu.jonahbauer.qed.model.Album;
 
 import java.util.List;

@@ -10,7 +10,7 @@ import androidx.lifecycle.Lifecycle;
 import eu.jonahbauer.qed.R;
 import eu.jonahbauer.qed.activities.sheets.InfoFragment;
 import eu.jonahbauer.qed.databinding.SingleFragmentBinding;
-import eu.jonahbauer.qed.layoutStuff.themes.Theme;
+import eu.jonahbauer.qed.ui.themes.Theme;
 import eu.jonahbauer.qed.model.viewmodel.InfoViewModel;
 import eu.jonahbauer.qed.util.TransitionUtils;
 import eu.jonahbauer.qed.util.ViewUtils;
