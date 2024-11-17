@@ -21,7 +21,7 @@ import eu.jonahbauer.qed.R;
 import eu.jonahbauer.qed.databinding.FragmentPersonsDatabaseBinding;
 import eu.jonahbauer.qed.model.Person;
 import eu.jonahbauer.qed.model.PersonFilter;
-import eu.jonahbauer.qed.model.adapter.PersonAdapter;
+import eu.jonahbauer.qed.ui.adapter.PersonAdapter;
 import eu.jonahbauer.qed.model.viewmodel.PersonListViewModel;
 import eu.jonahbauer.qed.networking.Reason;
 import eu.jonahbauer.qed.util.StatusWrapper;

@@ -12,7 +12,7 @@ import androidx.lifecycle.MutableLiveData;
 import eu.jonahbauer.qed.model.LogRequest;
 import eu.jonahbauer.qed.model.LogRequest.FileLogRequest;
 import eu.jonahbauer.qed.model.Message;
-import eu.jonahbauer.qed.model.adapter.MessageAdapter;
+import eu.jonahbauer.qed.ui.adapter.MessageAdapter;
 import eu.jonahbauer.qed.networking.Reason;
 import eu.jonahbauer.qed.networking.async.QEDPageStreamReceiver;
 import eu.jonahbauer.qed.networking.pages.QEDChatPages;

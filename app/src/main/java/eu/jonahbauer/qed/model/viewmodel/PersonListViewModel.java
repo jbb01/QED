@@ -6,7 +6,7 @@ import androidx.lifecycle.*;
 
 import eu.jonahbauer.qed.model.Person;
 import eu.jonahbauer.qed.model.PersonFilter;
-import eu.jonahbauer.qed.model.adapter.PersonAdapter;
+import eu.jonahbauer.qed.ui.adapter.PersonAdapter;
 import eu.jonahbauer.qed.networking.Reason;
 import eu.jonahbauer.qed.networking.async.QEDPageReceiver;
 import eu.jonahbauer.qed.networking.pages.QEDDBPages;

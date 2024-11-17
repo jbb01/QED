@@ -20,7 +20,7 @@ import eu.jonahbauer.qed.R;
 import eu.jonahbauer.qed.activities.settings.ChatPreferenceFragment;
 import eu.jonahbauer.qed.databinding.FragmentChatBinding;
 import eu.jonahbauer.qed.model.Message;
-import eu.jonahbauer.qed.model.adapter.MessageAdapter;
+import eu.jonahbauer.qed.ui.adapter.MessageAdapter;
 import eu.jonahbauer.qed.model.viewmodel.ChatViewModel;
 import eu.jonahbauer.qed.util.*;
 

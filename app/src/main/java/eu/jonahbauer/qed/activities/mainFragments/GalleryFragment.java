@@ -21,7 +21,7 @@ import com.google.android.material.snackbar.Snackbar;
 import eu.jonahbauer.qed.R;
 import eu.jonahbauer.qed.databinding.FragmentGalleryBinding;
 import eu.jonahbauer.qed.model.Album;
-import eu.jonahbauer.qed.model.adapter.AlbumAdapter;
+import eu.jonahbauer.qed.ui.adapter.AlbumAdapter;
 import eu.jonahbauer.qed.model.viewmodel.AlbumListViewModel;
 import eu.jonahbauer.qed.networking.Reason;
 import eu.jonahbauer.qed.util.Preferences;

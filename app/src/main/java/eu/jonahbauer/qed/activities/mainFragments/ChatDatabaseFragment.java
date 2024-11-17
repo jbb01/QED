@@ -13,11 +13,10 @@ import eu.jonahbauer.qed.R;
 import eu.jonahbauer.qed.databinding.FragmentChatDatabaseBinding;
 import eu.jonahbauer.qed.model.Message;
 import eu.jonahbauer.qed.model.MessageFilter;
-import eu.jonahbauer.qed.model.adapter.MessageAdapter;
+import eu.jonahbauer.qed.ui.adapter.MessageAdapter;
 import eu.jonahbauer.qed.model.room.Database;
 import eu.jonahbauer.qed.model.room.MessageDao;
 import eu.jonahbauer.qed.model.viewmodel.MessageListViewModel;
-import eu.jonahbauer.qed.util.*;
 import eu.jonahbauer.qed.util.*;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 

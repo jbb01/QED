@@ -19,10 +19,9 @@ import androidx.navigation.Navigation;
 import androidx.navigation.fragment.FragmentNavigator;
 
 import eu.jonahbauer.qed.R;
-import eu.jonahbauer.qed.activities.mainFragments.EventDatabaseFragmentDirections;
 import eu.jonahbauer.qed.databinding.FragmentEventsDatabaseBinding;
 import eu.jonahbauer.qed.model.Event;
-import eu.jonahbauer.qed.model.adapter.EventAdapter;
+import eu.jonahbauer.qed.ui.adapter.EventAdapter;
 import eu.jonahbauer.qed.model.viewmodel.EventListViewModel;
 import eu.jonahbauer.qed.networking.Reason;
 import eu.jonahbauer.qed.util.StatusWrapper;

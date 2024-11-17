@@ -17,7 +17,7 @@ import eu.jonahbauer.qed.Application;
 import eu.jonahbauer.qed.R;
 import eu.jonahbauer.qed.databinding.FragmentLogBinding;
 import eu.jonahbauer.qed.model.LogRequest;
-import eu.jonahbauer.qed.model.adapter.MessageAdapter;
+import eu.jonahbauer.qed.ui.adapter.MessageAdapter;
 import eu.jonahbauer.qed.model.room.Database;
 import eu.jonahbauer.qed.model.viewmodel.LogViewModel;
 import eu.jonahbauer.qed.networking.Reason;

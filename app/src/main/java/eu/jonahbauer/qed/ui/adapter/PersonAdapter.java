@@ -1,4 +1,4 @@
-package eu.jonahbauer.qed.model.adapter;
+package eu.jonahbauer.qed.ui.adapter;
 
 import android.content.Context;
 import android.icu.text.Normalizer2;

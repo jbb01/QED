@@ -28,7 +28,7 @@ import eu.jonahbauer.qed.model.Album;
 import eu.jonahbauer.qed.model.AlbumFilter;
 import eu.jonahbauer.qed.model.Image;
 import eu.jonahbauer.qed.model.Person;
-import eu.jonahbauer.qed.model.adapter.ImageAdapter;
+import eu.jonahbauer.qed.ui.adapter.ImageAdapter;
 import eu.jonahbauer.qed.model.viewmodel.AlbumViewModel;
 import eu.jonahbauer.qed.networking.Reason;
 import eu.jonahbauer.qed.util.*;

@@ -10,7 +10,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.SavedStateHandle;
 import eu.jonahbauer.qed.model.Message;
 import eu.jonahbauer.qed.model.MessageFilter;
-import eu.jonahbauer.qed.model.adapter.MessageAdapter;
+import eu.jonahbauer.qed.ui.adapter.MessageAdapter;
 import eu.jonahbauer.qed.model.room.Database;
 import eu.jonahbauer.qed.model.room.MessageDao;
 import eu.jonahbauer.qed.util.Preferences;
