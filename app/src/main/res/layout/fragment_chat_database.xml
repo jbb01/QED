@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="?android:colorBackground"
-        tools:context=".activities.mainFragments.ChatDatabaseFragment">
+        tools:context=".activities.main.ChatDatabaseFragment">
 
         <LinearLayout
             android:id="@+id/database_search_filters"

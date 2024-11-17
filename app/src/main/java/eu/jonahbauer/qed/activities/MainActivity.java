@@ -31,7 +31,7 @@ import com.google.android.material.snackbar.Snackbar;
 import eu.jonahbauer.qed.BuildConfig;
 import eu.jonahbauer.qed.MainDirections;
 import eu.jonahbauer.qed.R;
-import eu.jonahbauer.qed.activities.mainFragments.OnActivityReenterListener;
+import eu.jonahbauer.qed.activities.main.OnActivityReenterListener;
 import eu.jonahbauer.qed.databinding.ActivityMainBinding;
 import eu.jonahbauer.qed.ui.CustomActionMode;
 import eu.jonahbauer.qed.ui.themes.Theme;

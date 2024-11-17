@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/nav_login"
-        android:name="eu.jonahbauer.qed.activities.mainFragments.LoginFragment"
+        android:name="eu.jonahbauer.qed.activities.main.LoginFragment"
         android:label="@string/title_fragment_login"
         tools:layout="@layout/fragment_login">
         <argument
@@ -19,7 +19,7 @@
 
     <fragment
         android:id="@+id/nav_chat"
-        android:name="eu.jonahbauer.qed.activities.mainFragments.ChatFragment"
+        android:name="eu.jonahbauer.qed.activities.main.ChatFragment"
         android:label="@string/title_fragment_chat"
         tools:layout="@layout/fragment_chat">
         <deepLink
@@ -32,7 +32,7 @@
 
     <fragment
         android:id="@+id/nav_chat_db"
-        android:name="eu.jonahbauer.qed.activities.mainFragments.ChatDatabaseFragment"
+        android:name="eu.jonahbauer.qed.activities.main.ChatDatabaseFragment"
         android:label="@string/title_fragment_chat_database"
         tools:layout="@layout/fragment_chat_database">
         <action
@@ -42,7 +42,7 @@
 
     <fragment
         android:id="@+id/nav_chat_log"
-        android:name="eu.jonahbauer.qed.activities.mainFragments.LogFragment"
+        android:name="eu.jonahbauer.qed.activities.main.LogFragment"
         android:label="@string/title_fragment_log"
         tools:layout="@layout/fragment_log">
         <argument
@@ -60,7 +60,7 @@
 
     <fragment
         android:id="@+id/nav_database_persons"
-        android:name="eu.jonahbauer.qed.activities.mainFragments.PersonDatabaseFragment"
+        android:name="eu.jonahbauer.qed.activities.main.PersonDatabaseFragment"
         android:label="@string/title_fragment_persons_database"
         tools:layout="@layout/fragment_persons_database">
         <deepLink
@@ -76,7 +76,7 @@
 
     <fragment
         android:id="@+id/nav_database_events"
-        android:name="eu.jonahbauer.qed.activities.mainFragments.EventDatabaseFragment"
+        android:name="eu.jonahbauer.qed.activities.main.EventDatabaseFragment"
         android:label="@string/title_fragment_events_database"
         tools:layout="@layout/fragment_events_database">
         <deepLink
@@ -92,7 +92,7 @@
 
     <fragment
         android:id="@+id/nav_gallery"
-        android:name="eu.jonahbauer.qed.activities.mainFragments.GalleryFragment"
+        android:name="eu.jonahbauer.qed.activities.main.GalleryFragment"
         android:label="@string/title_fragment_gallery"
         tools:layout="@layout/fragment_gallery">
         <deepLink
@@ -108,7 +108,7 @@
 
     <fragment
         android:id="@+id/nav_album"
-        android:name="eu.jonahbauer.qed.activities.mainFragments.AlbumFragment"
+        android:name="eu.jonahbauer.qed.activities.main.AlbumFragment"
         tools:layout="@layout/fragment_album">
         <argument
             android:name="album"
@@ -131,7 +131,7 @@
 
     <fragment
         android:id="@+id/nav_person"
-        android:name="eu.jonahbauer.qed.activities.mainFragments.PersonFragment"
+        android:name="eu.jonahbauer.qed.activities.main.PersonFragment"
         tools:layout="@layout/fragment_info_person">
         <argument
             android:name="person"
@@ -148,7 +148,7 @@
 
     <fragment
         android:id="@+id/nav_event"
-        android:name="eu.jonahbauer.qed.activities.mainFragments.EventFragment"
+        android:name="eu.jonahbauer.qed.activities.main.EventFragment"
         tools:layout="@layout/fragment_info_event">
         <argument
             android:name="event"
@@ -165,7 +165,7 @@
 
     <fragment
         android:id="@+id/nav_registration"
-        android:name="eu.jonahbauer.qed.activities.mainFragments.RegistrationFragment"
+        android:name="eu.jonahbauer.qed.activities.main.RegistrationFragment"
         tools:layout="@layout/fragment_info_registration">
         <argument
             android:name="registration"

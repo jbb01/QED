@@ -21,10 +21,10 @@ import eu.jonahbauer.qed.model.Person;
 import eu.jonahbauer.qed.model.Registration;
 import eu.jonahbauer.qed.model.viewmodel.RegistrationViewModel;
 import eu.jonahbauer.qed.network.util.NetworkConstants;
-import eu.jonahbauer.qed.activities.mainFragments.EventFragmentArgs;
-import eu.jonahbauer.qed.activities.mainFragments.PersonFragmentArgs;
-import eu.jonahbauer.qed.activities.mainFragments.RegistrationFragmentArgs;
-import eu.jonahbauer.qed.activities.mainFragments.RegistrationFragmentDirections;
+import eu.jonahbauer.qed.activities.main.EventFragmentArgs;
+import eu.jonahbauer.qed.activities.main.PersonFragmentArgs;
+import eu.jonahbauer.qed.activities.main.RegistrationFragmentArgs;
+import eu.jonahbauer.qed.activities.main.RegistrationFragmentDirections;
 
 import java.util.Locale;
 import java.util.Objects;

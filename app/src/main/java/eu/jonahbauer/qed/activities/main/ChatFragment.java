@@ -1,4 +1,4 @@
-package eu.jonahbauer.qed.activities.mainFragments;
+package eu.jonahbauer.qed.activities.main;
 
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;

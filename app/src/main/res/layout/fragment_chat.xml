@@ -15,7 +15,7 @@
         android:layout_height="match_parent"
         android:background="?android:colorBackground"
         android:clipChildren="false"
-        tools:context=".activities.mainFragments.ChatFragment" >
+        tools:context=".activities.main.ChatFragment" >
 
         <ProgressBar
             android:id="@+id/progress_bar"

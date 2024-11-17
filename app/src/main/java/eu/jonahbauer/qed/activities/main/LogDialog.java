@@ -1,4 +1,4 @@
-package eu.jonahbauer.qed.activities.mainFragments;
+package eu.jonahbauer.qed.activities.main;
 
 import static android.content.DialogInterface.BUTTON_POSITIVE;
 

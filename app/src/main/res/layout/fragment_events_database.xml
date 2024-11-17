@@ -16,7 +16,7 @@
         android:background="?android:colorBackground"
         android:transitionGroup="true"
         android:transitionName="@string/transition_name_event_database_fragment"
-        tools:context=".activities.mainFragments.EventDatabaseFragment">
+        tools:context=".activities.main.EventDatabaseFragment">
 
         <ProgressBar
             style="?android:attr/progressBarStyleLarge"

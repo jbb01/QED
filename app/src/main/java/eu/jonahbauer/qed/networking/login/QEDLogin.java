@@ -17,7 +17,7 @@ import eu.jonahbauer.qed.Application;
 import eu.jonahbauer.qed.MainDirections;
 import eu.jonahbauer.qed.R;
 import eu.jonahbauer.qed.activities.MainActivity;
-import eu.jonahbauer.qed.activities.mainFragments.LoginFragmentArgs;
+import eu.jonahbauer.qed.activities.main.LoginFragmentArgs;
 import eu.jonahbauer.qed.crypt.PasswordStorage;
 import eu.jonahbauer.qed.crypt.PasswordUtils;
 import eu.jonahbauer.qed.networking.Feature;

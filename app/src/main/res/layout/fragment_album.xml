@@ -23,7 +23,7 @@
         android:background="?android:colorBackground"
         android:transitionGroup="true"
         android:transitionName="@string/transition_name_album_fragment"
-        tools:context="eu.jonahbauer.qed.activities.mainFragments.AlbumFragment">
+        tools:context="eu.jonahbauer.qed.activities.main.AlbumFragment">
 
         <include
             layout="@layout/gallery_offline_label"

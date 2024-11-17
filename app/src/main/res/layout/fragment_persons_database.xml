@@ -17,7 +17,7 @@
         android:background="?android:colorBackground"
         android:transitionGroup="true"
         android:transitionName="@string/transition_name_person_database_fragment"
-        tools:context=".activities.mainFragments.PersonDatabaseFragment">
+        tools:context=".activities.main.PersonDatabaseFragment">
 
         <LinearLayout
             android:id="@+id/database_search_filters"

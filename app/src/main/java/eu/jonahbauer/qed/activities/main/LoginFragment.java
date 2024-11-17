@@ -1,4 +1,4 @@
-package eu.jonahbauer.qed.activities.mainFragments;
+package eu.jonahbauer.qed.activities.main;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -11,7 +11,6 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import eu.jonahbauer.qed.R;
-import eu.jonahbauer.qed.activities.mainFragments.LoginFragmentArgs;
 import eu.jonahbauer.qed.databinding.FragmentLoginBinding;
 import eu.jonahbauer.qed.networking.Feature;
 import eu.jonahbauer.qed.networking.Reason;
@@ -36,7 +35,7 @@ public class LoginFragment extends Fragment implements QEDPageReceiver<Boolean> 
 
         Bundle arguments = getArguments();
         if (arguments != null) {
-            eu.jonahbauer.qed.activities.mainFragments.LoginFragmentArgs args = LoginFragmentArgs.fromBundle(arguments);
+            eu.jonahbauer.qed.activities.main.LoginFragmentArgs args = LoginFragmentArgs.fromBundle(arguments);
             mFeature = args.getFeature();
         }
 
