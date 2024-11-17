@@ -1,4 +1,4 @@
-package eu.jonahbauer.qed.model.parser;
+package eu.jonahbauer.qed.network.parser.database;
 
 import android.util.Log;
 
@@ -6,7 +6,7 @@ import androidx.annotation.NonNull;
 
 import eu.jonahbauer.qed.model.Person;
 
-import eu.jonahbauer.qed.networking.parser.HtmlParser;
+import eu.jonahbauer.qed.network.parser.HtmlParser;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 

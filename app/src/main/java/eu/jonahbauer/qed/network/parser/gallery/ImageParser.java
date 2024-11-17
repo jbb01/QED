@@ -1,14 +1,14 @@
-package eu.jonahbauer.qed.model.parser;
+package eu.jonahbauer.qed.network.parser.gallery;
 
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
 import eu.jonahbauer.qed.model.Image;
-import eu.jonahbauer.qed.networking.NetworkConstants;
+import eu.jonahbauer.qed.network.parser.HtmlParseException;
+import eu.jonahbauer.qed.network.parser.HtmlParser;
+import eu.jonahbauer.qed.network.util.NetworkConstants;
 import eu.jonahbauer.qed.networking.Reason;
-import eu.jonahbauer.qed.networking.parser.HtmlParseException;
-import eu.jonahbauer.qed.networking.parser.HtmlParser;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;

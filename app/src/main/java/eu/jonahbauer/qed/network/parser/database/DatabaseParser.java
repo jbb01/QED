@@ -1,8 +1,8 @@
-package eu.jonahbauer.qed.model.parser;
+package eu.jonahbauer.qed.network.parser.database;
 
 import android.net.Uri;
 import androidx.annotation.Nullable;
-import eu.jonahbauer.qed.networking.parser.HtmlParser;
+import eu.jonahbauer.qed.network.parser.HtmlParser;
 import org.jsoup.nodes.Element;
 
 public abstract class DatabaseParser<T> extends HtmlParser<T> {

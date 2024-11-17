@@ -1,4 +1,4 @@
-package eu.jonahbauer.qed.model.parser;
+package eu.jonahbauer.qed.network.parser.database;
 
 import eu.jonahbauer.qed.model.Event;
 import eu.jonahbauer.qed.network.util.NetworkUtil;

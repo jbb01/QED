@@ -8,7 +8,7 @@ import androidx.annotation.NonNull;
 import eu.jonahbauer.qed.model.LogRequest;
 import eu.jonahbauer.qed.model.LogRequest.FileLogRequest;
 import eu.jonahbauer.qed.model.Message;
-import eu.jonahbauer.qed.model.parser.ChatLogParser;
+import eu.jonahbauer.qed.network.parser.chat.ChatLogParser;
 import eu.jonahbauer.qed.networking.Feature;
 import eu.jonahbauer.qed.network.util.NetworkConstants;
 import eu.jonahbauer.qed.networking.Reason;

@@ -1,4 +1,4 @@
-package eu.jonahbauer.qed.networking.parser;
+package eu.jonahbauer.qed.network.parser;
 
 import eu.jonahbauer.qed.networking.Reason;
 

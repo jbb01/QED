@@ -1,4 +1,4 @@
-package eu.jonahbauer.qed.model.parser;
+package eu.jonahbauer.qed.network.parser.chat;
 
 import android.util.Log;
 

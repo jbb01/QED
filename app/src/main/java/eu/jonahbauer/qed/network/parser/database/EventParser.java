@@ -1,4 +1,4 @@
-package eu.jonahbauer.qed.model.parser;
+package eu.jonahbauer.qed.network.parser.database;
 
 import android.util.Log;
 
@@ -8,7 +8,7 @@ import androidx.annotation.Nullable;
 import eu.jonahbauer.qed.model.Event;
 import eu.jonahbauer.qed.model.Registration;
 
-import eu.jonahbauer.qed.networking.parser.HtmlParser;
+import eu.jonahbauer.qed.network.parser.HtmlParser;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;

@@ -8,7 +8,7 @@ import androidx.room.rxjava3.EmptyResultSetException;
 import eu.jonahbauer.qed.R;
 import eu.jonahbauer.qed.networking.exceptions.InvalidCredentialsException;
 import eu.jonahbauer.qed.networking.exceptions.LowMemoryException;
-import eu.jonahbauer.qed.networking.parser.HtmlParseException;
+import eu.jonahbauer.qed.network.parser.HtmlParseException;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

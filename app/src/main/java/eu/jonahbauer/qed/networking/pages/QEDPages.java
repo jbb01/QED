@@ -6,7 +6,7 @@ import eu.jonahbauer.qed.networking.async.AsyncLoadQEDPage;
 import eu.jonahbauer.qed.networking.async.AsyncLoadQEDPageToStream;
 import eu.jonahbauer.qed.networking.async.QEDPageReceiver;
 import eu.jonahbauer.qed.networking.async.QEDPageStreamReceiver;
-import eu.jonahbauer.qed.networking.parser.Parser;
+import eu.jonahbauer.qed.network.parser.Parser;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.annotations.CheckReturnValue;

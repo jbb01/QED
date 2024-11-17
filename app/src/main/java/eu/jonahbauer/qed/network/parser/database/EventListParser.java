@@ -1,4 +1,4 @@
-package eu.jonahbauer.qed.model.parser;
+package eu.jonahbauer.qed.network.parser.database;
 
 import android.util.Log;
 
@@ -6,14 +6,12 @@ import androidx.annotation.NonNull;
 
 import eu.jonahbauer.qed.model.Event;
 
-import eu.jonahbauer.qed.networking.parser.HtmlParser;
+import eu.jonahbauer.qed.network.parser.HtmlParser;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
 import java.util.List;
 import java.util.Objects;
-
-import static eu.jonahbauer.qed.model.parser.EventParser.parseCost;
 
 public final class EventListParser extends DatabaseParser<List<Event>> {
     private static final String LOG_TAG = EventListParser.class.getName();
@@ -68,7 +66,7 @@ public final class EventListParser extends DatabaseParser<List<Event>> {
                         cost: try {
                             var element = columns.get(6);
                             if (element == null) break cost;
-                            event.setCost(parseCost(element));
+                            event.setCost(EventParser.parseCost(element));
                         } catch (Exception ignored) {}
 
                         maxParticipants: try {
