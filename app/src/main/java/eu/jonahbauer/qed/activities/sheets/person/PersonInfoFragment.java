@@ -86,7 +86,7 @@ public class PersonInfoFragment extends InfoFragment {
         mBinding.toggleEventsButton.setIconTint(color);
 
         TypedValue typedValue = new TypedValue();
-        requireContext().getTheme().resolveAttribute(R.attr.textAppearanceButton, typedValue, true);
+        requireContext().getTheme().resolveAttribute(com.google.android.material.R.attr.textAppearanceButton, typedValue, true);
         @StyleRes int textAppearanceButton = typedValue.data;
 
         mBinding.toggleEventsButton.setTitleTextAppearance(textAppearanceButton);

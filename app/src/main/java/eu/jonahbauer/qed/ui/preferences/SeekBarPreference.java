@@ -188,7 +188,7 @@ public class SeekBarPreference extends Preference {
     }
 
     public SeekBarPreference(Context context, AttributeSet attrs) {
-        this(context, attrs, R.attr.seekBarPreferenceStyle);
+        this(context, attrs, androidx.preference.R.attr.seekBarPreferenceStyle);
     }
 
     public SeekBarPreference(Context context) {
@@ -249,8 +249,8 @@ public class SeekBarPreference extends Preference {
     public void onBindViewHolder(PreferenceViewHolder view) {
         super.onBindViewHolder(view);
         view.itemView.setOnKeyListener(mSeekBarKeyListener);
-        mSeekBar = (SeekBar) view.findViewById(R.id.seekbar);
-        mSeekBarValueTextView = (TextView) view.findViewById(R.id.seekbar_value);
+        mSeekBar = (SeekBar) view.findViewById(androidx.preference.R.id.seekbar);
+        mSeekBarValueTextView = (TextView) view.findViewById(androidx.preference.R.id.seekbar_value);
         if (mShowSeekBarValue) {
             mSeekBarValueTextView.setVisibility(View.VISIBLE);
             mSeekBarValueTextView.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);

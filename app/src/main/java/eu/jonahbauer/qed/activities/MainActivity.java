@@ -83,19 +83,7 @@ public class MainActivity extends AppCompatActivity implements NavController.OnD
                 .setOpenableLayout(drawerLayout)
                 .build();
         NavigationUI.setupActionBarWithNavController(this, mNavController, mAppBarConfiguration);
-        navigationView.setNavigationItemSelectedListener(item -> {
-            var destination = item.getItemId();
-
-            @SuppressLint("RestrictedApi")
-            var first = mNavController.getBackQueue().firstOrNull();
-            var options = new NavOptions.Builder();
-            if (mTopLevelDestinations.contains(destination) && first != null) {
-                options.setPopUpTo(first.getDestination().getId(), true);
-            }
-            mNavController.navigate(item.getItemId(), null, options.build());
-            drawerLayout.close();
-            return true;
-        });
+        NavigationUI.setupWithNavController(navigationView, mNavController, false);
 
         mNavController.addOnDestinationChangedListener(this);
 

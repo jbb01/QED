@@ -7,7 +7,7 @@ import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.transition.Transition;
-import eu.jonahbauer.qed.R;
+import com.google.android.material.R;
 import eu.jonahbauer.qed.activities.MainActivity;
 
 public class ActionBarAnimation implements Transition.TransitionListener {

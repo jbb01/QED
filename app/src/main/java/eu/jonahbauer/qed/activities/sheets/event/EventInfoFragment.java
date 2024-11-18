@@ -68,7 +68,7 @@ public class EventInfoFragment extends InfoFragment {
         mBinding.toggleParticipantsButton.setIconTint(color);
 
         TypedValue typedValue = new TypedValue();
-        requireContext().getTheme().resolveAttribute(R.attr.textAppearanceButton, typedValue, true);
+        requireContext().getTheme().resolveAttribute(com.google.android.material.R.attr.textAppearanceButton, typedValue, true);
         @StyleRes int textAppearanceButton = typedValue.data;
 
         mBinding.toggleParticipantsButton.setTitleTextAppearance(textAppearanceButton);

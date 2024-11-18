@@ -52,12 +52,12 @@ public class ImageAdapter extends ArrayAdapter<Image> {
 
         ListItemImageBinding binding;
         if (convertView != null) {
-            binding = (ListItemImageBinding) convertView.getTag(R.id.dataBinding);
+            binding = (ListItemImageBinding) convertView.getTag(androidx.databinding.library.R.id.dataBinding);
         } else {
             LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             binding = ListItemImageBinding.inflate(inflater, parent, false);
             binding.setDisposable(new CompositeDisposable());
-            binding.getRoot().setTag(R.id.dataBinding, binding);
+            binding.getRoot().setTag(androidx.databinding.library.R.id.dataBinding, binding);
         }
 
         Long imageId = image != null ? image.getId() : null;

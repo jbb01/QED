@@ -110,9 +110,12 @@ public class MessageAdapter extends ArrayAdapter<Message> {
         array.recycle();
 
         if (textAppearance != 0) {
-            var taArray = mContext.obtainStyledAttributes(textAppearance, new int[] {R.styleable.TextAppearance_android_textColor, R.styleable.TextAppearance_android_textSize});
-            mDefaultTextSize = taArray.getDimensionPixelSize(R.styleable.TextAppearance_android_textSize, mDefaultTextSize);
-            mDefaultTextColor = taArray.getColor(R.styleable.TextAppearance_android_textColor, mDefaultTextColor);
+            var taArray = mContext.obtainStyledAttributes(textAppearance, new int[] {
+                    androidx.appcompat.R.styleable.TextAppearance_android_textColor,
+                    androidx.appcompat.R.styleable.TextAppearance_android_textSize
+            });
+            mDefaultTextSize = taArray.getDimensionPixelSize(androidx.appcompat.R.styleable.TextAppearance_android_textSize, mDefaultTextSize);
+            mDefaultTextColor = taArray.getColor(androidx.appcompat.R.styleable.TextAppearance_android_textColor, mDefaultTextColor);
             taArray.recycle();
         }
     }

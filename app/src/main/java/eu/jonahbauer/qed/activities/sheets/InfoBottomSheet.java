@@ -76,7 +76,7 @@ public abstract class InfoBottomSheet extends BottomSheetDialogFragment {
         view.setOnClickListener(v -> dismiss());
 
         var coordinator = (ViewGroup) view.getRootView().findViewById(R.id.coordinator);
-        var touchOutside = view.getRootView().findViewById(R.id.touch_outside);
+        var touchOutside = view.getRootView().findViewById(com.google.android.material.R.id.touch_outside);
 
         // register callback
         mBottomSheetCallback = new ColorfulBottomSheetCallback(mDialogWindow, touchOutside, getSheetBackgroundColor());
@@ -270,7 +270,7 @@ public abstract class InfoBottomSheet extends BottomSheetDialogFragment {
             mDarkColor = getSheetBackgroundColorDark();
 
             TypedValue typedValue = new TypedValue();
-            mContent.getContext().getTheme().resolveAttribute(R.attr.actionBarSize, typedValue, true);
+            mContent.getContext().getTheme().resolveAttribute(androidx.appcompat.R.attr.actionBarSize, typedValue, true);
             mActionBarSize = typedValue.getDimension(getResources().getDisplayMetrics());
             mActionBarElevation = mToolbar.getElevation();
 

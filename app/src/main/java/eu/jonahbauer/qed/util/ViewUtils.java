@@ -68,7 +68,7 @@ public class ViewUtils {
         int wrapContentMeasureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
         view.measure(matchParentMeasureSpec, wrapContentMeasureSpec);
 
-        final int duration = view.getContext().getResources().getInteger(R.integer.material_motion_duration_medium_2);
+        final int duration = view.getContext().getResources().getInteger(com.google.android.material.R.integer.material_motion_duration_medium_2);
         final int targetHeight = view.getMeasuredHeight();
         final int initialPadding = view.getPaddingTop();
 
@@ -100,7 +100,7 @@ public class ViewUtils {
      * from fully visible to transparent.
      */
     public static void collapse(@NonNull final View view) {
-        final int duration = view.getContext().getResources().getInteger(R.integer.material_motion_duration_medium_2);
+        final int duration = view.getContext().getResources().getInteger(com.google.android.material.R.integer.material_motion_duration_medium_2);
         final int initialHeight = view.getMeasuredHeight();
         final int initialPadding = view.getPaddingTop();
 
@@ -509,7 +509,7 @@ public class ViewUtils {
 
     public static @Px float getActionBarSize(@NonNull Context context) {
         var out = new TypedValue();
-        if (context.getTheme().resolveAttribute(R.attr.actionBarSize, out, true)) {
+        if (context.getTheme().resolveAttribute(androidx.appcompat.R.attr.actionBarSize, out, true)) {
             return out.getDimension(context.getResources().getDisplayMetrics());
         } else {
             return dpToPx(context, 56);

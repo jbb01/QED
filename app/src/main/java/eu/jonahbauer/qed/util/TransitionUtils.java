@@ -163,7 +163,7 @@ public class TransitionUtils {
 
     public static int getTransitionDuration(@NonNull Fragment fragment) {
         TypedValue value = new TypedValue();
-        fragment.requireContext().getTheme().resolveAttribute(R.attr.motionDurationLong1, value, true);
+        fragment.requireContext().getTheme().resolveAttribute(com.google.android.material.R.attr.motionDurationLong1, value, true);
         return value.data;
     }
 
