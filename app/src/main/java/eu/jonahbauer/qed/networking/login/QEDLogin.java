@@ -36,6 +36,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -265,12 +266,9 @@ public final class QEDLogin {
      */
     public static Disposable loginAsync(String username, char[] password, Feature feature, QEDPageReceiver<Boolean> listener) {
         var observable = Single.fromCallable(() -> {
-            try {
-                login(username, password, feature);
-                saveUsernameAndPassword(username, password);
-            } finally {
-                PasswordUtils.wipe(password);
-            }
+            var saved = Arrays.copyOf(password, password.length);
+            login(username, password, feature);
+            saveUsernameAndPassword(username, saved);
             return true;
         });
 
