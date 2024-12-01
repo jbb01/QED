@@ -1,0 +1,3 @@
+This app bundles the <a href="https://chat.qed-verein.de">chat</a>, <a href="https://gallery.qed-verein.de">gallery </a> and <a href="https://qeddb.qed-verein.de">database</a> of the <a href="https://qed-verein.de">Quod Erat Demonstrandum e.V.</a> into one very, very good app.
+
+Disclaimer: This app is not related to the Quod Erat Demonstrandum e.V. in any official way.
