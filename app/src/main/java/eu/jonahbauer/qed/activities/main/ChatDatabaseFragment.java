@@ -89,7 +89,7 @@ public class ChatDatabaseFragment extends Fragment {
 
         mBinding.searchButton.setOnClickListener(v -> search());
 
-        ViewUtils.setupExpandable(mBinding.expandCheckBox, mBinding.expandable, mMessageListViewModel.getExpanded());
+        ViewUtils.setupExpandable(getViewLifecycleOwner(), mMessageListViewModel.getExpanded(), mBinding.expandCheckBox, mBinding.expandable);
         ViewUtils.link(mBinding.databaseChannelCheckbox, mBinding.databaseChannelRow, mBinding.databaseChannelEditText);
         ViewUtils.link(mBinding.databaseMessageCheckbox, mBinding.databaseMessageRow, mBinding.databaseMessageEditText);
         ViewUtils.link(mBinding.databaseNameCheckbox, mBinding.databaseNameRow, mBinding.databaseNameEditText);

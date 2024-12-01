@@ -1,13 +1,11 @@
 package eu.jonahbauer.qed.util;
 
-import android.animation.ObjectAnimator;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Rect;
-import android.graphics.drawable.Animatable;
 import android.os.SystemClock;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -23,18 +21,16 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.*;
 import androidx.navigation.NavBackStackEntry;
 import androidx.navigation.fragment.NavHostFragment;
+import androidx.vectordrawable.graphics.drawable.SeekableAnimatedVectorDrawable;
 import com.google.android.material.chip.Chip;
 import eu.jonahbauer.qed.R;
 import eu.jonahbauer.qed.databinding.AlertDialogEditTextBinding;
+import eu.jonahbauer.qed.ui.transition.ExpandableView;
 import eu.jonahbauer.qed.ui.views.InterceptingView;
 import it.unimi.dsi.fastutil.Pair;
-import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
@@ -57,70 +53,6 @@ import java.util.stream.Collectors;
 @UtilityClass
 @SuppressWarnings("unused")
 public class ViewUtils {
-
-    /**
-     * Expands the given view using an animator.
-     * The view will slide in from its top edge while increasing its alpha value from transparent to fully visible.
-     */
-    public static void expand(@NonNull final View view) {
-        // measure view
-        int matchParentMeasureSpec = View.MeasureSpec.makeMeasureSpec(((View) view.getParent()).getWidth(), View.MeasureSpec.EXACTLY);
-        int wrapContentMeasureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
-        view.measure(matchParentMeasureSpec, wrapContentMeasureSpec);
-
-        final int duration = view.getContext().getResources().getInteger(com.google.android.material.R.integer.material_motion_duration_medium_2);
-        final int targetHeight = view.getMeasuredHeight();
-        final int initialPadding = view.getPaddingTop();
-
-        // Older versions of android (pre API 21) cancel animations for views with a height of 0.
-        view.getLayoutParams().height = 1;
-        view.setVisibility(View.VISIBLE);
-        view.setAlpha(0);
-
-        var animator = ObjectAnimator.ofFloat(0, 1);
-        animator.addUpdateListener(animation -> {
-            var fraction = animation.getAnimatedFraction();
-            if (fraction == 1) {
-                view.getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT;
-                view.setAlpha(1);
-                setPaddingTop(view, initialPadding);
-            } else {
-                view.getLayoutParams().height = (int) (targetHeight * fraction);
-                view.setAlpha(fraction);
-                setPaddingTop(view, initialPadding - (int) (targetHeight * (1 - fraction)));
-            }
-            view.requestLayout();
-        });
-        animator.setDuration(duration);
-        animator.start();
-    }
-
-    /**
-     * Collapses the given view using an animator. The view will slide out its top edge while decreasing its alpha value
-     * from fully visible to transparent.
-     */
-    public static void collapse(@NonNull final View view) {
-        final int duration = view.getContext().getResources().getInteger(com.google.android.material.R.integer.material_motion_duration_medium_2);
-        final int initialHeight = view.getMeasuredHeight();
-        final int initialPadding = view.getPaddingTop();
-
-        var animator = ObjectAnimator.ofFloat(0, 1);
-        animator.addUpdateListener(animation -> {
-            var fraction = animation.getAnimatedFraction();
-            if (fraction == 1) {
-                view.setVisibility(View.GONE);
-                view.setAlpha(1);
-                setPaddingTop(view, initialPadding);
-            } else {
-                view.getLayoutParams().height = initialHeight - (int) (initialHeight * fraction);
-                view.setAlpha(1 - fraction);
-                setPaddingTop(view, initialPadding - (int) (initialHeight * fraction));
-            }
-            view.requestLayout();
-        });
-        animator.setDuration(duration);
-        animator.start();
-    }
 
     //<editor-fold desc="Padding" defaultstate="collapsed">
     public static void setPaddingTop(@NonNull View view, int paddingTop) {
@@ -551,28 +483,31 @@ public class ViewUtils {
 
     /**
      * Links the button's checked state to the visibility of the expanding view.
-     * Visibility changes are handled using {@link #expand(View)} and {@link #collapse(View)}.
-     * The provided live data provides access to the current state and is initially queried for the initial state, but
-     * further changes will not be reflected.
+     * @see ExpandableView
      */
-    public static void setupExpandable(@NonNull CompoundButton button, @NonNull View expandingView, @NonNull MutableLiveData<Boolean> state) {
-        var checkedSetter = (BooleanConsumer) checked -> {
-            button.setChecked(checked);
-            button.setButtonDrawable(checked ? R.drawable.ic_arrow_up_accent_animation : R.drawable.ic_arrow_down_accent_animation);
+    public static void setupExpandable(
+            @NonNull LifecycleOwner owner, @NonNull MutableLiveData<Boolean> state,
+            @NonNull CompoundButton button, @NonNull View expandingView
+    ) {
+        var drawable = SeekableAnimatedVectorDrawable.create(button.getContext(), R.drawable.ic_arrow_down_accent_animation);
+        button.setButtonDrawable(drawable);
 
-            var drawable = button.getButtonDrawable();
-            if (drawable instanceof Animatable) ((Animatable) drawable).start();
+        var expandable = ExpandableView.from(expandingView);
+        expandable.setDrawable(drawable);
 
-            if (checked) expand(expandingView);
-            else collapse(expandingView);
+        var observer = (Observer<Boolean>) isChecked -> {
+            if (isChecked == null) isChecked = false;
+            expandable.setExpanded(isChecked, true);
+            button.setChecked(isChecked);
         };
 
-        var expanded = state.getValue();
-        if (expanded == null) expanded = false;
-        checkedSetter.accept((boolean) expanded);
+        var isInitiallyChecked = (boolean) Objects.requireNonNullElse(state.getValue(), false);
+        expandable.setExpanded(isInitiallyChecked, false);
+        button.setChecked(isInitiallyChecked);
 
-        button.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            checkedSetter.accept(isChecked);
+        state.observe(owner, observer);
+
+        button.setOnCheckedChangeListener((view, isChecked) -> {
             state.setValue(isChecked);
         });
     }

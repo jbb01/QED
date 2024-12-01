@@ -115,7 +115,7 @@ public class AlbumFragment extends Fragment implements AdapterView.OnItemClickLi
             }
         });
 
-        ViewUtils.setupExpandable(mBinding.expandCheckBox, mBinding.expandable, mAlbumViewModel.getExpanded());
+        ViewUtils.setupExpandable(getViewLifecycleOwner(), mAlbumViewModel.getExpanded(), mBinding.expandCheckBox, mBinding.expandable);
         ViewUtils.link(mBinding.albumPhotographerCheckBox, mBinding.albumPhotographerRow, mBinding.albumPhotographerSpinner);
         ViewUtils.link(mBinding.albumDateCheckBox, mBinding.albumDateRow, mBinding.albumDateSpinner);
         ViewUtils.link(mBinding.albumUploadCheckBox, mBinding.albumUploadRow, mBinding.albumUploadSpinner);

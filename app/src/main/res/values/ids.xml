@@ -4,4 +4,5 @@
 
     <item type="id" name="open_in_browser"/>
     <item type="id" name="person_favorite"/>
+    <item type="id" name="expandable"/>
 </resources>

@@ -89,7 +89,7 @@ public class PersonDatabaseFragment extends Fragment implements AdapterView.OnIt
 
         mBinding.searchButton.setOnClickListener(v -> search());
 
-        ViewUtils.setupExpandable(mBinding.expandCheckBox, mBinding.expandable, mPersonListViewModel.getExpanded());
+        ViewUtils.setupExpandable(getViewLifecycleOwner(), mPersonListViewModel.getExpanded(), mBinding.expandCheckBox, mBinding.expandable);
         ViewUtils.link(mBinding.databaseFirstNameCheckbox, mBinding.databaseFirstNameRow, mBinding.databaseFirstNameEditText);
         ViewUtils.link(mBinding.databaseLastNameCheckbox, mBinding.databaseLastNameRow, mBinding.databaseLastNameEditText);
     }
