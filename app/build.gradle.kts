@@ -25,8 +25,8 @@ android {
 
     defaultConfig {
         applicationId = "eu.jonahbauer.qed"
-        versionCode = 5
-        versionName = "3.1.0-rc.1"
+        versionCode = 6
+        versionName = "3.1.0"
 
         minSdk = 24
         targetSdk = 35
@@ -51,13 +51,10 @@ android {
         }
 
         getByName("release") {
-            postprocessing {
-                isRemoveUnusedCode = true
-                isObfuscate = false
-                isOptimizeCode = true
-            }
-
             signingConfig = signingConfigs.getByName("release")
+
+            isMinifyEnabled = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
 
         getByName("debug") {

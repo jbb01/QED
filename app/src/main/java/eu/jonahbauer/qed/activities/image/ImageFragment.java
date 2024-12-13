@@ -293,7 +293,7 @@ public class ImageFragment extends Fragment implements Toolbar.OnMenuItemClickLi
             if (extended) {
                 controller.show(WindowInsetsCompat.Type.systemBars());
             } else {
-                controller.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_BARS_BY_SWIPE);
+                controller.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_DEFAULT);
                 controller.hide(WindowInsetsCompat.Type.systemBars());
             }
         }

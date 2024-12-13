@@ -1,21 +1,26 @@
 # Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+-dontobfuscate
+-optimizations !code/simplification/arithmetic,!field/*,!class/merging/*,!code/allocation/variable
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
-
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
-
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# Please add these rules to your existing keep rules in order to suppress warnings.
+# This is generated automatically by the Android Gradle plugin.
+-dontwarn **com.fasterxml.jackson.core.JsonParser$Feature
+-dontwarn com.fasterxml.jackson.core.JsonProcessingException
+-dontwarn com.fasterxml.jackson.core.type.TypeReference
+-dontwarn com.fasterxml.jackson.databind.JsonNode
+-dontwarn com.fasterxml.jackson.databind.ObjectMapper
+-dontwarn com.madrobot.beans.BeanInfo
+-dontwarn com.madrobot.beans.IntrospectionException
+-dontwarn com.madrobot.beans.Introspector
+-dontwarn com.madrobot.beans.PropertyDescriptor
+-dontwarn java.beans.BeanInfo
+-dontwarn java.beans.IntrospectionException
+-dontwarn java.beans.Introspector
+-dontwarn java.beans.PropertyDescriptor
+-dontwarn net.minidev.json.JSONArray
+-dontwarn net.minidev.json.JSONValue
+-dontwarn net.minidev.json.parser.ContainerFactory
+-dontwarn net.minidev.json.parser.JSONParser
+-dontwarn org.cheffo.jeplite.JEP
+-dontwarn org.cheffo.jeplite.ParseException
+-dontwarn sun.misc.BASE64Encoder
