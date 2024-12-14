@@ -5,6 +5,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
+import eu.jonahbauer.qed.BuildConfig;
+
 import eu.jonahbauer.qed.R;
 import eu.jonahbauer.qed.activities.MainActivity;
 import eu.jonahbauer.qed.model.Language;
@@ -24,6 +26,10 @@ public class GeneralPreferenceFragment extends AbstractPreferenceFragment implem
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.preferences_general, rootKey);
+
+        var updates = findPreference("general.update_check.category");
+        assert updates != null;
+        updates.setVisible(BuildConfig.UPDATE_CHECK);
 
         language = findPreference(Preferences.getGeneral().getKeys().getLanguage());
         assert language != null;

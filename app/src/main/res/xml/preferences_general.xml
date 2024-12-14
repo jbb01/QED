@@ -47,6 +47,7 @@
     </PreferenceCategory>
 
     <PreferenceCategory
+        android:key="general.update_check.category"
         app:title="@string/preferences_general_group_update_check">
         <SwitchPreference
             android:defaultValue="true"

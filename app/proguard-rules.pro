@@ -1,6 +1,6 @@
 # Add project specific ProGuard rules here.
 -dontobfuscate
--optimizations !code/simplification/arithmetic,!field/*,!class/merging/*,!code/allocation/variable
+-dontoptimize
 
 # Please add these rules to your existing keep rules in order to suppress warnings.
 # This is generated automatically by the Android Gradle plugin.

@@ -4,9 +4,9 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import eu.jonahbauer.qed.BuildConfig;
 import eu.jonahbauer.qed.model.parcel.LambdaCreator;
 import eu.jonahbauer.qed.model.parcel.ParcelExtensions;
-import eu.jonahbauer.qed.network.util.NetworkConstants;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
@@ -30,6 +30,8 @@ public class Release implements Comparable<Release>, Parcelable {
     private static final String KEY_CREATED_AT = "created_at";
     private static final String KEY_NOTES = "body";
     private static final String KEY_PRERELEASE = "prerelease";
+
+    private static @Nullable Release CURRENT;
 
     /**
      * The version string.
@@ -62,6 +64,20 @@ public class Release implements Comparable<Release>, Parcelable {
 
     public static @NonNull Release parse(@NonNull JSONObject json) throws JSONException {
         return new Release(json);
+    }
+
+    public static @NonNull Release getCurrentRelease() {
+        var current = CURRENT;
+        if (current == null) {
+            var version = new Version(BuildConfig.VERSION_NAME);
+            @SuppressWarnings("ConstantValue")
+            var timestamp = BuildConfig.BUILD_TIMESTAMP != null
+                    ? Instant.ofEpochMilli(BuildConfig.BUILD_TIMESTAMP)
+                    : Instant.now();
+            current = new Release(version, timestamp);
+            CURRENT = current;
+        }
+        return current;
     }
 
     public Release(@NonNull JSONObject json) throws JSONException {

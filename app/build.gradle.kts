@@ -1,22 +1,26 @@
 @file:Suppress("UnstableApiUsage")
 
-import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+import java.util.Properties
 
 plugins {
     id("com.android.application")
     id("androidx.navigation.safeargs")
 }
 
-val localProperties = gradleLocalProperties(rootDir, providers)
-
 android {
     signingConfigs {
-        create("release") {
-            val keyStoreFile = localProperties.getProperty("KEY_STORE_FILE")
-            storeFile = if (keyStoreFile != null) file(keyStoreFile) else null
-            storePassword = localProperties.getProperty("KEY_STORE_PASSWORD")
-            keyAlias = localProperties.getProperty("KEY_ALIAS")
-            keyPassword = localProperties.getProperty("KEY_PASSWORD")
+        // https://developer.android.com/studio/publish/app-signing#secure-shared-keystore
+        val keystorePropertiesFile = rootProject.file("keystore.properties")
+        if (keystorePropertiesFile.exists()) {
+            val keystoreProperties = Properties()
+            keystoreProperties.load(keystorePropertiesFile.inputStream())
+
+            create("release") {
+                storeFile = file(keystoreProperties["storeFile"] as String)
+                storePassword = keystoreProperties["storePassword"] as String
+                keyAlias = keystoreProperties["keyAlias"] as String
+                keyPassword = keystoreProperties["keyPassword"] as String
+            }
         }
     }
 
@@ -36,22 +40,13 @@ android {
 
     buildTypes {
         all {
-            buildConfigField(
-                    "java.time.Instant", "BUILD_TIMESTAMP",
-                    "java.time.Instant.ofEpochMilli(${System.currentTimeMillis()}L)"
-            )
-            buildConfigField(
-                    "eu.jonahbauer.qed.model.Release", "RELEASE",
-                    "new eu.jonahbauer.qed.model.Release(\"v" + defaultConfig.versionName + "\", BUILD_TIMESTAMP)"
-            )
-
             val isPrerelease = defaultConfig.versionName!!.contains(Regex("^\\d+\\.\\d+\\.\\d+-"))
             buildConfigField("boolean", "PRERELEASE", isPrerelease.toString())
             resValue("string", "preferences_general_update_check_includes_prerelease_default", isPrerelease.toString())
         }
 
         getByName("release") {
-            signingConfig = signingConfigs.getByName("release")
+            signingConfig = signingConfigs.findByName("release")
 
             isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
@@ -60,6 +55,27 @@ android {
         getByName("debug") {
             isMinifyEnabled = false
             isDebuggable = true
+        }
+    }
+
+    flavorDimensions += "distribution"
+    productFlavors {
+        create("github") {
+            isDefault = true
+            dimension = "distribution"
+            versionNameSuffix = "+github"
+
+            buildConfigField("boolean", "UPDATE_CHECK", "true")
+            buildConfigField("Long", "BUILD_TIMESTAMP", "${System.currentTimeMillis()}L")
+        }
+
+        create("fdroid") {
+            dimension = "distribution"
+            applicationIdSuffix = ".fdroid"
+            versionNameSuffix = "+fdroid"
+
+            buildConfigField("boolean", "UPDATE_CHECK", "false")
+            buildConfigField("Long", "BUILD_TIMESTAMP", "null")
         }
     }
 

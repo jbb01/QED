@@ -1,7 +1,9 @@
 package eu.jonahbauer.qed.util;
 
+import eu.jonahbauer.qed.BuildConfig;
 import eu.jonahbauer.qed.MockSharedPreferences;
 import eu.jonahbauer.qed.model.Release;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -33,6 +35,7 @@ public class UpdateCheckerTest {
 
     @Before
     public void init() {
+        Assume.assumeTrue(BuildConfig.UPDATE_CHECK);
         MockSharedPreferences.init();
     }
 

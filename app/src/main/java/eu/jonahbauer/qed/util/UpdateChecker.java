@@ -88,14 +88,15 @@ public class UpdateChecker implements Callable<Release> {
      */
     @Override
     @WorkerThread
-    @Nullable
-    public Release call() throws Exception {
+    public @Nullable Release call() throws Exception {
+        if (!BuildConfig.UPDATE_CHECK) return null;
+
         var enabled = Preferences.getGeneral().isUpdateCheckEnabled();
         if (!enabled) return null;
 
         var includesPrereleases = Preferences.getGeneral().isUpdateCheckIncludesPrereleases();
         var latestRelease = getLatestRelease(includesPrereleases);
-        if (BuildConfig.RELEASE.compareTo(latestRelease) >= 0) return null;
+        if (Release.getCurrentRelease().compareTo(latestRelease) >= 0) return null;
 
         var ignored = Preferences.getGeneral().getUpdateCheckDontSuggest();
         if (ignored != null && ignored.contains(latestRelease.getVersion())) {
