@@ -8,14 +8,22 @@
             android:key="@string/preferences_general_github_key"
             android:title="@string/preferences_general_github_title"
             android:icon="@drawable/ic_settings_github"
-            android:summary="@string/preferences_general_github_summary"/>
+            android:summary="@string/preferences_general_github_summary">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="https://github.com/jbb01/QED" />
+        </Preference>
 
         <Preference
             android:defaultValue="false"
             android:key="@string/preferences_general_bug_report_key"
             android:title="@string/preferences_general_bug_report_title"
             android:summary="@string/preferences_general_bug_report_summary"
-            android:icon="@drawable/ic_settings_bug_report" />
+            android:icon="@drawable/ic_settings_bug_report" >
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="https://github.com/jbb01/QED/issues/new"/>
+        </Preference>
 
         <ListPreference
             android:key="@string/preferences_general_language_key"
@@ -49,6 +57,7 @@
             android:summaryOff="@string/preferences_general_update_check_enabled_false_summary"/>
         <SwitchPreference
             android:defaultValue="@string/preferences_general_update_check_includes_prerelease_default"
+            android:dependency="@string/preferences_general_update_check_enabled_key"
             android:key="@string/preferences_general_update_check_includes_prereleases_key"
             android:title="@string/preferences_general_update_check_includes_prereleases_title"
             android:icon="@drawable/ic_settings_update_check_beta"

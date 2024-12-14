@@ -34,23 +34,19 @@ public class Release implements Comparable<Release>, Parcelable {
     /**
      * The version string.
      */
-    @NonNull
-    Version version;
+    @NonNull Version version;
     /**
      * The URL of the release website on GitHub.
      */
-    @NonNull
-    String url;
+    @NonNull String url;
     /**
      * The timestamp of when the release was created.
      */
-    @NonNull
-    Instant createdAt;
+    @NonNull Instant createdAt;
     /**
      * The release notes.
      */
-    @Nullable
-    String notes;
+    @Nullable String notes;
     /**
      * Whether this is a prerelease.
      */
@@ -83,7 +79,7 @@ public class Release implements Comparable<Release>, Parcelable {
     }
 
     public Release(@NonNull Version version, @NonNull Instant createdAt) {
-        this(version, NetworkConstants.GIT_HUB + "/releases/" + version, createdAt, null, version.isPrerelease());
+        this(version, "https://github.com/jbb01/QED/releases/" + version, createdAt, null, version.isPrerelease());
     }
 
     public Release(@NonNull String version, @NonNull String url, @NonNull Instant createdAt, @Nullable String notes, boolean prerelease) {
@@ -91,7 +87,7 @@ public class Release implements Comparable<Release>, Parcelable {
     }
 
     @SuppressWarnings("UnnecessaryInitCause") // would require api 27 to fix
-    private static Instant parseInstant(String str) throws JSONException {
+    private static @NonNull Instant parseInstant(@NonNull String str) throws JSONException {
         try {
             return Instant.parse(str);
         } catch (DateTimeParseException e) {
@@ -266,11 +262,11 @@ public class Release implements Comparable<Release>, Parcelable {
         });
 
         private static int comparePrereleaseIdentifiers(@NonNull List<String> a, @NonNull List<String> b) {
-            if (a.size() == 0 && b.size() == 0) return 0;
+            if (a.isEmpty() && b.isEmpty()) return 0;
 
             // When major, minor, and patch are equal, a pre-release version has lower precedence than a normal version
-            if (a.size() == 0) return 1;
-            if (b.size() == 0) return -1;
+            if (a.isEmpty()) return 1;
+            if (b.isEmpty()) return -1;
 
             for (int i = 0, length = Math.min(a.size(), b.size()); i < length; i++) {
                 var val = comparePrereleaseIdentifier(a.get(i), b.get(i));

@@ -30,8 +30,6 @@ public class NetworkConstants {
     public static final String GALLERY_SERVER_IMAGE = "https://qedgallery.qed-verein.de/image.php?type=%s&imageid=%d";
     public static final String GALLERY_SERVER_IMAGE_VIEW = "https://qedgallery.qed-verein.de/image_view.php?imageid=%d";
 
-    public static final String GIT_HUB = "https://github.com/jbb01/QED";
-    public static final String GIT_HUB_ISSUE_TRACKER = "https://github.com/jbb01/QED/issues/new";
     public static final String GIT_HUB_API = "https://api.github.com/repos/jbb01/QED";
 
     public static final ZoneId SERVER_TIME_ZONE = ZoneId.of("Europe/Berlin");
