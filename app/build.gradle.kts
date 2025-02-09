@@ -7,6 +7,12 @@ plugins {
     id("androidx.navigation.safeargs")
 }
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
 android {
     signingConfigs {
         // https://developer.android.com/studio/publish/app-signing#secure-shared-keystore
