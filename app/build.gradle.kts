@@ -35,8 +35,8 @@ android {
 
     defaultConfig {
         applicationId = "eu.jonahbauer.qed"
-        versionCode = 8
-        versionName = "3.1.2"
+        versionCode = 9
+        versionName = "3.1.3"
 
         minSdk = 24
         targetSdk = 35
