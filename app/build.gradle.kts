@@ -46,9 +46,9 @@ android {
 
     buildTypes {
         all {
-            val isPrerelease = defaultConfig.versionName!!.contains(Regex("^\\d+\\.\\d+\\.\\d+-"))
-            buildConfigField("boolean", "PRERELEASE", isPrerelease.toString())
-            resValue("string", "preferences_general_update_check_includes_prerelease_default", isPrerelease.toString())
+            val isPreRelease = defaultConfig.versionName!!.contains(Regex("^\\d+\\.\\d+\\.\\d+-"))
+            buildConfigField("boolean", "PRERELEASE", isPreRelease.toString())
+            resValue("string", "preferences_general_update_check_includes_prerelease_default", isPreRelease.toString())
         }
 
         getByName("release") {
@@ -95,6 +95,11 @@ android {
         viewBinding = true
         dataBinding = true
         buildConfig = true
+    }
+
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
     }
 }
 
