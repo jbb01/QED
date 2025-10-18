@@ -1,14 +1,10 @@
 package eu.jonahbauer.qed.network.parser;
 
 import android.util.Log;
-
 import androidx.annotation.NonNull;
-
 import androidx.annotation.Nullable;
-
 import eu.jonahbauer.qed.model.util.ParsedInstant;
 import eu.jonahbauer.qed.model.util.ParsedLocalDate;
-
 import org.jetbrains.annotations.Contract;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -30,7 +26,7 @@ public abstract class HtmlParser<T> implements Parser<T> {
 
     @NonNull
     @Contract("_, _ -> param1")
-    protected abstract T parse(@NonNull T obj, Document document) throws HtmlParseException;
+    protected abstract T parse(@NonNull T obj, @NonNull Document document) throws HtmlParseException;
 
     @Nullable
     protected static LocalDate parseLocalDate(@NonNull String date) {
@@ -64,48 +60,13 @@ public abstract class HtmlParser<T> implements Parser<T> {
 
     @Nullable
     protected static Boolean parseBoolean(@Nullable String bool) {
-        if ("Ja".equals(bool)) {
+        if ("Ja".equalsIgnoreCase(bool)) {
             return true;
-        } else if ("Nein".equals(bool)) {
+        } else if ("Nein".equalsIgnoreCase(bool)) {
             return false;
         } else {
             Log.w(LOG_TAG, "Could not parse boolean \"" + bool + "\".");
             return null;
         }
-    }
-
-    @Nullable
-    protected static Boolean parseBoolean(@NonNull Element element) {
-        return parseBoolean(element.text());
-    }
-
-    @Nullable
-    protected static Integer parseInteger(String number) {
-        try {
-            return Integer.parseInt(number);
-        } catch (NumberFormatException e) {
-            Log.w(LOG_TAG, "Could not parse integer \"" + number + "\".", e);
-            return null;
-        }
-    }
-
-    @Nullable
-    protected static Integer parseInteger(@NonNull Element element) {
-        return parseInteger(element.text());
-    }
-
-    @Nullable
-    protected static Double parseDouble(String number) {
-        try {
-            return Double.parseDouble(number);
-        } catch (NumberFormatException e) {
-            Log.w(LOG_TAG, "Could not parse double \"" + number + "\".", e);
-            return null;
-        }
-    }
-
-    @Nullable
-    protected static Double parseDouble(@NonNull Element element) {
-        return parseDouble(element.text());
     }
 }

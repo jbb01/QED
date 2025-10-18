@@ -24,7 +24,7 @@ public final class AlbumListParser extends HtmlParser<List<Album>> {
 
     @NonNull
     @Override
-    protected List<Album> parse(@NonNull List<Album> list, Document document) {
+    protected List<Album> parse(@NonNull List<Album> list, @NonNull Document document) {
         list.clear();
 
         document.select("main .menu li a")

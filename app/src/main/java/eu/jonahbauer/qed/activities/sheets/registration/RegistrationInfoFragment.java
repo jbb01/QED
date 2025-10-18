@@ -5,15 +5,17 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.navigation.NavDeepLinkBuilder;
 import androidx.navigation.Navigation;
-
 import com.google.android.material.snackbar.Snackbar;
 import eu.jonahbauer.qed.R;
 import eu.jonahbauer.qed.activities.MainActivity;
+import eu.jonahbauer.qed.activities.main.EventFragmentArgs;
+import eu.jonahbauer.qed.activities.main.PersonFragmentArgs;
+import eu.jonahbauer.qed.activities.main.RegistrationFragmentArgs;
+import eu.jonahbauer.qed.activities.main.RegistrationFragmentDirections;
 import eu.jonahbauer.qed.activities.sheets.InfoFragment;
 import eu.jonahbauer.qed.databinding.FragmentInfoRegistrationBinding;
 import eu.jonahbauer.qed.model.Event;
@@ -21,10 +23,6 @@ import eu.jonahbauer.qed.model.Person;
 import eu.jonahbauer.qed.model.Registration;
 import eu.jonahbauer.qed.model.viewmodel.RegistrationViewModel;
 import eu.jonahbauer.qed.network.util.NetworkConstants;
-import eu.jonahbauer.qed.activities.main.EventFragmentArgs;
-import eu.jonahbauer.qed.activities.main.PersonFragmentArgs;
-import eu.jonahbauer.qed.activities.main.RegistrationFragmentArgs;
-import eu.jonahbauer.qed.activities.main.RegistrationFragmentDirections;
 
 import java.util.Locale;
 import java.util.Objects;

@@ -18,11 +18,11 @@ import eu.jonahbauer.qed.activities.main.PersonFragmentDirections;
 import eu.jonahbauer.qed.activities.main.RegistrationFragmentArgs;
 import eu.jonahbauer.qed.activities.sheets.InfoFragment;
 import eu.jonahbauer.qed.databinding.FragmentInfoPersonBinding;
-import eu.jonahbauer.qed.ui.views.ListItem;
 import eu.jonahbauer.qed.model.Person;
 import eu.jonahbauer.qed.model.Registration;
 import eu.jonahbauer.qed.model.viewmodel.PersonViewModel;
 import eu.jonahbauer.qed.network.util.NetworkConstants;
+import eu.jonahbauer.qed.ui.views.ListItem;
 import eu.jonahbauer.qed.util.Actions;
 import eu.jonahbauer.qed.util.Preferences;
 import eu.jonahbauer.qed.util.TextUtils;
@@ -223,20 +223,24 @@ public class PersonInfoFragment extends InfoFragment {
     public static void bindPayments(ViewGroup parent, Collection<Person.Payment> payments) {
         bindList(parent, payments, (payment, item) -> {
             var context = item.getContext();
-            var type = payment.getType();
+            var purpose = payment.getPurpose();
             item.setIcon(R.drawable.ic_person_payment);
             item.setTitle(TextUtils.formatRange(context, TimeUtils::format, payment.getStart(), payment.getEnd()));
-            item.setSubtitle(type != null ? type.getStringRes() : R.string.empty);
+            item.setSubtitle(purpose != null ? purpose.getStringRes() : 0);
         });
     }
 
     @BindingAdapter("person_registrations")
     public static void bindRegistrations(ViewGroup parent, Collection<Registration> registrations) {
         bindList(parent, registrations, (registration, item) -> {
-            var status = registration.getStatus();
-            item.setIcon(R.drawable.ic_person_event);
+            var status = Objects.requireNonNullElse(registration.getStatus(), Registration.Status.UNKNOWN);
+            item.setIcon(status.getPersonDrawableRes());
             item.setTitle(registration.getEventTitle());
-            item.setSubtitle(status != null ? status.getStringRes() : R.string.empty);
+            var subtitle = item.getResources().getString(status.getStringRes());
+            if (registration.isOrganizer()) {
+                subtitle += " (" + item.getResources().getString(R.string.registration_orga) + ")";
+            }
+            item.setSubtitle(subtitle);
             item.setOnClickListener(v -> showRegistration(v, registration));
         });
     }

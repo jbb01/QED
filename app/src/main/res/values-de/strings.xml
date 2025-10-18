@@ -330,10 +330,17 @@
 
     <!-- Registration -->
     <string name="registration_orga">Orga</string>
-    <string name="registration_status_confirmed">bestätigt</string>
-    <string name="registration_status_pending">angemeldet</string>
+    <string name="registration_status_unknown">angemeldet</string>
     <string name="registration_status_rejected">abgelehnt</string>
     <string name="registration_status_cancelled">abgemeldet</string>
+    <string name="registration_payment_type_transfer">Überweisung</string>
+    <string name="registration_payment_type_expense">Auslage</string>
+    <string name="registration_payment_category_shopping">Einkauf</string>
+    <string name="registration_payment_category_talk_gift">Vortragsgeschenk</string>
+    <string name="registration_payment_category_deposit">Pfand</string>
+    <string name="registration_payment_category_organizer_gift">Orgageschenk</string>
+    <string name="registration_payment_category_transportation">Transport</string>
+    <string name="registration_payment_category_talk_materials">Vortragsmaterial</string>
 
     <!-- Gallery -->
     <string name="offline_mode_not_available">Im Offline-Modus nicht verfügbar.</string>

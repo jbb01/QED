@@ -397,10 +397,17 @@
 
     <!-- Registration -->
     <string name="registration_orga">Organizer</string>
-    <string name="registration_status_confirmed">confirmed</string>
-    <string name="registration_status_pending">pending</string>
+    <string name="registration_status_unknown">signed up</string>
     <string name="registration_status_rejected">rejected</string>
     <string name="registration_status_cancelled">cancelled</string>
+    <string name="registration_payment_type_transfer">Transfer</string>
+    <string name="registration_payment_type_expense">Expense</string>
+    <string name="registration_payment_category_shopping">Shopping</string>
+    <string name="registration_payment_category_talk_gift">Talk Gift</string>
+    <string name="registration_payment_category_deposit">Deposit</string>
+    <string name="registration_payment_category_organizer_gift">Organizer Gift</string>
+    <string name="registration_payment_category_transportation">Transportation</string>
+    <string name="registration_payment_category_talk_materials">Talk Materials</string>
 
     <!-- Gallery -->
     <string name="offline_mode_not_available">Not available in offline mode.</string>

@@ -3,10 +3,16 @@ package eu.jonahbauer.qed.activities.sheets.event;
 import android.app.PendingIntent;
 import android.os.Bundle;
 import android.util.TypedValue;
-import android.view.*;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
-
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StyleRes;
+import androidx.databinding.BindingAdapter;
 import androidx.navigation.NavDeepLinkBuilder;
+import androidx.navigation.Navigation;
 import eu.jonahbauer.qed.R;
 import eu.jonahbauer.qed.activities.MainActivity;
 import eu.jonahbauer.qed.activities.main.EventFragmentArgs;
@@ -14,22 +20,16 @@ import eu.jonahbauer.qed.activities.main.EventFragmentDirections;
 import eu.jonahbauer.qed.activities.main.RegistrationFragmentArgs;
 import eu.jonahbauer.qed.activities.sheets.InfoFragment;
 import eu.jonahbauer.qed.databinding.FragmentInfoEventBinding;
-import eu.jonahbauer.qed.ui.views.ListItem;
 import eu.jonahbauer.qed.model.Event;
 import eu.jonahbauer.qed.model.Registration;
 import eu.jonahbauer.qed.model.viewmodel.EventViewModel;
 import eu.jonahbauer.qed.network.util.NetworkConstants;
+import eu.jonahbauer.qed.ui.views.ListItem;
 
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.StyleRes;
-import androidx.databinding.BindingAdapter;
-import androidx.navigation.Navigation;
 
 public class EventInfoFragment extends InfoFragment {
     private static final String SAVED_EXPANDED = "expanded";
@@ -134,8 +134,8 @@ public class EventInfoFragment extends InfoFragment {
     public static void bindParticipants(ViewGroup parent, Collection<Registration> participants) {
         var nonOrganizers = participants.stream().filter(r -> !r.isOrganizer()).collect(Collectors.toList());
         bindList(parent, nonOrganizers, (registration, item) -> {
-            var status = Objects.requireNonNullElse(registration.getStatus(), Registration.Status.PENDING);
-            item.setIcon(status.getDrawableRes());
+            var status = Objects.requireNonNullElse(registration.getStatus(), Registration.Status.UNKNOWN);
+            item.setIcon(status.getEventDrawableRes());
             item.setTitle(registration.getPersonName());
             item.setSubtitle(status.getStringRes());
             item.setOnClickListener(v -> showRegistration(parent, registration));

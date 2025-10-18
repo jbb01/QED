@@ -41,13 +41,13 @@ public class Debug {
         Registration registration;
 
         registration = new Registration(Registration.NO_ID);
-        registration.setStatus(Status.PENDING);
+        registration.setStatus(Status.UNKNOWN);
         registration.setEventTitle("Akademie 2021");
         registration.setPerson(person);
         person.getEvents().add(registration);
 
         registration = new Registration(Registration.NO_ID);
-        registration.setStatus(Status.CONFIRMED);
+        registration.setStatus(Status.UNKNOWN);
         registration.setEventTitle("Musterstadt 2020");
         registration.setPerson(person);
         person.getEvents().add(registration);
@@ -59,7 +59,7 @@ public class Debug {
         person.getEvents().add(registration);
 
         registration = new Registration(Registration.NO_ID);
-        registration.setStatus(Status.CONFIRMED);
+        registration.setStatus(Status.UNKNOWN);
         registration.setOrganizer(true);
         registration.setEventTitle("Testseminar");
         registration.setPerson(person);
@@ -92,14 +92,14 @@ public class Debug {
 
         Registration registration;
         registration = new Registration(Registration.NO_ID);
-        registration.setStatus(Status.CONFIRMED);
+        registration.setStatus(Status.UNKNOWN);
         registration.setOrganizer(true);
         registration.setPersonName("Max Mustermann");
         registration.setEvent(event);
         event.getParticipants().add(registration);
 
         registration = new Registration(Registration.NO_ID);
-        registration.setStatus(Status.PENDING);
+        registration.setStatus(Status.UNKNOWN);
         registration.setOrganizer(true);
         registration.setPersonName("Erika Musterfrau");
         registration.setEvent(event);
@@ -153,7 +153,7 @@ public class Debug {
 
     public static Registration dummyRegistration() {
         var registration = new Registration(Registration.NO_ID);
-        registration.setStatus(Status.PENDING);
+        registration.setStatus(Status.UNKNOWN);
         registration.setOrganizer(true);
 
         registration.setEventId(Event.NO_ID);
@@ -174,11 +174,15 @@ public class Debug {
         registration.setRailcard("50");
         registration.setOvernightStays(3);
 
-        registration.setPaymentAmount(100d);
         registration.setPaymentDone(true);
-        registration.setPaymentTime(new ParsedLocalDate("30.01.2020", LocalDate.of(2020, 1, 30)));
         registration.setMemberAbatement(true);
         registration.setOtherAbatement(null);
+
+        var payment = new Registration.Payment();
+        payment.setAmount(100d);
+        payment.setType(Registration.Payment.Type.TRANSFER);
+        payment.setDate(new ParsedLocalDate("30.01.2020", LocalDate.of(2020, 1, 30)));
+        registration.getPayments().add(payment);
 
         registration.setLoaded(Instant.now());
 

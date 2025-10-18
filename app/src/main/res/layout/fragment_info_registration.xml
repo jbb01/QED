@@ -7,6 +7,7 @@
         <import type="eu.jonahbauer.qed.util.Actions"/>
         <import type="eu.jonahbauer.qed.util.TimeUtils"/>
         <import type="eu.jonahbauer.qed.util.TextUtils"/>
+        <import type="eu.jonahbauer.qed.model.Registration.Status"/>
 
         <variable name="registration" type="eu.jonahbauer.qed.model.Registration" />
     </data>
@@ -48,12 +49,12 @@
             <eu.jonahbauer.qed.ui.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{registration.status != null}"
-                app:icon="@{registration.status.drawableResVariant}"
+                android:visibility="@{registration.status != null &amp;&amp; registration.status != Status.UNKNOWN}"
+                app:icon="@{registration.status.registrationDrawableRes}"
                 app:title="@{registration.status.stringRes}"
                 app:subtitle="@string/registration_subtitle_status"
-                tools:icon="@drawable/ic_registration_status_pending"
-                tools:title="@string/registration_status_pending"/>
+                tools:icon="@drawable/ic_registration_status_unknown"
+                tools:title="@string/registration_status_unknown"/>
 
         </LinearLayout>
 
@@ -219,30 +220,12 @@
             <eu.jonahbauer.qed.ui.views.ListItem
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{registration.paymentAmount != null}"
-                app:icon="@drawable/ic_registration_payment"
-                app:title="@{@string/registration_title_payment(registration.paymentAmount)}"
-                app:subtitle="@string/registration_subtitle_payment"
-                tools:title="100.00 €"/>
-
-            <eu.jonahbauer.qed.ui.views.ListItem
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:visibility="@{registration.paymentDone != null}"
                 app:icon="@{registration.paymentDone ? @drawable/ic_registration_payment_done : @drawable/ic_registration_payment_not_done}"
                 app:title="@{registration.paymentDone ? @string/registration_title_payment_done_true : @string/registration_title_payment_done_false}"
                 app:subtitle="@string/registration_subtitle_payment_done"
                 tools:icon="@drawable/ic_registration_payment_done"
                 tools:title="@string/registration_title_payment_done_true"/>
-
-            <eu.jonahbauer.qed.ui.views.ListItem
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="@{registration.paymentTime != null}"
-                app:icon="@drawable/ic_registration_payment_time"
-                app:title="@{TimeUtils.format(registration.paymentTime)}"
-                app:subtitle="@string/registration_subtitle_payment_time"
-                tools:title="01.01.2000"/>
 
             <eu.jonahbauer.qed.ui.views.ListItem
                 android:layout_width="match_parent"
@@ -260,6 +243,14 @@
                 app:icon="@drawable/ic_registration_payment_abatement"
                 app:title="@{registration.otherAbatement}"
                 app:subtitle="@string/registration_subtitle_payment_other_abatement"/>
+
+<!--            <LinearLayout-->
+<!--                android:visibility="gone"-->
+<!--                android:id="@+id/payment_list"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:orientation="vertical"-->
+<!--                app:registration_payments="@{registration.payments}"/>-->
         </LinearLayout>
 
         <View style="?dividerStyle"

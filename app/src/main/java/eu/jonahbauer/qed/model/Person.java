@@ -215,7 +215,7 @@ public class Person implements Parcelable, HasId {
         private ParsedLocalDate start;
         private ParsedLocalDate end;
         private String comment;
-        private Type type;
+        private Purpose purpose;
         private Double amount;
 
         @Override
@@ -228,7 +228,7 @@ public class Person implements Parcelable, HasId {
             dest.writeTypedObject(start, flags);
             dest.writeTypedObject(end, flags);
             dest.writeString(comment);
-            dest.writeTypedObject(type, flags);
+            dest.writeTypedObject(purpose, flags);
             dest.writeValue(amount);
         }
 
@@ -238,14 +238,14 @@ public class Person implements Parcelable, HasId {
             payment.setStart(source.readTypedObject(ParsedLocalDate.CREATOR));
             payment.setEnd(source.readTypedObject(ParsedLocalDate.CREATOR));
             payment.setComment(source.readString());
-            payment.setType(source.readTypedObject(Type.CREATOR));
+            payment.setPurpose(source.readTypedObject(Purpose.CREATOR));
             payment.setAmount((Double) source.readValue(null));
             return payment;
         });
 
         @Getter
         @RequiredArgsConstructor
-        public enum Type implements ParcelableEnum {
+        public enum Purpose implements ParcelableEnum {
             REGULAR_MEMBER(R.string.person_payment_regular_member),
             SPONSOR_MEMBER(R.string.person_payment_sponsor_member),
             DONATION(R.string.person_payment_donation),
@@ -253,7 +253,7 @@ public class Person implements Parcelable, HasId {
             FREE_MEMBER(R.string.person_payment_free_member),
             SPONSOR_AND_MEMBER(R.string.person_payment_sponsor_and_member);
 
-            public static final Parcelable.Creator<Type> CREATOR = new ParcelableEnum.Creator<>(Type.values(), Type[]::new);
+            public static final Parcelable.Creator<Purpose> CREATOR = new ParcelableEnum.Creator<>(Purpose.values(), Purpose[]::new);
 
             private final @StringRes int stringRes;
         }

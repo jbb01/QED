@@ -47,7 +47,7 @@ public final class AlbumParser extends HtmlParser<Album> {
 
     @NonNull
     @Override
-    protected Album parse(@NonNull Album album, Document document) {
+    protected Album parse(@NonNull Album album, @NonNull Document document) {
         checkError(document);
 
         // Album name

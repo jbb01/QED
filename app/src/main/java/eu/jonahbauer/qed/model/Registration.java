@@ -5,12 +5,15 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 
 import eu.jonahbauer.qed.R;
 
 import java.time.Instant;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import eu.jonahbauer.qed.model.contact.ContactDetailType;
 import eu.jonahbauer.qed.model.parcel.ParcelExtensions;
@@ -64,11 +67,10 @@ public class Registration implements Parcelable, HasId {
     private String notes;
 
     // Payment
-    private Double paymentAmount;
     private Boolean paymentDone;
-    private ParsedLocalDate paymentTime;
     private Boolean memberAbatement;
     private String otherAbatement;
+    private final Set<Payment> payments = new LinkedHashSet<>();
 
     private Instant loaded;
 
@@ -140,8 +142,10 @@ public class Registration implements Parcelable, HasId {
     }
 
     public boolean hasPaymentInformation() {
-        return paymentAmount != null || paymentDone != null || paymentTime != null
-                || memberAbatement != null || !TextUtils.isNullOrBlank(otherAbatement);
+        return paymentDone != null
+                || memberAbatement != null
+                || !TextUtils.isNullOrBlank(otherAbatement)
+                || !payments.isEmpty();
     }
 
     @Override
@@ -177,11 +181,10 @@ public class Registration implements Parcelable, HasId {
         dest.writeString(talks);
         dest.writeString(notes);
 
-        dest.writeValue(paymentAmount);
         dest.writeValue(paymentDone);
-        dest.writeTypedObject(paymentTime, flags);
         dest.writeValue(memberAbatement);
         dest.writeString(otherAbatement);
+        ParcelExtensions.writeTypedCollection(dest, payments);
 
         ParcelExtensions.writeInstant(dest, loaded);
     }
@@ -215,11 +218,10 @@ public class Registration implements Parcelable, HasId {
         registration.talks = source.readString();
         registration.notes = source.readString();
 
-        registration.paymentAmount = (Double) source.readValue(null);
         registration.paymentDone = (Boolean) source.readValue(null);
-        registration.paymentTime = source.readTypedObject(ParsedLocalDate.CREATOR);
         registration.memberAbatement = (Boolean) source.readValue(null);
         registration.otherAbatement = source.readString();
+        ParcelExtensions.readTypedCollection(source, registration.payments, Payment.CREATOR);
 
         registration.loaded = ParcelExtensions.readInstant(source);
 
@@ -229,16 +231,89 @@ public class Registration implements Parcelable, HasId {
     @Getter
     @RequiredArgsConstructor
     public enum Status implements ParcelableEnum {
-        PENDING(R.string.registration_status_pending, R.drawable.ic_event_registration_pending, R.drawable.ic_registration_status_pending),
-        CONFIRMED(R.string.registration_status_confirmed, R.drawable.ic_event_registration_confirmed, R.drawable.ic_registration_status_confirmed),
-        REJECTED(R.string.registration_status_rejected, R.drawable.ic_event_registration_rejected, R.drawable.ic_registration_status_rejected),
-        CANCELLED(R.string.registration_status_cancelled, R.drawable.ic_event_registration_cancelled, R.drawable.ic_registration_status_cancelled)
+        UNKNOWN(
+                R.string.registration_status_unknown,
+                R.drawable.ic_event_registration_unknown,
+                R.drawable.ic_person_registration_unknown,
+                R.drawable.ic_registration_status_unknown
+        ),
+        REJECTED(
+                R.string.registration_status_rejected,
+                R.drawable.ic_event_registration_rejected,
+                R.drawable.ic_person_registration_rejected,
+                R.drawable.ic_registration_status_rejected
+        ),
+        CANCELLED(
+                R.string.registration_status_cancelled,
+                R.drawable.ic_event_registration_cancelled,
+                R.drawable.ic_person_registration_cancelled,
+                R.drawable.ic_registration_status_cancelled
+        )
         ;
         public static final Parcelable.Creator<Status> CREATOR = new ParcelableEnum.Creator<>(Status.values(), Status[]::new);
 
         private final @StringRes   int stringRes;
-        private final @DrawableRes int drawableRes;
-        private final @DrawableRes int drawableResVariant;
+        private final @DrawableRes int eventDrawableRes;
+        private final @DrawableRes int personDrawableRes;
+        private final @DrawableRes int registrationDrawableRes;
+    }
+
+    @Data
+    public static class Payment implements Parcelable {
+        private ParsedLocalDate date;
+        private Double amount;
+
+        private Type type;
+        private Category category;
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(@NonNull Parcel dest, int flags) {
+            dest.writeTypedObject(date, flags);
+            dest.writeTypedObject(type, flags);
+            dest.writeValue(amount);
+        }
+
+        @SuppressLint("ParcelClassLoader")
+        public static final Creator<Payment> CREATOR = new LambdaCreator<>(Payment[]::new, source -> {
+            var payment = new Payment();
+            payment.setDate(source.readTypedObject(ParsedLocalDate.CREATOR));
+            payment.setType(source.readTypedObject(Type.CREATOR));
+            payment.setAmount((Double) source.readValue(null));
+            return payment;
+        });
+
+        @Getter
+        @RequiredArgsConstructor
+        public enum Type implements ParcelableEnum {
+            TRANSFER(R.string.registration_payment_type_transfer),
+            EXPENSE(R.string.registration_payment_type_expense),
+            ;
+
+            public static final Parcelable.Creator<Type> CREATOR = new ParcelableEnum.Creator<>(Type.values(), Type[]::new);
+
+            private final @StringRes int stringRes;
+        }
+
+        @Getter
+        @RequiredArgsConstructor
+        public enum Category implements ParcelableEnum {
+            SHOPPING(R.string.registration_payment_category_shopping),
+            TALK_GIFT(R.string.registration_payment_category_talk_gift),
+            DEPOSIT(R.string.registration_payment_category_deposit),
+            ORGANIZER_GIFT(R.string.registration_payment_category_organizer_gift),
+            TRANSPORTATION(R.string.registration_payment_category_transportation),
+            TALK_MATERIALS(R.string.registration_payment_category_talk_materials),
+            ;
+
+            public static final Parcelable.Creator<Category> CREATOR = new ParcelableEnum.Creator<>(Category.values(), Category[]::new);
+
+            private final @StringRes int stringRes;
+        }
     }
 
     /**
